@@ -1,6 +1,8 @@
 #ifndef _DIGITAMA_TIME_H
 #define _DIGITAMA_TIME_H
 
+#include <string>
+
 namespace WarGrey::STEM {
     long long current_seconds();
     long long current_milliseconds();

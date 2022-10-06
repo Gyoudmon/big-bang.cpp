@@ -80,7 +80,7 @@ static void game_fonts_initialize(int fontsize = 16) {
     game_serif_font = game_create_font("times.ttf", fontsize); // Times New Roman
     game_monospace_font = game_create_font("cour.ttf", fontsize); // Courier New
     game_math_font = game_create_font("BOD_R.TTF", fontsize); // Bodoni MT
-    game_unicode_font = game_create_font("msyh.ttf", fontsize);
+    game_unicode_font = game_create_font("msyh.ttc", fontsize);
 #else /* the following fonts have not been tested */
     game_sans_serif_font = game_create_font("Nimbus Sans.ttc", fontsize);
     game_serif_font = game_create_font("DejaVu Serif.ttc", fontsize);
@@ -683,13 +683,13 @@ bool WarGrey::STEM::Universe::snapshot(const char* pname) {
             if (IMG_SavePNG(snapshot, pname) == 0) {
                 okay = true;
             } else {
-                this->send_message(0xFF0000, "fail to save snapshot: %s\n", SDL_GetError());
+                this->send_message(0xFF0000, "failed to save snapshot: %s", SDL_GetError());
             }
         } else {
-            this->send_message(0xFF0000, "fail to take snapshot: %s\n", SDL_GetError());
+            this->send_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
         }
     } else {
-         this->send_message(0xFF0000, "fail to take snapshot: %s\n", SDL_GetError());
+         this->send_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
     }
 
     if (snapshot != NULL) {
@@ -714,7 +714,7 @@ void WarGrey::STEM::Universe::take_snapshot() {
     path snapshot_png = (this->snapshot_rootdir.empty() ? current_path() : path(this->snapshot_rootdir))
         / path(game_create_string("%s-%s.%lld.png", basename, make_timestamp_utc(s, true).c_str(), ms % 1000));
 
-    if (this->snapshot(snapshot_png.c_str())) {
+    if (this->snapshot(snapshot_png.string().c_str())) { // stupid windows as it requires `string()`
         this->send_message("A snapshot has been saved as '%s'.", snapshot_png.c_str());
     }
 }

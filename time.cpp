@@ -8,16 +8,24 @@ using namespace WarGrey::STEM;
 using namespace std::chrono;
 
 /**************************************************************************************************/
-static inline void ntime(char* timestamp, const time_t s, const char* tfmt, bool locale = false) {
-    struct tm* ts;
+static inline void ntime(char* timestamp, const time_t utc_s, const char* tfmt, bool locale = false) {
+    struct tm now_s;
 
+#if defined(__windows__)
+	if (locale) {
+		localtime_s(&now_s, &utc_s);
+	} else {
+		gmtime_s(&now_s, &utc_s);
+	}
+#else
     if (locale) {
-        ts = localtime(&s);
+        localtime_r(&utc_s, &now_s);
     } else {
-        ts = gmtime(&s);
+        gmtime_r(&utc_s, &now_s);
     }
+#endif
 
-    strftime(timestamp, 31, tfmt, ts);
+    strftime(timestamp, 31, tfmt, &now_s);
 }
 
 /**************************************************************************************************/
