@@ -462,7 +462,7 @@ void WarGrey::STEM::Universe::on_editing(const char* text, int pos, int span) {
 }
 
 void WarGrey::STEM::Universe::do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height) {
-    game_world_reset(this->renderer, this->_fgc, this->_bgc);
+    game_world_reset(renderer, this->_fgc, this->_bgc);
     
     if (this->in_editing) {
         this->display_usr_input_and_caret(renderer, true);
@@ -486,8 +486,9 @@ bool WarGrey::STEM::Universe::display_usr_message() {
 
         updated = true;
     } else {
-        if (!this->message.empty()) {
+        if (this->needs_termio_if_no_echo && !this->message.empty()) {
             std::cout << this->message << std::endl;
+            this->needs_termio_if_no_echo = false;
         }
     }
 
@@ -582,6 +583,7 @@ void WarGrey::STEM::Universe::send_message(uint32_t fgc, const char* fmt, ...) {
 }
 
 void WarGrey::STEM::Universe::send_message(uint32_t fgc, const std::string& msg) {
+    this->needs_termio_if_no_echo = true;
     this->message = msg;
     this->_mfgc = fgc;
 

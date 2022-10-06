@@ -174,6 +174,7 @@ namespace WarGrey::STEM {
 
             std::string message;            // 回显区消息
             uint32_t _mfgc;                 // 消息颜色
+            bool needs_termio_if_no_echo;   // 消息是否需要输出
 
         private:
             int update_sequence_depth;      // 延迟绘制深度
