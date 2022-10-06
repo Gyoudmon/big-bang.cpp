@@ -2,6 +2,7 @@
 #include "vsntext.hpp"
 #include "colorspace.hpp"
 #include "text.hpp"
+#include "time.hpp"
 
 #include <iostream>
 #include <unordered_map>
@@ -47,7 +48,7 @@ static std::string system_fontdirs[] = {
     "/usr/share/fonts"
 };
 
-static void game_push_fonts_of_directory(std::filesystem::path& root) {
+static void game_push_fonts_of_directory(path& root) {
     for (auto entry : directory_iterator(root)) {
         path self = entry.path();
 
@@ -262,8 +263,8 @@ const std::string* WarGrey::STEM::game_font_list(int* n, int fontsize) {
 WarGrey::STEM::Universe::Universe() : Universe("Big Bang!") {}
 
 WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint32_t bgc)
-    : _fps(fps), _fgc(fgc), _bgc(bgc), in_editing(false), current_usrin(NULL), echo_font(NULL)
-      ,update_sequence_depth(0) ,update_is_needed(false) {
+    : _fps(fps), _fgc(fgc), _bgc(bgc), _mfgc(fgc), in_editing(false), current_usrin(NULL), echo_font(NULL)
+      , update_sequence_depth(0), update_is_needed(false) {
     
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
@@ -484,6 +485,10 @@ bool WarGrey::STEM::Universe::display_usr_message() {
         }
 
         updated = true;
+    } else {
+        if (!this->message.empty()) {
+            std::cout << this->message << std::endl;
+        }
     }
 
     return updated;
@@ -568,7 +573,7 @@ void WarGrey::STEM::Universe::set_input_echo_area(int x, int y, int width, int h
 
 void WarGrey::STEM::Universe::send_message(const char* fmt, ...) {
     VSNPRINT(text, fmt);
-    this->send_message(this->_fgc, text);
+    this->send_message(this->_mfgc, text);
 }
 
 void WarGrey::STEM::Universe::send_message(uint32_t fgc, const char* fmt, ...) {
@@ -654,13 +659,15 @@ void WarGrey::STEM::Universe::popback_input_text() {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Universe::snapshot(std::string& path) {
-    this->snapshot(path.c_str());
+bool WarGrey::STEM::Universe::snapshot(const std::string& path) {
+    return this->snapshot(path.c_str());
 }
 
-void WarGrey::STEM::Universe::snapshot(const char* pname) {
+bool WarGrey::STEM::Universe::snapshot(const char* pname) {
     SDL_Renderer* renderer = NULL;
     SDL_Surface* snapshot = NULL;
+    uint32_t saved_fgc = this->_mfgc;
+    bool okay = false;
 
     snapshot = SDL_CreateRGBSurface(0, this->window_width, this->window_height, 32, 0, 0, 0, 0);
 
@@ -671,14 +678,16 @@ void WarGrey::STEM::Universe::snapshot(const char* pname) {
             this->do_redraw(renderer, 0, 0, this->window_width, this->window_height);
 
             create_directories(path(pname).parent_path());
-            if (IMG_SavePNG(snapshot, pname) != 0) {
-                printf("fail to save snapshot: %s\n", SDL_GetError());
+            if (IMG_SavePNG(snapshot, pname) == 0) {
+                okay = true;
+            } else {
+                this->send_message(0xFF0000, "fail to save snapshot: %s\n", SDL_GetError());
             }
         } else {
-            printf("fail to take snapshot: %s\n", SDL_GetError());
+            this->send_message(0xFF0000, "fail to take snapshot: %s\n", SDL_GetError());
         }
     } else {
-         printf("fail to take snapshot: %s\n", SDL_GetError());
+         this->send_message(0xFF0000, "fail to take snapshot: %s\n", SDL_GetError());
     }
 
     if (snapshot != NULL) {
@@ -688,6 +697,32 @@ void WarGrey::STEM::Universe::snapshot(const char* pname) {
     if (renderer != NULL) {
         SDL_DestroyRenderer(renderer);
     }
+
+    if (!okay) {
+        this->_mfgc = saved_fgc;
+    }
+
+    return okay;
+}
+
+void WarGrey::STEM::Universe::take_snapshot() {
+    const char* basename = SDL_GetWindowTitle(this->window);
+    long long ms = current_milliseconds();
+    long long s = ms / 1000;
+    path snapshot_png = (this->snapshot_rootdir.empty() ? current_path() : path(this->snapshot_rootdir))
+        / path(game_create_string("%s-%s.%lld.png", basename, make_timestamp_utc(s, true).c_str(), ms % 1000));
+
+    if (this->snapshot(snapshot_png.c_str())) {
+        this->send_message("A snapshot has been saved as '%s'.", snapshot_png.c_str());
+    }
+}
+
+void WarGrey::STEM::Universe::set_snapshot_folder(const char* dir) {
+    this->set_snapshot_folder(std::string(dir));
+}
+
+void WarGrey::STEM::Universe::set_snapshot_folder(const std::string& dir) {
+    this->snapshot_rootdir = path(dir).make_preferred().string();
 }
 
 /*************************************************************************************************/

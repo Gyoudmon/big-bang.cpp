@@ -73,9 +73,10 @@ namespace WarGrey::STEM {
             virtual bool can_exit() { return false; }
 
         public: // 常规操作
-            void set_snapshot_folder(const char* path) { this->snapshot_dirpath = path; }
-            void snapshot(std::string& path);
-            void snapshot(const char* path);
+            void set_snapshot_folder(const char* path);
+            void set_snapshot_folder(const std::string& path);
+            bool snapshot(const std::string& path);
+            bool snapshot(const char* path);
             
         public: // 窗体 setter 和 getter
             void set_blend_mode(SDL_BlendMode bmode);
@@ -179,7 +180,7 @@ namespace WarGrey::STEM {
             bool update_is_needed;          // 有绘制事件被延迟
 
         private:
-            std::string snapshot_dirpath;   // 屏幕截图位置
+            std::string snapshot_rootdir;   // 屏幕截图位置
     };
 
     class Pasteboard : public WarGrey::STEM::Universe {
