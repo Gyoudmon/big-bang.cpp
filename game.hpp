@@ -182,9 +182,9 @@ namespace WarGrey::STEM {
             std::string snapshot_dirpath;   // 屏幕截图位置
     };
 
-    class DrawingBoard : public WarGrey::STEM::Universe {
+    class Pasteboard : public WarGrey::STEM::Universe {
         public:
-            DrawingBoard(const char* title, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU)
+            Pasteboard(const char* title, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU)
                 : Universe(title, 0, fgc, bgc) {}
     };
 }

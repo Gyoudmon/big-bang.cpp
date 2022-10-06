@@ -310,6 +310,7 @@ void WarGrey::STEM::Universe::big_bang() {
     SDL_SetRenderTarget(this->renderer, this->texture);
     this->begin_update_sequence();
     this->reflow(this->window_width, this->window_height);
+    this->notify_updated();
     this->end_update_sequence();
 
     /* 游戏主循环 */
@@ -437,6 +438,7 @@ void WarGrey::STEM::Universe::on_resize(int width, int height) {
     this->begin_update_sequence();
     game_world_reset(this->renderer, this->texture, this->_fgc, this->_bgc);
     this->reflow(width, height);
+    this->notify_updated();
     this->end_update_sequence();
 }
 
