@@ -6,10 +6,11 @@
 #include <SDL2/SDL_image.h>
 
 #include <cstdint>
-#include <string>
 
 #include "named_colors.hpp"
 #include "geometry.hpp"
+#include "display.hpp"
+#include "virtualization/screen.hpp"
 
 /**
  * 为兼容 Windows 而变得丑陋
@@ -39,7 +40,7 @@ namespace WarGrey::STEM {
     const std::string* game_font_list(int* n, int fontsize = 16);
     
     /**********************************************************************************************/
-    class Universe {
+    class Universe : public WarGrey::STEM::IDisplay {
         public:
             /* 构造函数，创建新对象时自动调用，默认创建一个黑底白字的窗口 */
             Universe();
@@ -75,8 +76,7 @@ namespace WarGrey::STEM {
         public: // 常规操作
             void set_snapshot_folder(const char* path);
             void set_snapshot_folder(const std::string& path);
-            bool snapshot(const std::string& path);
-            bool snapshot(const char* path);
+            SDL_Surface* snapshot();
             
         public: // 窗体 setter 和 getter
             void set_blend_mode(SDL_BlendMode bmode);
@@ -182,6 +182,9 @@ namespace WarGrey::STEM {
 
         private:
             std::string snapshot_rootdir;   // 屏幕截图位置
+
+        private:
+            WarGrey::STEM::IScreen* screen;
     };
 
     class Pasteboard : public WarGrey::STEM::Universe {

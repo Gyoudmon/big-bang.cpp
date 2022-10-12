@@ -4,6 +4,8 @@
 #include "text.hpp"
 #include "time.hpp"
 
+#include "virtualization/screen/onionskip.hpp"
+
 #include <iostream>
 #include <unordered_map>
 #include <filesystem>
@@ -279,6 +281,8 @@ WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint
     game_world_reset(this->renderer, this->texture, this->_fgc, this->_bgc);
 
     this->set_blend_mode(SDL_BLENDMODE_NONE);
+
+    this->screen = new OnionSkip(this);
 }
 
 WarGrey::STEM::Universe::~Universe() {
@@ -289,6 +293,8 @@ WarGrey::STEM::Universe::~Universe() {
     SDL_DestroyTexture(this->texture);
     SDL_DestroyRenderer(this->renderer);
     SDL_DestroyWindow(this->window);
+
+    delete this->screen;
 }
 
 void WarGrey::STEM::Universe::big_bang() {
@@ -661,15 +667,15 @@ void WarGrey::STEM::Universe::popback_input_text() {
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::Universe::snapshot(const std::string& path) {
-    return this->snapshot(path.c_str());
-}
-
-bool WarGrey::STEM::Universe::snapshot(const char* pname) {
+SDL_Surface* WarGrey::STEM::Universe::snapshot() {
+    static SDL_Surface* snapshot = NULL;
     SDL_Renderer* renderer = NULL;
-    SDL_Surface* snapshot = NULL;
     uint32_t saved_fgc = this->_mfgc;
     bool okay = false;
+
+    if (snapshot != NULL) {
+        SDL_FreeSurface(snapshot);
+    }
 
     snapshot = SDL_CreateRGBSurface(0, this->window_width, this->window_height, 32, 0, 0, 0, 0);
 
@@ -678,22 +684,11 @@ bool WarGrey::STEM::Universe::snapshot(const char* pname) {
         
         if (renderer != NULL) {
             this->do_redraw(renderer, 0, 0, this->window_width, this->window_height);
-
-            create_directories(path(pname).parent_path());
-            if (IMG_SavePNG(snapshot, pname) == 0) {
-                okay = true;
-            } else {
-                this->send_message(0xFF0000, "failed to save snapshot: %s", SDL_GetError());
-            }
         } else {
             this->send_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
         }
     } else {
          this->send_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
-    }
-
-    if (snapshot != NULL) {
-        SDL_FreeSurface(snapshot);
     }
 
     if (renderer != NULL) {
@@ -704,7 +699,7 @@ bool WarGrey::STEM::Universe::snapshot(const char* pname) {
         this->_mfgc = saved_fgc;
     }
 
-    return okay;
+    return snapshot;
 }
 
 void WarGrey::STEM::Universe::take_snapshot() {
@@ -714,8 +709,10 @@ void WarGrey::STEM::Universe::take_snapshot() {
     path snapshot_png = (this->snapshot_rootdir.empty() ? current_path() : path(this->snapshot_rootdir))
         / path(game_create_string("%s-%s.%lld.png", basename, make_timestamp_utc(s, true).c_str(), ms % 1000));
 
-    if (this->snapshot(snapshot_png.string().c_str())) { // stupid windows as it requires `string()`
+    if (this->save_snapshot(snapshot_png.string().c_str())) { // stupid windows as it requires `string()`
         this->send_message("A snapshot has been saved as '%s'.", snapshot_png.c_str());
+    } else {
+        this->send_message(0xFF0000, "failed to save snapshot: %s", SDL_GetError());
     }
 }
 
