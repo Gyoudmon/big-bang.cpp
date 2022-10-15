@@ -13,19 +13,13 @@
 #include "virtualization/screen.hpp"
 
 namespace WarGrey::STEM {
-    class Universe : public WarGrey::STEM::IDisplay {
+    class IUniverse : public WarGrey::STEM::IDisplay {
         public:
-            /* 构造函数，创建新对象时自动调用，默认创建一个黑底白字的窗口 */
-            Universe();
-
-            /**
-             * 更有用一些的构造函数，创建新对象时根据参数自动选择，
-             * 设置帧频, 窗口标题, 前景背景色, 和混色模式
-             */
-            Universe(const char* title, int fps = 60, uint32_t fgc = 0xFFFFFFU, uint32_t bgc = 0x000000U);
+            /* 构造函数，用以设置帧频, 窗口标题, 前景背景色, 和混色模式 */
+            IUniverse(const char* title, int fps, uint32_t fgc, uint32_t bgc);
             
             /* 析构函数，销毁旧对象时自动调用，默认销毁游戏宇宙 */
-            virtual ~Universe();
+            virtual ~IUniverse();
 
             /* 宇宙大爆炸，开始游戏主循环 */
             void big_bang();
@@ -35,8 +29,8 @@ namespace WarGrey::STEM {
             virtual void construct(int argc, char* argv[]) {}
             
             /* 排列可视化元素，在合适的时候自动调用，默认什么都不做 */
-            virtual void reflow(int width, int height) {}
-            
+            virtual void reflow(int window, int height) {}
+
             /* 更新游戏世界，定时器到期时自动调用，默认什么都不做 */
             virtual void update(uint32_t interval, uint32_t count, uint32_t uptime) {}
             
@@ -71,11 +65,12 @@ namespace WarGrey::STEM {
             void notify_updated();
 
         public: // 用户 IME 输入输出
-            void set_input_echo_area(int x, int y, int width, int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_unicode_font);
+            void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_unicode_font);
             void start_input_text(const char* fmt, ...);
             void start_input_text(const std::string& prompt);
             void stop_input_text();
 
+        public: // 用户消息输出
             void send_message(uint32_t fgc, const char* fmt, ...);
             void send_message(uint32_t fgc, const std::string& msg);
             void send_message(const char* fmt, ...);
@@ -91,7 +86,10 @@ namespace WarGrey::STEM {
             virtual void on_text(const char* text, bool entire) {}                               // 处理文本输入事件
             virtual void on_text(const char* text, int pos, int span) {}                         // 处理文本输入事件
             
-            virtual void save() {}                                                               // 处理保存事件                                  
+            virtual void save() {}                                                               // 处理保存事件
+
+        protected:
+            virtual void draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height);
 
         private:
             /* 响应定时器事件，刷新游戏世界 */
@@ -118,22 +116,22 @@ namespace WarGrey::STEM {
         private:
             void do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height);
             bool display_usr_input_and_caret(SDL_Renderer* renderer, bool yes);
-            bool display_usr_message();
+            bool display_usr_message(SDL_Renderer* renderer);
             void enter_input_text();
             void popback_input_text();
 
         private:
-            uint32_t _fgc = 0xFFFFFFU;          // 窗体前景色
-            uint32_t _bgc = 0x000000U;          // 窗体背景色
-            int window_width = 0;               // 窗体宽度
-            int window_height = 0;              // 窗体高度
-            SDL_Window* window = nullptr;       // 窗体对象
-            SDL_Renderer* renderer = nullptr;   // 渲染器对象
-            SDL_Texture* texture = nullptr;     // 纹理对象
+            uint32_t _fgc;                      // 窗体前景色
+            uint32_t _bgc;                      // 窗体背景色
+            int window_width;                   // 窗体宽度
+            int window_height;                  // 窗体高度
+            SDL_Window* window;                 // 窗体对象
+            SDL_Renderer* renderer;             // 渲染器对象
+            SDL_Texture* texture;               // 纹理对象
 
         private:
-            SDL_TimerID timer = 0;              // SDL 定时器
-            int _fps = 60;                      // 帧频
+            SDL_TimerID timer;                  // SDL 定时器
+            int _fps;                           // 帧频
 
         private:
             const char* current_usrin;          // IME 原始输入
@@ -144,7 +142,6 @@ namespace WarGrey::STEM {
             uint32_t _ifgc;                     // 回显区前景色
             uint32_t _ibgc;                     // 回显区背景色
             TTF_Font* echo_font;                // 回显字体
-
             std::string message;                // 回显区消息
             uint32_t _mfgc;                     // 消息颜色
             bool needs_termio_if_no_echo;       // 消息是否需要输出
@@ -155,9 +152,15 @@ namespace WarGrey::STEM {
 
         private:
             std::string snapshot_rootdir;       // 屏幕截图位置
+    };
 
-        private:
-            WarGrey::STEM::IScreen* screen;
+    class Universe : public WarGrey::STEM::IUniverse {
+        public:
+            /* 构造函数，创建新对象时自动调用，默认创建一个黑底白字的窗口 */
+            Universe();
+
+            /* 更有用一些的构造函数，创建新对象时根据参数自动选择 */
+            Universe(const char* title, int fps = 60, uint32_t fgc = 0xFFFFFFU, uint32_t bgc = 0x000000U);
     };
 
     class Pasteboard : public WarGrey::STEM::Universe {
