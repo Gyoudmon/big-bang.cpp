@@ -24,7 +24,7 @@ static inline void setup_for_text(TTF_Font* font, const std::string& text, unsig
 }
 
 static SDL_Surface* game_text_surface(const std::string& text, ::TextRenderMode mode, TTF_Font* font, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
-    SDL_Surface* surface = NULL;
+    SDL_Surface* surface = nullptr;
 
 #ifndef __windows__
     if (wrap >= 0) {
@@ -49,7 +49,7 @@ static SDL_Surface* game_text_surface(const std::string& text, ::TextRenderMode 
     }
 #endif
 
-    if (surface == NULL) {
+    if (surface == nullptr) {
         fprintf(stderr, "无法渲染文本: %s\n", TTF_GetError());
     }
 
@@ -59,7 +59,7 @@ static SDL_Surface* game_text_surface(const std::string& text, ::TextRenderMode 
 static inline void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* message, int x, int y) {
     /** TODO: Cache the textures of text **/
 
-    if (message != NULL) {
+    if (message != nullptr) {
         game_render_surface(target, message, x, y);
         SDL_FreeSurface(message);
     }
@@ -79,7 +79,7 @@ void WarGrey::STEM::game_text_size(TTF_Font* font, int* width, int* height, cons
 }
 
 void WarGrey::STEM::game_text_size(TTF_Font* font, int* width, int* height, const std::string& text) { 
-    if (font == NULL) {
+    if (font == nullptr) {
         font = GAME_DEFAULT_FONT;
     }
 
@@ -90,7 +90,7 @@ void WarGrey::STEM::game_text_size(TTF_Font* font, int* width, int* height, cons
 void WarGrey::STEM::game_draw_solid_text(TTF_Font* font, SDL_Renderer* renderer, uint32_t rgb, int x, int y, const std::string& text, int wrap) {
     SDL_Color text_color;
 
-    if (font == NULL) {
+    if (font == nullptr) {
         font = GAME_DEFAULT_FONT;
     }
 
@@ -102,7 +102,7 @@ void WarGrey::STEM::game_draw_solid_text(TTF_Font* font, SDL_Renderer* renderer,
 void WarGrey::STEM::game_draw_shaded_text(TTF_Font* font, SDL_Renderer* renderer, uint32_t fgc, uint32_t bgc, int x, int y, const std::string& text, int wrap) {
     SDL_Color text_color, background_color;
 
-    if (font == NULL) {
+    if (font == nullptr) {
         font = GAME_DEFAULT_FONT;
     }
 
@@ -115,7 +115,7 @@ void WarGrey::STEM::game_draw_shaded_text(TTF_Font* font, SDL_Renderer* renderer
 void WarGrey::STEM::game_draw_lcd_text(TTF_Font* font, SDL_Renderer* renderer, uint32_t fgc, uint32_t bgc, int x, int y, const std::string& text, int wrap) {
     SDL_Color text_color, background_color;
 
-    if (font == NULL) {
+    if (font == nullptr) {
         font = GAME_DEFAULT_FONT;
     }
 
@@ -128,7 +128,7 @@ void WarGrey::STEM::game_draw_lcd_text(TTF_Font* font, SDL_Renderer* renderer, u
 void WarGrey::STEM::game_draw_blended_text(TTF_Font* font, SDL_Renderer* renderer, uint32_t rgb, int x, int y, const std::string& text, int wrap) {
     SDL_Color text_color;
 
-    if (font == NULL) {
+    if (font == nullptr) {
         font = GAME_DEFAULT_FONT;
     }
 

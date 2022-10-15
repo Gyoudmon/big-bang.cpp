@@ -12,11 +12,11 @@ static inline void ntime(char* timestamp, const time_t utc_s, const char* tfmt, 
     struct tm now_s;
 
 #if defined(__windows__)
-	if (locale) {
-		localtime_s(&now_s, &utc_s);
-	} else {
-		gmtime_s(&now_s, &utc_s);
-	}
+    if (locale) {
+        localtime_s(&now_s, &utc_s);
+    } else {
+        gmtime_s(&now_s, &utc_s);
+    }
 #else
     if (locale) {
         localtime_r(&utc_s, &now_s);
@@ -30,7 +30,7 @@ static inline void ntime(char* timestamp, const time_t utc_s, const char* tfmt, 
 
 /**************************************************************************************************/
 long long WarGrey::STEM::current_seconds() {
-    return time(NULL);
+    return time(nullptr);
 }
 
 long long WarGrey::STEM::current_milliseconds() {

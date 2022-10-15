@@ -11,7 +11,7 @@ using namespace WarGrey::STEM;
 // non-determinstic generator
 static std::random_device rd;
 
-// to seed mersenne twister, similar to srand() with datum better than time(NULL);
+// to seed mersenne twister, similar to srand() with datum better than time(nullptr);
 static std::mt19937 random_generator(rd());
 
 /*************************************************************************************************/

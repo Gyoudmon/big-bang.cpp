@@ -1,16 +1,19 @@
 #include "game.hpp"                 // 放最前面以兼容 macOS
 #include "image.hpp"
+#include "flonum.hpp"
+
+#include <filesystem>
 
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* message, SDL_Rect* region) {
+static void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* message, SDL_Rect* region) {
     /** TODO: Cache the textures of text **/
     
     SDL_Texture* text = SDL_CreateTextureFromSurface(target, message);
 
-    if (text != NULL) {
-        SDL_RenderCopy(target, text, NULL, region);
+    if (text != nullptr) {
+        SDL_RenderCopy(target, text, nullptr, region);
         SDL_DestroyTexture(text);
     }
 
@@ -18,18 +21,20 @@ void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* message, SDL_Re
 }
 
 /*************************************************************************************************/
+SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height) {
+    return SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+}
+
+SDL_Surface* WarGrey::STEM::game_blank_image(float width, float height) {
+    return game_blank_image(fl2fxi(width), fl2fxi(height));
+}
+
 SDL_Surface* WarGrey::STEM::game_load_image(const std::string& file) {
     return game_load_image(file.c_str());
 }
 
 SDL_Surface* WarGrey::STEM::game_load_image(const char* file) {
-    SDL_Surface* surface = IMG_Load(file);
-
-    if (surface == NULL) {
-        fprintf(stderr, "无法加载图片: %s\n", TTF_GetError());
-    }
-
-    return surface;
+    return IMG_Load(file);
 }
 
 void WarGrey::STEM::game_unload_image(SDL_Surface* image) {
@@ -47,7 +52,7 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& f
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y) {
     SDL_Surface* image = game_load_image(file);
 
-    if (image != NULL) {
+    if (image != nullptr) {
         game_draw_image(renderer, image, x, y);
         game_unload_image(image);
     }
@@ -74,9 +79,51 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& f
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, int width, int height) {
     SDL_Surface* image = game_load_image(file);
 
-    if (image != NULL) {
+    if (image != nullptr) {
         game_draw_image(renderer, image, x, y, width, height);
         game_unload_image(image);
     }
+}
+
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y) {
+    game_render_surface(renderer, image, fl2fxi(x), fl2fxi(y));
+}
+    
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y) {
+    game_draw_image(renderer, file.c_str(), fl2fxi(x), fl2fxi(y));
+}
+
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y) {
+    game_draw_image(renderer, file, fl2fxi(x), fl2fxi(y));
+}
+
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, float width, float height) {
+    game_draw_image(renderer, image, fl2fxi(x), fl2fxi(y), fl2fxi(width), fl2fxi(height));
+}
+
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, float width, float height) {
+    game_draw_image(renderer, file.c_str(), fl2fxi(x), fl2fxi(y), fl2fxi(width), fl2fxi(height));
+}
+
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, float width, float height) {
+    game_draw_image(renderer, file, fl2fxi(x), fl2fxi(y), fl2fxi(width), fl2fxi(height));
+}
+
+/*************************************************************************************************/
+bool WarGrey::STEM::game_save_image(SDL_Surface* png, const std::string& pname) {
+    return game_save_image(png, pname.c_str());
+}
+
+bool WarGrey::STEM::game_save_image(SDL_Surface* png, const char* pname) {
+    bool okay = false;
+
+    if (png != nullptr) {
+        create_directories(std::filesystem::path(pname).parent_path());
+        if (IMG_SavePNG(png, pname) == 0) {
+            okay = true;
+        }
+    }
+
+    return okay;
 }
 

@@ -1,0 +1,1002 @@
+#include "planet.hpp"
+#include "graphlet.hpp"
+
+#include "geometry.hpp"
+#include "mathematics.hpp"
+#include "colorspace.hpp"
+#include "image.hpp"
+
+#include "flonum.hpp"
+
+using namespace WarGrey::STEM;
+
+/** NOTE
+ *   C-Style casting tries all C++ style casting except dynamic_cast;
+ *   reinterpret_cast may cause "Access violation reading location 0xFFFFFFFFFFFFFFFF" even for subtype casting.
+ */
+
+#define GRAPHLET_INFO(g) (static_cast<GraphletInfo*>(g->info))
+
+namespace {
+    struct AsyncInfo {
+        float x0;
+	float y0;
+	float fx0;
+	float fy0;
+	float dx0;
+	float dy0;
+    };
+
+    class GraphletInfo : public WarGrey::STEM::IGraphletInfo {
+        public:
+            GraphletInfo(WarGrey::STEM::IPlanet* master, unsigned int mode)
+                : IGraphletInfo(master), mode(mode) {};
+
+        public:
+            float x;
+            float y;
+            bool selected;
+
+        public:
+            unsigned int mode;
+
+	public: // for asynchronously loaded graphlets
+            AsyncInfo* async;
+
+        public:
+            IGraphlet* next;
+            IGraphlet* prev;
+    };
+}
+
+static inline GraphletInfo* bind_graphlet_owership(WarGrey::STEM::IPlanet* master, unsigned int mode, IGraphlet* g) {
+    auto info = new GraphletInfo(master, mode);
+    
+    g->info = info;
+
+    return info;
+}
+
+static inline GraphletInfo* planet_graphlet_info(WarGrey::STEM::IPlanet* master, IGraphlet* g) {
+    GraphletInfo* info = nullptr;
+
+    if ((g != nullptr) && (g->info != nullptr)) {
+        if (g->info->master == master) {
+            info = GRAPHLET_INFO(g);
+        }
+    }
+    
+    return info;
+}
+
+static inline bool unsafe_graphlet_unmasked(GraphletInfo* info, unsigned int mode) {
+    return ((info->mode & mode) == info->mode);
+}
+
+static void unsafe_fill_graphlet_bound(IGraphlet* g, GraphletInfo* info, float* x, float* y, float* width, float* height) {
+    g->fill_extent(info->x, info->y, width, height);
+
+    (*x) = info->x;
+    (*y) = info->y;
+}
+
+static inline void unsafe_add_selected(WarGrey::STEM::IPlanet* master, IGraphlet* g, GraphletInfo* info) {
+    master->before_select(g, true);
+    info->selected = true;
+    master->after_select(g, true);
+    master->notify_updated();
+}
+
+static inline void unsafe_set_selected(WarGrey::STEM::IPlanet* master, IGraphlet* g, GraphletInfo* info) {
+    master->begin_update_sequence();
+    master->no_selected();
+    unsafe_add_selected(master, g, info);
+    master->end_update_sequence();
+}
+
+static void graphlet_anchor_fraction(GraphletAnchor& a, float* ofx, float* ofy) {
+    float fx = 0.0F;
+    float fy = 0.0F;
+
+    if (a != GraphletAnchor::LT) {
+        switch (a) {
+        case GraphletAnchor::LT:                       break;
+        case GraphletAnchor::LC:            fy = 0.5F; break;
+        case GraphletAnchor::LB:            fy = 1.0F; break;
+        case GraphletAnchor::CT: fx = 0.5F;            break;
+        case GraphletAnchor::CC: fx = 0.5F; fy = 0.5F; break;
+        case GraphletAnchor::CB: fx = 0.5F; fy = 1.0F; break;
+        case GraphletAnchor::RT: fx = 1.0F;            break;
+        case GraphletAnchor::RC: fx = 1.0F; fy = 0.5F; break;
+        case GraphletAnchor::RB: fx = 1.0F; fy = 1.0F; break;
+        }
+    }
+
+    (*ofx) = fx;
+    (*ofy) = fy;
+}
+
+static inline void graphlet_anchor_offset(float width, float height, GraphletAnchor& a, float* xoff, float* yoff) {
+    float fx, fy;
+
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    (*xoff) = fx * width;
+    (*yoff) = fy * height;
+}
+
+static bool unsafe_move_graphlet_via_info(Planet* master, GraphletInfo* info, float x, float y, bool absolute) {
+    bool moved = false;
+    
+    if (!absolute) {
+        x += info->x;
+        y += info->y;
+    }
+
+    if ((info->x != x) || (info->y != y)) {
+        info->x = x;
+        info->y = y;
+
+        master->size_cache_invalid();
+        moved = true;
+    }
+
+    return moved;
+}
+
+static bool unsafe_move_graphlet_via_info(Planet* master, IGraphlet* g, GraphletInfo* info
+    , float x, float y, float fx, float fy, float dx, float dy, bool absolute) {
+    float sx, sy, sw, sh;
+    float ax = 0.0F;
+    float ay = 0.0F;
+    
+    if (g->ready()) {
+        unsafe_fill_graphlet_bound(g, info, &sx, &sy, &sw, &sh);
+        ax = (sw * fx);
+        ay = (sh * fy);
+    } else {
+        info->async = new AsyncInfo();
+
+        info->async->x0 = x;
+        info->async->y0 = y;
+        info->async->fx0 = fx;
+        info->async->fy0 = fy;
+        info->async->dx0 = dx;
+        info->async->dy0 = dy;
+    }
+    
+    return unsafe_move_graphlet_via_info(master, info, x - ax + dx, y - ay + dy, true);
+}
+
+static IGraphlet* do_search_selected_graphlet(IGraphlet* start, unsigned int mode, IGraphlet* terminator) {
+    IGraphlet* found = nullptr;
+    IGraphlet* child = start;
+
+    do {
+        GraphletInfo* info = GRAPHLET_INFO(child);
+
+        if (info->selected && (unsafe_graphlet_unmasked(info, mode))) {
+            found = child;
+            break;
+        }
+
+        child = info->next;
+    } while (child != terminator);
+    
+    return found;
+}
+
+static void do_resize(Planet* master, IGraphlet* g, GraphletInfo* info, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
+    GraphletAnchor resize_anchor;
+
+    // TODO: the theory or implementation seems incorrect. 
+
+    if (g->resizable(&resize_anchor)) {
+        float sx, sy, sw, sh, fx, fy, nx, ny, nw, nh;
+
+        unsafe_fill_graphlet_bound(g, info, &sx, &sy, &sw, &sh);
+        graphlet_anchor_fraction(resize_anchor, &fx, &fy);
+
+        g->resize((sw / prev_scale_x) * scale_x, (sh / prev_scale_y) * scale_y);
+        g->fill_extent(sx, sy, &nw, &nh);
+
+        nx = sx + (sw - nw) * fx;
+        ny = sy + (sh - nh) * fy;
+
+        unsafe_move_graphlet_via_info(master, info, nx, ny, true);
+    }
+}
+
+/*************************************************************************************************/
+Planet::Planet(const char* name, unsigned int initial_mode)
+    : IPlanet(name), mode(initial_mode)
+      , translate_x(0.0F), translate_y(0.0F)
+      , scale_x(1.0F), scale_y(1.0F) {}
+
+Planet::Planet(const std::string& name, unsigned int initial_mode) : Planet(name.c_str(), initial_mode) {}
+
+Planet::~Planet() {
+    this->collapse();
+}
+
+void WarGrey::STEM::Planet::change_mode(unsigned int mode) {
+    if (mode != this->mode) {
+        this->no_selected();
+        this->mode = mode;
+        this->size_cache_invalid();
+        this->notify_updated();
+    }
+}
+
+unsigned int WarGrey::STEM::Planet::current_mode() {
+    return this->mode;
+}
+
+bool WarGrey::STEM::Planet::graphlet_unmasked(IGraphlet* g) {
+    GraphletInfo* info = planet_graphlet_info(this, g);
+
+    return ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode));
+}
+
+void WarGrey::STEM::Planet::notify_graphlet_ready(IGraphlet* g) {
+    GraphletInfo* info = planet_graphlet_info(this, g);
+
+    if (info != nullptr) {
+        if (info->async != nullptr) {
+            this->size_cache_invalid();
+            this->begin_update_sequence();
+
+            unsafe_move_graphlet_via_info(this, g, info,
+                info->async->x0, info->async->y0, info->async->fx0, info->async->fy0, info->async->dx0, info->async->dy0,
+                true);
+
+            if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
+                do_resize(this, g, info, this->scale_x, this->scale_y);
+            }
+
+            delete info->async;
+            info->async = nullptr;
+
+            this->notify_updated();
+            this->on_graphlet_ready(g);
+            this->end_update_sequence();
+        }
+    }
+}
+
+void WarGrey::STEM::Planet::insert(IGraphlet* g, float x, float y, float fx, float fy, float dx, float dy) {
+    if (g->info == nullptr) {
+        GraphletInfo* info = bind_graphlet_owership(this, this->mode, g);
+
+        if (this->head_graphlet == nullptr) {
+            this->head_graphlet = g;
+            info->prev = this->head_graphlet;
+        } else {
+            GraphletInfo* head_info = GRAPHLET_INFO(this->head_graphlet);
+            GraphletInfo* prev_info = GRAPHLET_INFO(head_info->prev);
+            
+            info->prev = head_info->prev;
+            prev_info->next = g;
+            head_info->prev = g;
+        }
+        info->next = this->head_graphlet;
+
+        this->begin_update_sequence();
+        g->sprite();
+        g->construct();
+        g->sprite_construct();
+        unsafe_move_graphlet_via_info(this, g, info, x, y, fx, fy, dx, dy, true);
+
+        if (g->ready()) {
+            if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
+                do_resize(this, g, info, this->scale_x, this->scale_y);
+            }
+
+            this->notify_updated();
+            this->on_graphlet_ready(g);
+            this->end_update_sequence();
+        } else {
+            this->notify_updated(); // is it necessary?
+            this->end_update_sequence();
+        }
+
+    }
+}
+
+void WarGrey::STEM::Planet::insert(IGraphlet* g, IGraphlet* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+    if (g->info == nullptr) {
+        GraphletInfo* tinfo = planet_graphlet_info(this, target);
+        float x = 0.0F;
+        float y = 0.0F;
+
+        // TODO: what if the target graphlet is not ready?
+
+        if ((tinfo != nullptr) && unsafe_graphlet_unmasked(tinfo, this->mode)) {
+            float tsx, tsy, tsw, tsh;
+
+            unsafe_fill_graphlet_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
+            x = tsx + tsw * tfx;
+            y = tsy + tsh * tfy;
+        }
+
+        this->insert(g, x, y, fx, fy, dx, dy);
+    }
+}
+
+void WarGrey::STEM::Planet::insert(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+    if (g->info == nullptr) {
+        GraphletInfo* xinfo = planet_graphlet_info(this, xtarget);
+        GraphletInfo* yinfo = planet_graphlet_info(this, ytarget);
+        float x = 0.0F;
+        float y = 0.0F;
+
+        // TODO: what if the target graphlet is not ready?
+
+        if ((xinfo != nullptr) && unsafe_graphlet_unmasked(xinfo, this->mode)
+            && (yinfo != nullptr) && unsafe_graphlet_unmasked(yinfo, this->mode)) {
+            float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
+
+            unsafe_fill_graphlet_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
+            unsafe_fill_graphlet_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
+            x = xsx + xsw * xfx;
+            y = ysy + ysh * yfy;
+        }
+
+        this->insert(g, x, y, fx, fy, dx, dy);
+    }
+}
+
+void WarGrey::STEM::Planet::remove(IGraphlet* g) {
+    GraphletInfo* info = planet_graphlet_info(this, g);
+
+    if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
+        GraphletInfo* prev_info = GRAPHLET_INFO(info->prev);
+        GraphletInfo* next_info = GRAPHLET_INFO(info->next);
+
+        prev_info->next = info->next;
+        next_info->prev = info->prev;
+
+        if (this->head_graphlet == g) {
+            if (this->head_graphlet == info->next) {
+                this->head_graphlet = nullptr;
+            } else {
+                this->head_graphlet = info->next;
+            }
+        }
+
+        if (this->hovering_graphlet == g) {
+            this->hovering_graphlet = nullptr;
+        }
+        
+        delete g; // g's destructor will delete the associated info object
+        this->notify_updated();
+        this->size_cache_invalid();
+    }
+}
+
+void WarGrey::STEM::Planet::erase() {
+    if (this->head_graphlet != nullptr) {
+        IGraphlet* temp_head = this->head_graphlet;
+        GraphletInfo* temp_info = GRAPHLET_INFO(temp_head);
+        GraphletInfo* prev_info = GRAPHLET_INFO(temp_info->prev);
+
+        this->head_graphlet = nullptr;
+        prev_info->next = nullptr;
+
+        do {
+            IGraphlet* child = temp_head;
+
+            temp_head = GRAPHLET_INFO(temp_head)->next;
+
+            delete child; // child's destructor will delete the associated info object
+        } while (temp_head != nullptr);
+
+        this->head_graphlet = nullptr;
+        this->size_cache_invalid();
+    }
+}
+
+void WarGrey::STEM::Planet::move_to(IGraphlet* g, float x, float y, float fx, float fy, float dx, float dy) {
+    GraphletInfo* info = planet_graphlet_info(this, g);
+    
+    if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
+        if (unsafe_move_graphlet_via_info(this, g, info, x, y, fx, fy, dx, dy, true)) {
+            this->notify_updated();
+        }
+    }
+}
+
+void WarGrey::STEM::Planet::move_to(IGraphlet* g, IGraphlet* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+    GraphletInfo* tinfo = planet_graphlet_info(this, target);
+    float x = 0.0F;
+    float y = 0.0F;
+
+    if ((tinfo != nullptr) && unsafe_graphlet_unmasked(tinfo, this->mode)) {
+        float tsx, tsy, tsw, tsh;
+
+        unsafe_fill_graphlet_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
+        x = tsx + tsw * tfx;
+        y = tsy + tsh * tfy;
+    }
+        
+    this->move_to(g, x, y, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::Planet::move_to(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+    GraphletInfo* xinfo = planet_graphlet_info(this, xtarget);
+    GraphletInfo* yinfo = planet_graphlet_info(this, ytarget);
+    float x = 0.0F;
+    float y = 0.0F;
+
+    if ((xinfo != nullptr) && unsafe_graphlet_unmasked(xinfo, this->mode)
+        && (yinfo != nullptr) && unsafe_graphlet_unmasked(yinfo, this->mode)) {
+        float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
+
+        unsafe_fill_graphlet_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
+        unsafe_fill_graphlet_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
+        x = xsx + xsw * xfx;
+        y = ysy + ysh * yfy;
+    }
+
+    this->move_to(g, x, y, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::Planet::move(IGraphlet* g, float x, float y) {
+    GraphletInfo* info = planet_graphlet_info(this, g);
+
+    if (info != nullptr) {
+        if (unsafe_graphlet_unmasked(info, this->mode)) {
+            if (unsafe_move_graphlet_via_info(this, info, x, y, false)) {
+                this->notify_updated();
+            }
+        }
+    } else if (this->head_graphlet != nullptr) {
+        IGraphlet* child = this->head_graphlet;
+
+        do {
+            info = GRAPHLET_INFO(child);
+
+            if (info->selected && unsafe_graphlet_unmasked(info, this->mode)) {
+                unsafe_move_graphlet_via_info(this, info, x, y, false);
+            }
+
+            child = info->next;
+        } while (child != this->head_graphlet);
+
+        this->notify_updated();
+    }
+}
+
+IGraphlet* WarGrey::STEM::Planet::find_graphlet(float x, float y) {
+    IGraphlet* found = nullptr;
+
+    if (this->head_graphlet != nullptr) {
+        GraphletInfo* head_info = GRAPHLET_INFO(this->head_graphlet);
+        IGraphlet* child = head_info->prev;
+
+        do {
+            GraphletInfo* info = GRAPHLET_INFO(child);
+
+            if (unsafe_graphlet_unmasked(info, this->mode)) {
+                if (!child->concealled()) {
+                    float sx, sy, sw, sh;
+
+                    unsafe_fill_graphlet_bound(child, info, &sx, &sy, &sw, &sh);
+
+                    sx += (this->translate_x * this->scale_x);
+                    sy += (this->translate_y * this->scale_y);
+
+                    if ((sx < x) && (x < (sx + sw)) && (sy < y) && (y < (sy + sh))) {
+                        if (child->is_colliding_with_mouse(x - sx, y - sy)) {
+                            found = child;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            child = info->prev;
+        } while (child != head_info->prev);
+    }
+
+    return found;
+}
+
+IGraphlet* WarGrey::STEM::Planet::find_next_selected_graphlet(IGraphlet* start) {
+    IGraphlet* found = nullptr;
+    
+    if (start == nullptr) {
+        if (this->head_graphlet != nullptr) {
+            found = do_search_selected_graphlet(this->head_graphlet, this->mode, this->head_graphlet);
+        }
+    } else {
+        GraphletInfo* info = planet_graphlet_info(this, start);
+
+        if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
+            found = do_search_selected_graphlet(info->next, this->mode, this->head_graphlet);
+        }
+    }
+
+    return found;
+}
+
+bool WarGrey::STEM::Planet::fill_graphlet_location(IGraphlet* g, float* x, float* y, float fx, float fy) {
+    bool okay = false;
+    GraphletInfo* info = planet_graphlet_info(this, g);
+    
+    if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
+        float sx, sy, sw, sh;
+
+        unsafe_fill_graphlet_bound(g, info, &sx, &sy, &sw, &sh);
+        if (x != nullptr) (*x) = sx + sw * fx;
+        if (y != nullptr) (*y) = sy + sh * fy;
+
+        okay = true;
+    }
+
+    return okay;
+}
+
+bool WarGrey::STEM::Planet::fill_graphlet_boundary(IGraphlet* g, float* x, float* y, float* width, float* height) {
+    bool okay = false;
+    GraphletInfo* info = planet_graphlet_info(this, g);
+
+    if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
+        float sx, sy, sw, sh;
+            
+        unsafe_fill_graphlet_bound(g, info, &sx, &sy, &sw, &sh);
+        if (x != nullptr) (*x) = sx;
+        if (y != nullptr) (*y) = sy;
+        if (width != nullptr) (*width) = sw;
+        if (height != nullptr) (*height) = sh;
+
+        okay = true;
+    }
+
+    return okay;
+}
+
+void WarGrey::STEM::Planet::fill_graphlets_boundary(float* x, float* y, float* width, float* height) {
+    this->recalculate_graphlets_extent_when_invalid();
+
+    if (x != nullptr) (*x) = this->graphlets_left;
+    if (y != nullptr) (*y) = this->graphlets_top;
+    if (width != nullptr) (*width) = this->graphlets_right - this->graphlets_left;
+    if (height != nullptr) (*height) = this->graphlets_bottom - this->graphlets_top;
+}
+
+void WarGrey::STEM::Planet::size_cache_invalid() {
+    this->graphlets_right = this->graphlets_left - 1.0F;
+}
+
+void WarGrey::STEM::Planet::recalculate_graphlets_extent_when_invalid() {
+    if (this->graphlets_right < this->graphlets_left) {
+        float rx, ry, width, height;
+
+        if (this->head_graphlet == nullptr) {
+            this->graphlets_left = 0.0F;
+            this->graphlets_top = 0.0F;
+            this->graphlets_right = 0.0F;
+            this->graphlets_bottom = 0.0F;
+        } else {
+            IGraphlet* child = this->head_graphlet;
+
+            this->graphlets_left = infinity_f;
+            this->graphlets_top = infinity_f;
+            this->graphlets_right = -infinity_f;
+            this->graphlets_bottom = -infinity_f;
+
+            do {
+                GraphletInfo* info = GRAPHLET_INFO(child);
+
+                if (unsafe_graphlet_unmasked(info, this->mode)) {
+                    unsafe_fill_graphlet_bound(child, info, &rx, &ry, &width, &height);
+                    this->graphlets_left = flmin(this->graphlets_left, rx);
+                    this->graphlets_top = flmin(this->graphlets_top, ry);
+                    this->graphlets_right = flmax(this->graphlets_right, rx + width);
+                    this->graphlets_bottom = flmax(this->graphlets_bottom, ry + height);
+                }
+
+                child = info->next;
+            } while (child != this->head_graphlet);
+        }
+    }
+}
+
+void WarGrey::STEM::Planet::add_selected(IGraphlet* g) {
+    if (this->can_select_multiple()) {
+        GraphletInfo* info = planet_graphlet_info(this, g);
+
+        if ((info != nullptr) && (!info->selected)) {
+            if (unsafe_graphlet_unmasked(info, this->mode) && this->can_select(g)) {
+                unsafe_add_selected(this, g, info);
+            }
+        }
+    }
+}
+
+void WarGrey::STEM::Planet::set_selected(IGraphlet* g) {
+    GraphletInfo* info = planet_graphlet_info(this, g);
+
+    if ((info != nullptr) && (!info->selected)) {
+        if (unsafe_graphlet_unmasked(info, this->mode) && (this->can_select(g))) {
+            unsafe_set_selected(this, g, info);
+        }
+    }
+}
+
+void WarGrey::STEM::Planet::no_selected() {
+    if (this->head_graphlet != nullptr) {
+        IGraphlet* child = this->head_graphlet;
+
+        this->begin_update_sequence();
+
+        do {
+            GraphletInfo* info = GRAPHLET_INFO(child);
+
+            if (info->selected && unsafe_graphlet_unmasked(info, this->mode)) {
+                this->before_select(child, false);
+                info->selected = false;
+                this->after_select(child, false);
+                this->notify_updated();
+            }
+
+            child = info->next;
+        } while (child != this->head_graphlet);
+
+        this->end_update_sequence();
+    }
+}
+
+bool WarGrey::STEM::Planet::is_selected(IGraphlet* g) {
+    GraphletInfo* info = planet_graphlet_info(this, g);
+    bool selected = false;
+
+    if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
+        selected = info->selected;
+    }
+
+    return selected;
+}
+
+unsigned int WarGrey::STEM::Planet::count_selected() {
+    unsigned int n = 0U;
+
+    if (this->head_graphlet != nullptr) {
+        IGraphlet* child = this->head_graphlet;
+
+        do {
+            GraphletInfo* info = GRAPHLET_INFO(child);
+
+            if (info->selected && unsafe_graphlet_unmasked(info, this->mode)) {
+                n += 1U;
+            }
+
+            child = info->next;
+        } while (child != this->head_graphlet);
+    }
+
+    return n;
+}
+
+IGraphlet* WarGrey::STEM::Planet::get_focus_graphlet() {
+    return (this->graphlet_unmasked(this->focused_graphlet) ? this->focused_graphlet : nullptr);
+}
+
+void WarGrey::STEM::Planet::set_caret_owner(IGraphlet* g) {
+    if (this->focused_graphlet != g) {
+        if ((g != nullptr) && (g->handle_events())) {
+            GraphletInfo* info = planet_graphlet_info(this, g);
+
+            if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
+                if (this->focused_graphlet != nullptr) {
+                    this->focused_graphlet->own_caret(false);
+                    this->on_focus(this->focused_graphlet, false);
+                }
+
+                this->focused_graphlet = g;
+                g->own_caret(true);
+
+                this->on_focus(g, true);
+            }
+        } else if (this->focused_graphlet != nullptr) {
+            this->focused_graphlet->own_caret(false);
+            this->on_focus(this->focused_graphlet, false);
+            this->focused_graphlet = nullptr;
+        }
+    } else if (g != nullptr) {
+        this->on_focus(g, true);
+    }
+}
+
+/************************************************************************************************/
+void WarGrey::STEM::Planet::on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {
+    if (this->focused_graphlet != nullptr) {
+        this->focused_graphlet->on_char(key, modifiers, repeats, pressed);
+    }
+}
+
+void WarGrey::STEM::Planet::on_text(const char* text, bool entire) {
+    if (this->focused_graphlet != nullptr) {
+        this->focused_graphlet->on_text(text, entire);
+    }
+}
+
+void WarGrey::STEM::Planet::on_text(const char* text, int pos, int span) {
+    if (this->focused_graphlet != nullptr) {
+        this->focused_graphlet->on_text(text, pos, span);
+    }
+}
+
+void WarGrey::STEM::Planet::on_tap(IGraphlet* g, float local_x, float local_y) {
+    if (g != nullptr) {
+        GraphletInfo* info = GRAPHLET_INFO(g);
+
+        if (!info->selected) {
+            if (this->can_select(g)) {
+                unsafe_set_selected(this, g, info);
+
+                if (g->handle_events()) {
+                    this->set_caret_owner(g);
+                }
+            } else {
+                this->no_selected();
+            }
+        }
+    }
+}
+
+/************************************************************************************************/
+void WarGrey::STEM::Planet::on_elapse(long long count, long long interval, long long uptime) {
+    if (this->head_graphlet != nullptr) {
+        IGraphlet* child = this->head_graphlet;
+
+        do {
+            GraphletInfo* info = GRAPHLET_INFO(child);
+
+            if (unsafe_graphlet_unmasked(info, this->mode)) {
+                child->update(count, interval, uptime);
+            }
+            
+            child = info->next;
+        } while (child != this->head_graphlet);
+    }
+
+    this->update(count, interval, uptime);
+}
+
+void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {
+    float dsX = flmax(0.0F, X);
+    float dsY = flmax(0.0F, Y);
+    float dsWidth = X + Width;
+    float dsHeight = Y + Height;
+    
+    if (this->background >= 0) {
+        game_fill_rect(renderer, X, Y, Width, Height, static_cast<uint32_t>(this->background));
+    }
+
+    if (this->head_graphlet != nullptr) {
+        IGraphlet* child = this->head_graphlet;
+        float gx, gy, gwidth, gheight;
+        
+        do {
+            GraphletInfo* info = GRAPHLET_INFO(child);
+
+            if (unsafe_graphlet_unmasked(info, this->mode)) {
+                child->fill_extent(info->x, info->y, &gwidth, &gheight);
+
+                gx = (info->x + this->translate_x) * this->scale_x + X;
+                gy = (info->y + this->translate_y) * this->scale_y + Y;
+                
+                if (rectangle_overlay(gx, gy, gx + gwidth, gy + gheight, dsX, dsY, dsWidth, dsHeight)) {
+                    child->draw(renderer, gx, gy, gwidth, gheight);
+
+                    if (info->selected) {
+                        this->draw_visible_selection(renderer, gx, gy, gwidth, gheight);
+                    }
+                }
+            }
+
+            child = info->next;
+        } while (child != this->head_graphlet);
+    }
+}
+
+void WarGrey::STEM::Planet::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
+}
+
+/*************************************************************************************************/
+WarGrey::STEM::IPlanet::IPlanet(const char* name) : caption(name), background(-1) {}
+WarGrey::STEM::IPlanet::IPlanet(const std::string& name) : IPlanet(name.c_str()) {}
+
+WarGrey::STEM::IPlanet::~IPlanet() {
+    if (this->info != nullptr) {
+        delete this->info;
+        this->info = nullptr;
+    }
+}
+
+const char* WarGrey::STEM::IPlanet::name() {
+    return this->caption.c_str();
+}
+
+IScreen* WarGrey::STEM::IPlanet::master() {
+    IScreen* screen = nullptr;
+
+    if (this->info != nullptr) {
+        screen = this->info->master;
+    }
+
+    return screen;
+}
+
+void WarGrey::STEM::IPlanet::begin_update_sequence() {
+    if (this->info != nullptr) {
+        this->info->master->begin_update_sequence();
+    }
+}
+
+bool WarGrey::STEM::IPlanet::in_update_sequence() {
+    return ((this->info != nullptr) && this->info->master->in_update_sequence());
+}
+
+void WarGrey::STEM::IPlanet::end_update_sequence() {
+    if (this->info != nullptr) {
+        this->info->master->end_update_sequence();
+    }
+}
+
+bool WarGrey::STEM::IPlanet::needs_update() {
+    return ((this->info != nullptr) && this->info->master->needs_update());
+}
+
+void WarGrey::STEM::IPlanet::notify_updated() {
+    if (this->info != nullptr) {
+        this->info->master->notify_updated();
+    }
+}
+
+void WarGrey::STEM::IPlanet::collapse() {
+    this->erase();
+}
+
+SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float width, float height, int bgcolor) {
+    return this->snapshot(0.0F, 0.0F, width, height, bgcolor);
+}
+
+SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float x, float y, float width, float height, int bgcolor) {
+    static SDL_Surface* photograph = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    int saved_bgc = this->background;
+
+    if (photograph != nullptr) {
+        SDL_FreeSurface(photograph);
+    }
+
+    if (x != 0.0F) width += x;
+    if (y != 0.0F) height += y;
+
+    photograph = game_blank_image(width, height);
+
+    if (photograph != nullptr) {
+        renderer = SDL_CreateSoftwareRenderer(photograph);
+        
+        if (renderer != nullptr) {
+            this->background = bgcolor;
+            this->draw(renderer, -x, -y, width, height);
+            SDL_RenderPresent(renderer);
+            SDL_DestroyRenderer(renderer);
+        }
+    }
+
+    this->background = saved_bgc;
+
+    return photograph;
+}
+
+bool WarGrey::STEM::IPlanet::save_snapshot(const std::string& png, float width, float height, int bgcolor) {
+    return this->save_snapshot(png.c_str(), 0.0F, 0.0F, width, height, bgcolor);
+}
+
+bool WarGrey::STEM::IPlanet::save_snapshot(const char* png, float width, float height, int bgcolor) {
+    return this->save_snapshot(png, 0.0F, 0.0F, width, height, bgcolor);
+}
+
+bool WarGrey::STEM::IPlanet::save_snapshot(const std::string& png, float x, float y, float width, float height, int bgcolor) {
+    return this->save_snapshot(png.c_str(), x, y, width, height, bgcolor);
+}
+
+bool WarGrey::STEM::IPlanet::save_snapshot(const char* png, float x, float y, float width, float height, int bgcolor) {
+    return game_save_image(this->snapshot(x, y, width, height, bgcolor), png);
+}
+
+bool WarGrey::STEM::IPlanet::fill_graphlet_location(IGraphlet* g, float* x, float* y, GraphletAnchor a) {
+    float fx, fy;
+
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    return this->fill_graphlet_location(g, x, y, fx, fy);
+}
+
+void WarGrey::STEM::IPlanet::insert(IGraphlet* g, float x, float y, GraphletAnchor a, float dx, float dy) {
+    float fx, fy;
+
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->insert(g, x, y, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, GraphletAnchor a, float dx, float dy) {
+    float tfx, tfy, fx, fy;
+
+    graphlet_anchor_fraction(ta, &tfx, &tfy);
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->insert(g, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, float tfx, float tfy, GraphletAnchor a, float dx, float dy) {
+    float fx, fy;
+
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->insert(g, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, float fx, float fy, float dx, float dy) {
+    float tfx, tfy;
+
+    graphlet_anchor_fraction(ta, &tfx, &tfy);
+    
+    this->insert(g, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, GraphletAnchor a, float dx, float dy) {
+    float fx, fy;
+
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->insert(g, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, float x, float y, GraphletAnchor a, float dx, float dy) {
+    float fx, fy;
+
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->move_to(g, x, y, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, GraphletAnchor a, float dx, float dy) {
+    float tfx, tfy, fx, fy;
+
+    graphlet_anchor_fraction(ta, &tfx, &tfy);
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, float tfx, float tfy, GraphletAnchor a, float dx, float dy) {
+    float fx, fy;
+
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, float fx, float fy, float dx, float dy) {
+    float tfx, tfy;
+
+    graphlet_anchor_fraction(ta, &tfx, &tfy);
+
+    this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, GraphletAnchor a, float dx, float dy) {
+    float fx, fy;
+    
+    graphlet_anchor_fraction(a, &fx, &fy);
+
+    this->move_to(g, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
+}
+

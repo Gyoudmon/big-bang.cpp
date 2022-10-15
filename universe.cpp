@@ -1,13 +1,14 @@
-#include "game.hpp"          // 放最前面以兼容 macOS
+#include "universe.hpp"
+#include "geometry.hpp"
 #include "vsntext.hpp"
 #include "colorspace.hpp"
 #include "text.hpp"
 #include "time.hpp"
+#include "image.hpp"
+#include "font.hpp"
 
 #include "virtualization/screen/onionskip.hpp"
 
-#include <iostream>
-#include <unordered_map>
 #include <filesystem>
 
 using namespace WarGrey::STEM;
@@ -16,7 +17,7 @@ using namespace std::filesystem;
 /*************************************************************************************************/
 #define Call_With_Error_Message(init, message, GetError) \
     if (init != 0) { \
-        std::cout << message << std::string(GetError()) << std::endl; \
+        fprintf(stderr, "%s%s\n", message, GetError()); \
         exit(1); \
     }
 
@@ -27,76 +28,11 @@ using namespace std::filesystem;
 #define Call_For_Variable(id, init, failure, message, GetError) \
     id = init; \
     if (id == failure) { \
-        std::cout << message << std::string(GetError()) << std::endl; \
+        fprintf(stderr, "%s%s\n", message, GetError()); \
         exit(1); \
     }
 
-#define Game_Close_Font(id) if (id != NULL) TTF_CloseFont(id); id = NULL
-
-/*************************************************************************************************/
-TTF_Font* WarGrey::STEM::GAME_DEFAULT_FONT = NULL;
-TTF_Font* WarGrey::STEM::game_sans_serif_font = NULL;
-TTF_Font* WarGrey::STEM::game_serif_font = NULL;
-TTF_Font* WarGrey::STEM::game_monospace_font = NULL;
-TTF_Font* WarGrey::STEM::game_math_font = NULL;
-TTF_Font* WarGrey::STEM::game_unicode_font = NULL;
-
-/*************************************************************************************************/
-static std::unordered_map<std::string, std::string> system_fonts;
-static std::string system_fontdirs[] = {
-    "/System/Library/Fonts",
-    "/Library/Fonts",
-    "C:\\Windows\\Fonts",
-    "/usr/share/fonts"
-};
-
-static void game_push_fonts_of_directory(path& root) {
-    for (auto entry : directory_iterator(root)) {
-        path self = entry.path();
-
-        if (entry.is_directory()) {
-            game_push_fonts_of_directory(self);
-        } else if (entry.is_regular_file()) {
-            system_fonts[self.filename().string()] = self.string();
-        }
-    }
-}
-
-static void game_fonts_initialize(int fontsize = 16) {
-    for (unsigned int idx = 0; idx < sizeof(system_fontdirs) / sizeof(std::string); idx++) {
-        path root(system_fontdirs[idx]);
-
-        if (exists(root) && is_directory(root)) {
-            game_push_fonts_of_directory(root);
-        }
-    }
-
-#if defined(__macosx__)
-    game_sans_serif_font = game_create_font("LucidaGrande.ttc", fontsize);
-    game_serif_font = game_create_font("Times.ttc", fontsize);
-    game_monospace_font = game_create_font("Courier.ttc", fontsize);
-    game_math_font = game_create_font("Bodoni 72.ttc", fontsize);
-    game_unicode_font = game_create_font("PingFang.ttc", fontsize);
-#elif defined(__windows__) /* HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts */
-    game_sans_serif_font = game_create_font("msyh.ttc", fontsize); // Microsoft YaHei
-    game_serif_font = game_create_font("times.ttf", fontsize); // Times New Roman
-    game_monospace_font = game_create_font("cour.ttf", fontsize); // Courier New
-    game_math_font = game_create_font("BOD_R.TTF", fontsize); // Bodoni MT
-    game_unicode_font = game_create_font("msyh.ttc", fontsize);
-#else /* the following fonts have not been tested */
-    game_sans_serif_font = game_create_font("Nimbus Sans.ttc", fontsize);
-    game_serif_font = game_create_font("DejaVu Serif.ttc", fontsize);
-    game_monospace_font = game_create_font("Monospace.ttf", fontsize);
-    game_math_font = game_create_font("URW Bookman.ttf", fontsize);
-    game_unicode_font = game_create_font("Arial Unicode.ttf", fontsize);
-#endif
-
-    GAME_DEFAULT_FONT = game_sans_serif_font;
-}
-
-static void game_fonts_destroy() {
-    Game_Close_Font(GAME_DEFAULT_FONT);
-}
+#define Game_Close_Font(id) if (id != nullptr) TTF_CloseFont(id); id = nullptr
 
 /*************************************************************************************************/
 typedef struct timer_parcel {
@@ -136,7 +72,7 @@ static unsigned int trigger_timer_event(unsigned int interval, void* datum) {
 
 /*************************************************************************************************/
 static void game_initialize(uint32_t flags, int fontsize = 16) {
-    if (GAME_DEFAULT_FONT == NULL) {
+    if (GAME_DEFAULT_FONT == nullptr) {
         Call_With_Safe_Exit(SDL_Init(flags), "SDL 初始化失败: ", SDL_Quit, SDL_GetError);
         Call_With_Safe_Exit(TTF_Init(), "TTF 初始化失败: ", TTF_Quit, TTF_GetError);
 
@@ -149,7 +85,7 @@ static void game_initialize(uint32_t flags, int fontsize = 16) {
             std::string err = std::string(IMG_GetError());
 
             if (err.size() > 0) {
-                std::cout << "IMG 初始化失败: " << err << std::endl;
+                fprintf(stderr, "IMG 初始化失败: %s\n", err.c_str());
                 exit(1);
             }
         }
@@ -165,12 +101,12 @@ static void game_initialize(uint32_t flags, int fontsize = 16) {
 
 static SDL_Texture* game_create_texture(SDL_Window* window, SDL_Renderer* renderer) {
     SDL_Texture* texture;
-    int width, height;
+    int width, height, rw, rh;
 
     SDL_GetWindowSize(window, &width, &height);
     Call_For_Variable(texture,
         SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height),
-        NULL, "纹理创建失败: ", SDL_GetError);
+        nullptr, "纹理创建失败: ", SDL_GetError);
 
     return texture;
 }
@@ -209,63 +145,17 @@ static inline void game_world_reset(SDL_Renderer* renderer, SDL_Texture* texture
 }
 
 static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* texture) {
-    SDL_SetRenderTarget(renderer, NULL);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
+    SDL_SetRenderTarget(renderer, nullptr);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
     SDL_SetRenderTarget(renderer, texture);
-}
-
-/*************************************************************************************************/
-TTF_Font* WarGrey::STEM::game_create_font(const char* face, int fontsize) {
-    std::string face_key(face);
-    TTF_Font* font = NULL;
-
-    if (system_fonts.find(face_key) == system_fonts.end()) {
-        font = TTF_OpenFont(face, fontsize);
-    } else {
-        font = TTF_OpenFont(system_fonts[face_key].c_str(), fontsize);
-    }
-
-    if (font == NULL) {
-        fprintf(stderr, "无法加载字体 '%s': %s\n", face, TTF_GetError());
-    }
-
-    return font;
-}
-
-void WarGrey::STEM::game_font_destroy(TTF_Font* font) {
-    TTF_CloseFont(font);
-}
-
-const std::string* WarGrey::STEM::game_font_list(int* n, int fontsize) {
-    static std::string* font_list = new std::string[system_fonts.size()];
-    static int i = 0;
-
-    if (i == 0) {
-        for (std::pair<std::string, std::string> k_v : system_fonts) {
-            TTF_Font* f = TTF_OpenFont(k_v.second.c_str(), fontsize);
-
-            if (f != NULL) {
-                font_list[i ++] = k_v.first;
-                
-                // insufficient resources to open all fonts
-                TTF_CloseFont(f);
-            }
-        }
-    }
-    
-    if (n != NULL) {
-        (*n) = i;
-    }
-
-    return (const std::string*)font_list;
 }
 
 /*************************************************************************************************/
 WarGrey::STEM::Universe::Universe() : Universe("Big Bang!") {}
 
 WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint32_t bgc)
-    : _fps(fps), _fgc(fgc), _bgc(bgc), _mfgc(fgc), in_editing(false), current_usrin(NULL), echo_font(NULL)
+    : _fps(fps), _fgc(fgc), _bgc(bgc), _mfgc(fgc), in_editing(false), current_usrin(nullptr), echo_font(nullptr)
       , update_sequence_depth(0), update_is_needed(false) {
     
     // 初始化游戏系统
@@ -354,7 +244,6 @@ void WarGrey::STEM::Universe::big_bang() {
 
                 quit_time = e.quit.timestamp;
             }; break;
-            default: /* std::cout << "Ignored unhandled event(type = " << e.type << ")" << std::endl; */ break;
             }
    
             this->end_update_sequence();
@@ -452,7 +341,7 @@ void WarGrey::STEM::Universe::on_resize(int width, int height) {
 void WarGrey::STEM::Universe::on_user_input(const char* text) {
     if (this->in_editing) {
         this->usrin.append(text);
-        this->current_usrin = NULL;
+        this->current_usrin = nullptr;
         
         if (this->display_usr_input_and_caret(this->renderer, true)) {
             this->notify_updated();
@@ -493,7 +382,7 @@ bool WarGrey::STEM::Universe::display_usr_message() {
         updated = true;
     } else {
         if (this->needs_termio_if_no_echo && !this->message.empty()) {
-            std::cout << this->message << std::endl;
+            printf("%s\n", this->message.c_str());
             this->needs_termio_if_no_echo = false;
         }
     }
@@ -630,9 +519,9 @@ void WarGrey::STEM::Universe::stop_input_text() {
 }
 
 void WarGrey::STEM::Universe::enter_input_text() {
-    if (this->current_usrin != NULL) {
+    if (this->current_usrin != nullptr) {
         this->on_user_input(this->current_usrin);
-        this->current_usrin = NULL;
+        this->current_usrin = nullptr;
     } else {
         this->stop_input_text();
     }
@@ -668,38 +557,26 @@ void WarGrey::STEM::Universe::popback_input_text() {
 
 /*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::Universe::snapshot() {
-    static SDL_Surface* snapshot = NULL;
-    SDL_Renderer* renderer = NULL;
-    uint32_t saved_fgc = this->_mfgc;
+    static SDL_Surface* photograph = nullptr;
     bool okay = false;
 
-    if (snapshot != NULL) {
-        SDL_FreeSurface(snapshot);
+    if (photograph != nullptr) {
+        SDL_FreeSurface(photograph);
     }
 
-    snapshot = SDL_CreateRGBSurface(0, this->window_width, this->window_height, 32, 0, 0, 0, 0);
+    photograph = game_blank_image(this->window_width, this->window_height);
 
-    if (snapshot != NULL) {
-        renderer = SDL_CreateSoftwareRenderer(snapshot);
+    if (photograph != nullptr) {
+        SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(photograph);
         
-        if (renderer != NULL) {
+        if (renderer != nullptr) {
             this->do_redraw(renderer, 0, 0, this->window_width, this->window_height);
-        } else {
-            this->send_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
+            SDL_RenderPresent(renderer);
+            SDL_DestroyRenderer(renderer);
         }
-    } else {
-         this->send_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
     }
 
-    if (renderer != NULL) {
-        SDL_DestroyRenderer(renderer);
-    }
-
-    if (!okay) {
-        this->_mfgc = saved_fgc;
-    }
-
-    return snapshot;
+    return photograph;
 }
 
 void WarGrey::STEM::Universe::take_snapshot() {
