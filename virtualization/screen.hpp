@@ -13,6 +13,7 @@ namespace WarGrey::STEM {
             virtual WarGrey::STEM::IDisplay* display() = 0;
         
         public:
+            virtual void refresh() = 0;
             virtual void begin_update_sequence() = 0;
             virtual bool in_update_sequence() = 0;
             virtual void end_update_sequence() = 0;
@@ -20,7 +21,7 @@ namespace WarGrey::STEM {
             virtual void notify_updated() = 0;
 
         public:
-            virtual void refresh() = 0;
+            virtual void log_message(int fgc, const std::string& message) = 0;
     };
 }
 

@@ -10,13 +10,12 @@
 #include "image.hpp"
 
 #include "display.hpp"
-#include "virtualization/screen.hpp"
 
 namespace WarGrey::STEM {
     class IUniverse : public WarGrey::STEM::IDisplay {
         public:
             /* 构造函数，用以设置帧频, 窗口标题, 前景背景色, 和混色模式 */
-            IUniverse(const char* title, int fps, uint32_t fgc, uint32_t bgc);
+            IUniverse(int fps, uint32_t fgc, uint32_t bgc);
             
             /* 析构函数，销毁旧对象时自动调用，默认销毁游戏宇宙 */
             virtual ~IUniverse();
@@ -25,17 +24,17 @@ namespace WarGrey::STEM {
             void big_bang();
 
         public:
-            /* 创建游戏世界，充当程序真正的 main 函数，默认什么都不做 */
-            virtual void construct(int argc, char* argv[]) {}
+            /* 创建游戏世界，充当程序真正的 main 函数 */
+            virtual void construct(int argc, char* argv[]) = 0;
             
-            /* 排列可视化元素，在合适的时候自动调用，默认什么都不做 */
-            virtual void reflow(int window, int height) {}
+            /* 排列可视化元素，在合适的时候自动调用 */
+            virtual void reflow(int window, int height) = 0;
 
-            /* 更新游戏世界，定时器到期时自动调用，默认什么都不做 */
-            virtual void update(uint32_t interval, uint32_t count, uint32_t uptime) {}
+            /* 更新游戏世界，定时器到期时自动调用 */
+            virtual void update(uint32_t interval, uint32_t count, uint32_t uptime) = 0;
             
-            /* 绘制游戏世界，在合适的时候自动调用，默认什么都不做 */
-            virtual void draw(SDL_Renderer* renderer, int x, int y, int width, int height) {}
+            /* 绘制游戏世界，在合适的时候自动调用 */
+            virtual void draw(SDL_Renderer* renderer, int x, int y, int width, int height) = 0;
 
             /* 告诉游戏主循环，是否游戏已经结束可以退出了，默认永久运行 */
             virtual bool can_exit() { return false; }
@@ -43,7 +42,7 @@ namespace WarGrey::STEM {
         public: // 常规操作
             void set_snapshot_folder(const char* path);
             void set_snapshot_folder(const std::string& path);
-            SDL_Surface* snapshot();
+            SDL_Surface* snapshot() override;
             
         public: // 窗体 setter 和 getter
             void set_blend_mode(SDL_BlendMode bmode);
@@ -57,15 +56,11 @@ namespace WarGrey::STEM {
             uint32_t get_foreground_color() { return this->_fgc; }
 
         public: // 窗体重汇相关
-            void refresh();
-            void begin_update_sequence() { this->update_sequence_depth += 1; }
-            bool in_update_sequence() { return (this->update_sequence_depth > 0); }
-            bool needs_update() { return this->update_is_needed; }
-            void end_update_sequence();
-            void notify_updated();
+            void refresh() override;
 
         public: // 用户 IME 输入输出
             void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_unicode_font);
+            int get_cmdwin_height() { return this->echo.h; }
             void start_input_text(const char* fmt, ...);
             void start_input_text(const std::string& prompt);
             void stop_input_text();
@@ -74,6 +69,7 @@ namespace WarGrey::STEM {
             void send_message(uint32_t fgc, const char* fmt, ...);
             void send_message(uint32_t fgc, const std::string& msg);
             void send_message(const char* fmt, ...);
+            void log_message(int fgc, const std::string& message) override;
 
         protected: // 常规事件处理和分派函数
             virtual void on_click(int x, int y) {}                                               // 处理单击事件
@@ -91,27 +87,30 @@ namespace WarGrey::STEM {
         protected:
             virtual void draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height);
 
-        private:
+        protected:
+            /* 大爆炸之前最后的初始化宇宙机会，默认什么都不做 */
+            virtual void on_big_bang(int width, int height) {}
+
             /* 响应定时器事件，刷新游戏世界 */
-            void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime);
+            virtual void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) = 0;
 
             /* 响应鼠标事件，并按需调用单击、右击、双击、移动、滚轮事件 */
-            void on_mouse_event(SDL_MouseButtonEvent &mouse, bool pressed); 
-            void on_mouse_event(SDL_MouseMotionEvent &mouse); 
-            void on_mouse_event(SDL_MouseWheelEvent &mouse);
+            virtual void on_mouse_event(SDL_MouseButtonEvent &mouse, bool pressed); 
+            virtual void on_mouse_event(SDL_MouseMotionEvent &mouse); 
+            virtual void on_mouse_event(SDL_MouseWheelEvent &mouse);
 
             /* 响应键盘事件，并按需调按下、松开事件 */
-            void on_keyboard_event(SDL_KeyboardEvent &key, bool pressed);
+            virtual void on_keyboard_event(SDL_KeyboardEvent &key, bool pressed);
 
             /* 响应窗体事件，并按需调用尺寸改变事件 */
-            void on_resize(int width, int height);
+            virtual void on_resize(int width, int height);
 
             /* 响应输入法事件，按需显示用户输入的内容 */
-            void on_user_input(const char* text);
-            void on_editing(const char* text, int pos, int span);
+            virtual void on_user_input(const char* text);
+            virtual void on_editing(const char* text, int pos, int span);
 
             /* 处理预设事件  */
-            void take_snapshot();
+            virtual void take_snapshot();
         
         private:
             void do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height);
@@ -147,10 +146,6 @@ namespace WarGrey::STEM {
             bool needs_termio_if_no_echo;       // 消息是否需要输出
 
         private:
-            int update_sequence_depth;          // 延迟绘制深度
-            bool update_is_needed;              // 有绘制事件被延迟
-
-        private:
             std::string snapshot_rootdir;       // 屏幕截图位置
     };
 
@@ -161,6 +156,22 @@ namespace WarGrey::STEM {
 
             /* 更有用一些的构造函数，创建新对象时根据参数自动选择 */
             Universe(const char* title, int fps = 60, uint32_t fgc = 0xFFFFFFU, uint32_t bgc = 0x000000U);
+        
+        public:
+            /* 创建游戏世界，充当程序真正的 main 函数，默认什么都不做 */
+            void construct(int argc, char* argv[]) override {}
+            
+            /* 排列可视化元素，在合适的时候自动调用，默认什么都不做 */
+            void reflow(int window, int height) override {}
+
+            /* 更新游戏世界，定时器到期时自动调用，默认什么都不做 */
+            void update(uint32_t interval, uint32_t count, uint32_t uptime) override {}
+            
+            /* 绘制游戏世界，在合适的时候自动调用，默认什么都不做 */
+            void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override {}
+
+        protected:
+            void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) override;
     };
 
     class Pasteboard : public WarGrey::STEM::Universe {

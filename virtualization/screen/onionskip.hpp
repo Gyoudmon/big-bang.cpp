@@ -6,28 +6,24 @@
 namespace WarGrey::STEM {
     class OnionSkip : public WarGrey::STEM::IScreen {
         public:
-            OnionSkip(WarGrey::STEM::IDisplay* display)
-                : _display(display), update_sequence_depth(0), update_is_needed(false) {}
+            OnionSkip(WarGrey::STEM::IDisplay* display) : _display(display) {}
 
         public:
             WarGrey::STEM::IDisplay* display() override { return this->_display; }
         
         public:
-            void begin_update_sequence() override;
-            bool in_update_sequence() override { return update_sequence_depth > 0; }
-            void end_update_sequence() override;
-            bool needs_update() override { return this->update_is_needed; }
-            void notify_updated() override;
+            void refresh() override { this->_display->refresh(); }
+            void begin_update_sequence() override { this->_display->begin_update_sequence(); }
+            bool in_update_sequence() override { return this->_display->in_update_sequence(); }
+            void end_update_sequence() override { this->_display->end_update_sequence(); }
+            bool needs_update() override { return this->_display->needs_update(); }
+            void notify_updated() override { this->_display->notify_updated(); }
 
         public:
-            void refresh() override;
+            void log_message(int fgc, const std::string& message) override { this->_display->log_message(fgc, message); }
 
         private:
             WarGrey::STEM::IDisplay* _display;
-
-        private:
-            int update_sequence_depth;
-            bool update_is_needed;
     };
 }
 

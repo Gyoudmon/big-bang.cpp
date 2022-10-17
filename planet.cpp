@@ -3,8 +3,7 @@
 
 #include "geometry.hpp"
 #include "mathematics.hpp"
-#include "colorspace.hpp"
-#include "image.hpp"
+#include "vsntext.hpp"
 
 #include "flonum.hpp"
 
@@ -27,25 +26,19 @@ namespace {
 	float dy0;
     };
 
-    class GraphletInfo : public WarGrey::STEM::IGraphletInfo {
-        public:
-            GraphletInfo(WarGrey::STEM::IPlanet* master, unsigned int mode)
-                : IGraphletInfo(master), mode(mode) {};
+    struct GraphletInfo : public WarGrey::STEM::IGraphletInfo {
+        GraphletInfo(WarGrey::STEM::IPlanet* master, unsigned int mode) : IGraphletInfo(master), mode(mode) {};
 
-        public:
-            float x;
-            float y;
-            bool selected;
+        float x;
+        float y;
+        bool selected;
+        unsigned int mode;
 
-        public:
-            unsigned int mode;
+	// for asynchronously loaded graphlets
+        AsyncInfo* async;
 
-	public: // for asynchronously loaded graphlets
-            AsyncInfo* async;
-
-        public:
-            IGraphlet* next;
-            IGraphlet* prev;
+        IGraphlet* next;
+        IGraphlet* prev;
     };
 }
 
@@ -209,11 +202,12 @@ static void do_resize(Planet* master, IGraphlet* g, GraphletInfo* info, float sc
 
 /*************************************************************************************************/
 Planet::Planet(const char* name, unsigned int initial_mode)
-    : IPlanet(name), mode(initial_mode)
+    : IPlanet(name), mode(initial_mode), head_graphlet(nullptr)
       , translate_x(0.0F), translate_y(0.0F)
       , scale_x(1.0F), scale_y(1.0F) {}
 
-Planet::Planet(const std::string& name, unsigned int initial_mode) : Planet(name.c_str(), initial_mode) {}
+Planet::Planet(const std::string& name, unsigned int initial_mode)
+    : Planet(name.c_str(), initial_mode) {}
 
 Planet::~Planet() {
     this->collapse();
@@ -806,7 +800,7 @@ void WarGrey::STEM::Planet::draw_visible_selection(SDL_Renderer* renderer, float
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IPlanet::IPlanet(const char* name) : caption(name), background(-1) {}
+WarGrey::STEM::IPlanet::IPlanet(const char* name) : caption(name), background(-1), info(nullptr) {}
 WarGrey::STEM::IPlanet::IPlanet(const std::string& name) : IPlanet(name.c_str()) {}
 
 WarGrey::STEM::IPlanet::~IPlanet() {
@@ -828,6 +822,22 @@ IScreen* WarGrey::STEM::IPlanet::master() {
     }
 
     return screen;
+}
+
+void WarGrey::STEM::IPlanet::send_message(const char* fmt, ...) {
+    VSNPRINT(text, fmt);
+    this->send_message(-1, text);
+}
+
+void WarGrey::STEM::IPlanet::send_message(int fgc, const char* fmt, ...) {
+    VSNPRINT(text, fmt);
+    this->send_message(fgc, text);
+}
+
+void WarGrey::STEM::IPlanet::send_message(int fgc, const std::string& msg) {
+    if (this->info != nullptr) {
+        this->info->master->log_message(fgc, msg);
+    }
 }
 
 void WarGrey::STEM::IPlanet::begin_update_sequence() {

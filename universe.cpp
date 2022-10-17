@@ -5,9 +5,6 @@
 #include "text.hpp"
 #include "time.hpp"
 #include "image.hpp"
-#include "font.hpp"
-
-#include "virtualization/screen/onionskip.hpp"
 
 #include <filesystem>
 
@@ -111,7 +108,7 @@ static SDL_Texture* game_create_texture(SDL_Window* window, SDL_Renderer* render
     return texture;
 }
 
-static SDL_Texture* game_create_world(int width, int height, SDL_Window** window, SDL_Renderer** renderer) {
+static void game_create_world(int width, int height, SDL_Window** window, SDL_Renderer** renderer) {
     uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
 
     if ((width <= 0) || (height <= 0)) {
@@ -124,8 +121,6 @@ static SDL_Texture* game_create_world(int width, int height, SDL_Window** window
 
     Call_With_Error_Message(SDL_CreateWindowAndRenderer(width, height, flags, window, renderer),
         "SDL 窗体和渲染器创建失败: ", SDL_GetError);
-
-    return game_create_texture((*window), (*renderer));
 }
 
 static inline void game_world_reset(SDL_Renderer* renderer, uint32_t fgc, uint32_t bgc) {
@@ -152,22 +147,14 @@ static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* textu
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IUniverse::IUniverse(const char *title, int fps, uint32_t fgc, uint32_t bgc)
-    : _fps(fps), _fgc(fgc), _bgc(bgc), _mfgc(fgc), in_editing(false), current_usrin(nullptr), echo_font(nullptr)
-      , update_sequence_depth(0), update_is_needed(false) {
+WarGrey::STEM::IUniverse::IUniverse(int fps, uint32_t fgc, uint32_t bgc)
+    : _fps(fps), _fgc(fgc), _bgc(bgc), _mfgc(fgc), in_editing(false)
+      , texture(nullptr), current_usrin(nullptr), echo_font(nullptr) {
     
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+    game_create_world(1, 0, &this->window, &this->renderer);
     
-    // 创建游戏世界
-    this->texture = game_create_world(1, 0, &this->window, &this->renderer);
-
-    // 设置标题
-    SDL_SetWindowTitle(this->window, title);
-
-    // 按指定颜色重置窗口
-    game_world_reset(this->renderer, this->texture, this->_fgc, this->_bgc);
-
     this->set_blend_mode(SDL_BLENDMODE_NONE);
 
     this->echo.x = 0;
@@ -179,15 +166,18 @@ WarGrey::STEM::IUniverse::~IUniverse() {
         SDL_RemoveTimer(this->timer);
     }
 
-    SDL_DestroyTexture(this->texture);
+    if (this->texture != nullptr) {
+        SDL_DestroyTexture(this->texture);
+    }
+
     SDL_DestroyRenderer(this->renderer);
     SDL_DestroyWindow(this->window);
 }
 
 void WarGrey::STEM::IUniverse::big_bang() {
     uint32_t quit_time = 0UL;           // 游戏退出时的在线时间
+    timer_parcel_t parcel;              // 时间轴包裹
     SDL_Event e;                        // SDL 事件
-    timer_parcel_t parcel;
     
     if (this->_fps > 0) {
         parcel.universe = this;
@@ -201,9 +191,9 @@ void WarGrey::STEM::IUniverse::big_bang() {
     }
 
     this->fill_window_size(&this->window_width, &this->window_height);
-    SDL_SetRenderTarget(this->renderer, this->texture);
     this->begin_update_sequence();
-    this->reflow(this->window_width, this->window_height);
+    this->on_big_bang(this->window_width, this->window_height);
+    this->on_resize(this->window_width, this->window_height);
     this->notify_updated();
     this->end_update_sequence();
 
@@ -246,11 +236,6 @@ void WarGrey::STEM::IUniverse::big_bang() {
             this->end_update_sequence();
         }
     }
-}
-
-void WarGrey::STEM::IUniverse::on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) {
-    this->update(interval, count, uptime);
-    this->notify_updated();
 }
 
 void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseButtonEvent &mouse, bool pressed) {
@@ -330,12 +315,15 @@ void WarGrey::STEM::IUniverse::on_resize(int width, int height) {
         this->echo.w = width;
     }
 
-    SDL_DestroyTexture(this->texture);
+    if (this->texture != nullptr) {
+        SDL_DestroyTexture(this->texture);
+    }
+
     this->texture = game_create_texture(this->window, this->renderer);
     
     this->begin_update_sequence();
     game_world_reset(this->renderer, this->texture, this->_fgc, this->_bgc);
-    this->reflow(width, height);
+    this->reflow(width, height - this->get_cmdwin_height());
     this->notify_updated();
     this->end_update_sequence();
 }
@@ -360,7 +348,7 @@ void WarGrey::STEM::IUniverse::on_editing(const char* text, int pos, int span) {
 
 void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height) {
     game_world_reset(renderer, this->_fgc, this->_bgc);
-    this->draw(renderer, x, y, width, height - this->echo.h);
+    this->draw(renderer, x, y, width, height - this->get_cmdwin_height());
 
     if (this->in_editing) {
         this->display_usr_input_and_caret(renderer, true);
@@ -374,7 +362,7 @@ void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, i
 }
 
 void WarGrey::STEM::IUniverse::draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height) {
-    game_draw_line(renderer, x, y, width, y, 0x666666U);
+    game_draw_line(renderer, x, y, width, y, 0x888888U);
 }
 
 bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
@@ -444,7 +432,12 @@ void WarGrey::STEM::IUniverse::set_window_size(int width, int height, bool cente
         SDL_SetWindowPosition(this->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     }
 
-    this->on_resize(width, height);
+    if (this->texture != nullptr) {
+        // the universe has been completely initialized
+        this->on_resize(width, height);
+    } else {
+        // the big_bang() will do resizing later
+    }
 }
 
 void WarGrey::STEM::IUniverse::fill_window_size(int* width, int* height) {
@@ -482,7 +475,7 @@ void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int 
 
 void WarGrey::STEM::IUniverse::send_message(const char* fmt, ...) {
     VSNPRINT(text, fmt);
-    this->send_message(-1, text);
+    this->send_message(this->_mfgc, text);
 }
 
 void WarGrey::STEM::IUniverse::send_message(uint32_t fgc, const char* fmt, ...) {
@@ -497,6 +490,14 @@ void WarGrey::STEM::IUniverse::send_message(uint32_t fgc, const std::string& msg
 
     if (this->display_usr_message(this->renderer)){
         this->notify_updated();
+    }
+}
+
+void WarGrey::STEM::IUniverse::log_message(int fgc, const std::string& msg) {
+    if (fgc >= 0) {
+        this->send_message(static_cast<uint32_t>(fgc), msg);
+    } else {
+        this->send_message(this->_mfgc, msg);
     }
 }
 
@@ -615,31 +616,13 @@ void WarGrey::STEM::IUniverse::set_snapshot_folder(const std::string& dir) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IUniverse::notify_updated() {
-    if (this->in_update_sequence()) {
-        this->update_is_needed = true;
-    } else {
-        this->refresh();
-        this->update_is_needed = false;
-    }
+WarGrey::STEM::Universe::Universe() : Universe("The Big Bang!") {}
+WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
+    this->set_window_title("%s", title);
 }
 
-void WarGrey::STEM::IUniverse::end_update_sequence() {
-    this->update_sequence_depth -= 1;
-
-    if (this->update_sequence_depth < 1) {
-        this->update_sequence_depth = 0;
-
-        if (this->update_is_needed) {
-            this->refresh();
-            this->update_is_needed = false;
-        }
-    }
-
+void WarGrey::STEM::Universe::on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) {
+    this->update(interval, count, uptime);
+    this->notify_updated();
 }
-
-/*************************************************************************************************/
-WarGrey::STEM::Universe::Universe() : Universe("Big Bang!") {}
-WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint32_t bgc)
-    : IUniverse(title, fps, fgc, bgc) {}
-
+ 

@@ -2,7 +2,6 @@
 #define _WARGREY_STEM_IDISPLAY_H
 
 #include <SDL2/SDL.h>
-
 #include <string>
 
 /**************************************************************************************************/
@@ -14,11 +13,25 @@ namespace WarGrey::STEM {
 
         public:
             virtual void refresh() = 0;
+
+        public:
+            virtual void log_message(int fgc, const std::string& message) = 0;
             virtual SDL_Surface* snapshot() = 0;
+
+        public:
+            void begin_update_sequence() { this->update_sequence_depth += 1; }
+            bool in_update_sequence() { return (this->update_sequence_depth > 0); }
+            void end_update_sequence();
+            bool needs_update() { return this->update_is_needed; }
+            void notify_updated();
 
         public:
             bool save_snapshot(const std::string& path);
             bool save_snapshot(const char* path);
+        
+        private:
+            int update_sequence_depth = 0;
+            bool update_is_needed = false;
     };
 }
 

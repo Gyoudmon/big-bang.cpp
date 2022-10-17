@@ -57,6 +57,9 @@ namespace WarGrey::STEM {
 
         public:
             virtual void set_background(int color) { this->background = color; }
+            void send_message(int fgc, const char* fmt, ...);
+            void send_message(int fgc, const std::string& msg);
+            void send_message(const char* fmt, ...);
 
         public:
             virtual void on_focus(WarGrey::STEM::IGraphlet* g, bool on_off) {}
