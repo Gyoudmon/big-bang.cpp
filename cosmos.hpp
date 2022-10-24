@@ -38,9 +38,9 @@ namespace WarGrey::STEM {
             void collapse();
 
         private:
-            WarGrey::STEM::IScreen* screen;
-            WarGrey::STEM::IPlanet* head_planet;
-            WarGrey::STEM::IPlanet* recent_planet;
+            WarGrey::STEM::IScreen* screen = nullptr;
+            WarGrey::STEM::IPlanet* head_planet = nullptr;
+            WarGrey::STEM::IPlanet* recent_planet = nullptr;
 
     };
 }

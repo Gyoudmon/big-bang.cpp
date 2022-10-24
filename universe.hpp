@@ -120,30 +120,30 @@ namespace WarGrey::STEM {
             void popback_input_text();
 
         private:
-            uint32_t _fgc;                      // 窗体前景色
-            uint32_t _bgc;                      // 窗体背景色
-            int window_width;                   // 窗体宽度
-            int window_height;                  // 窗体高度
-            SDL_Window* window;                 // 窗体对象
-            SDL_Renderer* renderer;             // 渲染器对象
-            SDL_Texture* texture;               // 纹理对象
+            uint32_t _fgc;                          // 窗体前景色
+            uint32_t _bgc;                          // 窗体背景色
+            int window_width;                       // 窗体宽度
+            int window_height;                      // 窗体高度
+            SDL_Window* window = nullptr;           // 窗体对象
+            SDL_Renderer* renderer = nullptr;       // 渲染器对象
+            SDL_Texture* texture = nullptr;         // 纹理对象
 
         private:
-            SDL_TimerID timer;                  // SDL 定时器
-            int _fps;                           // 帧频
+            SDL_TimerID timer;                      // SDL 定时器
+            int _fps;                               // 帧频
 
         private:
-            const char* current_usrin;          // IME 原始输入
-            std::string prompt;                 // 输入提示
-            std::string usrin;                  // 用户输入
-            bool in_editing;                    // 是否在输入期间
-            SDL_Rect echo;                      // 输入回显区域
-            uint32_t _ifgc;                     // 回显区前景色
-            uint32_t _ibgc;                     // 回显区背景色
-            TTF_Font* echo_font;                // 回显字体
-            std::string message;                // 回显区消息
-            uint32_t _mfgc;                     // 消息颜色
-            bool needs_termio_if_no_echo;       // 消息是否需要输出
+            const char* current_usrin = nullptr;    // IME 原始输入
+            std::string prompt;                     // 输入提示
+            std::string usrin;                      // 用户输入
+            bool in_editing = false;                // 是否在输入期间
+            SDL_Rect echo;                          // 输入回显区域
+            uint32_t _ifgc;                         // 回显区前景色
+            uint32_t _ibgc;                         // 回显区背景色
+            TTF_Font* echo_font = nullptr;          // 回显字体
+            std::string message;                    // 回显区消息
+            uint32_t _mfgc;                         // 消息颜色
+            bool needs_termio_if_no_echo;           // 消息是否需要输出
 
         private:
             std::string snapshot_rootdir;       // 屏幕截图位置

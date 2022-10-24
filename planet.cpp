@@ -202,9 +202,7 @@ static void do_resize(Planet* master, IGraphlet* g, GraphletInfo* info, float sc
 
 /*************************************************************************************************/
 Planet::Planet(const char* name, unsigned int initial_mode)
-    : IPlanet(name), mode(initial_mode), head_graphlet(nullptr)
-      , translate_x(0.0F), translate_y(0.0F)
-      , scale_x(1.0F), scale_y(1.0F) {}
+    : IPlanet(name), mode(initial_mode), head_graphlet(nullptr) {}
 
 Planet::Planet(const std::string& name, unsigned int initial_mode)
     : Planet(name.c_str(), initial_mode) {}
@@ -800,7 +798,7 @@ void WarGrey::STEM::Planet::draw_visible_selection(SDL_Renderer* renderer, float
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IPlanet::IPlanet(const char* name) : caption(name), background(-1), info(nullptr) {}
+WarGrey::STEM::IPlanet::IPlanet(const char* name) : caption(name) {}
 WarGrey::STEM::IPlanet::IPlanet(const std::string& name) : IPlanet(name.c_str()) {}
 
 WarGrey::STEM::IPlanet::~IPlanet() {

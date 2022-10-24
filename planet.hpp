@@ -133,10 +133,10 @@ namespace WarGrey::STEM {
             }
 
         public:
-            IPlanetInfo* info;
+            IPlanetInfo* info = nullptr;
 
         protected:
-            int background;
+            int background = -1;
 
         private:
             std::string caption;
@@ -212,16 +212,16 @@ namespace WarGrey::STEM {
             float graphlets_bottom;
 
         private:
-            WarGrey::STEM::IGraphlet* head_graphlet;
-            WarGrey::STEM::IGraphlet* focused_graphlet;
-            WarGrey::STEM::IGraphlet* hovering_graphlet;
-            unsigned int mode;
+            WarGrey::STEM::IGraphlet* head_graphlet = nullptr;
+            WarGrey::STEM::IGraphlet* focused_graphlet = nullptr;
+            WarGrey::STEM::IGraphlet* hovering_graphlet = nullptr;
+            unsigned int mode = 0U;
 
 	private:
-	    float translate_x;
-	    float translate_y;
-	    float scale_x;
-	    float scale_y;
+	    float translate_x = 0.0F;
+	    float translate_y = 0.0F;
+	    float scale_x = 1.0F;
+	    float scale_y = 1.0F;
     };
 }
 
