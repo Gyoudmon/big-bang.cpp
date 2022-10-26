@@ -1,10 +1,11 @@
 #include "universe.hpp"
 #include "geometry.hpp"
-#include "vsntext.hpp"
 #include "colorspace.hpp"
 #include "text.hpp"
 #include "time.hpp"
 #include "image.hpp"
+
+#include "datum/string.hpp"
 
 #include <filesystem>
 
@@ -28,8 +29,6 @@ using namespace std::filesystem;
         fprintf(stderr, "%s%s\n", message, GetError()); \
         exit(1); \
     }
-
-#define Game_Close_Font(id) if (id != nullptr) TTF_CloseFont(id); id = nullptr
 
 /*************************************************************************************************/
 typedef struct timer_parcel {
@@ -541,27 +540,7 @@ void WarGrey::STEM::IUniverse::enter_input_text() {
 }
 
 void WarGrey::STEM::IUniverse::popback_input_text() {
-    size_t size = this->usrin.size();
-
-    if (size > 0) {
-        const unsigned char* text = reinterpret_cast<const unsigned char*>(this->usrin.c_str());
-        
-        /**
-         * UTF-8 encodes characters in 1 to 4 bytes, and their binary forms are:
-         *   0xxx xxxx
-         *   110x xxxx  10xx xxxx
-         *   1110 xxxx  10xx xxxx  10xx xxxx
-         *   1111 xxxx  10xx xxxx  10xx xxxx  10xx xxxx
-         */
-        
-        if (text[size - 1] < 0b10000000U) {
-            this->usrin.pop_back();
-        } else {
-            size -= 2;
-            while (text[size] < 0b11000000U) size--;
-            this->usrin.erase(size);
-        }
-
+    if (string_popback_utf8_char(this->usrin)) {
         if (this->display_usr_input_and_caret(this->renderer, true)) {
             this->notify_updated();
         }

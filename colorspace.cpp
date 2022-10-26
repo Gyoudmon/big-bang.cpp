@@ -3,13 +3,14 @@
 
 #include "colorspace.hpp"
 
-#include "flonum.hpp"
-#include "fixnum.hpp"
+#include "datum/flonum.hpp"
+#include "datum/fixnum.hpp"
+#include "datum/box.hpp"
 
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-#define UCHAR(v) ((unsigned char)flround(v * 255.0))
+#define UCHAR(v) static_cast<unsigned char>(flround(v * 255.0F))
 
 static int sdl_set_render_draw_color(SDL_Renderer* renderer, float r, float g, float b, unsigned char a) {
     return SDL_SetRenderDrawColor(renderer, UCHAR(r), UCHAR(g), UCHAR(b), a);
@@ -58,6 +59,18 @@ static int set_render_color_from_hsi_sector(SDL_Renderer* renderer, float hue, f
         case 'g': return sdl_set_render_draw_color(renderer, midor, major, minor, alpha); break;
         default:  return sdl_set_render_draw_color(renderer, minor, midor, major, alpha); break;
         }
+    }
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::RGB_FillColor(SDL_Color* c, unsigned int hex, float alpha) {
+    return RGB_FillColor(c, hex, UCHAR(alpha));
+}
+
+void WarGrey::STEM::RGB_FillColor(SDL_Color* c, unsigned int hex, unsigned char alpha) {
+    if (c != nullptr) {
+        RGB_FromHexadecimal(hex, &c->r, &c->g, &c->b);
+        c->a = alpha;
     }
 }
 
@@ -117,15 +130,22 @@ int WarGrey::STEM::HSI_SetRenderDrawColor(SDL_Renderer* renderer, float hue, flo
 
 /*************************************************************************************************/
 void WarGrey::STEM::RGB_FromHexadecimal(unsigned int hex, unsigned char* r, unsigned char* g, unsigned char* b) {
-    (*r) = (unsigned char)((hex >> 16) & 0xFF);
-    (*g) = (unsigned char)((hex >> 8) & 0xFF);
-    (*b) = (unsigned char)(hex & 0xFF);
+    SET_BOX(r, static_cast<unsigned char>((hex >> 16) & 0xFF));
+    SET_BOX(g, static_cast<unsigned char>((hex >> 8) & 0xFF));
+    SET_BOX(b, static_cast<unsigned char>(hex & 0xFF));
 }
 
 void WarGrey::STEM::RGB_FromHexadecimal(unsigned int hex, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a) {
-    (*r) = (unsigned char)((hex >> 24) & 0xFF);
-    (*g) = (unsigned char)((hex >> 16) & 0xFF);
-    (*b) = (unsigned char)((hex >> 8) & 0xFF);
-    (*a) = (unsigned char)(hex & 0xFF);
+    SET_BOX(r, static_cast<unsigned char>((hex >> 24) & 0xFF));
+    SET_BOX(g, static_cast<unsigned char>((hex >> 16) & 0xFF));
+    SET_BOX(b, static_cast<unsigned char>((hex >> 8) & 0xFF));
+    SET_BOX(a, static_cast<unsigned char>(hex & 0xFF));
+}
+
+void WarGrey::STEM::RGB_FromHexadecimal(unsigned int hex, unsigned char* r, unsigned char* g, unsigned char* b, float* a) {
+    unsigned char alpha;
+
+    RGB_FromHexadecimal(hex, r, g, b, &alpha);
+    SET_BOX(a, float(alpha) / 255.0F);
 }
 

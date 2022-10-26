@@ -1,6 +1,7 @@
 #include "game.hpp"                 // 放最前面以兼容 macOS
 #include "image.hpp"
-#include "flonum.hpp"
+
+#include "datum/flonum.hpp"
 
 #include <filesystem>
 

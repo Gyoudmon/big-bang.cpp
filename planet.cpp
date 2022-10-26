@@ -3,9 +3,9 @@
 
 #include "geometry.hpp"
 #include "mathematics.hpp"
-#include "vsntext.hpp"
+#include "colorspace.hpp"
 
-#include "flonum.hpp"
+#include "datum/string.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -763,8 +763,8 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
     float dsWidth = X + Width;
     float dsHeight = Y + Height;
     
-    if (this->background >= 0) {
-        game_fill_rect(renderer, X, Y, Width, Height, static_cast<uint32_t>(this->background));
+    if (this->bg_alpha >= 0.0F) {
+        game_fill_rect(renderer, X, Y, Width, Height, this->background, this->bg_alpha);
     }
 
     if (this->head_graphlet != nullptr) {
@@ -822,6 +822,10 @@ IScreen* WarGrey::STEM::IPlanet::master() {
     return screen;
 }
 
+void WarGrey::STEM::IPlanet::fill_background(SDL_Color* c) {
+    RGB_FillColor(c, this->background, this->bg_alpha);
+}
+
 void WarGrey::STEM::IPlanet::send_message(const char* fmt, ...) {
     VSNPRINT(text, fmt);
     this->send_message(-1, text);
@@ -868,14 +872,15 @@ void WarGrey::STEM::IPlanet::collapse() {
     this->erase();
 }
 
-SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float width, float height, int bgcolor) {
-    return this->snapshot(0.0F, 0.0F, width, height, bgcolor);
+SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float width, float height, uint32_t bgcolor, float alpha) {
+    return this->snapshot(0.0F, 0.0F, width, height, bgcolor, alpha);
 }
 
-SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float x, float y, float width, float height, int bgcolor) {
+SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
     static SDL_Surface* photograph = nullptr;
     SDL_Renderer* renderer = nullptr;
     int saved_bgc = this->background;
+    int saved_alpha = this->bg_alpha;
 
     if (photograph != nullptr) {
         SDL_FreeSurface(photograph);
@@ -891,6 +896,7 @@ SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float x, float y, float width, flo
         
         if (renderer != nullptr) {
             this->background = bgcolor;
+            this->bg_alpha = alpha;
             this->draw(renderer, -x, -y, width, height);
             SDL_RenderPresent(renderer);
             SDL_DestroyRenderer(renderer);
@@ -898,24 +904,25 @@ SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float x, float y, float width, flo
     }
 
     this->background = saved_bgc;
+    this->bg_alpha = saved_alpha;
 
     return photograph;
 }
 
-bool WarGrey::STEM::IPlanet::save_snapshot(const std::string& png, float width, float height, int bgcolor) {
-    return this->save_snapshot(png.c_str(), 0.0F, 0.0F, width, height, bgcolor);
+bool WarGrey::STEM::IPlanet::save_snapshot(const std::string& png, float width, float height, uint32_t bgcolor, float alpha) {
+    return this->save_snapshot(png.c_str(), 0.0F, 0.0F, width, height, bgcolor, alpha);
 }
 
-bool WarGrey::STEM::IPlanet::save_snapshot(const char* png, float width, float height, int bgcolor) {
-    return this->save_snapshot(png, 0.0F, 0.0F, width, height, bgcolor);
+bool WarGrey::STEM::IPlanet::save_snapshot(const char* png, float width, float height, uint32_t bgcolor, float alpha) {
+    return this->save_snapshot(png, 0.0F, 0.0F, width, height, bgcolor, alpha);
 }
 
-bool WarGrey::STEM::IPlanet::save_snapshot(const std::string& png, float x, float y, float width, float height, int bgcolor) {
-    return this->save_snapshot(png.c_str(), x, y, width, height, bgcolor);
+bool WarGrey::STEM::IPlanet::save_snapshot(const std::string& png, float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
+    return this->save_snapshot(png.c_str(), x, y, width, height, bgcolor, alpha);
 }
 
-bool WarGrey::STEM::IPlanet::save_snapshot(const char* png, float x, float y, float width, float height, int bgcolor) {
-    return game_save_image(this->snapshot(x, y, width, height, bgcolor), png);
+bool WarGrey::STEM::IPlanet::save_snapshot(const char* png, float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
+    return game_save_image(this->snapshot(x, y, width, height, bgcolor, alpha), png);
 }
 
 bool WarGrey::STEM::IPlanet::fill_graphlet_location(IGraphlet* g, float* x, float* y, GraphletAnchor a) {

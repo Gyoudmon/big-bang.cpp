@@ -17,7 +17,7 @@ namespace WarGrey::STEM {
     void game_fonts_destroy();
 
     TTF_Font* game_create_font(const char* face, int fontsize);
-    void game_font_destroy(TTF_Font* font);
+    void game_font_destroy(TTF_Font* font, bool usr_only = true);
     const std::string* game_font_list(int* n, int fontsize = 16);
 }
 

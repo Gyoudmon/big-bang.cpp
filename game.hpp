@@ -1,5 +1,4 @@
-#ifndef _SYNTAX_GAME_H
-#define _SYNTAX_GAME_H
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -22,7 +21,5 @@
  */
 #ifdef main
 #undef main
-#endif
-
 #endif
 

@@ -41,7 +41,7 @@ namespace WarGrey::STEM {
             IGraphletInfo* info = nullptr;
 
         private:
-            WarGrey::STEM::GraphletAnchor anchor;
+            WarGrey::STEM::GraphletAnchor anchor = WarGrey::STEM::GraphletAnchor::LT;
             float anchor_x;
             float anchor_y;
     };

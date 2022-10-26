@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_PLANET_H
-#define _WARGREY_STEM_PLANET_H
+#pragma once
 
 #include "universe.hpp"
 #include "forward.hpp"
@@ -56,7 +55,8 @@ namespace WarGrey::STEM {
             virtual void erase() = 0;
 
         public:
-            virtual void set_background(int color) { this->background = color; }
+            void set_background(uint32_t color, float a = 1.0F) { this->background = color; this->bg_alpha = a; }
+            void fill_background(SDL_Color* color);
             void send_message(int fgc, const char* fmt, ...);
             void send_message(int fgc, const std::string& msg);
             void send_message(const char* fmt, ...);
@@ -103,13 +103,13 @@ namespace WarGrey::STEM {
             void notify_updated();
 
         public:
-            SDL_Surface* snapshot(float width, float height, int bgcolor = -1);
-            SDL_Surface* snapshot(float x, float y, float width, float height, int bgcolor = -1);
+            SDL_Surface* snapshot(float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
+            SDL_Surface* snapshot(float x, float y, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
         
-            bool save_snapshot(const std::string& pname, float width, float height, int bgcolor = -1);
-            bool save_snapshot(const char* pname, float width, float height, int bgcolor = -1);
-            bool save_snapshot(const std::string& pname, float x, float y, float width, float height, int bgcolor = -1);
-            bool save_snapshot(const char* pname, float x, float y, float width, float height, int bgcolor = -1);
+            bool save_snapshot(const std::string& pname, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
+            bool save_snapshot(const char* pname, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F );
+            bool save_snapshot(const std::string& pname, float x, float y, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
+            bool save_snapshot(const char* pname, float x, float y, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
 
         public:
             bool fill_graphlet_location(IGraphlet* g, float* x, float* y, GraphletAnchor a);
@@ -136,7 +136,8 @@ namespace WarGrey::STEM {
             IPlanetInfo* info = nullptr;
 
         protected:
-            int background = -1;
+            uint32_t background = 0U;
+            float bg_alpha = 0.0F;
 
         private:
             std::string caption;
@@ -224,6 +225,4 @@ namespace WarGrey::STEM {
 	    float scale_y = 1.0F;
     };
 }
-
-#endif
 

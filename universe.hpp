@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_UNIVERSE_H
-#define _WARGREY_STEM_UNIVERSE_H
+#pragma once
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -180,6 +179,4 @@ namespace WarGrey::STEM {
                 : Universe(title, 0, fgc, bgc) {}
     };
 }
-
-#endif
 

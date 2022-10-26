@@ -72,7 +72,11 @@ void WarGrey::STEM::game_fonts_initialize(int fontsize) {
 }
 
 void WarGrey::STEM::game_fonts_destroy() {
-    Game_Close_Font(GAME_DEFAULT_FONT);
+    Game_Close_Font(game_sans_serif_font);
+    Game_Close_Font(game_serif_font);
+    Game_Close_Font(game_monospace_font);
+    Game_Close_Font(game_math_font);
+    Game_Close_Font(game_unicode_font);
 }
 
 /*************************************************************************************************/
@@ -93,8 +97,20 @@ TTF_Font* WarGrey::STEM::game_create_font(const char* face, int fontsize) {
     return font;
 }
 
-void WarGrey::STEM::game_font_destroy(TTF_Font* font) {
-    TTF_CloseFont(font);
+void WarGrey::STEM::game_font_destroy(TTF_Font* font, bool usr_only) {
+    if (font != nullptr) {
+        if (!usr_only) {
+            TTF_CloseFont(font);
+        } else if (font == GAME_DEFAULT_FONT) {
+        } else if (font == game_sans_serif_font) {
+        } else if (font == game_serif_font) {
+        } else if (font == game_monospace_font) {
+        } else if (font == game_math_font) {
+        } else if (font == game_unicode_font) {
+        } else {
+            TTF_CloseFont(font);
+        }
+    }
 }
 
 const std::string* WarGrey::STEM::game_font_list(int* n, int fontsize) {
@@ -108,7 +124,7 @@ const std::string* WarGrey::STEM::game_font_list(int* n, int fontsize) {
             if (f != nullptr) {
                 font_list[i ++] = k_v.first;
                 
-                // insufficient resources to open all fonts
+                // because of insufficient resources to open all fonts
                 TTF_CloseFont(f);
             }
         }

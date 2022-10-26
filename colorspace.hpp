@@ -4,7 +4,11 @@
 #include <SDL2/SDL.h>
 
 namespace WarGrey::STEM {
+    void RGB_FillColor(SDL_Color* c, unsigned int hex, float alpha);
+    void RGB_FillColor(SDL_Color* c, unsigned int hex, unsigned char alpha);
+
     void RGB_FromHexadecimal(unsigned int hex, unsigned char* red, unsigned char* green, unsigned char* blue);
+    void RGB_FromHexadecimal(unsigned int hex, unsigned char* red, unsigned char* green, unsigned char* blue, float* alpha);
     void RGB_FromHexadecimal(unsigned int hex, unsigned char* red, unsigned char* green, unsigned char* blue, unsigned char* alpha);
 
     int RGB_SetRenderDrawColor(SDL_Renderer* renderer, unsigned int hex, float alpha);

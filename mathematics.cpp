@@ -1,4 +1,3 @@
-#include "flonum.hpp"
 #include "mathematics.hpp"
 
 using namespace WarGrey::STEM;
