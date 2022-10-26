@@ -1,5 +1,4 @@
-#ifndef _WARGREY_COLORSPACE_H
-#define _WARGREY_COLORSPACE_H
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -20,6 +19,4 @@ namespace WarGrey::STEM {
     int HSI_SetRenderDrawColor(SDL_Renderer* renderer, float hue, float saturation, float intensity, float alpha);
     int HSI_SetRenderDrawColor(SDL_Renderer* renderer, float hue, float saturation, float intensity, unsigned char alpha = 0xFFU);
 }
-
-#endif
 

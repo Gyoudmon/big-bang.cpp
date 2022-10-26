@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_FONT_H
-#define _WARGREY_STEM_FONT_H
+#pragma once
 
 #include <SDL2/SDL_ttf.h>
 
@@ -20,6 +19,4 @@ namespace WarGrey::STEM {
     void game_font_destroy(TTF_Font* font, bool usr_only = true);
     const std::string* game_font_list(int* n, int fontsize = 16);
 }
-
-#endif
 

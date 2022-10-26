@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_DATUM_CHAR_H
-#define _WARGREY_STEM_DATUM_CHAR_H
+#pragma once
 
 namespace WarGrey::STEM {
     static const char linefeed = 0x0A;
@@ -26,6 +25,4 @@ namespace WarGrey::STEM {
     static const wchar_t wminus = (wchar_t)(minus);
     static const wchar_t wdot = (wchar_t)(dot);
 }
-
-#endif
 

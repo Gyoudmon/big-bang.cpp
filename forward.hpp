@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_FORWARD_H
-#define _WARGREY_STEM_FORWARD_H
+#pragma once
 
 namespace WarGrey::STEM {
     class IPlanet;
@@ -11,6 +10,4 @@ namespace WarGrey::STEM {
 
     enum class GraphletAnchor { LT, CT, RT, LC, CC, RC, LB, CB, RB };
 }
-
-#endif
 

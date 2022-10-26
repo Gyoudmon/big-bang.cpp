@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_FIXNUM_H
-#define _WARGREY_STEM_FIXNUM_H
+#pragma once
 
 #include <cmath>
 #include <cstdlib>
@@ -41,4 +40,3 @@ namespace WarGrey::STEM {
     static inline size_t integer_length(unsigned long long n) { size_t s = 0;  while (n) { n >>= 1; s++; } return s; }
 }
 
-#endif

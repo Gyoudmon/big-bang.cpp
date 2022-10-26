@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_COSMOS_H
-#define _WARGREY_STEM_COSMOS_H
+#pragma once
 
 #include "universe.hpp"
 #include "planet.hpp"
@@ -44,6 +43,4 @@ namespace WarGrey::STEM {
 
     };
 }
-
-#endif
 

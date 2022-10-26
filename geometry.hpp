@@ -1,5 +1,4 @@
-#ifndef _SYNTAX_GEOMETRY_H
-#define _SYNTAX_GEOMETRY_H
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -80,6 +79,4 @@ namespace WarGrey::STEM {
     void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, uint32_t rgb, float alpha = 1.0F);
     void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
 }
-
-#endif
 

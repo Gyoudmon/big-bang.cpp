@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_DATUM_STRING_H
-#define _WARGREY_STEM_DATUM_STRING_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -59,6 +58,4 @@ namespace WarGrey::STEM {
     /************************************************************************************************/
     bool string_popback_utf8_char(std::string& src);
 }
-
-#endif
 

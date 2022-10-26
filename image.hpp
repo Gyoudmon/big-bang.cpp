@@ -1,5 +1,4 @@
-#ifndef _WARGREY_IMAGE_H
-#define _WARGREY_IMAGE_H
+#pragma once
 
 #include <SDL2/SDL_image.h>
 
@@ -28,6 +27,4 @@ namespace WarGrey::STEM {
     bool game_save_image(SDL_Surface* png, const std::string& pname);
     bool game_save_image(SDL_Surface* png, const char* pname);
 }
-
-#endif
 

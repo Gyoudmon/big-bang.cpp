@@ -1,5 +1,4 @@
-#ifndef _DIGITAMA_TIME_H
-#define _DIGITAMA_TIME_H
+#pragma once
 
 #include <string>
 
@@ -14,6 +13,4 @@ namespace WarGrey::STEM {
     std::string make_datestamp_utc(long long utc_s, bool locale);
     std::string make_daytimestamp_utc(long long utc_s, bool locale);
 }
-
-#endif
 

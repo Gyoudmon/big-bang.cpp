@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_SPRITE_H
-#define _WARGREY_STEM_SPRITE_H
+#pragma once
 
 #include "forward.hpp"
 
@@ -60,6 +59,4 @@ namespace WarGrey::STEM {
             bool findable = true;
     };
 }
-
-#endif
 

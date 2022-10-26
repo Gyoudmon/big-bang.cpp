@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_IDISPLAY_H
-#define _WARGREY_STEM_IDISPLAY_H
+#pragma once
 
 #include <SDL2/SDL.h>
 #include <string>
@@ -34,6 +33,4 @@ namespace WarGrey::STEM {
             bool update_is_needed = false;
     };
 }
-
-#endif
 

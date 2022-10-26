@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_GRAPHLET_H
-#define _WARGREY_STEM_GRAPHLET_H
+#pragma once
 
 #include "sprite.hpp"
 
@@ -46,6 +45,4 @@ namespace WarGrey::STEM {
             float anchor_y;
     };
 }
-
-#endif
 

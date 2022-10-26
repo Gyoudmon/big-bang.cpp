@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_FLONUM_H
-#define _WARGREY_STEM_FLONUM_H
+#pragma once
 
 #include <cmath>
 #include <limits>
@@ -112,6 +111,4 @@ namespace WarGrey::STEM {
     int inline fl2fxi(float f) { return WarGrey::STEM::fl2fx<int>(f); }
     int inline fl2fxi(double fl) { return WarGrey::STEM::fl2fx<int>(fl); }
 }
-
-#endif
 

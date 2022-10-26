@@ -1,5 +1,4 @@
-#ifndef _WARGREY_NAMED_COLOR_H
-#define _WARGREY_NAMED_COLOR_H
+#pragma once
 
 namespace WarGrey::STEM {
 #define BISQUE 0xffe4c4U
@@ -151,6 +150,4 @@ namespace WarGrey::STEM {
 #define MEDIUMSPRINGGREEN 0xfa9aU
 #define MINTCREAM 0xf5fffaU
 }
-
-#endif
 
