@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_ONIONSKIP_H
-#define _WARGREY_STEM_ONIONSKIP_H
+#pragma once
 
 #include "../screen.hpp"
 
@@ -26,6 +25,4 @@ namespace WarGrey::STEM {
             WarGrey::STEM::IDisplay* _display;
     };
 }
-
-#endif 
 

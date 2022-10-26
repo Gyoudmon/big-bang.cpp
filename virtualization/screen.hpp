@@ -1,5 +1,4 @@
-#ifndef _WARGREY_STEM_SCREEN_H
-#define _WARGREY_STEM_SCREEN_H
+#pragma once
 
 #include "../display.hpp"
 
@@ -24,6 +23,4 @@ namespace WarGrey::STEM {
             virtual void log_message(int fgc, const std::string& message) = 0;
     };
 }
-
-#endif
 
