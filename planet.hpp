@@ -62,6 +62,12 @@ namespace WarGrey::STEM {
             void send_message(const char* fmt, ...);
 
         public:
+            virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) { return false; }
+            virtual bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks, bool touch) { return false; }
+            virtual bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy, bool touch) { return false; }
+            virtual bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) { return false; }
+
+        public:
             virtual void on_focus(WarGrey::STEM::IGraphlet* g, bool on_off) {}
             virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
             virtual void on_text(const char* text, bool entire) {}
@@ -71,6 +77,8 @@ namespace WarGrey::STEM {
             virtual void on_goodbye(WarGrey::STEM::IGraphlet* g, float local_x, float local_y) {}
             virtual void on_tap(WarGrey::STEM::IGraphlet* g, float local_x, float local_y) {}
             virtual void on_tap_selected(WarGrey::STEM::IGraphlet* g, float local_x, float local_y) {}
+
+            virtual void on_save() {}
 
         public:
             virtual void draw_visible_selection(SDL_Renderer* renderer, float X, float Y, float width, float height) = 0;
@@ -181,6 +189,11 @@ namespace WarGrey::STEM {
         public:
             using WarGrey::STEM::IPlanet::on_elapse;
 
+            bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) override;
+            bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy, bool touch) override;
+            bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks, bool touch) override;
+            bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) override;
+            
             void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
             void on_text(const char* text, bool entire) override;
             void on_text(const char* text, int pos, int span) override;
@@ -205,6 +218,7 @@ namespace WarGrey::STEM {
 
         private:
             void recalculate_graphlets_extent_when_invalid();
+            bool say_goodbye_to_hover_graphlet(uint32_t state, float x, float y, float dx, float dy);
 
         private:
             float graphlets_left;
@@ -218,11 +232,11 @@ namespace WarGrey::STEM {
             WarGrey::STEM::IGraphlet* hovering_graphlet = nullptr;
             unsigned int mode = 0U;
 
-	private:
-	    float translate_x = 0.0F;
-	    float translate_y = 0.0F;
-	    float scale_x = 1.0F;
-	    float scale_y = 1.0F;
+        private:
+            float translate_x = 0.0F;
+            float translate_y = 0.0F;
+            float scale_x = 1.0F;
+            float scale_y = 1.0F;
     };
 }
 

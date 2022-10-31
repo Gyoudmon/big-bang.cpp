@@ -291,7 +291,7 @@ void WarGrey::STEM::IUniverse::on_keyboard_event(SDL_KeyboardEvent &keyboard, bo
 
             if (key.mod & ctrl_mod) {
                 switch (key.sym) {
-                    case SDLK_s: this->save(); break;
+                    case SDLK_s: this->on_save(); break;
                     case SDLK_p: this->take_snapshot(); break;
                     default: this->on_char(key.sym, key.mod, keyboard.repeat, pressed);
                 }
@@ -603,4 +603,4 @@ void WarGrey::STEM::Universe::on_elapse(uint32_t interval, uint32_t count, uint3
     this->update(interval, count, uptime);
     this->notify_updated();
 }
- 
+

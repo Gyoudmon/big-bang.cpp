@@ -164,3 +164,67 @@ void WarGrey::STEM::Cosmos::draw(SDL_Renderer* renderer, int x, int y, int width
     }
 }
 
+/*************************************************************************************************/
+void WarGrey::STEM::Cosmos::on_mouse_event(SDL_MouseButtonEvent& m, bool pressed) {
+    if (this->recent_planet != nullptr) {
+        uint8_t button = m.button;
+        float flx = float(m.x);
+        float fly = float(m.y);
+        uint8_t clicks = m.clicks;
+
+        this->begin_update_sequence();
+        if (pressed) {
+            this->recent_planet->on_pointer_pressed(button, flx, fly, clicks, false);
+        } else {
+            this->recent_planet->on_pointer_released(button, flx, fly, clicks, false);
+        }
+        this->end_update_sequence();
+    }
+}
+
+void WarGrey::STEM::Cosmos::on_mouse_move(uint32_t state, int x, int y, int dx, int dy) {
+    if (this->recent_planet != nullptr) {
+        this->begin_update_sequence();
+        this->recent_planet->on_pointer_move(state, float(x), float(y), float(dx), float(dy), false);
+        this->end_update_sequence();
+    }
+}
+
+void WarGrey::STEM::Cosmos::on_scroll(int horizon, int vertical, float hprecise, float vprecise) {
+    if (this->recent_planet != nullptr) {
+        this->begin_update_sequence();
+        this->recent_planet->on_scroll(horizon, vertical, hprecise, vprecise);
+        this->end_update_sequence();
+    }
+}
+
+void WarGrey::STEM::Cosmos::on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {
+    if (this->recent_planet != nullptr) {
+        this->begin_update_sequence();
+        this->recent_planet->on_char(key, modifiers, repeats, pressed);
+        this->end_update_sequence();
+    }
+}
+
+void WarGrey::STEM::Cosmos::on_text(const char* text, bool entire) {
+    if (this->recent_planet != nullptr) {
+        this->begin_update_sequence();
+        this->recent_planet->on_text(text, entire);
+        this->end_update_sequence();
+    }
+}
+
+void WarGrey::STEM::Cosmos::on_text(const char* text, int pos, int span) {
+    if (this->recent_planet != nullptr) {
+        this->begin_update_sequence();
+        this->recent_planet->on_text(text, pos, span);
+        this->end_update_sequence();
+    }
+}
+            
+void WarGrey::STEM::Cosmos::on_save() {
+    if (this->recent_planet != nullptr) {
+        this->recent_planet->on_save();
+    }
+}
+

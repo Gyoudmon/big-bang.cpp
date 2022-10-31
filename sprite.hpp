@@ -12,8 +12,8 @@ namespace WarGrey::STEM {
             ISprite() {}
             virtual ~ISprite() {}
 
-            virtual void sprite() {}           // pseudo constructor for special derived classes before constructing
-            virtual void sprite_construct() {} // pseudo constructor for special derived classes after constructing
+            virtual void pre_construct() {}     // pseudo constructor for special derived classes before constructing
+            virtual void post_construct() {}    // pseudo constructor for special derived classes after constructing
 
         public:
             virtual void construct() {}
@@ -28,9 +28,14 @@ namespace WarGrey::STEM {
             virtual bool on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) { return false; }
             virtual bool on_text(const char* text, bool entire) { return false; }
             virtual bool on_text(const char* text, int pos, int span) { return false; }
-            virtual void on_hover(float local_x, float local_y) {}
-            virtual void on_tap(float local_x, float local_y) {}
-            virtual void on_goodbye(float local_x, float local_y) {}
+            virtual bool on_hover(float local_x, float local_y) { return false; }
+            virtual bool on_tap(float local_x, float local_y) { return false; }
+            virtual bool on_goodbye(float local_x, float local_y) { return false; }
+
+        public: // low-level events
+            virtual bool on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) { return false; }
+            virtual bool on_pointer_move(uint32_t state, float local_x, float local_y, float dx, float dy, bool bye) { return false; }
+            virtual bool on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) { return false; }
 
         public:
             void enable_resizing(bool yes_no, WarGrey::STEM::GraphletAnchor anchor = GraphletAnchor::CC) { this->can_resize = yes_no; this->resize_anchor = anchor; }

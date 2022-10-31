@@ -16,17 +16,15 @@ namespace WarGrey::STEM {
             void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override;
 
         protected: // 常规事件处理和分派函数
-            void on_click(int x, int y) override {}
-            void on_right_click(int x, int y) override {}
-            void on_double_click(int x, int y) override {}
-            void on_mouse_move(uint32_t state, int x, int y, int dx, int dy) override {}
-            void on_scroll(int horizon, int vertical, float hprecise, float vprecise) override {}
+            void on_mouse_event(SDL_MouseButtonEvent& mouse, bool pressed) override; 
+            void on_mouse_move(uint32_t state, int x, int y, int dx, int dy) override;
+            void on_scroll(int horizon, int vertical, float hprecise, float vprecise) override;
 
-            void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override {}
-            void on_text(const char* text, bool entire) override {}
-            void on_text(const char* text, int pos, int span) override {}
+            void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
+            void on_text(const char* text, bool entire) override;
+            void on_text(const char* text, int pos, int span) override;
             
-            void save() override {}
+            void on_save() override;
 
         protected:
             void on_big_bang(int width, int height) override;

@@ -19,26 +19,26 @@ using namespace WarGrey::STEM;
 namespace {
     struct AsyncInfo {
         float x0;
-	float y0;
-	float fx0;
-	float fy0;
-	float dx0;
-	float dy0;
+    float y0;
+    float fx0;
+    float fy0;
+    float dx0;
+    float dy0;
     };
 
     struct GraphletInfo : public WarGrey::STEM::IGraphletInfo {
         GraphletInfo(WarGrey::STEM::IPlanet* master, unsigned int mode) : IGraphletInfo(master), mode(mode) {};
 
-        float x;
-        float y;
-        bool selected;
-        unsigned int mode;
+        float x = 0.0F;
+        float y = 0.0F;
+        bool selected = false;
+        unsigned int mode = 0U;
 
-	// for asynchronously loaded graphlets
-        AsyncInfo* async;
+    // for asynchronously loaded graphlets
+        AsyncInfo* async = nullptr;
 
-        IGraphlet* next;
-        IGraphlet* prev;
+        IGraphlet* next = nullptr;
+        IGraphlet* prev = nullptr;
     };
 }
 
@@ -274,9 +274,9 @@ void WarGrey::STEM::Planet::insert(IGraphlet* g, float x, float y, float fx, flo
         info->next = this->head_graphlet;
 
         this->begin_update_sequence();
-        g->sprite();
+        g->pre_construct();
         g->construct();
-        g->sprite_construct();
+        g->post_construct();
         unsafe_move_graphlet_via_info(this, g, info, x, y, fx, fy, dx, dy, true);
 
         if (g->ready()) {
@@ -291,7 +291,6 @@ void WarGrey::STEM::Planet::insert(IGraphlet* g, float x, float y, float fx, flo
             this->notify_updated(); // is it necessary?
             this->end_update_sequence();
         }
-
     }
 }
 
@@ -738,6 +737,134 @@ void WarGrey::STEM::Planet::on_tap(IGraphlet* g, float local_x, float local_y) {
     }
 }
 
+bool WarGrey::STEM::Planet::on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) {
+    bool handled = false;
+
+    switch (clicks) {
+        case 1: {
+            switch (button) {
+                case SDL_BUTTON_LEFT: {
+                    IGraphlet* unmasked_graphlet = this->find_graphlet(x, y);
+
+                    this->set_caret_owner(unmasked_graphlet);
+                    this->no_selected();
+                    
+                    if ((unmasked_graphlet != nullptr) && (unmasked_graphlet->handle_low_level_events())) {
+                        GraphletInfo* info = GRAPHLET_INFO(unmasked_graphlet);
+                        float local_x = x - info->x;
+                        float local_y = y - info->y;
+
+                        handled = unmasked_graphlet->on_pointer_pressed(button, local_x, local_y, clicks);
+                    }
+                }; break;
+            }
+        }; break;
+    }
+
+    return handled;
+}
+
+bool WarGrey::STEM::Planet::on_pointer_move(uint32_t state, float x, float y, float dx, float dy, bool touch) {
+    bool handled = false;
+
+    if (state == 0) {
+        IGraphlet* unmasked_graphlet = this->find_graphlet(x, y);
+
+        if (unmasked_graphlet != this->hovering_graphlet) {
+            this->say_goodbye_to_hover_graphlet(state, x, y, dx, dy);
+        }
+
+        if (unmasked_graphlet != nullptr) {
+            GraphletInfo* info = GRAPHLET_INFO(unmasked_graphlet);
+            float local_x = x - info->x;
+            float local_y = y - info->y;
+
+            this->hovering_graphlet = unmasked_graphlet;
+
+            if (unmasked_graphlet->handle_events()) {
+                unmasked_graphlet->on_hover(local_x, local_y);
+
+                if (unmasked_graphlet->handle_low_level_events()) {
+                    unmasked_graphlet->on_pointer_move(state, local_x, local_y, dx, dy, false);
+                }
+            }
+
+            this->on_hover(this->hovering_graphlet, local_x, local_y);
+
+            handled = true;
+        }
+    }
+
+    return handled;
+}
+
+bool WarGrey::STEM::Planet::on_pointer_released(uint8_t button, float x, float y, uint8_t clicks, bool touch) {
+    bool handled = false;
+
+    switch (clicks) {
+        case 1: {
+            switch (button) {
+                case SDL_BUTTON_LEFT: {
+                    IGraphlet* unmasked_graphlet = this->find_graphlet(x, y);
+        
+                    if (unmasked_graphlet != nullptr) {
+                        GraphletInfo* info = GRAPHLET_INFO(unmasked_graphlet);
+                        float local_x = x - info->x;
+                        float local_y = y - info->y;
+
+                        if (unmasked_graphlet->handle_events()) {
+                            unmasked_graphlet->on_tap(local_x, local_y);
+
+                            if (unmasked_graphlet->handle_low_level_events()) {
+                                unmasked_graphlet->on_pointer_released(button, local_x, local_y, clicks);
+                            }
+                        }
+
+                        this->on_tap(unmasked_graphlet, local_x, local_y);
+
+                        if (info->selected) {
+                            this->on_tap_selected(unmasked_graphlet, local_x, local_y);
+                        }
+
+                        handled = info->selected;
+                    }
+                }; break;
+            }
+        }; break;
+    }
+
+    return handled;
+}
+
+bool WarGrey::STEM::Planet::on_scroll(int horizon, int vertical, float hprecise, float vprecise) {
+    bool handled = false;
+
+    return handled;
+}
+
+bool WarGrey::STEM::Planet::say_goodbye_to_hover_graphlet(uint32_t state, float x, float y, float dx, float dy) {
+    bool done = false;
+
+    if (this->hovering_graphlet != nullptr) {
+        GraphletInfo* info = GRAPHLET_INFO(this->hovering_graphlet);
+        float local_x = x - info->x;
+        float local_y = y - info->y;
+
+        if (this->hovering_graphlet->handle_events()) {
+            done |= this->hovering_graphlet->on_goodbye(local_x, local_y);
+
+            if (this->hovering_graphlet->handle_low_level_events()) {
+                done |= this->hovering_graphlet->on_pointer_move(state, local_x, local_y, dx, dy, true);
+            }
+        }
+
+        this->on_goodbye(this->hovering_graphlet, local_x, local_y);
+        this->hovering_graphlet = nullptr;
+    }
+
+    return done;
+}
+
 /************************************************************************************************/
 void WarGrey::STEM::Planet::on_elapse(long long count, long long interval, long long uptime) {
     if (this->head_graphlet != nullptr) {
@@ -795,6 +922,7 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
 }
 
 void WarGrey::STEM::Planet::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
+    game_draw_rect(renderer, x, y, width, height, 0x0000FFU);
 }
 
 /*************************************************************************************************/
@@ -827,13 +955,17 @@ void WarGrey::STEM::IPlanet::fill_background(SDL_Color* c) {
 }
 
 void WarGrey::STEM::IPlanet::send_message(const char* fmt, ...) {
-    VSNPRINT(text, fmt);
-    this->send_message(-1, text);
+    if (this->info != nullptr) {
+        VSNPRINT(text, fmt);
+        this->send_message(-1, text);
+    }
 }
 
 void WarGrey::STEM::IPlanet::send_message(int fgc, const char* fmt, ...) {
-    VSNPRINT(text, fmt);
-    this->send_message(fgc, text);
+    if (this->info != nullptr) {
+        VSNPRINT(text, fmt);
+        this->send_message(fgc, text);
+    }
 }
 
 void WarGrey::STEM::IPlanet::send_message(int fgc, const std::string& msg) {

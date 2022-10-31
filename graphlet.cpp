@@ -1,6 +1,8 @@
 #include "graphlet.hpp"
 #include "planet.hpp"
 
+#include "datum/string.hpp"
+
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
@@ -58,6 +60,26 @@ bool WarGrey::STEM::IGraphlet::has_caret() {
 void WarGrey::STEM::IGraphlet::fill_location(float* x, float* y, WarGrey::STEM::GraphletAnchor a) {
     if (this->info != nullptr) {
         this->info->master->fill_graphlet_location(this, x, y, a);
+    }
+}
+
+void WarGrey::STEM::IGraphlet::send_message(const char* fmt, ...) {
+    if (this->info != nullptr) {
+        VSNPRINT(text, fmt);
+        this->send_message(-1, text);
+    }
+}
+
+void WarGrey::STEM::IGraphlet::send_message(int fgc, const char* fmt, ...) {
+    if (this->info != nullptr) {
+        VSNPRINT(text, fmt);
+        this->send_message(fgc, text);
+    }
+}
+
+void WarGrey::STEM::IGraphlet::send_message(int fgc, const std::string& msg) {
+    if (this->info != nullptr) {
+        this->info->master->send_message(fgc, msg);
     }
 }
 

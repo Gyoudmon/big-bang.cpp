@@ -37,6 +37,11 @@ namespace WarGrey::STEM {
             void notify_updated();
 
         public:
+            void send_message(int fgc, const char* fmt, ...);
+            void send_message(int fgc, const std::string& msg);
+            void send_message(const char* fmt, ...);
+
+        public:
             IGraphletInfo* info = nullptr;
 
         private:

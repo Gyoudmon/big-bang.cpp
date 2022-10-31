@@ -81,7 +81,7 @@ namespace WarGrey::STEM {
             virtual void on_text(const char* text, bool entire) {}                               // 处理文本输入事件
             virtual void on_text(const char* text, int pos, int span) {}                         // 处理文本输入事件
             
-            virtual void save() {}                                                               // 处理保存事件
+            virtual void on_save() {}                                                            // 处理保存事件
 
         protected:
             virtual void draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height);
@@ -93,15 +93,15 @@ namespace WarGrey::STEM {
             /* 响应定时器事件，刷新游戏世界 */
             virtual void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) = 0;
 
-            /* 响应鼠标事件，并按需调用单击、右击、双击、移动、滚轮事件 */
-            virtual void on_mouse_event(SDL_MouseButtonEvent &mouse, bool pressed); 
-            virtual void on_mouse_event(SDL_MouseMotionEvent &mouse); 
-            virtual void on_mouse_event(SDL_MouseWheelEvent &mouse);
+            /* 响应鼠标事件，并按需触发单击、右击、双击、移动、滚轮事件 */
+            virtual void on_mouse_event(SDL_MouseButtonEvent& mouse, bool pressed); 
+            virtual void on_mouse_event(SDL_MouseMotionEvent& mouse); 
+            virtual void on_mouse_event(SDL_MouseWheelEvent& mouse);
 
-            /* 响应键盘事件，并按需调按下、松开事件 */
-            virtual void on_keyboard_event(SDL_KeyboardEvent &key, bool pressed);
+            /* 响应键盘事件，并按需触发按下、松开事件 */
+            virtual void on_keyboard_event(SDL_KeyboardEvent& key, bool pressed);
 
-            /* 响应窗体事件，并按需调用尺寸改变事件 */
+            /* 响应窗体事件，并按需触发尺寸改变事件 */
             virtual void on_resize(int width, int height);
 
             /* 响应输入法事件，按需显示用户输入的内容 */
