@@ -245,7 +245,6 @@ void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, in
 }
 
 /*************************************************************************************************/
-/*************************************************************************************************/
 void WarGrey::STEM::game_draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height) {
     SDL_FRect box;
 

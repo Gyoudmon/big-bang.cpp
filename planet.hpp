@@ -187,8 +187,6 @@ namespace WarGrey::STEM {
             void size_cache_invalid();
 
         public:
-            using WarGrey::STEM::IPlanet::on_elapse;
-
             bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) override;
             bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy, bool touch) override;
             bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks, bool touch) override;
