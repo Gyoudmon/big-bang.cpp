@@ -57,6 +57,8 @@ namespace WarGrey::STEM {
         public:
             void set_background(uint32_t color, float a = 1.0F) { this->background = color; this->bg_alpha = a; }
             void fill_background(SDL_Color* color);
+            void start_input_text(const std::string& prompt);
+            void start_input_text(const char* prompt, ...);
             void send_message(int fgc, const char* fmt, ...);
             void send_message(int fgc, const std::string& msg);
             void send_message(const char* fmt, ...);

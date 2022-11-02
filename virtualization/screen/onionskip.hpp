@@ -20,6 +20,7 @@ namespace WarGrey::STEM {
 
         public:
             void log_message(int fgc, const std::string& message) override { this->_display->log_message(fgc, message); }
+            void start_input_text(const std::string& prompt) override { this->_display->start_input_text(prompt); }
 
         private:
             WarGrey::STEM::IDisplay* _display;

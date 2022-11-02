@@ -21,6 +21,7 @@ namespace WarGrey::STEM {
 
         public:
             virtual void log_message(int fgc, const std::string& message) = 0;
+            virtual void start_input_text(const std::string& prompt) = 0;
     };
 }
 

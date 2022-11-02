@@ -954,17 +954,30 @@ void WarGrey::STEM::IPlanet::fill_background(SDL_Color* c) {
     RGB_FillColor(c, this->background, this->bg_alpha);
 }
 
+void WarGrey::STEM::IPlanet::start_input_text(const char* fmt, ...) {
+    if (this->info != nullptr) {
+        VSNPRINT(prompt, fmt);
+        this->start_input_text(prompt);
+    }
+}
+
+void WarGrey::STEM::IPlanet::start_input_text(const std::string& prompt) {
+    if (this->info != nullptr) {
+        this->info->master->start_input_text(prompt);
+    }
+}
+
 void WarGrey::STEM::IPlanet::send_message(const char* fmt, ...) {
     if (this->info != nullptr) {
-        VSNPRINT(text, fmt);
-        this->send_message(-1, text);
+        VSNPRINT(msg, fmt);
+        this->send_message(-1, msg);
     }
 }
 
 void WarGrey::STEM::IPlanet::send_message(int fgc, const char* fmt, ...) {
     if (this->info != nullptr) {
-        VSNPRINT(text, fmt);
-        this->send_message(fgc, text);
+        VSNPRINT(msg, fmt);
+        this->send_message(fgc, msg);
     }
 }
 
