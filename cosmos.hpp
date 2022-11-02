@@ -21,7 +21,7 @@ namespace WarGrey::STEM {
             void on_scroll(int horizon, int vertical, float hprecise, float vprecise) override;
 
             void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
-            void on_text(const char* text, bool entire) override;
+            void on_text(const char* text, size_t size, bool entire) override;
             void on_text(const char* text, int pos, int span) override;
             
             void on_save() override;

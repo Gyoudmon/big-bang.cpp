@@ -206,10 +206,10 @@ void WarGrey::STEM::Cosmos::on_char(char key, uint16_t modifiers, uint8_t repeat
     }
 }
 
-void WarGrey::STEM::Cosmos::on_text(const char* text, bool entire) {
+void WarGrey::STEM::Cosmos::on_text(const char* text, size_t size, bool entire) {
     if (this->recent_planet != nullptr) {
         this->begin_update_sequence();
-        this->recent_planet->on_text(text, entire);
+        this->recent_planet->on_text(text, size, entire);
         this->end_update_sequence();
     }
 }

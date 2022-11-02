@@ -31,6 +31,7 @@ namespace WarGrey::STEM {
                                   use this method to do it manually. */
 
         public:
+            void fill_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
             void fill_location(float* x, float* y, WarGrey::STEM::GraphletAnchor a = GraphletAnchor::LT);
 
         public:

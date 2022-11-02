@@ -26,7 +26,7 @@ namespace WarGrey::STEM {
 
         public:
             virtual bool on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) { return false; }
-            virtual bool on_text(const char* text, bool entire) { return false; }
+            virtual bool on_text(const char* text, size_t size, bool entire) { return false; }
             virtual bool on_text(const char* text, int pos, int span) { return false; }
             virtual bool on_hover(float local_x, float local_y) { return false; }
             virtual bool on_tap(float local_x, float local_y) { return false; }

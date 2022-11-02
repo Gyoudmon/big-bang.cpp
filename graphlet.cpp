@@ -2,6 +2,7 @@
 #include "planet.hpp"
 
 #include "datum/string.hpp"
+#include "datum/box.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -21,6 +22,10 @@ IPlanet* WarGrey::STEM::IGraphlet::master() {
     }
 
     return planet;
+}
+
+void WarGrey::STEM::IGraphlet::fill_extent(float x, float y, float* w, float* h) {
+    SET_VALUES(w, 0.0F, h, 0.0F);
 }
 
 void WarGrey::STEM::IGraphlet::notify_updated() {

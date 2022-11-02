@@ -141,7 +141,7 @@ std::vector<std::string> WarGrey::STEM::string_lines(std::string& src, bool skip
 }
 
 /************************************************************************************************/
-unsigned long long WarGrey::STEM::scan_natural(const unsigned char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+unsigned long long WarGrey::STEM::scan_natural(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
     unsigned long long value = 0;
 
     while ((*pos) < end) {
@@ -162,7 +162,7 @@ unsigned long long WarGrey::STEM::scan_natural(const unsigned char* src, size_t*
     return value;
 }
 
-long long WarGrey::STEM::scan_integer(const unsigned char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+long long WarGrey::STEM::scan_integer(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
     int sign = 1;
     long long value = 0;
 
@@ -193,7 +193,7 @@ long long WarGrey::STEM::scan_integer(const unsigned char* src, size_t* pos, siz
     return value * sign;
 }
 
-double WarGrey::STEM::scan_flonum(const unsigned char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+double WarGrey::STEM::scan_flonum(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
     double value = flnan;
     double i_acc = 10.0;
     double f_acc = 1.0;
@@ -243,7 +243,7 @@ double WarGrey::STEM::scan_flonum(const unsigned char* src, size_t* pos, size_t 
     return value * sign;
 }
 
-void WarGrey::STEM::scan_bytes(const unsigned char* src, size_t* pos, size_t end, unsigned char* bs, size_t bs_start, size_t bs_end, bool terminating) {
+void WarGrey::STEM::scan_bytes(const char* src, size_t* pos, size_t end, char* bs, size_t bs_start, size_t bs_end, bool terminating) {
     size_t bsize = bs_end - bs_start;
     size_t size = fxmin(end - (*pos), bsize);
 
@@ -262,7 +262,27 @@ void WarGrey::STEM::scan_bytes(const unsigned char* src, size_t* pos, size_t end
     (*pos) += size;
 }
 
-size_t WarGrey::STEM::scan_skip_space(const unsigned char* src, size_t* pos, size_t end) {
+size_t WarGrey::STEM::scan_skip_token(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+    size_t idx = (*pos);
+
+    while ((*pos) < end) {
+        char c = src[(*pos)];
+
+        if (c == space) {
+            break;
+        }
+
+        (*pos) += 1;
+    }
+
+    if (skip_trailing_space) {
+        scan_skip_space(src, pos, end);
+    }
+
+    return (*pos) - idx;
+}
+
+size_t WarGrey::STEM::scan_skip_space(const char* src, size_t* pos, size_t end) {
     size_t idx = (*pos);
 
     while ((*pos) < end) {
@@ -278,7 +298,7 @@ size_t WarGrey::STEM::scan_skip_space(const unsigned char* src, size_t* pos, siz
     return (*pos) - idx;
 }
 
-size_t WarGrey::STEM::scan_skip_newline(const unsigned char* src, size_t* pos, size_t end) {
+size_t WarGrey::STEM::scan_skip_newline(const char* src, size_t* pos, size_t end) {
     size_t idx = (*pos);
 
     while ((*pos) < end) {
@@ -294,7 +314,7 @@ size_t WarGrey::STEM::scan_skip_newline(const unsigned char* src, size_t* pos, s
     return (*pos) - idx;
 }
 
-size_t WarGrey::STEM::scan_skip_this_line(const unsigned char* src, size_t* pos, size_t end) {
+size_t WarGrey::STEM::scan_skip_this_line(const char* src, size_t* pos, size_t end) {
     size_t idx = (*pos);
 
     while ((*pos) < end) {
@@ -311,6 +331,7 @@ size_t WarGrey::STEM::scan_skip_this_line(const unsigned char* src, size_t* pos,
     return (*pos) - idx;
 }
 
+/************************************************************************************************/
 bool WarGrey::STEM::string_popback_utf8_char(std::string& src) {
     size_t size = src.size();
     bool okay = false;

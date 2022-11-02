@@ -72,7 +72,7 @@ namespace WarGrey::STEM {
         public:
             virtual void on_focus(WarGrey::STEM::IGraphlet* g, bool on_off) {}
             virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
-            virtual void on_text(const char* text, bool entire) {}
+            virtual void on_text(const char* text, size_t size, bool entire) {}
             virtual void on_text(const char* text, int pos, int span) {}
             virtual void on_elapse(long long count, long long interval, long long uptime) {}
             virtual void on_hover(WarGrey::STEM::IGraphlet* g, float local_x, float local_y) {}
@@ -195,7 +195,7 @@ namespace WarGrey::STEM {
             bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) override;
             
             void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
-            void on_text(const char* text, bool entire) override;
+            void on_text(const char* text, size_t size, bool entire) override;
             void on_text(const char* text, int pos, int span) override;
             void on_tap(WarGrey::STEM::IGraphlet* g, float x, float y) override;
             void on_elapse(long long count, long long interval, long long uptime) override;

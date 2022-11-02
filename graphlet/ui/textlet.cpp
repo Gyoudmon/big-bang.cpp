@@ -94,7 +94,6 @@ WarGrey::STEM::Labellet::Labellet(const char *fmt, ...) {
 
 WarGrey::STEM::Labellet::Labellet(TTF_Font* font, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
-
     this->set_font(font);
     this->set_text(caption);
 }

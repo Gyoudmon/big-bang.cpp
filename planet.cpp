@@ -707,9 +707,9 @@ void WarGrey::STEM::Planet::on_char(char key, uint16_t modifiers, uint8_t repeat
     }
 }
 
-void WarGrey::STEM::Planet::on_text(const char* text, bool entire) {
+void WarGrey::STEM::Planet::on_text(const char* text, size_t size, bool entire) {
     if (this->focused_graphlet != nullptr) {
-        this->focused_graphlet->on_text(text, entire);
+        this->focused_graphlet->on_text(text, size, entire);
     }
 }
 

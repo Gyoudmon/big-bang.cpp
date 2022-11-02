@@ -336,7 +336,7 @@ void WarGrey::STEM::IUniverse::on_user_input(const char* text) {
         }
     }
 
-    this->on_text(text, false);
+    this->on_text(text, strlen(text), false);
 }
 
 void WarGrey::STEM::IUniverse::on_editing(const char* text, int pos, int span) {
@@ -521,7 +521,7 @@ void WarGrey::STEM::IUniverse::start_input_text(const std::string& p) {
 void WarGrey::STEM::IUniverse::stop_input_text() {
     this->in_editing = false;
     SDL_StopTextInput();
-    this->on_text(this->usrin.c_str(), true);
+    this->on_text(this->usrin.c_str(), this->usrin.size(), true);
     this->usrin.erase();
     this->prompt.erase();
 

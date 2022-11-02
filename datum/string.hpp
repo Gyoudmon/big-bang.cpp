@@ -41,18 +41,19 @@ namespace WarGrey::STEM {
     std::string binumber(unsigned long long n, size_t bitsize = 0);
     std::string hexnumber(unsigned long long n, size_t bytecount = 0);
 
-    unsigned long long scan_natural(const unsigned char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
-    long long scan_integer(const unsigned char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
-    double scan_flonum(const unsigned char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
-    void scan_bytes(const unsigned char* src, size_t* pos, size_t end, unsigned char* bs, size_t bs_start, size_t bs_end, bool terminating = true);
+    unsigned long long scan_natural(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
+    long long scan_integer(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
+    double scan_flonum(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
+    void scan_bytes(const char* src, size_t* pos, size_t end, char* bs, size_t bs_start, size_t bs_end, bool terminating = true);
     
-    size_t scan_skip_space(const unsigned char* src, size_t* pos, size_t end);
-    size_t scan_skip_newline(const unsigned char* src, size_t* pos, size_t end);
-    size_t scan_skip_this_line(const unsigned char* src, size_t* pos, size_t end);
+    size_t scan_skip_token(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
+    size_t scan_skip_space(const char* src, size_t* pos, size_t end);
+    size_t scan_skip_newline(const char* src, size_t* pos, size_t end);
+    size_t scan_skip_this_line(const char* src, size_t* pos, size_t end);
 
     template<typename B, size_t N>
-    void scan_bytes(const unsigned char* src, size_t* pos, size_t end, B (&bs)[N], size_t start = 0U, bool terminating = true) {
-        scan_bytes(src, pos, end, (unsigned char*)bs, 0, N, terminating);
+    void scan_bytes(const char* src, size_t* pos, size_t end, B (&bs)[N], size_t start = 0U, bool terminating = true) {
+        scan_bytes(src, pos, end, reinterpret_cast<char*>(bs), 0, N, terminating);
     }
 
     /************************************************************************************************/
