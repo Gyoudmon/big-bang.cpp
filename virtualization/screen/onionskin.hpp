@@ -3,9 +3,9 @@
 #include "../screen.hpp"
 
 namespace WarGrey::STEM {
-    class OnionSkip : public WarGrey::STEM::IScreen {
+    class OnionSkin : public WarGrey::STEM::IScreen {
         public:
-            OnionSkip(WarGrey::STEM::IDisplay* display) : _display(display) {}
+            OnionSkin(WarGrey::STEM::IDisplay* display) : _display(display) {}
 
         public:
             WarGrey::STEM::IDisplay* display() override { return this->_display; }
