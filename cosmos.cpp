@@ -94,6 +94,11 @@ void WarGrey::STEM::Cosmos::collapse() {
     }
 }
 
+bool WarGrey::STEM::Cosmos::can_exit() {
+    return (this->recent_planet != nullptr) && this->recent_planet->can_exit();
+}
+
+
 /*************************************************************************************************/
 void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
     if (this->head_planet != nullptr) {

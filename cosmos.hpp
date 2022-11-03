@@ -14,6 +14,7 @@ namespace WarGrey::STEM {
             void reflow(int window, int height) override;
             void update(uint32_t interval, uint32_t count, uint32_t uptime) override {};
             void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override;
+            bool can_exit() override;
 
         protected: // 常规事件处理和分派函数
             void on_mouse_event(SDL_MouseButtonEvent& mouse, bool pressed) override; 

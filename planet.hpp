@@ -38,6 +38,7 @@ namespace WarGrey::STEM {
             virtual void update(long long count, long long interval, long long uptime) {}
             virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
             virtual void collapse();
+            virtual bool can_exit() { return false; }
         
         public:
             virtual WarGrey::STEM::IGraphlet* find_graphlet(float x, float y) = 0;
