@@ -147,7 +147,7 @@ static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* textu
 
 /*************************************************************************************************/
 WarGrey::STEM::IUniverse::IUniverse(int fps, uint32_t fgc, uint32_t bgc)
-    : _fps(fps), _fgc(fgc), _bgc(bgc), _mfgc(fgc) {
+    : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
     
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
@@ -550,7 +550,6 @@ void WarGrey::STEM::IUniverse::popback_input_text() {
 /*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
     static SDL_Surface* photograph = nullptr;
-    bool okay = false;
 
     if (photograph != nullptr) {
         SDL_FreeSurface(photograph);

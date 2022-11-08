@@ -109,15 +109,6 @@ static void graphlet_anchor_fraction(GraphletAnchor& a, float* ofx, float* ofy) 
     (*ofy) = fy;
 }
 
-static inline void graphlet_anchor_offset(float width, float height, GraphletAnchor& a, float* xoff, float* yoff) {
-    float fx, fy;
-
-    graphlet_anchor_fraction(a, &fx, &fy);
-
-    (*xoff) = fx * width;
-    (*yoff) = fy * height;
-}
-
 static bool unsafe_move_graphlet_via_info(Planet* master, GraphletInfo* info, float x, float y, bool absolute) {
     bool moved = false;
     
@@ -202,7 +193,7 @@ static void do_resize(Planet* master, IGraphlet* g, GraphletInfo* info, float sc
 
 /*************************************************************************************************/
 Planet::Planet(const char* name, unsigned int initial_mode)
-    : IPlanet(name), mode(initial_mode), head_graphlet(nullptr) {}
+    : IPlanet(name), head_graphlet(nullptr), mode(initial_mode) {}
 
 Planet::Planet(const std::string& name, unsigned int initial_mode)
     : Planet(name.c_str(), initial_mode) {}
