@@ -4,12 +4,12 @@ using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
 inline static float quick_degrees_to_radians(float degrees) {
-	return degrees * pi / 180.0f;
+	return degrees * pi_f / 180.0f;
 }
 
 /*************************************************************************************************/
 float WarGrey::STEM::radians_to_degrees(float radians) {
-	return (radians / pi) * 180.0f;
+	return (radians / pi_f) * 180.0f;
 }
 
 float WarGrey::STEM::degrees_to_radians(float degrees) {

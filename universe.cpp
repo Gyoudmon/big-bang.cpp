@@ -97,7 +97,7 @@ static void game_initialize(uint32_t flags, int fontsize = 16) {
 
 static SDL_Texture* game_create_texture(SDL_Window* window, SDL_Renderer* renderer) {
     SDL_Texture* texture;
-    int width, height, rw, rh;
+    int width, height;
 
     SDL_GetWindowSize(window, &width, &height);
     Call_For_Variable(texture,

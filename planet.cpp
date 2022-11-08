@@ -1025,7 +1025,7 @@ SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float x, float y, float width, flo
     static SDL_Surface* photograph = nullptr;
     SDL_Renderer* renderer = nullptr;
     int saved_bgc = this->background;
-    int saved_alpha = this->bg_alpha;
+    float saved_alpha = this->bg_alpha;
 
     if (photograph != nullptr) {
         SDL_FreeSurface(photograph);

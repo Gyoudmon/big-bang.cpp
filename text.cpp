@@ -21,7 +21,8 @@ static inline void setup_for_text(TTF_Font* font, const std::string& text, unsig
     c.a = 0xFFU;
 }
 
-static inline void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* message, int x, int y) {
+template<typename T>
+static inline void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* message, T x, T y) {
     /** TODO: Cache the textures of text **/
 
     if (message != nullptr) {

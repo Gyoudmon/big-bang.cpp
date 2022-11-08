@@ -9,11 +9,11 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-static unsigned int newline_position(const char* src, unsigned int idx0, unsigned int idxn, unsigned int* next_idx) {
-    unsigned int line_size = 0;
-    unsigned int eol_size = 0;
+static size_t newline_position(const char* src, size_t idx0, size_t idxn, size_t* next_idx) {
+    size_t line_size = 0;
+    size_t eol_size = 0;
 
-    for (unsigned int idx = idx0; idx < idxn; idx ++) {
+    for (size_t idx = idx0; idx < idxn; idx ++) {
         if (src[idx] == linefeed) {
             eol_size = (((idx + 1) < idxn) && (src[idx + 1] == carriage_return)) ? 2 : 1;
             break;
@@ -114,8 +114,8 @@ long long WarGrey::STEM::string_to_fixnum(std::string& string) {
 /**************************************************************************************************/
 std::string WarGrey::STEM::string_first_line(std::string& src) {
     const char* raw_src = src.c_str();
-    unsigned int total = src.size();
-    unsigned int line_size = newline_position(raw_src, 0, total, &total);
+    size_t total = src.size();
+    size_t line_size = newline_position(raw_src, 0, total, &total);
     
     return std::string(raw_src, line_size);
 }
@@ -123,11 +123,11 @@ std::string WarGrey::STEM::string_first_line(std::string& src) {
 std::vector<std::string> WarGrey::STEM::string_lines(std::string& src, bool skip_empty_line) {
     std::vector<std::string> lines;
     const char* raw_src = src.c_str();
-    unsigned int total = src.size();
-    unsigned int nidx = 0;
+    size_t total = src.size();
+    size_t nidx = 0;
 
     while (total > 0) {
-        unsigned int line_size = newline_position(raw_src, 0, total, &nidx);
+        size_t line_size = newline_position(raw_src, 0, total, &nidx);
 
         if ((line_size > 0) || (!skip_empty_line)) {
             lines.push_back(std::string(raw_src, line_size));
