@@ -8,20 +8,6 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-static void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* message, SDL_Rect* region) {
-    /** TODO: Cache the textures of text **/
-    
-    SDL_Texture* text = SDL_CreateTextureFromSurface(target, message);
-
-    if (text != nullptr) {
-        SDL_RenderCopy(target, text, nullptr, region);
-        SDL_DestroyTexture(text);
-    }
-
-    SDL_FreeSurface(message);
-}
-
-/*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height) {
     return SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
 }
