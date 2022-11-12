@@ -7,15 +7,14 @@ using namespace WarGrey::STEM;
 using namespace std::filesystem;
 
 /*************************************************************************************************/
-#define Game_Close_Font(id) if (id != nullptr) TTF_CloseFont(id); id = nullptr
+#define Game_Close_Font(id) if (id != nullptr) TTF_CloseFont(id); id = nullptr;
 
-/*************************************************************************************************/
-TTF_Font* WarGrey::STEM::GAME_DEFAULT_FONT = nullptr;
-TTF_Font* WarGrey::STEM::game_sans_serif_font = nullptr;
-TTF_Font* WarGrey::STEM::game_serif_font = nullptr;
-TTF_Font* WarGrey::STEM::game_monospace_font = nullptr;
-TTF_Font* WarGrey::STEM::game_math_font = nullptr;
-TTF_Font* WarGrey::STEM::game_unicode_font = nullptr;
+TTF_Font* WarGrey::STEM::game_font::DEFAULT = nullptr;
+TTF_Font* WarGrey::STEM::game_font::sans_serif = nullptr;
+TTF_Font* WarGrey::STEM::game_font::serif = nullptr;
+TTF_Font* WarGrey::STEM::game_font::monospace = nullptr;
+TTF_Font* WarGrey::STEM::game_font::math = nullptr;
+TTF_Font* WarGrey::STEM::game_font::unicode = nullptr;
 
 /*************************************************************************************************/
 static std::unordered_map<std::string, std::string> system_fonts;
@@ -49,34 +48,34 @@ void WarGrey::STEM::game_fonts_initialize(int fontsize) {
     }
 
 #if defined(__macosx__)
-    game_sans_serif_font = game_create_font("LucidaGrande.ttc", fontsize);
-    game_serif_font = game_create_font("Times.ttc", fontsize);
-    game_monospace_font = game_create_font("Courier.ttc", fontsize);
-    game_math_font = game_create_font("Bodoni 72.ttc", fontsize);
-    game_unicode_font = game_create_font("PingFang.ttc", fontsize);
+    game_font::sans_serif = game_create_font("LucidaGrande.ttc", fontsize);
+    game_font::serif = game_create_font("Times.ttc", fontsize);
+    game_font::monospace = game_create_font("Courier.ttc", fontsize);
+    game_font::math = game_create_font("Bodoni 72.ttc", fontsize);
+    game_font::unicode = game_create_font("PingFang.ttc", fontsize);
 #elif defined(__windows__) /* HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts */
-    game_sans_serif_font = game_create_font("msyh.ttc", fontsize); // Microsoft YaHei
-    game_serif_font = game_create_font("times.ttf", fontsize); // Times New Roman
-    game_monospace_font = game_create_font("cour.ttf", fontsize); // Courier New
-    game_math_font = game_create_font("BOD_R.TTF", fontsize); // Bodoni MT
-    game_unicode_font = game_create_font("msyh.ttc", fontsize);
+    game_font::sans_serif = game_create_font("msyh.ttc", fontsize); // Microsoft YaHei
+    game_font::serif = game_create_font("times.ttf", fontsize); // Times New Roman
+    game_font::monospace = game_create_font("cour.ttf", fontsize); // Courier New
+    game_font::math = game_create_font("BOD_R.TTF", fontsize); // Bodoni MT
+    game_font::unicode = game_create_font("msyh.ttc", fontsize);
 #else /* the following fonts have not been tested */
-    game_sans_serif_font = game_create_font("Nimbus Sans.ttc", fontsize);
-    game_serif_font = game_create_font("DejaVu Serif.ttc", fontsize);
-    game_monospace_font = game_create_font("Monospace.ttf", fontsize);
-    game_math_font = game_create_font("URW Bookman.ttf", fontsize);
-    game_unicode_font = game_create_font("Arial Unicode.ttf", fontsize);
+    game_font::sans_serif = game_create_font("Nimbus Sans.ttc", fontsize);
+    game_font::serif = game_create_font("DejaVu Serif.ttc", fontsize);
+    game_font::monospace = game_create_font("Monospace.ttf", fontsize);
+    game_font::math = game_create_font("URW Bookman.ttf", fontsize);
+    game_font::unicode = game_create_font("Arial Unicode.ttf", fontsize);
 #endif
 
-    GAME_DEFAULT_FONT = game_sans_serif_font;
+    game_font::DEFAULT = game_font::sans_serif;
 }
 
 void WarGrey::STEM::game_fonts_destroy() {
-    Game_Close_Font(game_sans_serif_font);
-    Game_Close_Font(game_serif_font);
-    Game_Close_Font(game_monospace_font);
-    Game_Close_Font(game_math_font);
-    Game_Close_Font(game_unicode_font);
+    Game_Close_Font(game_font::sans_serif);
+    Game_Close_Font(game_font::serif);
+    Game_Close_Font(game_font::monospace);
+    Game_Close_Font(game_font::math);
+    Game_Close_Font(game_font::unicode);
 }
 
 /*************************************************************************************************/
@@ -101,12 +100,12 @@ void WarGrey::STEM::game_font_destroy(TTF_Font* font, bool usr_only) {
     if (font != nullptr) {
         if (!usr_only) {
             TTF_CloseFont(font);
-        } else if (font == GAME_DEFAULT_FONT) {
-        } else if (font == game_sans_serif_font) {
-        } else if (font == game_serif_font) {
-        } else if (font == game_monospace_font) {
-        } else if (font == game_math_font) {
-        } else if (font == game_unicode_font) {
+        } else if (font == game_font::DEFAULT) {
+        } else if (font == game_font::sans_serif) {
+        } else if (font == game_font::serif) {
+        } else if (font == game_font::monospace) {
+        } else if (font == game_font::math) {
+        } else if (font == game_font::unicode) {
         } else {
             TTF_CloseFont(font);
         }

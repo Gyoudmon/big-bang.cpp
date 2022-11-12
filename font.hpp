@@ -5,12 +5,15 @@
 #include <string>
 
 namespace WarGrey::STEM {
-    extern TTF_Font* GAME_DEFAULT_FONT;
-    extern TTF_Font* game_sans_serif_font;
-    extern TTF_Font* game_serif_font;
-    extern TTF_Font* game_monospace_font;
-    extern TTF_Font* game_math_font;
-    extern TTF_Font* game_unicode_font;
+    class game_font {
+        public:
+            static TTF_Font* DEFAULT;
+            static TTF_Font* sans_serif;
+            static TTF_Font* serif;
+            static TTF_Font* monospace;
+            static TTF_Font* math;
+            static TTF_Font* unicode;
+    };
 
     void game_fonts_initialize(int fontsize = 16);
     void game_fonts_destroy();

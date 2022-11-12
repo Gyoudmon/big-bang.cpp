@@ -35,7 +35,7 @@ static SDL_Surface* solid_text_surface(TTF_Font* font, uint32_t rgb, const std::
     SDL_Color text_color;
 
     if (font == nullptr) {
-        font = GAME_DEFAULT_FONT;
+        font = game_font::DEFAULT;
     }
 
     setup_for_text(font, text, rgb, text_color);
@@ -47,7 +47,7 @@ static SDL_Surface* shaded_text_surface(TTF_Font* font, uint32_t fgc, uint32_t b
     SDL_Color text_color, background_color;
 
     if (font == nullptr) {
-        font = GAME_DEFAULT_FONT;
+        font = game_font::DEFAULT;
     }
 
     setup_for_text(font, text, fgc, text_color);
@@ -60,7 +60,7 @@ static SDL_Surface* lcd_text_surface(TTF_Font* font, uint32_t fgc, uint32_t bgc,
     SDL_Color text_color, background_color;
 
     if (font == nullptr) {
-        font = GAME_DEFAULT_FONT;
+        font = game_font::DEFAULT;
     }
 
     setup_for_text(font, text, fgc, text_color);
@@ -73,7 +73,7 @@ static SDL_Surface* blended_text_surface(TTF_Font* font, uint32_t rgb, const std
     SDL_Color text_color;
 
     if (font == nullptr) {
-        font = GAME_DEFAULT_FONT;
+        font = game_font::DEFAULT;
     }
 
     setup_for_text(font, text, rgb, text_color);
@@ -96,7 +96,7 @@ void WarGrey::STEM::game_text_size(TTF_Font* font, int* width, int* height, cons
 
 void WarGrey::STEM::game_text_size(TTF_Font* font, int* width, int* height, const std::string& text) { 
     if (font == nullptr) {
-        font = GAME_DEFAULT_FONT;
+        font = game_font::DEFAULT;
     }
 
     unsafe_utf8_size(font, width, height, text);

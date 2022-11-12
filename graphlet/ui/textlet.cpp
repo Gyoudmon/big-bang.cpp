@@ -32,7 +32,7 @@ void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, float alpha) {
 void WarGrey::STEM::ITextlet::set_font(TTF_Font* font, GraphletAnchor anchor) {
     this->moor(anchor);
 
-    this->text_font = ((font == nullptr) ? GAME_DEFAULT_FONT : font);
+    this->text_font = ((font == nullptr) ? game_font::DEFAULT : font);
     this->set_text(this->raw, anchor);
     this->on_font_changed();
 
