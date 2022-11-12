@@ -3,8 +3,6 @@
 
 #include "datum/flonum.hpp"
 
-#include <SDL2/SDL2_gfxPrimitives.h>
-
 using namespace WarGrey::STEM;
 
 /**************************************************************************************************/
@@ -54,11 +52,59 @@ static void draw_filled_circle(SDL_Renderer* renderer, int cx, int cy, int radiu
 }
 
 static void draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br) {
-    aaellipseRGBA(renderer, (int16_t)(cx), (int16_t)(cy), (int16_t)(ar), int16_t(br), 0x12, 0x34, 0x56, 0xFFU);
+    /* II. quadrant from bottom left to top right */
+    long x = -ar;
+    long y = 0;
+    long a2 = ar * ar;
+    long b2 = br * br;
+    long e2 = br;
+    long dx = (1 + 2 * x) * e2 * e2;
+    long dy = x * x;
+    long err = dx + dy;
+
+    do {
+        SDL_RenderDrawPoint(renderer, cx - x, cy + y);
+        SDL_RenderDrawPoint(renderer, cx + x, cy + y);
+        SDL_RenderDrawPoint(renderer, cx + x, cy - y);
+        SDL_RenderDrawPoint(renderer, cx - x, cy - y);
+
+        e2 = 2 * err;
+        if (e2 >= dx) { x++; err += dx += 2 * b2; }    /* x step */
+        if (e2 <= dy) { y++; err += dy += 2 * a2; }    /* y step */
+    } while (x <= 0);
+
+    /* to early stop for flat ellipses with a = 1, finish tip of ellipse */
+    while (y++ < br) {
+        SDL_RenderDrawPoint(renderer, cx, cy + y);
+        SDL_RenderDrawPoint(renderer, cx, cy - y);
+    }
 }
 
 static void draw_filled_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br) {
-    filledEllipseRGBA(renderer, (int16_t)(cx), (int16_t)(cy), (int16_t)(ar), int16_t(br), 0x12, 0x34, 0x56, 0xFFU);
+    /* Q II. from bottom left to top right */
+    long x = -ar;
+    long y = 0;
+    long a2 = ar * ar;
+    long b2 = br * br;
+    long e2 = br;
+    long dx = (1 + 2 * x) * e2 * e2;
+    long dy = x * x;
+    long err = dx + dy;
+
+    do {
+        SDL_RenderDrawLine(renderer, cx + x, cy + y, cx - x, cy + y); // Q I, Q II
+        SDL_RenderDrawLine(renderer, cx + x, cy,     cx + x, cy - y); // Q III
+        SDL_RenderDrawLine(renderer, cx - x, cy - y, cx,     cy - y); // Q I
+
+        e2 = 2 * err;
+        if (e2 >= dx) { x++; err += dx += 2 * b2; }     /* x step */
+        if (e2 <= dy) { y++; err += dy += 2 * a2; }     /* y step */
+    } while (x <= 0);
+
+    /* to early stop for flat ellipses with a = 1, finish tip of ellipse */
+    while (y++ < br) {
+        SDL_RenderDrawLine(renderer, cx, cy + y, cx, cy - y);
+    }
 }
 
 /*************************************************************************************************/
