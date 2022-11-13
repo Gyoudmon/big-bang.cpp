@@ -125,6 +125,10 @@ void WarGrey::STEM::game_text_size(TTF_Font* font, float* width, float* height, 
 SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, TTF_Font* font, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
     SDL_Surface* surface = nullptr;
 
+    if (font == nullptr) {
+        font = game_font::DEFAULT;
+    }
+
 #ifndef __windows__
     if (wrap >= 0) {
         switch (mode) {
