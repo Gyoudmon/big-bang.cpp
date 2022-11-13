@@ -130,7 +130,7 @@ SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, TTF_Font*
     }
 
 #ifndef __windows__
-    if (wrap >= 0) {
+    if (wrap >= 0) { // will wrap by newline for 0
         switch (mode) {
             case ::TextRenderMode::Solid: surface = TTF_RenderUTF8_Solid_Wrapped(font, text.c_str(), fgc, wrap); break;
             case ::TextRenderMode::Shaded: surface = TTF_RenderUTF8_Shaded_Wrapped(font, text.c_str(), fgc, bgc, wrap); break;
