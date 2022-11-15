@@ -42,6 +42,11 @@ namespace WarGrey::STEM {
     void game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, uint32_t rgb, float alpha = 1.0F);
     void game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
 
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha = 1.0F);
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha = 1.0F);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+
     /**********************************************************************************************/
     void game_draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height);
     void game_draw_grid(SDL_Renderer* renderer, int nx, int ny, float grid_size, float xoff = 0.0F, float yoff = 0.0F);
@@ -78,5 +83,10 @@ namespace WarGrey::STEM {
     void game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
     void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, uint32_t rgb, float alpha = 1.0F);
     void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha = 1.0F);
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha = 1.0F);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
 }
 

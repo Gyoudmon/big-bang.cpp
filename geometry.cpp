@@ -1,7 +1,9 @@
 #include "geometry.hpp"
 #include "colorspace.hpp"
+#include "mathematics.hpp"
 
 #include "datum/flonum.hpp"
+#include "datum/fixnum.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -104,6 +106,94 @@ static void draw_filled_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, 
     /* to early stop for flat ellipses with a = 1, finish tip of ellipse */
     while (y++ < br) {
         SDL_RenderDrawLine(renderer, cx, cy + y, cx, cy - y);
+    }
+}
+
+static void draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float r, float rotation) {
+    // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
+    float start = degrees_to_radians(rotation);
+    float delta = 2.0 * pi_f / float(n);
+    float x0, y0, px, py;
+
+    x0 = px = r * flcos(start) + cx;
+    y0 = py = r * flsin(start) + cy;
+
+    for (int idx = 1; idx < n; idx++) {
+        float theta = start + delta * float(idx);
+        float sx = r * flcos(theta) + cx;
+        float sy = r * flsin(theta) + cy;
+
+        SDL_RenderDrawLineF(renderer, px, py, sx, sy);
+        px = sx;
+        py = sy;
+    }
+
+    if (px != x0) {
+        SDL_RenderDrawLineF(renderer, px, py, x0, y0);
+    } else {
+        SDL_RenderDrawPointF(renderer, cx, cy);
+    }
+}
+
+static void fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float r, float rotation) {
+    // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
+    float start = degrees_to_radians(rotation);
+    float delta = 2.0 * pi_f / float(n);
+    float ymin = +r + cy;
+    float ymax = -r + cy;
+    SDL_FPoint pts[n + 1];
+
+    for (int idx = 0; idx < n; idx ++) {
+        float theta = start + delta * float(idx);
+        float sx = r * flcos(theta) + cx;
+        float sy = r * flsin(theta) + cy;
+
+        pts[idx].x = sx;
+        pts[idx].y = sy;
+
+        if (sy < ymin) ymin = sy;
+        if (sy > ymax) ymax = sy;
+    }
+    
+    pts[n] = pts[0];
+
+    for (float y = ymin; y < ymax + 1.0; y += 1.0) {
+        float xmin = cx - r;
+        float xmax = cx + r;
+        int pcount = 0;
+        float px1, px2, py, t;
+
+        for (int i = 0; i < n / 2; i ++) {
+            SDL_FPoint spt = pts[i];
+            SDL_FPoint ept = pts[i + 1];
+
+            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, &px1, &py, &t)) {
+                if (flin(0.0, t, 1.0)) pcount += 1;
+            } else { // parallel edges
+                px1 = spt.x;
+                px2 = ept.x;
+                pcount = 2;
+            }
+             
+            spt = pts[n - i];
+            ept = pts[n - i - 1];
+
+            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, &px2, &py, &t)) {
+                if (flin(0.0, t, 1.0)) pcount += 1;
+            } /* ignore parallel edges */
+            
+            if (pcount == 2) {
+                break;
+            }
+        }
+
+        if (pcount == 2) {
+            SDL_RenderDrawLineF(renderer, px1, y, px2, y);
+        } else if (n == 2) {
+            SDL_RenderDrawPointF(renderer, px1, py);
+        } else if (n <= 1) {
+            SDL_RenderDrawPointF(renderer, cx, cy);
+        }
     }
 }
 
@@ -290,6 +380,22 @@ void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, in
     draw_filled_ellipse(renderer, cx, cy, ar, br);
 }
 
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha) {
+    game_draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, rgb, alpha);
+}
+
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation, float value, float alpha) {
+    game_draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha) {
+    game_fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, rgb, alpha);
+}
+
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation, float value, float alpha) {
+    game_fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, hue, saturation, value, alpha);
+}
+
 /*************************************************************************************************/
 void WarGrey::STEM::game_draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height) {
     SDL_FRect box;
@@ -471,5 +577,25 @@ void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy
 void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, float hue, float saturation, float value, float alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_filled_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
+}
+
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha) {
+    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+    draw_regular_polygon(renderer, n, cx, cy, radius, rotation);
+}
+
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation, float value, float alpha) {
+    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
+    draw_regular_polygon(renderer, n, cx, cy, radius, rotation);
+}
+
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha) {
+    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+    fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
+}
+
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation, float value, float alpha) {
+    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
+    fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
 
