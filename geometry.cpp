@@ -139,6 +139,8 @@ static void fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float 
     // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
     float start = degrees_to_radians(rotation);
     float delta = 2.0 * pi_f / float(n);
+    float xmin = cx - r;
+    float xmax = cx + r;
     float ymin = +r + cy;
     float ymax = -r + cy;
     SDL_FPoint pts[n + 1];
@@ -158,39 +160,42 @@ static void fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float 
     pts[n] = pts[0];
 
     for (float y = ymin; y < ymax + 1.0; y += 1.0) {
-        float xmin = cx - r;
-        float xmax = cx + r;
         int pcount = 0;
-        float px1, px2, py, t;
+        float px[2];
+        float py, t;
 
         for (int i = 0; i < n / 2; i ++) {
             SDL_FPoint spt = pts[i];
             SDL_FPoint ept = pts[i + 1];
 
-            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, &px1, &py, &t)) {
+            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, px + pcount, &py, &t)) {
                 if (flin(0.0, t, 1.0)) pcount += 1;
-            } else { // parallel edges
-                px1 = spt.x;
-                px2 = ept.x;
+            } else if (pcount == 0) {
+                px[0] = spt.x;
+                px[1] = ept.x;
                 pcount = 2;
             }
-             
+            
+            if (pcount == 2) break;
+
             spt = pts[n - i];
             ept = pts[n - i - 1];
 
-            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, &px2, &py, &t)) {
+            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, px + pcount, &py, &t)) {
                 if (flin(0.0, t, 1.0)) pcount += 1;
-            } /* ignore parallel edges */
-            
-            if (pcount == 2) {
-                break;
+            } else if (pcount == 0) {
+                px[0] = spt.x;
+                px[1] = ept.x;
+                pcount = 2;
             }
+            
+            if (pcount == 2) break;
         }
 
         if (pcount == 2) {
-            SDL_RenderDrawLineF(renderer, px1, y, px2, y);
+            SDL_RenderDrawLineF(renderer, px[0], y, px[1], y);
         } else if (n == 2) {
-            SDL_RenderDrawPointF(renderer, px1, py);
+            SDL_RenderDrawPointF(renderer, px[0], py);
         } else if (n <= 1) {
             SDL_RenderDrawPointF(renderer, cx, cy);
         }
