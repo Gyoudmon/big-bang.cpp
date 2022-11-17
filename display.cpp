@@ -1,6 +1,8 @@
 #include "display.hpp"
 #include "image.hpp"
 
+#include "datum/string.hpp"
+
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
@@ -9,7 +11,12 @@ bool WarGrey::STEM::IDisplay::save_snapshot(const std::string& path) {
 }
 
 bool WarGrey::STEM::IDisplay::save_snapshot(const char* pname) {
-    return game_save_image(this->snapshot(), pname);
+    SDL_Surface* snapshot_png = this->snapshot();
+    bool okay = game_save_image(snapshot_png, pname);
+
+    SDL_FreeSurface(snapshot_png);
+
+    return okay;
 }
 
 /*************************************************************************************************/
@@ -34,5 +41,20 @@ void WarGrey::STEM::IDisplay::end_update_sequence() {
         }
     }
 
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::IDisplay::log_message(const char* fmt, ...) {
+    VSNPRINT(text, fmt);
+    this->log_message(text);
+}
+
+void WarGrey::STEM::IDisplay::log_message(const std::string& msg) {
+    this->log_message(-1, msg);
+}
+
+void WarGrey::STEM::IDisplay::log_message(int fgc, const char* fmt, ...) {
+    VSNPRINT(text, fmt);
+    this->log_message(fgc, text);
 }
 

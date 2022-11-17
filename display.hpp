@@ -28,6 +28,11 @@ namespace WarGrey::STEM {
         public:
             bool save_snapshot(const std::string& path);
             bool save_snapshot(const char* path);
+
+        public:
+            void log_message(int fgc, const char* fmt, ...);
+            void log_message(const char* fmt, ...);
+            void log_message(const std::string& message);
         
         private:
             int update_sequence_depth = 0;

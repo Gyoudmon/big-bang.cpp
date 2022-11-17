@@ -111,7 +111,7 @@ static void game_create_world(int width, int height, SDL_Window** window, SDL_Re
     uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
 
     if ((width <= 0) || (height <= 0)) {
-        if ((width <= 0) && (height <= 0)) {
+        if ((width <= 0) && (height <= 0))  {
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
         } else {
             flags |= SDL_WINDOW_MAXIMIZED;
@@ -243,7 +243,7 @@ void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseButtonEvent &mouse, bool 
                 case SDL_BUTTON_LEFT: this->on_click(mouse.x, mouse.y); break;
                 case SDL_BUTTON_RIGHT: this->on_right_click(mouse.x, mouse.y); break;
             }
-        } else {
+        } else if (mouse.clicks == 2) {
             switch (mouse.button) {
                 case SDL_BUTTON_LEFT: this->on_double_click(mouse.x, mouse.y); break;
             }
@@ -364,17 +364,15 @@ void WarGrey::STEM::IUniverse::draw_cmdwin(SDL_Renderer* renderer, int x, int y,
 }
 
 bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
-    bool updated = false;
+    bool updated = (this->echo.h > 0);
 
-    if (this->echo.h > 0) {
+    if (updated) {
         game_fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
 
         if (!this->message.empty()) {
             game_draw_blended_text(this->echo_font, renderer, this->_mfgc,
                     this->echo.x, this->echo.y, this->message, this->echo.w);
         }
-
-        updated = true;
     } else {
         if (!this->message.empty()) {
             if (this->needs_termio_if_no_echo) {
@@ -471,31 +469,16 @@ void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int 
     SDL_SetTextInputRect(&this->echo);
 }
 
-void WarGrey::STEM::IUniverse::send_message(const char* fmt, ...) {
-    VSNPRINT(text, fmt);
-    this->send_message(this->_mfgc, text);
-}
-
-void WarGrey::STEM::IUniverse::send_message(uint32_t fgc, const char* fmt, ...) {
-    VSNPRINT(text, fmt);
-    this->send_message(fgc, text);
-}
-
-void WarGrey::STEM::IUniverse::send_message(uint32_t fgc, const std::string& msg) {
+void WarGrey::STEM::IUniverse::log_message(int fgc, const std::string& msg) {
     this->needs_termio_if_no_echo = true;
     this->message = msg;
-    this->_mfgc = fgc;
+    
+    if (fgc >= 0) {
+        this->_mfgc = fgc;
+    }
 
     if (this->display_usr_message(this->renderer)){
         this->notify_updated();
-    }
-}
-
-void WarGrey::STEM::IUniverse::log_message(int fgc, const std::string& msg) {
-    if (fgc >= 0) {
-        this->send_message(static_cast<uint32_t>(fgc), msg);
-    } else {
-        this->send_message(this->_mfgc, msg);
     }
 }
 
@@ -549,13 +532,7 @@ void WarGrey::STEM::IUniverse::popback_input_text() {
 
 /*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
-    static SDL_Surface* photograph = nullptr;
-
-    if (photograph != nullptr) {
-        SDL_FreeSurface(photograph);
-    }
-
-    photograph = game_blank_image(this->window_width, this->window_height);
+    SDL_Surface* photograph = game_blank_image(this->window_width, this->window_height);
 
     if (photograph != nullptr) {
         SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(photograph);
@@ -578,9 +555,9 @@ void WarGrey::STEM::IUniverse::take_snapshot() {
         / path(game_create_string("%s-%s.%lld.png", basename, make_timestamp_utc(s, true).c_str(), ms % 1000));
 
     if (this->save_snapshot(snapshot_png.string().c_str())) { // stupid windows as it requires `string()`
-        this->send_message(this->_fgc, "A snapshot has been saved as '%s'.", snapshot_png.c_str());
+        this->log_message(this->_fgc, "A snapshot has been saved as '%s'.", snapshot_png.c_str());
     } else {
-        this->send_message(0xFF0000, "failed to save snapshot: %s", SDL_GetError());
+        this->log_message(0xFF0000, "failed to save snapshot: %s", SDL_GetError());
     }
 }
 

@@ -63,11 +63,8 @@ namespace WarGrey::STEM {
             void start_input_text(const char* fmt, ...);
             void start_input_text(const std::string& prompt) override;
             void stop_input_text();
-
-        public: // 用户消息输出
-            void send_message(uint32_t fgc, const char* fmt, ...);
-            void send_message(uint32_t fgc, const std::string& msg);
-            void send_message(const char* fmt, ...);
+            
+            using WarGrey::STEM::IDisplay::log_message;
             void log_message(int fgc, const std::string& message) override;
 
         protected: // 常规事件处理和分派函数
@@ -145,7 +142,7 @@ namespace WarGrey::STEM {
             bool needs_termio_if_no_echo;           // 消息是否需要输出
 
         private:
-            std::string snapshot_rootdir;       // 屏幕截图位置
+            std::string snapshot_rootdir;           // 屏幕截图位置
     };
 
     class Universe : public WarGrey::STEM::IUniverse {
