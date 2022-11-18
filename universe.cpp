@@ -341,7 +341,7 @@ void WarGrey::STEM::IUniverse::on_user_input(const char* text) {
 
 void WarGrey::STEM::IUniverse::on_editing(const char* text, int pos, int span) {
     this->current_usrin = text;
-    this->on_text(text, pos, span);
+    this->on_editing_text(text, pos, span);
 }
 
 void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height) {

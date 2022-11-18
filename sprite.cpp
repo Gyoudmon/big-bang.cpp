@@ -12,13 +12,8 @@ void WarGrey::STEM::ISprite::fill_margin(float x, float y, float* top, float* ri
 }
 
 SDL_Surface* WarGrey::STEM::ISprite::snapshot() {
-    static SDL_Surface* photograph = nullptr;
-    bool okay = false;
+    SDL_Surface* photograph = nullptr;
     float width, height;
-
-    if (photograph != nullptr) {
-        SDL_FreeSurface(photograph);
-    }
 
     this->fill_extent(0.0F, 0.0F, &width, &height);
     photograph = game_blank_image(width, height);
@@ -40,7 +35,12 @@ bool WarGrey::STEM::ISprite::save_snapshot(const std::string& pname) {
     return this->save_snapshot(pname.c_str());
 }
 
-bool WarGrey::STEM::ISprite::save_snapshot(const char* pname) { 
-    return game_save_image(this->snapshot(), pname);
+bool WarGrey::STEM::ISprite::save_snapshot(const char* pname) {
+    SDL_Surface* photograph = this->snapshot();
+    bool okay = game_save_image(photograph, pname);
+
+    SDL_FreeSurface(photograph);
+
+    return okay;
 }
 

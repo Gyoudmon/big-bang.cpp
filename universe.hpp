@@ -76,7 +76,7 @@ namespace WarGrey::STEM {
 
             virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {} // 处理键盘事件
             virtual void on_text(const char* text, size_t size, bool entire) {}                  // 处理文本输入事件
-            virtual void on_text(const char* text, int pos, int span) {}                         // 处理文本输入事件
+            virtual void on_editing_text(const char* text, int pos, int span) {}                         // 处理文本输入事件
             
             virtual void on_save() {}                                                            // 处理保存事件
 

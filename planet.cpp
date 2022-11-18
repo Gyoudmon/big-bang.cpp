@@ -19,11 +19,11 @@ using namespace WarGrey::STEM;
 namespace {
     struct AsyncInfo {
         float x0;
-    float y0;
-    float fx0;
-    float fy0;
-    float dx0;
-    float dy0;
+        float y0;
+        float fx0;
+        float fy0;
+        float dx0;
+        float dy0;
     };
 
     struct GraphletInfo : public WarGrey::STEM::IGraphletInfo {
@@ -704,9 +704,9 @@ void WarGrey::STEM::Planet::on_text(const char* text, size_t size, bool entire) 
     }
 }
 
-void WarGrey::STEM::Planet::on_text(const char* text, int pos, int span) {
+void WarGrey::STEM::Planet::on_editing_text(const char* text, int pos, int span) {
     if (this->focused_graphlet != nullptr) {
-        this->focused_graphlet->on_text(text, pos, span);
+        this->focused_graphlet->on_editing_text(text, pos, span);
     }
 }
 

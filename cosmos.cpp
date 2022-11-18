@@ -98,7 +98,6 @@ bool WarGrey::STEM::Cosmos::can_exit() {
     return (this->recent_planet != nullptr) && this->recent_planet->can_exit();
 }
 
-
 /*************************************************************************************************/
 void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
     if (this->head_planet != nullptr) {
@@ -219,10 +218,10 @@ void WarGrey::STEM::Cosmos::on_text(const char* text, size_t size, bool entire) 
     }
 }
 
-void WarGrey::STEM::Cosmos::on_text(const char* text, int pos, int span) {
+void WarGrey::STEM::Cosmos::on_editing_text(const char* text, int pos, int span) {
     if (this->recent_planet != nullptr) {
         this->begin_update_sequence();
-        this->recent_planet->on_text(text, pos, span);
+        this->recent_planet->on_editing_text(text, pos, span);
         this->end_update_sequence();
     }
 }
