@@ -1,5 +1,6 @@
 #include "game.hpp"                 // 放最前面以兼容 macOS
 #include "image.hpp"
+#include "colorspace.hpp"
 
 #include "datum/flonum.hpp"
 
@@ -8,12 +9,12 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-SDL_Surface* WarGrey::STEM::game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum) {
-    return game_lambda_image(float(width), float(height), make_image, datum);
+SDL_Surface* WarGrey::STEM::game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key) {
+    return game_lambda_image(float(width), float(height), make_image, datum, alpha_color_key);
 }
 
-SDL_Surface* WarGrey::STEM::game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum) {
-    SDL_Surface* surface = game_blank_image(width, height);
+SDL_Surface* WarGrey::STEM::game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key) {
+    SDL_Surface* surface = game_blank_image(width, height, alpha_color_key);
 
     if (surface != nullptr) {
         SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(surface);
@@ -28,16 +29,18 @@ SDL_Surface* WarGrey::STEM::game_lambda_image(float width, float height, game_la
     return surface;
 }
 
-SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height) {
+SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height, uint32_t alpha_color_key) {
     SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+    uint8_t r, g, b;
 
-    SDL_SetColorKey(surface, 1, SDL_MapRGB(surface->format, 0, 0, 0));
+    RGB_FromHexadecimal(alpha_color_key, &r, &g, &b);
+    SDL_SetColorKey(surface, 1, SDL_MapRGB(surface->format, r, g, b));
 
     return surface;
 }
 
-SDL_Surface* WarGrey::STEM::game_blank_image(float width, float height) {
-    return game_blank_image(fl2fxi(width), fl2fxi(height));
+SDL_Surface* WarGrey::STEM::game_blank_image(float width, float height, uint32_t alpha_color_key) {
+    return game_blank_image(fl2fxi(width), fl2fxi(height), alpha_color_key);
 }
 
 SDL_Surface* WarGrey::STEM::game_load_image(const std::string& file) {

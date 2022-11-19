@@ -19,6 +19,8 @@ namespace WarGrey::STEM {
 
             void set_border_color(int32_t color);
             int32_t get_border_color() { return this->border_color; }
+
+            void set_alpha_key_color(uint32_t color);
  
         public:
             virtual void fill_shape_origin(float* x, float* y);
@@ -33,8 +35,9 @@ namespace WarGrey::STEM {
 
         private:
             SDL_Surface* geometry = nullptr;
-            int32_t color;
-            int32_t border_color;
+            int32_t color = -1;
+            int32_t border_color = -1;
+            uint32_t alpha_color_key = 0xFFFFFFU;
     };
 
     /**********************************************************************************************/

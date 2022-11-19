@@ -30,13 +30,16 @@ void WarGrey::STEM::IShapelet::construct() {
     float width, height;
 
     this->fill_shape_extent(&width, &height);
-    geometry = game_blank_image(width, height);
+    geometry = game_blank_image(width, height, this->alpha_color_key);
         
     if (geometry != nullptr) {
         SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(geometry);
         
         if (renderer != nullptr) {
             uint8_t r, g, b;
+
+            RGB_SetRenderDrawColor(renderer, this->alpha_color_key);
+            SDL_RenderClear(renderer);
     
             if (color >= 0) {
                 RGB_FromHexadecimal(color, &r, &g, &b);
@@ -66,6 +69,13 @@ void WarGrey::STEM::IShapelet::fill_extent(float x, float y, float* w, float* h)
 
 void WarGrey::STEM::IShapelet::fill_shape_origin(float* x, float* y) {
     SET_VALUES(x, 0.0F, y, 0.0F);
+}
+
+void WarGrey::STEM::IShapelet::set_alpha_key_color(uint32_t color) {
+    if (this->alpha_color_key != color) {
+        this->alpha_color_key = color;
+        this->construct();
+    }
 }
 
 void WarGrey::STEM::IShapelet::set_border_color(int32_t color) {

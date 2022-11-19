@@ -5,11 +5,11 @@
 namespace WarGrey::STEM {
     typedef void (*game_lambda_image_f)(SDL_Renderer*, float, float, void*);
 
-    SDL_Surface* game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum);
-    SDL_Surface* game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum);
+    SDL_Surface* game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key = 0xFFFFFFU);
+    SDL_Surface* game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key = 0xFFFFFFU);
     
-    SDL_Surface* game_blank_image(int width, int height);
-    SDL_Surface* game_blank_image(float width, float height);
+    SDL_Surface* game_blank_image(int width, int height, uint32_t alpha_color_key = 0xFFFFFFU);
+    SDL_Surface* game_blank_image(float width, float height, uint32_t alpha_color_key = 0xFFFFFFU);
     
     SDL_Surface* game_load_image(const char* file);
     SDL_Surface* game_load_image(const std::string& file);
