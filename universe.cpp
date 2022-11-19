@@ -6,6 +6,7 @@
 #include "image.hpp"
 
 #include "datum/string.hpp"
+#include "datum/box.hpp"
 
 #include <filesystem>
 
@@ -451,6 +452,13 @@ void WarGrey::STEM::IUniverse::set_window_fullscreen(bool yes) {
 void WarGrey::STEM::IUniverse::refresh() {
     this->do_redraw(this->renderer, 0, 0, this->window_width, this->window_height);
     game_world_refresh(this->renderer, this->texture);
+}
+
+void WarGrey::STEM::IUniverse::fill_extent(float* width, float* height) {
+    int fxw, fxh;
+
+    SDL_GetWindowSize(this->window, &fxw, &fxh);
+    SET_VALUES(width, float(fxw), height, float(fxh));
 }
 
 /*************************************************************************************************/

@@ -14,6 +14,7 @@ namespace WarGrey::STEM {
 
     class IGraphlet : public WarGrey::STEM::ISprite {
         public:
+            IGraphlet() { this->set_border_collision_strategy(BorderCollisionStrategy::IGNORE); }
             virtual ~IGraphlet();
 
         public:
@@ -42,6 +43,20 @@ namespace WarGrey::STEM {
             void send_message(int fgc, const std::string& msg);
             void send_message(const char* fmt, ...);
 
+        public: // gameplay events
+            virtual void on_border(float hoffset, float voffset);
+
+        public:
+            void camouflage(bool yes_no) { this->findable = !yes_no; }
+            bool concealled() { return !this->findable; }
+
+        public:
+            void set_speed(float xspd, float yspd) { this->xspeed = xspd; this->yspeed = yspd; }
+            void set_border_collision_strategy(WarGrey::STEM::BorderCollisionStrategy s);
+            void set_border_collision_strategy(WarGrey::STEM::BorderCollisionStrategy vs, WarGrey::STEM::BorderCollisionStrategy hs);
+            void set_border_collision_strategy(BorderCollisionStrategy ts, BorderCollisionStrategy rs, BorderCollisionStrategy bs, BorderCollisionStrategy ls);
+            void fill_speed(float* xspd, float* yspd) { if (xspd != nullptr) (*xspd) = this->xspeed; if (yspd != nullptr) (*yspd) = this->yspeed; }
+
         public:
             IGraphletInfo* info = nullptr;
 
@@ -49,6 +64,12 @@ namespace WarGrey::STEM {
             WarGrey::STEM::GraphletAnchor anchor = WarGrey::STEM::GraphletAnchor::LT;
             float anchor_x;
             float anchor_y;
+
+        private:
+            bool findable = true;
+            float xspeed = 0.0F;
+            float yspeed = 0.0F;
+            WarGrey::STEM::BorderCollisionStrategy border_collision_strategies[4];
     };
 }
 

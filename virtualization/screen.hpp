@@ -12,7 +12,10 @@ namespace WarGrey::STEM {
             virtual WarGrey::STEM::IDisplay* display() = 0;
         
         public:
+            virtual void fill_extent(float* width, float* height) = 0;
             virtual void refresh() = 0;
+            
+        public:
             virtual void begin_update_sequence() = 0;
             virtual bool in_update_sequence() = 0;
             virtual void end_update_sequence() = 0;

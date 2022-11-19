@@ -8,8 +8,6 @@
 #include "datum/string.hpp"
 #include "datum/flonum.hpp"
 
-#include <SDL2/SDL.h>
-
 using namespace WarGrey::STEM;
 
 /** NOTE
@@ -37,7 +35,7 @@ namespace {
         bool selected = false;
         unsigned int mode = 0U;
 
-    // for asynchronously loaded graphlets
+        // for asynchronously loaded graphlets
         AsyncInfo* async = nullptr;
 
         IGraphlet* next = nullptr;
@@ -863,12 +861,46 @@ bool WarGrey::STEM::Planet::say_goodbye_to_hover_graphlet(uint32_t state, float 
 void WarGrey::STEM::Planet::on_elapse(long long count, long long interval, long long uptime) {
     if (this->head_graphlet != nullptr) {
         IGraphlet* child = this->head_graphlet;
+        float cwidth, cheight, dwidth, dheight;
+        float xspd, yspd, hdist, vdist;
 
         do {
             GraphletInfo* info = GRAPHLET_INFO(child);
+            this->info->master->fill_extent(&dwidth, &dheight);
 
             if (unsafe_graphlet_unmasked(info, this->mode)) {
                 child->update(count, interval, uptime);
+
+                child->fill_speed(&xspd, &yspd);
+                
+                if ((xspd != 0.0F) || (yspd != 0.0F)) {
+                    info->x += xspd;
+                    info->y += yspd;
+
+                    child->fill_extent(info->x, info->y, &cwidth, &cheight);
+
+                    if (info->x < 0) {
+                        hdist = info->x;
+                    } else if (info->x + cwidth > dwidth) {
+                        hdist = dwidth - info->x - cwidth;
+                    } else {
+                        hdist = 0.0F;
+                    }
+
+                    if (info->y < 0) {
+                        vdist = info->y;
+                    } else if (info->y + cheight > dheight) {
+                        vdist = dheight - info->y - cheight;
+                    } else {
+                        vdist = 0.0F;
+                    }
+
+                    if ((hdist != 0.0F) || (vdist != 0.0F)) {
+                        child->on_border(hdist, vdist);
+                    }
+
+                    this->notify_updated();
+                }
             }
             
             child = info->next;

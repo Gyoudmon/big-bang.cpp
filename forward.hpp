@@ -9,5 +9,7 @@ namespace WarGrey::STEM {
     class IGraphlet;
 
     enum class GraphletAnchor { LT, CT, RT, LC, CC, RC, LB, CB, RB };
+    enum class BorderEdge { TOP, RIGHT, BOTTOM, LEFT, NONE };
+    enum class BorderCollisionStrategy { IGNORE, STOP, BOUNCE };
 }
 

@@ -47,10 +47,6 @@ namespace WarGrey::STEM {
             bool handle_low_level_events() { return (this->handle_events() && this->deal_with_low_level_events); }
 
         public:
-            void camouflage(bool yes_no) { this->findable = !yes_no; }
-            bool concealled() { return !this->findable; }
-
-        public:
             SDL_Surface* snapshot();
             bool save_snapshot(const std::string& pname);
             bool save_snapshot(const char* pname);
@@ -61,7 +57,6 @@ namespace WarGrey::STEM {
             bool deal_with_events = false;
             bool deal_with_low_level_events = false;
             // bool wheel_translation = true;
-            bool findable = true;
     };
 }
 

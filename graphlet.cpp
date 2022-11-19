@@ -88,3 +88,48 @@ void WarGrey::STEM::IGraphlet::send_message(int fgc, const std::string& msg) {
     }
 }
 
+/*************************************************************************************************/
+void WarGrey::STEM::IGraphlet::on_border(float hoffset, float voffset) {
+    BorderCollisionStrategy hstrategy = BorderCollisionStrategy::IGNORE;
+    BorderCollisionStrategy vstrategy = BorderCollisionStrategy::IGNORE;
+
+    if (hoffset < 0.0F) {
+        hstrategy = this->border_collision_strategies[static_cast<int>(BorderEdge::LEFT)];
+    } else if (hoffset > 0.0F) {
+        hstrategy = this->border_collision_strategies[static_cast<int>(BorderEdge::RIGHT)];
+    }
+
+    if (voffset < 0.0F) {
+        vstrategy = this->border_collision_strategies[static_cast<int>(BorderEdge::TOP)];
+    } else if (voffset > 0.0F) {
+        vstrategy = this->border_collision_strategies[static_cast<int>(BorderEdge::BOTTOM)];
+    }
+
+    switch (hstrategy) {
+        case BorderCollisionStrategy::BOUNCE: this->xspeed *= -1.0F; break;
+        case BorderCollisionStrategy::STOP: this->xspeed = 0.0F; break;
+        default: /* ignore */; break;
+    }
+
+    switch (vstrategy) {
+        case BorderCollisionStrategy::BOUNCE: this->yspeed *= -1.0F; break;
+        case BorderCollisionStrategy::STOP: this->yspeed = 0.0F; break;
+        default: /* ignore */; break;
+    }
+}
+
+void WarGrey::STEM::IGraphlet::set_border_collision_strategy(BorderCollisionStrategy s) {
+    this->set_border_collision_strategy(s, s, s, s);
+}
+
+void WarGrey::STEM::IGraphlet::set_border_collision_strategy(BorderCollisionStrategy vs, BorderCollisionStrategy hs) {
+    this->set_border_collision_strategy(vs, vs, hs, hs);
+}
+    
+void WarGrey::STEM::IGraphlet::set_border_collision_strategy(BorderCollisionStrategy ts, BorderCollisionStrategy rs, BorderCollisionStrategy bs, BorderCollisionStrategy ls) {
+    this->border_collision_strategies[static_cast<int>(BorderEdge::TOP)] = ts;
+    this->border_collision_strategies[static_cast<int>(BorderEdge::RIGHT)] = rs;
+    this->border_collision_strategies[static_cast<int>(BorderEdge::BOTTOM)] = bs;
+    this->border_collision_strategies[static_cast<int>(BorderEdge::LEFT)] = ls;
+}
+

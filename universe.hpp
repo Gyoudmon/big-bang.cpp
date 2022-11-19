@@ -54,8 +54,9 @@ namespace WarGrey::STEM {
             uint32_t get_background_color() { return this->_bgc; }
             uint32_t get_foreground_color() { return this->_fgc; }
 
-        public: // 窗体重汇相关
+        public: // 窗体相关方法
             void refresh() override;
+            void fill_extent(float* width, float* height) override;
 
         public: // 用户 IME 输入输出
             void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_font::unicode);

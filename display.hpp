@@ -11,6 +11,7 @@ namespace WarGrey::STEM {
             virtual ~IDisplay() {}
 
         public:
+            virtual void fill_extent(float* width, float* height) = 0;
             virtual void refresh() = 0;
 
         public:

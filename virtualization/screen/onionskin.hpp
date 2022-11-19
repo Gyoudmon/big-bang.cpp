@@ -12,6 +12,9 @@ namespace WarGrey::STEM {
         
         public:
             void refresh() override { this->_display->refresh(); }
+            void fill_extent(float* width, float* height) override { this->_display->fill_extent(width, height); };
+        
+        public:
             void begin_update_sequence() override { this->_display->begin_update_sequence(); }
             bool in_update_sequence() override { return this->_display->in_update_sequence(); }
             void end_update_sequence() override { this->_display->end_update_sequence(); }
