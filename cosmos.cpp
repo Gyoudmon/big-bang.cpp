@@ -44,7 +44,6 @@ static inline void draw_planet(SDL_Renderer* renderer, IPlanet* planet, float x,
 /*************************************************************************************************/
 WarGrey::STEM::Cosmos::Cosmos(int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
     this->screen = new OnionSkin(this);
-    this->set_cmdwin_height(24);
 }
 
 WarGrey::STEM::Cosmos::~Cosmos() {

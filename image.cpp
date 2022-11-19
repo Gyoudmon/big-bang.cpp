@@ -29,7 +29,11 @@ SDL_Surface* WarGrey::STEM::game_lambda_image(float width, float height, game_la
 }
 
 SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height) {
-    return SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+    SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
+
+    SDL_SetColorKey(surface, 1, SDL_MapRGB(surface->format, 0, 0, 0));
+
+    return surface;
 }
 
 SDL_Surface* WarGrey::STEM::game_blank_image(float width, float height) {

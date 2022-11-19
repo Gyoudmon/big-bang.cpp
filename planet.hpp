@@ -35,7 +35,7 @@ namespace WarGrey::STEM {
             virtual void construct(float Width, float Height) {}
             virtual void load(float Width, float Height) {}
             virtual void reflow(float width, float height) {}
-            virtual void update(long long count, long long interval, long long uptime) {}
+            virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
             virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
             virtual void collapse();
             virtual bool can_exit() { return false; }

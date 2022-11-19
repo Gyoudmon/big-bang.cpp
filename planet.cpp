@@ -862,7 +862,7 @@ void WarGrey::STEM::Planet::on_elapse(long long count, long long interval, long 
     if (this->head_graphlet != nullptr) {
         IGraphlet* child = this->head_graphlet;
         float cwidth, cheight, dwidth, dheight;
-        float xspd, yspd, hdist, vdist;
+        float nx, ny, xspd, yspd, hdist, vdist;
 
         do {
             GraphletInfo* info = GRAPHLET_INFO(child);
@@ -870,36 +870,60 @@ void WarGrey::STEM::Planet::on_elapse(long long count, long long interval, long 
 
             if (unsafe_graphlet_unmasked(info, this->mode)) {
                 child->update(count, interval, uptime);
-
                 child->fill_speed(&xspd, &yspd);
                 
                 if ((xspd != 0.0F) || (yspd != 0.0F)) {
-                    info->x += xspd;
-                    info->y += yspd;
+                    nx = info->x + xspd;
+                    ny = info->y + yspd;
 
-                    child->fill_extent(info->x, info->y, &cwidth, &cheight);
+                    child->fill_extent(nx, ny, &cwidth, &cheight);
 
-                    if (info->x < 0) {
-                        hdist = info->x;
-                    } else if (info->x + cwidth > dwidth) {
-                        hdist = dwidth - info->x - cwidth;
+                    if (nx < 0) {
+                        hdist = nx;
+                    } else if (nx + cwidth > dwidth) {
+                        hdist = nx + cwidth - dwidth;
                     } else {
                         hdist = 0.0F;
                     }
 
-                    if (info->y < 0) {
-                        vdist = info->y;
-                    } else if (info->y + cheight > dheight) {
-                        vdist = dheight - info->y - cheight;
+                    if (ny < 0) {
+                        vdist = ny;
+                    } else if (ny + cheight > dheight) {
+                        vdist = ny + cheight - dheight;
                     } else {
                         vdist = 0.0F;
                     }
 
                     if ((hdist != 0.0F) || (vdist != 0.0F)) {
-                        child->on_border(hdist, vdist);
-                    }
+                        child->on_boundary(hdist, vdist);
+                        child->fill_speed(&xspd, &yspd);
+                        
+                        if ((xspd != 0.0F) || (yspd != 0.0F)) {
+                            info->x = nx;
+                            info->y = ny;
+                            this->notify_updated();
+                        } else {
+                            if (nx < 0.0F) {
+                                info->x = 0.0F;
+                                this->notify_updated();
+                            } else if (nx + cwidth > dwidth) {
+                                info->x = dwidth - cwidth;
+                                this->notify_updated();
+                            }
 
-                    this->notify_updated();
+                            if (ny < 0.0F) {
+                                info->y = 0.0F;
+                                this->notify_updated();
+                            } else if (ny + cheight > dheight) {
+                                info->y = dheight - cheight;
+                                this->notify_updated();
+                            }
+                        }
+                    } else {
+                        info->x = nx;
+                        info->y = ny;
+                        this->notify_updated();
+                    }
                 }
             }
             
@@ -916,7 +940,7 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
     float dsWidth = X + Width;
     float dsHeight = Y + Height;
     
-    if (this->bg_alpha >= 0.0F) {
+    if (this->bg_alpha > 0.0F) {
         game_fill_rect(renderer, X, Y, Width, Height, this->background, this->bg_alpha);
     }
 

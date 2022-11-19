@@ -3,10 +3,10 @@
 #include "../graphlet.hpp"
 
 namespace WarGrey::STEM {
-    class Shapelet : public virtual WarGrey::STEM::IGraphlet {
+    class IShapelet : public virtual WarGrey::STEM::IGraphlet {
         public:
-            Shapelet(int32_t color = -1, int32_t border_color = -1);
-            virtual ~Shapelet();
+            IShapelet(int32_t color = -1, int32_t border_color = -1);
+            virtual ~IShapelet();
 
         public:
             void construct() override;
@@ -38,7 +38,7 @@ namespace WarGrey::STEM {
     };
 
     /**********************************************************************************************/
-    class Rectanglet : public WarGrey::STEM::Shapelet {
+    class Rectanglet : public WarGrey::STEM::IShapelet {
         public:
 	    Rectanglet(float edge_size, int32_t color, int32_t border_color = -1);
 	    Rectanglet(float width, float height, int32_t color, int32_t border_color = -1);
@@ -56,7 +56,7 @@ namespace WarGrey::STEM {
 	    float height;
     };
 
-    class RoundedRectanglet : public WarGrey::STEM::Shapelet {
+    class RoundedRectanglet : public WarGrey::STEM::IShapelet {
         public:
 	    RoundedRectanglet(float edge_size, float radius, int32_t color, int32_t border_color = -1);
 	    RoundedRectanglet(float width, float height, float radius, int32_t color, int32_t border_color = -1);
@@ -75,7 +75,7 @@ namespace WarGrey::STEM {
             float radius;
     };
 
-    class Ellipselet : public WarGrey::STEM::Shapelet {
+    class Ellipselet : public WarGrey::STEM::IShapelet {
         public:
 	    Ellipselet(float radius, int32_t color, int32_t border_color = -1);
 	    Ellipselet(float aradius, float bradius, int32_t color, int32_t border_color = -1);
@@ -99,7 +99,7 @@ namespace WarGrey::STEM {
                 : Ellipselet(radius, radius, color, border_color) {}
     };
     
-    class RegularPolygonlet : public WarGrey::STEM::Shapelet {
+    class RegularPolygonlet : public WarGrey::STEM::IShapelet {
         public:
 	    RegularPolygonlet(int n, float radius, int32_t color, int32_t border_color = -1);
 	    RegularPolygonlet(int n, float radius, float rotation, int32_t color, int32_t border_color = -1);

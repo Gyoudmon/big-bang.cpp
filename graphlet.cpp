@@ -89,7 +89,7 @@ void WarGrey::STEM::IGraphlet::send_message(int fgc, const std::string& msg) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IGraphlet::on_border(float hoffset, float voffset) {
+void WarGrey::STEM::IGraphlet::on_boundary(float hoffset, float voffset) {
     BorderCollisionStrategy hstrategy = BorderCollisionStrategy::IGNORE;
     BorderCollisionStrategy vstrategy = BorderCollisionStrategy::IGNORE;
 
@@ -105,16 +105,17 @@ void WarGrey::STEM::IGraphlet::on_border(float hoffset, float voffset) {
         vstrategy = this->border_collision_strategies[static_cast<int>(BorderEdge::BOTTOM)];
     }
 
-    switch (hstrategy) {
-        case BorderCollisionStrategy::BOUNCE: this->xspeed *= -1.0F; break;
-        case BorderCollisionStrategy::STOP: this->xspeed = 0.0F; break;
-        default: /* ignore */; break;
-    }
+    if ((hstrategy == BorderCollisionStrategy::STOP) || (vstrategy == BorderCollisionStrategy::STOP)) {
+        this->xspeed = 0.0F;
+        this->yspeed = 0.0F;
+    } else {
+        if (hstrategy == BorderCollisionStrategy::BOUNCE) {
+            this->xspeed *= -1.0F;
+        }
 
-    switch (vstrategy) {
-        case BorderCollisionStrategy::BOUNCE: this->yspeed *= -1.0F; break;
-        case BorderCollisionStrategy::STOP: this->yspeed = 0.0F; break;
-        default: /* ignore */; break;
+        if (vstrategy == BorderCollisionStrategy::BOUNCE) {
+            this->yspeed *= -1.0F;
+        }
     }
 }
 
@@ -123,7 +124,7 @@ void WarGrey::STEM::IGraphlet::set_border_collision_strategy(BorderCollisionStra
 }
 
 void WarGrey::STEM::IGraphlet::set_border_collision_strategy(BorderCollisionStrategy vs, BorderCollisionStrategy hs) {
-    this->set_border_collision_strategy(vs, vs, hs, hs);
+    this->set_border_collision_strategy(vs, hs, vs, hs);
 }
     
 void WarGrey::STEM::IGraphlet::set_border_collision_strategy(BorderCollisionStrategy ts, BorderCollisionStrategy rs, BorderCollisionStrategy bs, BorderCollisionStrategy ls) {
@@ -131,5 +132,25 @@ void WarGrey::STEM::IGraphlet::set_border_collision_strategy(BorderCollisionStra
     this->border_collision_strategies[static_cast<int>(BorderEdge::RIGHT)] = rs;
     this->border_collision_strategies[static_cast<int>(BorderEdge::BOTTOM)] = bs;
     this->border_collision_strategies[static_cast<int>(BorderEdge::LEFT)] = ls;
+}
+
+void WarGrey::STEM::IGraphlet::motion_bounce(bool horizon, bool vertical) {
+    if (horizon) {
+        this->xspeed *= -1.0F;
+    }
+    
+    if (vertical) {
+        this->yspeed *= -1.0F;
+    }
+}
+
+void WarGrey::STEM::IGraphlet::motion_stop(bool horizon, bool vertical) {
+    if (horizon) {
+        this->xspeed = 0.0F;
+    }
+    
+    if (vertical) {
+        this->yspeed = 0.0F;
+    }
 }
 

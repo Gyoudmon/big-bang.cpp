@@ -44,7 +44,7 @@ namespace WarGrey::STEM {
             void send_message(const char* fmt, ...);
 
         public: // gameplay events
-            virtual void on_border(float hoffset, float voffset);
+            virtual void on_boundary(float hoffset, float voffset);
 
         public:
             void camouflage(bool yes_no) { this->findable = !yes_no; }
@@ -56,6 +56,8 @@ namespace WarGrey::STEM {
             void set_border_collision_strategy(WarGrey::STEM::BorderCollisionStrategy vs, WarGrey::STEM::BorderCollisionStrategy hs);
             void set_border_collision_strategy(BorderCollisionStrategy ts, BorderCollisionStrategy rs, BorderCollisionStrategy bs, BorderCollisionStrategy ls);
             void fill_speed(float* xspd, float* yspd) { if (xspd != nullptr) (*xspd) = this->xspeed; if (yspd != nullptr) (*yspd) = this->yspeed; }
+            void motion_stop(bool horizon, bool vertical);
+            void motion_bounce(bool horizon, bool vertical);
 
         public:
             IGraphletInfo* info = nullptr;

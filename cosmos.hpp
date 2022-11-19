@@ -39,7 +39,6 @@ namespace WarGrey::STEM {
             WarGrey::STEM::IScreen* screen = nullptr;
             WarGrey::STEM::IPlanet* head_planet = nullptr;
             WarGrey::STEM::IPlanet* recent_planet = nullptr;
-
     };
 }
 

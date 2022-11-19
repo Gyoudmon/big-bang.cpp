@@ -15,17 +15,17 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-WarGrey::STEM::Shapelet::Shapelet(int32_t color, int32_t bcolor) : color(color), border_color(bcolor) {
+WarGrey::STEM::IShapelet::IShapelet(int32_t color, int32_t bcolor) : color(color), border_color(bcolor) {
     this->enable_resizing(true);
 }
 
-WarGrey::STEM::Shapelet::~Shapelet() {
+WarGrey::STEM::IShapelet::~IShapelet() {
     if (this->geometry != nullptr) {
         SDL_FreeSurface(this->geometry);
     }
 }
 
-void WarGrey::STEM::Shapelet::construct() {
+void WarGrey::STEM::IShapelet::construct() {
     SDL_Surface* geometry = nullptr;
     float width, height;
 
@@ -37,7 +37,7 @@ void WarGrey::STEM::Shapelet::construct() {
         
         if (renderer != nullptr) {
             uint8_t r, g, b;
-
+    
             if (color >= 0) {
                 RGB_FromHexadecimal(color, &r, &g, &b);
                 this->fill_shape(renderer, width, height, r, g, b, 0xFFU);
@@ -56,7 +56,7 @@ void WarGrey::STEM::Shapelet::construct() {
     this->on_shape_changed(geometry);
 }
 
-void WarGrey::STEM::Shapelet::fill_extent(float x, float y, float* w, float* h) {
+void WarGrey::STEM::IShapelet::fill_extent(float x, float y, float* w, float* h) {
     if (this->geometry == nullptr) {
 	SET_VALUES(w, 0.0F, h, 0.0F);
     } else {
@@ -64,25 +64,25 @@ void WarGrey::STEM::Shapelet::fill_extent(float x, float y, float* w, float* h) 
     }
 }
 
-void WarGrey::STEM::Shapelet::fill_shape_origin(float* x, float* y) {
+void WarGrey::STEM::IShapelet::fill_shape_origin(float* x, float* y) {
     SET_VALUES(x, 0.0F, y, 0.0F);
 }
 
-void WarGrey::STEM::Shapelet::set_border_color(int32_t color) {
+void WarGrey::STEM::IShapelet::set_border_color(int32_t color) {
     if (this->border_color != color) {
         this->border_color = color;
         this->construct();
     }
 }
 
-void WarGrey::STEM::Shapelet::set_color(int32_t color) {
+void WarGrey::STEM::IShapelet::set_color(int32_t color) {
     if (this->color != color) {
         this->color = color;
         this->construct();
     }
 }
 
-void WarGrey::STEM::Shapelet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if (this->geometry != nullptr) {
         float ox, oy;
 
@@ -92,7 +92,7 @@ void WarGrey::STEM::Shapelet::draw(SDL_Renderer* renderer, float x, float y, flo
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Shapelet::on_shape_changed(SDL_Surface* g) {
+void WarGrey::STEM::IShapelet::on_shape_changed(SDL_Surface* g) {
     if (this->geometry != nullptr) {
         SDL_FreeSurface(this->geometry);
     }
@@ -106,7 +106,7 @@ WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, int32_t color, int32_t bo
 	: Rectanglet(edge_size, edge_size, color, border_color) {}
 
 WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, int32_t color, int32_t border_color)
-	: Shapelet(color, border_color), width(width), height(height) {}
+	: IShapelet(color, border_color), width(width), height(height) {}
 
 void WarGrey::STEM::Rectanglet::resize(float w, float h) {
     if ((w > 0.0F) && (h > 0.0F)) {
@@ -135,7 +135,7 @@ WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float edge_size, float radiu
 	: RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
 
 WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, float radius, int32_t color, int32_t border_color)
-	: Shapelet(color, border_color), width(width), height(height), radius(radius) {}
+	: IShapelet(color, border_color), width(width), height(height), radius(radius) {}
 
 void WarGrey::STEM::RoundedRectanglet::resize(float w, float h) {
     if ((w > 0.0F) && (h > 0.0F)) {
@@ -176,7 +176,7 @@ WarGrey::STEM::Ellipselet::Ellipselet(float radius, int32_t color, int32_t borde
 	: Ellipselet(radius, radius, color, border_color) {}
 
 WarGrey::STEM::Ellipselet::Ellipselet(float a, float b, int32_t color, int32_t border_color)
-	: Shapelet(color, border_color), aradius(a), bradius(b) {}
+	: IShapelet(color, border_color), aradius(a), bradius(b) {}
 
 void WarGrey::STEM::Ellipselet::resize(float w, float h) {
     if ((w > 0.0F) && (h > 0.0F)) {
@@ -224,7 +224,7 @@ WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, int32_t
 	: RegularPolygonlet(n, radius, 0.0F, color, border_color) {}
 
 WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float rotation, int32_t color, int32_t border_color)
-	: Shapelet(color, border_color), n(n), aradius(radius), bradius(radius), rotation(rotation) {
+	: IShapelet(color, border_color), n(n), aradius(radius), bradius(radius), rotation(rotation) {
     this->initialize_vertice();
 }
 
