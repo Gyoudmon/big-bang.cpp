@@ -149,3 +149,16 @@ void WarGrey::STEM::RGB_FromHexadecimal(unsigned int hex, unsigned char* r, unsi
     SET_BOX(a, float(alpha) / 255.0F);
 }
 
+
+void WarGrey::STEM::RGB_FromHexadecimal(int hex, unsigned char* r, unsigned char* g, unsigned char* b) {
+    RGB_FromHexadecimal(static_cast<unsigned int>(hex), r, g, b);
+}
+
+void WarGrey::STEM::RGB_FromHexadecimal(int hex, unsigned char* r, unsigned char* g, unsigned char* b, unsigned char* a) {
+    RGB_FromHexadecimal(static_cast<unsigned int>(hex), r, g, b, a);
+}
+
+void WarGrey::STEM::RGB_FromHexadecimal(int hex, unsigned char* r, unsigned char* g, unsigned char* b, float* a) {
+    RGB_FromHexadecimal(static_cast<unsigned int>(hex), r, g, b, a);
+}
+

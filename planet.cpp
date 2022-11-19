@@ -6,6 +6,9 @@
 #include "colorspace.hpp"
 
 #include "datum/string.hpp"
+#include "datum/flonum.hpp"
+
+#include <SDL2/SDL.h>
 
 using namespace WarGrey::STEM;
 
@@ -888,6 +891,7 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
     if (this->head_graphlet != nullptr) {
         IGraphlet* child = this->head_graphlet;
         float gx, gy, gwidth, gheight;
+        SDL_Rect clip;
         
         do {
             GraphletInfo* info = GRAPHLET_INFO(child);
@@ -899,6 +903,12 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
                 gy = (info->y + this->translate_y) * this->scale_y + Y;
                 
                 if (rectangle_overlay(gx, gy, gx + gwidth, gy + gheight, dsX, dsY, dsWidth, dsHeight)) {
+                    clip.x = flfloor(gx);
+                    clip.y = flfloor(gy);
+                    clip.w = flceiling(gwidth);
+                    clip.h = flceiling(gheight);
+
+                    SDL_RenderSetClipRect(renderer, &clip);
                     child->draw(renderer, gx, gy, gwidth, gheight);
 
                     if (info->selected) {
@@ -909,11 +919,18 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
 
             child = info->next;
         } while (child != this->head_graphlet);
+                    
+        SDL_RenderSetClipRect(renderer, nullptr);
     }
 }
 
 void WarGrey::STEM::Planet::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
-    game_draw_rect(renderer, x, y, width, height, 0x0000FFU);
+    SDL_BlendMode saved_mode;
+
+    SDL_GetRenderDrawBlendMode(renderer, &saved_mode);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
+    game_draw_rect(renderer, x, y, width, height, 0x00FFFFU);
+    SDL_SetRenderDrawBlendMode(renderer, saved_mode);
 }
 
 /*************************************************************************************************/

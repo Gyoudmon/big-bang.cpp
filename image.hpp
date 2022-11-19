@@ -3,6 +3,11 @@
 #include <SDL2/SDL_image.h>
 
 namespace WarGrey::STEM {
+    typedef void (*game_lambda_image_f)(SDL_Renderer*, float, float, void*);
+
+    SDL_Surface* game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum);
+    SDL_Surface* game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum);
+    
     SDL_Surface* game_blank_image(int width, int height);
     SDL_Surface* game_blank_image(float width, float height);
     

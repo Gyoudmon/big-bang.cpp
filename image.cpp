@@ -8,6 +8,26 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
+SDL_Surface* WarGrey::STEM::game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum) {
+    return game_lambda_image(float(width), float(height), make_image, datum);
+}
+
+SDL_Surface* WarGrey::STEM::game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum) {
+    SDL_Surface* surface = game_blank_image(width, height);
+
+    if (surface != nullptr) {
+        SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(surface);
+        
+        if (renderer != nullptr) {
+            make_image(renderer, width, height, datum);
+            SDL_RenderPresent(renderer);
+            SDL_DestroyRenderer(renderer);
+        }
+    }
+
+    return surface;
+}
+
 SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height) {
     return SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
 }
