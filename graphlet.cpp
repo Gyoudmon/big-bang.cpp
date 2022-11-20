@@ -68,28 +68,28 @@ void WarGrey::STEM::IGraphlet::fill_location(float* x, float* y, WarGrey::STEM::
     }
 }
 
-void WarGrey::STEM::IGraphlet::send_message(const char* fmt, ...) {
+void WarGrey::STEM::IGraphlet::log_message(const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(text, fmt);
-        this->send_message(-1, text);
+        this->log_message(-1, text);
     }
 }
 
-void WarGrey::STEM::IGraphlet::send_message(int fgc, const char* fmt, ...) {
+void WarGrey::STEM::IGraphlet::log_message(int fgc, const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(text, fmt);
-        this->send_message(fgc, text);
+        this->log_message(fgc, text);
     }
 }
 
-void WarGrey::STEM::IGraphlet::send_message(int fgc, const std::string& msg) {
+void WarGrey::STEM::IGraphlet::log_message(int fgc, const std::string& msg) {
     if (this->info != nullptr) {
-        this->info->master->send_message(fgc, msg);
+        this->info->master->log_message(fgc, msg);
     }
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IGraphlet::on_boundary(float hoffset, float voffset) {
+void WarGrey::STEM::IGraphlet::on_border(float hoffset, float voffset) {
     BorderCollisionStrategy hstrategy = BorderCollisionStrategy::IGNORE;
     BorderCollisionStrategy vstrategy = BorderCollisionStrategy::IGNORE;
 

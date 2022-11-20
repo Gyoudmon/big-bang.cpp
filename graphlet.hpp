@@ -39,12 +39,12 @@ namespace WarGrey::STEM {
             void notify_updated();
 
         public:
-            void send_message(int fgc, const char* fmt, ...);
-            void send_message(int fgc, const std::string& msg);
-            void send_message(const char* fmt, ...);
+            void log_message(int fgc, const char* fmt, ...);
+            void log_message(int fgc, const std::string& msg);
+            void log_message(const char* fmt, ...);
 
         public: // gameplay events
-            virtual void on_boundary(float hoffset, float voffset);
+            virtual void on_border(float hoffset, float voffset);
 
         public:
             void camouflage(bool yes_no) { this->findable = !yes_no; }

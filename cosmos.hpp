@@ -33,6 +33,8 @@ namespace WarGrey::STEM {
 
         protected:
             void push_planet(WarGrey::STEM::IPlanet* planet);
+
+        private:
             void collapse();
 
         private:

@@ -44,4 +44,3 @@ WarGrey::STEM::World::World(const char* title, int fps, uint32_t fgc, uint32_t b
     this->self = new WorldPlanet(this, title);
     this->push_planet(this->self);
 }
-

@@ -37,7 +37,6 @@ namespace WarGrey::STEM {
             virtual void reflow(float width, float height) {}
             virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
             virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
-            virtual void collapse();
             virtual bool can_exit() { return false; }
         
         public:
@@ -60,9 +59,9 @@ namespace WarGrey::STEM {
             void fill_background(SDL_Color* color);
             void start_input_text(const std::string& prompt);
             void start_input_text(const char* prompt, ...);
-            void send_message(int fgc, const char* fmt, ...);
-            void send_message(int fgc, const std::string& msg);
-            void send_message(const char* fmt, ...);
+            void log_message(int fgc, const char* fmt, ...);
+            void log_message(int fgc, const std::string& msg);
+            void log_message(const char* fmt, ...);
 
         public:
             virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) { return false; }
@@ -75,7 +74,7 @@ namespace WarGrey::STEM {
             virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
             virtual void on_text(const char* text, size_t size, bool entire) {}
             virtual void on_editing_text(const char* text, int pos, int span) {}
-            virtual void on_elapse(long long count, long long interval, long long uptime) {}
+            virtual void on_elapse(uint32_t count, u_int32_t interval, uint32_t uptime) {}
             virtual void on_hover(WarGrey::STEM::IGraphlet* g, float local_x, float local_y) {}
             virtual void on_goodbye(WarGrey::STEM::IGraphlet* g, float local_x, float local_y) {}
             virtual void on_tap(WarGrey::STEM::IGraphlet* g, float local_x, float local_y) {}
@@ -199,7 +198,7 @@ namespace WarGrey::STEM {
             void on_text(const char* text, size_t size, bool entire) override;
             void on_editing_text(const char* text, int pos, int span) override;
             void on_tap(WarGrey::STEM::IGraphlet* g, float x, float y) override;
-            void on_elapse(long long count, long long interval, long long uptime) override;
+            void on_elapse(uint32_t count, u_int32_t interval, uint32_t uptime) override;
 
         public:
             void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
@@ -220,6 +219,7 @@ namespace WarGrey::STEM {
         private:
             void recalculate_graphlets_extent_when_invalid();
             bool say_goodbye_to_hover_graphlet(uint32_t state, float x, float y, float dx, float dy);
+            void collapse();
 
         private:
             float graphlets_left;

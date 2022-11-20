@@ -203,6 +203,10 @@ Planet::~Planet() {
     this->collapse();
 }
 
+void Planet::collapse() {
+    this->erase();
+}
+
 void WarGrey::STEM::Planet::change_mode(unsigned int mode) {
     if (mode != this->mode) {
         this->no_selected();
@@ -858,7 +862,7 @@ bool WarGrey::STEM::Planet::say_goodbye_to_hover_graphlet(uint32_t state, float 
 }
 
 /************************************************************************************************/
-void WarGrey::STEM::Planet::on_elapse(long long count, long long interval, long long uptime) {
+void WarGrey::STEM::Planet::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
     if (this->head_graphlet != nullptr) {
         IGraphlet* child = this->head_graphlet;
         float cwidth, cheight, dwidth, dheight;
@@ -895,7 +899,7 @@ void WarGrey::STEM::Planet::on_elapse(long long count, long long interval, long 
                     }
 
                     if ((hdist != 0.0F) || (vdist != 0.0F)) {
-                        child->on_boundary(hdist, vdist);
+                        child->on_border(hdist, vdist);
                         child->fill_speed(&xspd, &yspd);
                         
                         if ((xspd != 0.0F) || (yspd != 0.0F)) {
@@ -1027,21 +1031,21 @@ void WarGrey::STEM::IPlanet::start_input_text(const std::string& prompt) {
     }
 }
 
-void WarGrey::STEM::IPlanet::send_message(const char* fmt, ...) {
+void WarGrey::STEM::IPlanet::log_message(const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(msg, fmt);
-        this->send_message(-1, msg);
+        this->log_message(-1, msg);
     }
 }
 
-void WarGrey::STEM::IPlanet::send_message(int fgc, const char* fmt, ...) {
+void WarGrey::STEM::IPlanet::log_message(int fgc, const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(msg, fmt);
-        this->send_message(fgc, msg);
+        this->log_message(fgc, msg);
     }
 }
 
-void WarGrey::STEM::IPlanet::send_message(int fgc, const std::string& msg) {
+void WarGrey::STEM::IPlanet::log_message(int fgc, const std::string& msg) {
     if (this->info != nullptr) {
         this->info->master->log_message(fgc, msg);
     }
@@ -1071,10 +1075,6 @@ void WarGrey::STEM::IPlanet::notify_updated() {
     if (this->info != nullptr) {
         this->info->master->notify_updated();
     }
-}
-
-void WarGrey::STEM::IPlanet::collapse() {
-    this->erase();
 }
 
 SDL_Surface* WarGrey::STEM::IPlanet::snapshot(float width, float height, uint32_t bgcolor, float alpha) {
