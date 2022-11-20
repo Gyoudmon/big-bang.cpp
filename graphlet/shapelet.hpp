@@ -41,6 +41,34 @@ namespace WarGrey::STEM {
     };
 
     /**********************************************************************************************/
+    class Linelet : public WarGrey::STEM::IShapelet {
+        public:
+	    Linelet(float ex, float ey, int32_t color);
+
+	public:
+	    void resize(float width, float height) override;
+
+        protected:
+            void fill_shape_extent(float* width, float* height) override;
+            void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override {}
+            void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+
+        private:
+            float epx;
+            float epy;
+    };
+
+    class HLinelet : public WarGrey::STEM::Linelet {
+        public:
+            HLinelet(float width, int32_t color) : Linelet(width, 0.0F, color) {}
+    };
+
+    class VLinelet : public WarGrey::STEM::Linelet {
+        public:
+            VLinelet(float height, int32_t color) : Linelet(0.0F, height, color) {}
+    };
+
+    /**********************************************************************************************/
     class Rectanglet : public WarGrey::STEM::IShapelet {
         public:
 	    Rectanglet(float edge_size, int32_t color, int32_t border_color = -1);

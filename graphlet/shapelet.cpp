@@ -112,6 +112,42 @@ void WarGrey::STEM::IShapelet::on_shape_changed(SDL_Surface* g) {
 }
 
 /*************************************************************************************************/
+WarGrey::STEM::Linelet::Linelet(float ex, float ey, int32_t color) : IShapelet(color, -1), epx(ex), epy(ey) {}
+
+void WarGrey::STEM::Linelet::resize(float w, float h) {
+    if ((w > 0.0F) && (h > 0.0F)) {
+        float width, height;
+        
+        this->fill_shape_extent(&width, &height);
+
+	if ((width != w) || (height != h)) {
+            this->epx *= w / width;
+            this->epy *= h / height;
+	    this->construct();
+	}
+    }
+}
+
+void WarGrey::STEM::Linelet::fill_shape_extent(float* width, float* height) {
+    SET_VALUES(width, flmax(flabs(this->epx), 1.0F), height, flmax(flabs(this->epy), 1.0F));
+}
+
+void WarGrey::STEM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    float x0 = 0.0F;
+    float y0 = 0.0F;
+
+    if (this->epx < 0.0F) {
+        x0 = -this->epx;
+    }
+
+    if (this->epy < 0.0F) {
+        y0 = -this->epy;
+    }
+
+    aalineRGBA(renderer, x0, y0, x0 + this->epx, y0 + this->epy, r, g, b, a);
+}
+
+/*************************************************************************************************/
 WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, int32_t color, int32_t border_color)
 	: Rectanglet(edge_size, edge_size, color, border_color) {}
 

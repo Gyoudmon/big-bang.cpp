@@ -968,6 +968,7 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
                     child->draw(renderer, gx, gy, gwidth, gheight);
 
                     if (info->selected) {
+                        SDL_RenderSetClipRect(renderer, nullptr);
                         this->draw_visible_selection(renderer, gx, gy, gwidth, gheight);
                     }
                 }
@@ -981,12 +982,7 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
 }
 
 void WarGrey::STEM::Planet::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
-    SDL_BlendMode saved_mode;
-
-    SDL_GetRenderDrawBlendMode(renderer, &saved_mode);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_ADD);
     game_draw_rect(renderer, x, y, width, height, 0x00FFFFU);
-    SDL_SetRenderDrawBlendMode(renderer, saved_mode);
 }
 
 /*************************************************************************************************/
