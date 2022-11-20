@@ -152,7 +152,7 @@ namespace WarGrey::STEM {
             Universe();
 
             /* 更有用一些的构造函数，创建新对象时根据参数自动选择 */
-            Universe(const char* title, int fps = 60, uint32_t fgc = 0xFFFFFFU, uint32_t bgc = 0x000000U);
+            Universe(const char* title, int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
         
         public:
             /* 创建游戏世界，充当程序真正的 main 函数，默认什么都不做 */
@@ -169,12 +169,6 @@ namespace WarGrey::STEM {
 
         protected:
             void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) override;
-    };
-
-    class Pasteboard : public WarGrey::STEM::Universe {
-        public:
-            Pasteboard(const char* title, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU)
-                : Universe(title, 0, fgc, bgc) {}
     };
 }
 
