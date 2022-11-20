@@ -27,7 +27,7 @@ namespace WarGrey::STEM {
             virtual void construct(int argc, char* argv[]) = 0;
             
             /* 排列可视化元素，在合适的时候自动调用 */
-            virtual void reflow(int window, int height) = 0;
+            virtual void reflow(float window, float height) = 0;
 
             /* 更新游戏世界，定时器到期时自动调用 */
             virtual void update(uint32_t interval, uint32_t count, uint32_t uptime) = 0;
@@ -159,7 +159,7 @@ namespace WarGrey::STEM {
             void construct(int argc, char* argv[]) override {}
             
             /* 排列可视化元素，在合适的时候自动调用，默认什么都不做 */
-            void reflow(int window, int height) override {}
+            void reflow(float window, float height) override {}
 
             /* 更新游戏世界，定时器到期时自动调用，默认什么都不做 */
             void update(uint32_t interval, uint32_t count, uint32_t uptime) override {}

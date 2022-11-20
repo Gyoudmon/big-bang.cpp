@@ -322,7 +322,7 @@ void WarGrey::STEM::IUniverse::on_resize(int width, int height) {
     
     this->begin_update_sequence();
     game_world_reset(this->renderer, this->texture, this->_fgc, this->_bgc);
-    this->reflow(width, height - this->get_cmdwin_height());
+    this->reflow(float(width), float(height - this->get_cmdwin_height()));
     this->notify_updated();
     this->end_update_sequence();
 }

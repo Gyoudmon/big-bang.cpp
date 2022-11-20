@@ -11,7 +11,7 @@ namespace WarGrey::STEM {
             virtual ~Cosmos();
 
         public:
-            void reflow(int window, int height) override;
+            void reflow(float window, float height) override;
             void update(uint32_t interval, uint32_t count, uint32_t uptime) override {};
             void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override;
             bool can_exit() override;

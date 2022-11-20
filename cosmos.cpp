@@ -115,11 +115,8 @@ void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
     }
 }
 
-void WarGrey::STEM::Cosmos::reflow(int nwidth, int nheight) {
-    if ((nwidth > 0.0F) && (nheight > 0.0F)) {
-        float width = float(nwidth);
-        float height = float(nheight);
-        
+void WarGrey::STEM::Cosmos::reflow(float width, float height) {
+    if ((width > 0.0F) && (height > 0.0F)) {
         if (this->head_planet != nullptr) {
             IPlanet* child = this->head_planet;
 
