@@ -1,5 +1,5 @@
 #include "planet.hpp"
-#include "graphlet.hpp"
+#include "matter.hpp"
 
 #include "geometry.hpp"
 #include "mathematics.hpp"
@@ -15,7 +15,7 @@ using namespace WarGrey::STEM;
  *   reinterpret_cast may cause "Access violation reading location 0xFFFFFFFFFFFFFFFF" even for subtype casting.
  */
 
-#define GRAPHLET_INFO(g) (static_cast<GraphletInfo*>(g->info))
+#define GRAPHLET_INFO(g) (static_cast<MatterInfo*>(g->info))
 
 namespace {
     struct AsyncInfo {
@@ -27,8 +27,8 @@ namespace {
         float dy0;
     };
 
-    struct GraphletInfo : public WarGrey::STEM::IGraphletInfo {
-        GraphletInfo(WarGrey::STEM::IPlanet* master, unsigned int mode) : IGraphletInfo(master), mode(mode) {};
+    struct MatterInfo : public WarGrey::STEM::IMatterInfo {
+        MatterInfo(WarGrey::STEM::IPlanet* master, unsigned int mode) : IMatterInfo(master), mode(mode) {};
 
         float x = 0.0F;
         float y = 0.0F;
@@ -38,21 +38,21 @@ namespace {
         // for asynchronously loaded graphlets
         AsyncInfo* async = nullptr;
 
-        IGraphlet* next = nullptr;
-        IGraphlet* prev = nullptr;
+        IMatter* next = nullptr;
+        IMatter* prev = nullptr;
     };
 }
 
-static inline GraphletInfo* bind_graphlet_owership(WarGrey::STEM::IPlanet* master, unsigned int mode, IGraphlet* g) {
-    auto info = new GraphletInfo(master, mode);
+static inline MatterInfo* bind_graphlet_owership(WarGrey::STEM::IPlanet* master, unsigned int mode, IMatter* g) {
+    auto info = new MatterInfo(master, mode);
     
     g->info = info;
 
     return info;
 }
 
-static inline GraphletInfo* planet_graphlet_info(WarGrey::STEM::IPlanet* master, IGraphlet* g) {
-    GraphletInfo* info = nullptr;
+static inline MatterInfo* planet_graphlet_info(WarGrey::STEM::IPlanet* master, IMatter* g) {
+    MatterInfo* info = nullptr;
 
     if ((g != nullptr) && (g->info != nullptr)) {
         if (g->info->master == master) {
@@ -63,46 +63,46 @@ static inline GraphletInfo* planet_graphlet_info(WarGrey::STEM::IPlanet* master,
     return info;
 }
 
-static inline bool unsafe_graphlet_unmasked(GraphletInfo* info, unsigned int mode) {
+static inline bool unsafe_graphlet_unmasked(MatterInfo* info, unsigned int mode) {
     return ((info->mode & mode) == info->mode);
 }
 
-static void unsafe_fill_graphlet_bound(IGraphlet* g, GraphletInfo* info, float* x, float* y, float* width, float* height) {
+static void unsafe_fill_graphlet_bound(IMatter* g, MatterInfo* info, float* x, float* y, float* width, float* height) {
     g->fill_extent(info->x, info->y, width, height);
 
     (*x) = info->x;
     (*y) = info->y;
 }
 
-static inline void unsafe_add_selected(WarGrey::STEM::IPlanet* master, IGraphlet* g, GraphletInfo* info) {
+static inline void unsafe_add_selected(WarGrey::STEM::IPlanet* master, IMatter* g, MatterInfo* info) {
     master->before_select(g, true);
     info->selected = true;
     master->after_select(g, true);
     master->notify_updated();
 }
 
-static inline void unsafe_set_selected(WarGrey::STEM::IPlanet* master, IGraphlet* g, GraphletInfo* info) {
+static inline void unsafe_set_selected(WarGrey::STEM::IPlanet* master, IMatter* g, MatterInfo* info) {
     master->begin_update_sequence();
     master->no_selected();
     unsafe_add_selected(master, g, info);
     master->end_update_sequence();
 }
 
-static void graphlet_anchor_fraction(GraphletAnchor& a, float* ofx, float* ofy) {
+static void graphlet_anchor_fraction(MatterAnchor& a, float* ofx, float* ofy) {
     float fx = 0.0F;
     float fy = 0.0F;
 
-    if (a != GraphletAnchor::LT) {
+    if (a != MatterAnchor::LT) {
         switch (a) {
-        case GraphletAnchor::LT:                       break;
-        case GraphletAnchor::LC:            fy = 0.5F; break;
-        case GraphletAnchor::LB:            fy = 1.0F; break;
-        case GraphletAnchor::CT: fx = 0.5F;            break;
-        case GraphletAnchor::CC: fx = 0.5F; fy = 0.5F; break;
-        case GraphletAnchor::CB: fx = 0.5F; fy = 1.0F; break;
-        case GraphletAnchor::RT: fx = 1.0F;            break;
-        case GraphletAnchor::RC: fx = 1.0F; fy = 0.5F; break;
-        case GraphletAnchor::RB: fx = 1.0F; fy = 1.0F; break;
+        case MatterAnchor::LT:                       break;
+        case MatterAnchor::LC:            fy = 0.5F; break;
+        case MatterAnchor::LB:            fy = 1.0F; break;
+        case MatterAnchor::CT: fx = 0.5F;            break;
+        case MatterAnchor::CC: fx = 0.5F; fy = 0.5F; break;
+        case MatterAnchor::CB: fx = 0.5F; fy = 1.0F; break;
+        case MatterAnchor::RT: fx = 1.0F;            break;
+        case MatterAnchor::RC: fx = 1.0F; fy = 0.5F; break;
+        case MatterAnchor::RB: fx = 1.0F; fy = 1.0F; break;
         }
     }
 
@@ -110,7 +110,7 @@ static void graphlet_anchor_fraction(GraphletAnchor& a, float* ofx, float* ofy) 
     (*ofy) = fy;
 }
 
-static bool unsafe_move_graphlet_via_info(Planet* master, GraphletInfo* info, float x, float y, bool absolute) {
+static bool unsafe_move_graphlet_via_info(Planet* master, MatterInfo* info, float x, float y, bool absolute) {
     bool moved = false;
     
     if (!absolute) {
@@ -129,7 +129,7 @@ static bool unsafe_move_graphlet_via_info(Planet* master, GraphletInfo* info, fl
     return moved;
 }
 
-static bool unsafe_move_graphlet_via_info(Planet* master, IGraphlet* g, GraphletInfo* info
+static bool unsafe_move_graphlet_via_info(Planet* master, IMatter* g, MatterInfo* info
     , float x, float y, float fx, float fy, float dx, float dy, bool absolute) {
     float sx, sy, sw, sh;
     float ax = 0.0F;
@@ -153,12 +153,12 @@ static bool unsafe_move_graphlet_via_info(Planet* master, IGraphlet* g, Graphlet
     return unsafe_move_graphlet_via_info(master, info, x - ax + dx, y - ay + dy, true);
 }
 
-static IGraphlet* do_search_selected_graphlet(IGraphlet* start, unsigned int mode, IGraphlet* terminator) {
-    IGraphlet* found = nullptr;
-    IGraphlet* child = start;
+static IMatter* do_search_selected_graphlet(IMatter* start, unsigned int mode, IMatter* terminator) {
+    IMatter* found = nullptr;
+    IMatter* child = start;
 
     do {
-        GraphletInfo* info = GRAPHLET_INFO(child);
+        MatterInfo* info = GRAPHLET_INFO(child);
 
         if (info->selected && (unsafe_graphlet_unmasked(info, mode))) {
             found = child;
@@ -171,8 +171,8 @@ static IGraphlet* do_search_selected_graphlet(IGraphlet* start, unsigned int mod
     return found;
 }
 
-static void do_resize(Planet* master, IGraphlet* g, GraphletInfo* info, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
-    GraphletAnchor resize_anchor;
+static void do_resize(Planet* master, IMatter* g, MatterInfo* info, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
+    MatterAnchor resize_anchor;
 
     // TODO: the theory or implementation seems incorrect. 
 
@@ -220,14 +220,14 @@ unsigned int WarGrey::STEM::Planet::current_mode() {
     return this->mode;
 }
 
-bool WarGrey::STEM::Planet::graphlet_unmasked(IGraphlet* g) {
-    GraphletInfo* info = planet_graphlet_info(this, g);
+bool WarGrey::STEM::Planet::graphlet_unmasked(IMatter* g) {
+    MatterInfo* info = planet_graphlet_info(this, g);
 
     return ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode));
 }
 
-void WarGrey::STEM::Planet::notify_graphlet_ready(IGraphlet* g) {
-    GraphletInfo* info = planet_graphlet_info(this, g);
+void WarGrey::STEM::Planet::notify_graphlet_ready(IMatter* g) {
+    MatterInfo* info = planet_graphlet_info(this, g);
 
     if (info != nullptr) {
         if (info->async != nullptr) {
@@ -252,16 +252,16 @@ void WarGrey::STEM::Planet::notify_graphlet_ready(IGraphlet* g) {
     }
 }
 
-void WarGrey::STEM::Planet::insert(IGraphlet* g, float x, float y, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Planet::insert(IMatter* g, float x, float y, float fx, float fy, float dx, float dy) {
     if (g->info == nullptr) {
-        GraphletInfo* info = bind_graphlet_owership(this, this->mode, g);
+        MatterInfo* info = bind_graphlet_owership(this, this->mode, g);
 
         if (this->head_graphlet == nullptr) {
             this->head_graphlet = g;
             info->prev = this->head_graphlet;
         } else {
-            GraphletInfo* head_info = GRAPHLET_INFO(this->head_graphlet);
-            GraphletInfo* prev_info = GRAPHLET_INFO(head_info->prev);
+            MatterInfo* head_info = GRAPHLET_INFO(this->head_graphlet);
+            MatterInfo* prev_info = GRAPHLET_INFO(head_info->prev);
             
             info->prev = head_info->prev;
             prev_info->next = g;
@@ -290,9 +290,9 @@ void WarGrey::STEM::Planet::insert(IGraphlet* g, float x, float y, float fx, flo
     }
 }
 
-void WarGrey::STEM::Planet::insert(IGraphlet* g, IGraphlet* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Planet::insert(IMatter* g, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
     if (g->info == nullptr) {
-        GraphletInfo* tinfo = planet_graphlet_info(this, target);
+        MatterInfo* tinfo = planet_graphlet_info(this, target);
         float x = 0.0F;
         float y = 0.0F;
 
@@ -310,10 +310,10 @@ void WarGrey::STEM::Planet::insert(IGraphlet* g, IGraphlet* target, float tfx, f
     }
 }
 
-void WarGrey::STEM::Planet::insert(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Planet::insert(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
     if (g->info == nullptr) {
-        GraphletInfo* xinfo = planet_graphlet_info(this, xtarget);
-        GraphletInfo* yinfo = planet_graphlet_info(this, ytarget);
+        MatterInfo* xinfo = planet_graphlet_info(this, xtarget);
+        MatterInfo* yinfo = planet_graphlet_info(this, ytarget);
         float x = 0.0F;
         float y = 0.0F;
 
@@ -333,12 +333,12 @@ void WarGrey::STEM::Planet::insert(IGraphlet* g, IGraphlet* xtarget, float xfx, 
     }
 }
 
-void WarGrey::STEM::Planet::remove(IGraphlet* g) {
-    GraphletInfo* info = planet_graphlet_info(this, g);
+void WarGrey::STEM::Planet::remove(IMatter* g) {
+    MatterInfo* info = planet_graphlet_info(this, g);
 
     if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
-        GraphletInfo* prev_info = GRAPHLET_INFO(info->prev);
-        GraphletInfo* next_info = GRAPHLET_INFO(info->next);
+        MatterInfo* prev_info = GRAPHLET_INFO(info->prev);
+        MatterInfo* next_info = GRAPHLET_INFO(info->next);
 
         prev_info->next = info->next;
         next_info->prev = info->prev;
@@ -363,15 +363,15 @@ void WarGrey::STEM::Planet::remove(IGraphlet* g) {
 
 void WarGrey::STEM::Planet::erase() {
     if (this->head_graphlet != nullptr) {
-        IGraphlet* temp_head = this->head_graphlet;
-        GraphletInfo* temp_info = GRAPHLET_INFO(temp_head);
-        GraphletInfo* prev_info = GRAPHLET_INFO(temp_info->prev);
+        IMatter* temp_head = this->head_graphlet;
+        MatterInfo* temp_info = GRAPHLET_INFO(temp_head);
+        MatterInfo* prev_info = GRAPHLET_INFO(temp_info->prev);
 
         this->head_graphlet = nullptr;
         prev_info->next = nullptr;
 
         do {
-            IGraphlet* child = temp_head;
+            IMatter* child = temp_head;
 
             temp_head = GRAPHLET_INFO(temp_head)->next;
 
@@ -383,8 +383,8 @@ void WarGrey::STEM::Planet::erase() {
     }
 }
 
-void WarGrey::STEM::Planet::move_to(IGraphlet* g, float x, float y, float fx, float fy, float dx, float dy) {
-    GraphletInfo* info = planet_graphlet_info(this, g);
+void WarGrey::STEM::Planet::move_to(IMatter* g, float x, float y, float fx, float fy, float dx, float dy) {
+    MatterInfo* info = planet_graphlet_info(this, g);
     
     if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
         if (unsafe_move_graphlet_via_info(this, g, info, x, y, fx, fy, dx, dy, true)) {
@@ -393,8 +393,8 @@ void WarGrey::STEM::Planet::move_to(IGraphlet* g, float x, float y, float fx, fl
     }
 }
 
-void WarGrey::STEM::Planet::move_to(IGraphlet* g, IGraphlet* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
-    GraphletInfo* tinfo = planet_graphlet_info(this, target);
+void WarGrey::STEM::Planet::move_to(IMatter* g, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+    MatterInfo* tinfo = planet_graphlet_info(this, target);
     float x = 0.0F;
     float y = 0.0F;
 
@@ -409,9 +409,9 @@ void WarGrey::STEM::Planet::move_to(IGraphlet* g, IGraphlet* target, float tfx, 
     this->move_to(g, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::Planet::move_to(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, float fx, float fy, float dx, float dy) {
-    GraphletInfo* xinfo = planet_graphlet_info(this, xtarget);
-    GraphletInfo* yinfo = planet_graphlet_info(this, ytarget);
+void WarGrey::STEM::Planet::move_to(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+    MatterInfo* xinfo = planet_graphlet_info(this, xtarget);
+    MatterInfo* yinfo = planet_graphlet_info(this, ytarget);
     float x = 0.0F;
     float y = 0.0F;
 
@@ -428,8 +428,8 @@ void WarGrey::STEM::Planet::move_to(IGraphlet* g, IGraphlet* xtarget, float xfx,
     this->move_to(g, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::Planet::move(IGraphlet* g, float x, float y) {
-    GraphletInfo* info = planet_graphlet_info(this, g);
+void WarGrey::STEM::Planet::move(IMatter* g, float x, float y) {
+    MatterInfo* info = planet_graphlet_info(this, g);
 
     if (info != nullptr) {
         if (unsafe_graphlet_unmasked(info, this->mode)) {
@@ -438,7 +438,7 @@ void WarGrey::STEM::Planet::move(IGraphlet* g, float x, float y) {
             }
         }
     } else if (this->head_graphlet != nullptr) {
-        IGraphlet* child = this->head_graphlet;
+        IMatter* child = this->head_graphlet;
 
         do {
             info = GRAPHLET_INFO(child);
@@ -454,15 +454,15 @@ void WarGrey::STEM::Planet::move(IGraphlet* g, float x, float y) {
     }
 }
 
-IGraphlet* WarGrey::STEM::Planet::find_graphlet(float x, float y) {
-    IGraphlet* found = nullptr;
+IMatter* WarGrey::STEM::Planet::find_graphlet(float x, float y) {
+    IMatter* found = nullptr;
 
     if (this->head_graphlet != nullptr) {
-        GraphletInfo* head_info = GRAPHLET_INFO(this->head_graphlet);
-        IGraphlet* child = head_info->prev;
+        MatterInfo* head_info = GRAPHLET_INFO(this->head_graphlet);
+        IMatter* child = head_info->prev;
 
         do {
-            GraphletInfo* info = GRAPHLET_INFO(child);
+            MatterInfo* info = GRAPHLET_INFO(child);
 
             if (unsafe_graphlet_unmasked(info, this->mode)) {
                 if (!child->concealled()) {
@@ -489,15 +489,15 @@ IGraphlet* WarGrey::STEM::Planet::find_graphlet(float x, float y) {
     return found;
 }
 
-IGraphlet* WarGrey::STEM::Planet::find_next_selected_graphlet(IGraphlet* start) {
-    IGraphlet* found = nullptr;
+IMatter* WarGrey::STEM::Planet::find_next_selected_graphlet(IMatter* start) {
+    IMatter* found = nullptr;
     
     if (start == nullptr) {
         if (this->head_graphlet != nullptr) {
             found = do_search_selected_graphlet(this->head_graphlet, this->mode, this->head_graphlet);
         }
     } else {
-        GraphletInfo* info = planet_graphlet_info(this, start);
+        MatterInfo* info = planet_graphlet_info(this, start);
 
         if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
             found = do_search_selected_graphlet(info->next, this->mode, this->head_graphlet);
@@ -507,9 +507,9 @@ IGraphlet* WarGrey::STEM::Planet::find_next_selected_graphlet(IGraphlet* start) 
     return found;
 }
 
-bool WarGrey::STEM::Planet::fill_graphlet_location(IGraphlet* g, float* x, float* y, float fx, float fy) {
+bool WarGrey::STEM::Planet::fill_graphlet_location(IMatter* g, float* x, float* y, float fx, float fy) {
     bool okay = false;
-    GraphletInfo* info = planet_graphlet_info(this, g);
+    MatterInfo* info = planet_graphlet_info(this, g);
     
     if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
@@ -524,9 +524,9 @@ bool WarGrey::STEM::Planet::fill_graphlet_location(IGraphlet* g, float* x, float
     return okay;
 }
 
-bool WarGrey::STEM::Planet::fill_graphlet_boundary(IGraphlet* g, float* x, float* y, float* width, float* height) {
+bool WarGrey::STEM::Planet::fill_graphlet_boundary(IMatter* g, float* x, float* y, float* width, float* height) {
     bool okay = false;
-    GraphletInfo* info = planet_graphlet_info(this, g);
+    MatterInfo* info = planet_graphlet_info(this, g);
 
     if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
@@ -566,7 +566,7 @@ void WarGrey::STEM::Planet::recalculate_graphlets_extent_when_invalid() {
             this->graphlets_right = 0.0F;
             this->graphlets_bottom = 0.0F;
         } else {
-            IGraphlet* child = this->head_graphlet;
+            IMatter* child = this->head_graphlet;
 
             this->graphlets_left = infinity_f;
             this->graphlets_top = infinity_f;
@@ -574,7 +574,7 @@ void WarGrey::STEM::Planet::recalculate_graphlets_extent_when_invalid() {
             this->graphlets_bottom = -infinity_f;
 
             do {
-                GraphletInfo* info = GRAPHLET_INFO(child);
+                MatterInfo* info = GRAPHLET_INFO(child);
 
                 if (unsafe_graphlet_unmasked(info, this->mode)) {
                     unsafe_fill_graphlet_bound(child, info, &rx, &ry, &width, &height);
@@ -590,9 +590,9 @@ void WarGrey::STEM::Planet::recalculate_graphlets_extent_when_invalid() {
     }
 }
 
-void WarGrey::STEM::Planet::add_selected(IGraphlet* g) {
+void WarGrey::STEM::Planet::add_selected(IMatter* g) {
     if (this->can_select_multiple()) {
-        GraphletInfo* info = planet_graphlet_info(this, g);
+        MatterInfo* info = planet_graphlet_info(this, g);
 
         if ((info != nullptr) && (!info->selected)) {
             if (unsafe_graphlet_unmasked(info, this->mode) && this->can_select(g)) {
@@ -602,8 +602,8 @@ void WarGrey::STEM::Planet::add_selected(IGraphlet* g) {
     }
 }
 
-void WarGrey::STEM::Planet::set_selected(IGraphlet* g) {
-    GraphletInfo* info = planet_graphlet_info(this, g);
+void WarGrey::STEM::Planet::set_selected(IMatter* g) {
+    MatterInfo* info = planet_graphlet_info(this, g);
 
     if ((info != nullptr) && (!info->selected)) {
         if (unsafe_graphlet_unmasked(info, this->mode) && (this->can_select(g))) {
@@ -614,12 +614,12 @@ void WarGrey::STEM::Planet::set_selected(IGraphlet* g) {
 
 void WarGrey::STEM::Planet::no_selected() {
     if (this->head_graphlet != nullptr) {
-        IGraphlet* child = this->head_graphlet;
+        IMatter* child = this->head_graphlet;
 
         this->begin_update_sequence();
 
         do {
-            GraphletInfo* info = GRAPHLET_INFO(child);
+            MatterInfo* info = GRAPHLET_INFO(child);
 
             if (info->selected && unsafe_graphlet_unmasked(info, this->mode)) {
                 this->before_select(child, false);
@@ -635,8 +635,8 @@ void WarGrey::STEM::Planet::no_selected() {
     }
 }
 
-bool WarGrey::STEM::Planet::is_selected(IGraphlet* g) {
-    GraphletInfo* info = planet_graphlet_info(this, g);
+bool WarGrey::STEM::Planet::is_selected(IMatter* g) {
+    MatterInfo* info = planet_graphlet_info(this, g);
     bool selected = false;
 
     if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
@@ -650,10 +650,10 @@ unsigned int WarGrey::STEM::Planet::count_selected() {
     unsigned int n = 0U;
 
     if (this->head_graphlet != nullptr) {
-        IGraphlet* child = this->head_graphlet;
+        IMatter* child = this->head_graphlet;
 
         do {
-            GraphletInfo* info = GRAPHLET_INFO(child);
+            MatterInfo* info = GRAPHLET_INFO(child);
 
             if (info->selected && unsafe_graphlet_unmasked(info, this->mode)) {
                 n += 1U;
@@ -666,14 +666,14 @@ unsigned int WarGrey::STEM::Planet::count_selected() {
     return n;
 }
 
-IGraphlet* WarGrey::STEM::Planet::get_focus_graphlet() {
+IMatter* WarGrey::STEM::Planet::get_focus_graphlet() {
     return (this->graphlet_unmasked(this->focused_graphlet) ? this->focused_graphlet : nullptr);
 }
 
-void WarGrey::STEM::Planet::set_caret_owner(IGraphlet* g) {
+void WarGrey::STEM::Planet::set_caret_owner(IMatter* g) {
     if (this->focused_graphlet != g) {
         if ((g != nullptr) && (g->handle_events())) {
-            GraphletInfo* info = planet_graphlet_info(this, g);
+            MatterInfo* info = planet_graphlet_info(this, g);
 
             if ((info != nullptr) && unsafe_graphlet_unmasked(info, this->mode)) {
                 if (this->focused_graphlet != nullptr) {
@@ -715,9 +715,9 @@ void WarGrey::STEM::Planet::on_editing_text(const char* text, int pos, int span)
     }
 }
 
-void WarGrey::STEM::Planet::on_tap(IGraphlet* g, float local_x, float local_y) {
+void WarGrey::STEM::Planet::on_tap(IMatter* g, float local_x, float local_y) {
     if (g != nullptr) {
-        GraphletInfo* info = GRAPHLET_INFO(g);
+        MatterInfo* info = GRAPHLET_INFO(g);
 
         if (!info->selected) {
             if (this->can_select(g)) {
@@ -740,13 +740,13 @@ bool WarGrey::STEM::Planet::on_pointer_pressed(uint8_t button, float x, float y,
         case 1: {
             switch (button) {
                 case SDL_BUTTON_LEFT: {
-                    IGraphlet* unmasked_graphlet = this->find_graphlet(x, y);
+                    IMatter* unmasked_graphlet = this->find_graphlet(x, y);
 
                     this->set_caret_owner(unmasked_graphlet);
                     this->no_selected();
                     
                     if ((unmasked_graphlet != nullptr) && (unmasked_graphlet->handle_low_level_events())) {
-                        GraphletInfo* info = GRAPHLET_INFO(unmasked_graphlet);
+                        MatterInfo* info = GRAPHLET_INFO(unmasked_graphlet);
                         float local_x = x - info->x;
                         float local_y = y - info->y;
 
@@ -764,14 +764,14 @@ bool WarGrey::STEM::Planet::on_pointer_move(uint32_t state, float x, float y, fl
     bool handled = false;
 
     if (state == 0) {
-        IGraphlet* unmasked_graphlet = this->find_graphlet(x, y);
+        IMatter* unmasked_graphlet = this->find_graphlet(x, y);
 
         if (unmasked_graphlet != this->hovering_graphlet) {
             this->say_goodbye_to_hover_graphlet(state, x, y, dx, dy);
         }
 
         if (unmasked_graphlet != nullptr) {
-            GraphletInfo* info = GRAPHLET_INFO(unmasked_graphlet);
+            MatterInfo* info = GRAPHLET_INFO(unmasked_graphlet);
             float local_x = x - info->x;
             float local_y = y - info->y;
 
@@ -801,10 +801,10 @@ bool WarGrey::STEM::Planet::on_pointer_released(uint8_t button, float x, float y
         case 1: {
             switch (button) {
                 case SDL_BUTTON_LEFT: {
-                    IGraphlet* unmasked_graphlet = this->find_graphlet(x, y);
+                    IMatter* unmasked_graphlet = this->find_graphlet(x, y);
         
                     if (unmasked_graphlet != nullptr) {
-                        GraphletInfo* info = GRAPHLET_INFO(unmasked_graphlet);
+                        MatterInfo* info = GRAPHLET_INFO(unmasked_graphlet);
                         float local_x = x - info->x;
                         float local_y = y - info->y;
 
@@ -842,7 +842,7 @@ bool WarGrey::STEM::Planet::say_goodbye_to_hover_graphlet(uint32_t state, float 
     bool done = false;
 
     if (this->hovering_graphlet != nullptr) {
-        GraphletInfo* info = GRAPHLET_INFO(this->hovering_graphlet);
+        MatterInfo* info = GRAPHLET_INFO(this->hovering_graphlet);
         float local_x = x - info->x;
         float local_y = y - info->y;
 
@@ -864,68 +864,61 @@ bool WarGrey::STEM::Planet::say_goodbye_to_hover_graphlet(uint32_t state, float 
 /************************************************************************************************/
 void WarGrey::STEM::Planet::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
     if (this->head_graphlet != nullptr) {
-        IGraphlet* child = this->head_graphlet;
-        float cwidth, cheight, dwidth, dheight;
-        float nx, ny, xspd, yspd, hdist, vdist;
+        IMatter* child = this->head_graphlet;
+        float cwidth, cheight, dwidth, dheight, xspd, yspd;
 
         do {
-            GraphletInfo* info = GRAPHLET_INFO(child);
+            MatterInfo* info = GRAPHLET_INFO(child);
             this->info->master->fill_extent(&dwidth, &dheight);
 
             if (unsafe_graphlet_unmasked(info, this->mode)) {
+                IMovable* sprite = child->as_sprite();
+
                 child->update(count, interval, uptime);
-                child->fill_speed(&xspd, &yspd);
+
+                if (sprite != nullptr) {
+                    float hdist = 0.0F;
+                    float vdist = 0.0F;
+
+                    sprite->fill_speed(&xspd, &yspd);
                 
-                if ((xspd != 0.0F) || (yspd != 0.0F)) {
-                    nx = info->x + xspd;
-                    ny = info->y + yspd;
+                    if ((xspd != 0.0F) || (yspd != 0.0F)) {
+                        info->x += xspd;
+                        info->y += yspd;
 
-                    child->fill_extent(nx, ny, &cwidth, &cheight);
+                        child->fill_extent(info->x, info->y, &cwidth, &cheight);
 
-                    if (nx < 0) {
-                        hdist = nx;
-                    } else if (nx + cwidth > dwidth) {
-                        hdist = nx + cwidth - dwidth;
-                    } else {
-                        hdist = 0.0F;
-                    }
+                        if (info->x < 0) {
+                            hdist = info->x;
+                        } else if (info->x + cwidth > dwidth) {
+                            hdist = info->x + cwidth - dwidth;
+                        }
 
-                    if (ny < 0) {
-                        vdist = ny;
-                    } else if (ny + cheight > dheight) {
-                        vdist = ny + cheight - dheight;
-                    } else {
-                        vdist = 0.0F;
-                    }
+                        if (info->y < 0) {
+                            vdist = info->y;
+                        } else if (info->y + cheight > dheight) {
+                            vdist = info->y + cheight - dheight;
+                        }
 
-                    if ((hdist != 0.0F) || (vdist != 0.0F)) {
-                        child->on_border(hdist, vdist);
-                        child->fill_speed(&xspd, &yspd);
+                        if ((hdist != 0.0F) || (vdist != 0.0F)) {
+                            sprite->on_border(hdist, vdist);
+                            sprite->fill_speed(&xspd, &yspd);
                         
-                        if ((xspd != 0.0F) || (yspd != 0.0F)) {
-                            info->x = nx;
-                            info->y = ny;
-                            this->notify_updated();
-                        } else {
-                            if (nx < 0.0F) {
-                                info->x = 0.0F;
-                                this->notify_updated();
-                            } else if (nx + cwidth > dwidth) {
-                                info->x = dwidth - cwidth;
-                                this->notify_updated();
-                            }
+                            if ((xspd == 0.0F) || (yspd == 0.0F)) {
+                                if (info->x < 0.0F) {
+                                    info->x = 0.0F;
+                                } else if (info->x + cwidth > dwidth) {
+                                    info->x = dwidth - cwidth;
+                                }
 
-                            if (ny < 0.0F) {
-                                info->y = 0.0F;
-                                this->notify_updated();
-                            } else if (ny + cheight > dheight) {
-                                info->y = dheight - cheight;
-                                this->notify_updated();
+                                if (info->y < 0.0F) {
+                                    info->y = 0.0F;
+                                } else if (info->y + cheight > dheight) {
+                                    info->y = dheight - cheight;
+                                }
                             }
                         }
-                    } else {
-                        info->x = nx;
-                        info->y = ny;
+                        
                         this->notify_updated();
                     }
                 }
@@ -949,12 +942,12 @@ void WarGrey::STEM::Planet::draw(SDL_Renderer* renderer, float X, float Y, float
     }
 
     if (this->head_graphlet != nullptr) {
-        IGraphlet* child = this->head_graphlet;
+        IMatter* child = this->head_graphlet;
         float gx, gy, gwidth, gheight;
         SDL_Rect clip;
         
         do {
-            GraphletInfo* info = GRAPHLET_INFO(child);
+            MatterInfo* info = GRAPHLET_INFO(child);
 
             if (unsafe_graphlet_unmasked(info, this->mode)) {
                 child->fill_extent(info->x, info->y, &gwidth, &gheight);
@@ -1130,7 +1123,7 @@ bool WarGrey::STEM::IPlanet::save_snapshot(const char* png, float x, float y, fl
     return game_save_image(this->snapshot(x, y, width, height, bgcolor, alpha), png);
 }
 
-bool WarGrey::STEM::IPlanet::fill_graphlet_location(IGraphlet* g, float* x, float* y, GraphletAnchor a) {
+bool WarGrey::STEM::IPlanet::fill_graphlet_location(IMatter* g, float* x, float* y, MatterAnchor a) {
     float fx, fy;
 
     graphlet_anchor_fraction(a, &fx, &fy);
@@ -1138,7 +1131,7 @@ bool WarGrey::STEM::IPlanet::fill_graphlet_location(IGraphlet* g, float* x, floa
     return this->fill_graphlet_location(g, x, y, fx, fy);
 }
 
-void WarGrey::STEM::IPlanet::insert(IGraphlet* g, float x, float y, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::insert(IMatter* g, float x, float y, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     graphlet_anchor_fraction(a, &fx, &fy);
@@ -1146,7 +1139,7 @@ void WarGrey::STEM::IPlanet::insert(IGraphlet* g, float x, float y, GraphletAnch
     this->insert(g, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::insert(IMatter* g, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
     float tfx, tfy, fx, fy;
 
     graphlet_anchor_fraction(ta, &tfx, &tfy);
@@ -1155,7 +1148,7 @@ void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, GraphletAnc
     this->insert(g, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, float tfx, float tfy, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::insert(IMatter* g, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     graphlet_anchor_fraction(a, &fx, &fy);
@@ -1163,7 +1156,7 @@ void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, float tfx, 
     this->insert(g, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::IPlanet::insert(IMatter* g, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
     float tfx, tfy;
 
     graphlet_anchor_fraction(ta, &tfx, &tfy);
@@ -1171,7 +1164,7 @@ void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* target, GraphletAnc
     this->insert(g, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::insert(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     graphlet_anchor_fraction(a, &fx, &fy);
@@ -1179,7 +1172,7 @@ void WarGrey::STEM::IPlanet::insert(IGraphlet* g, IGraphlet* xtarget, float xfx,
     this->insert(g, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, float x, float y, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::move_to(IMatter* g, float x, float y, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     graphlet_anchor_fraction(a, &fx, &fy);
@@ -1187,7 +1180,7 @@ void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, float x, float y, GraphletAnc
     this->move_to(g, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::move_to(IMatter* g, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
     float tfx, tfy, fx, fy;
 
     graphlet_anchor_fraction(ta, &tfx, &tfy);
@@ -1196,7 +1189,7 @@ void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, GraphletAn
     this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, float tfx, float tfy, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::move_to(IMatter* g, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     graphlet_anchor_fraction(a, &fx, &fy);
@@ -1204,7 +1197,7 @@ void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, float tfx,
     this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, GraphletAnchor ta, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::IPlanet::move_to(IMatter* g, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
     float tfx, tfy;
 
     graphlet_anchor_fraction(ta, &tfx, &tfy);
@@ -1212,7 +1205,7 @@ void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* target, GraphletAn
     this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlanet::move_to(IGraphlet* g, IGraphlet* xtarget, float xfx, IGraphlet* ytarget, float yfy, GraphletAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlanet::move_to(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
     
     graphlet_anchor_fraction(a, &fx, &fy);

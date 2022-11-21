@@ -14,11 +14,11 @@ namespace {
             }
 
         public:
-            bool can_interactive_move(IGraphlet* g, float local_x, float local_y) override {
+            bool can_interactive_move(IMatter* g, float local_x, float local_y) override {
                 return master->can_interactive_move(g, local_x, local_y);
             }
 
-            bool can_select(IGraphlet* g) override {
+            bool can_select(IMatter* g) override {
                 return master->can_select(g);
             }
 
@@ -26,11 +26,11 @@ namespace {
                 return master->can_select_multiple();
             }
 
-            void before_select(IGraphlet* g, bool on_or_off) override {
+            void before_select(IMatter* g, bool on_or_off) override {
                 return master->before_select(g, on_or_off);
             }
 
-            void after_select(IGraphlet* g, bool on_or_off) override {
+            void after_select(IMatter* g, bool on_or_off) override {
                 return master->after_select(g, on_or_off);
             }
 

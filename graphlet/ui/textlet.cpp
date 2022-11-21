@@ -29,7 +29,7 @@ void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, float alpha) {
     this->notify_updated();
 }
 
-void WarGrey::STEM::ITextlet::set_font(TTF_Font* font, GraphletAnchor anchor) {
+void WarGrey::STEM::ITextlet::set_font(TTF_Font* font, MatterAnchor anchor) {
     this->moor(anchor);
 
     this->text_font = ((font == nullptr) ? game_font::DEFAULT : font);
@@ -39,7 +39,7 @@ void WarGrey::STEM::ITextlet::set_font(TTF_Font* font, GraphletAnchor anchor) {
     this->notify_updated();
 }
 
-void WarGrey::STEM::ITextlet::set_text(std::string& content, GraphletAnchor anchor) {
+void WarGrey::STEM::ITextlet::set_text(std::string& content, MatterAnchor anchor) {
     this->raw = content;
 
     this->moor(anchor);

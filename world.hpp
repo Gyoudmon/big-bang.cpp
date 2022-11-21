@@ -16,11 +16,11 @@ namespace WarGrey::STEM {
             virtual void load(float Width, float Height) {}
 
         public:
-            virtual bool can_interactive_move(IGraphlet* g, float local_x, float local_y) { return false; }
-            virtual bool can_select(IGraphlet* g) { return false; }
+            virtual bool can_interactive_move(IMatter* g, float local_x, float local_y) { return false; }
+            virtual bool can_select(IMatter* g) { return false; }
             virtual bool can_select_multiple() { return false; }
-            virtual void before_select(IGraphlet* g, bool on_or_off) {}
-            virtual void after_select(IGraphlet* g, bool on_or_off) {}
+            virtual void before_select(IMatter* g, bool on_or_off) {}
+            virtual void after_select(IMatter* g, bool on_or_off) {}
 
         protected:
             WarGrey::STEM::Planet* self;

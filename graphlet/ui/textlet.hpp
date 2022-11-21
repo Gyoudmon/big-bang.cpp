@@ -5,8 +5,9 @@
 
 #include <cstdint>
 
+#include "../graphlet.hpp"
+
 #include "../../named_colors.hpp"
-#include "../../graphlet.hpp"
 
 namespace WarGrey::STEM {
     class ITextlet : public virtual WarGrey::STEM::IGraphlet {
@@ -16,10 +17,10 @@ namespace WarGrey::STEM {
 
         public:
             void set_text(const char* fmt, ...);
-            void set_text(std::string& content, WarGrey::STEM::GraphletAnchor anchor = GraphletAnchor::LT);
+            void set_text(std::string& content, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         
         public:
-            void set_font(TTF_Font* font, WarGrey::STEM::GraphletAnchor anchor = GraphletAnchor::LT);
+            void set_font(TTF_Font* font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
             void set_text_color(uint32_t color_hex = SILVER, float alpha = 1.0F);
 
         public:
