@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../sprite.hpp"
+#include "graphlet.hpp"
+#include "../matter/movable.hpp"
 
 namespace WarGrey::STEM {
-    class IShapemon : public virtual WarGrey::STEM::Sprite {
+    class IShapelet : public WarGrey::STEM::IGraphlet, public WarGrey::STEM::IMovable {
         public:
-            IShapemon(int32_t color = -1, int32_t border_color = -1);
-            virtual ~IShapemon();
+            IShapelet(int32_t color = -1, int32_t border_color = -1);
+            virtual ~IShapelet();
 
         public:
             void construct() override;
@@ -41,9 +42,9 @@ namespace WarGrey::STEM {
     };
 
     /**********************************************************************************************/
-    class Linemon : public WarGrey::STEM::IShapemon {
+    class Linelet : public WarGrey::STEM::IShapelet {
         public:
-	        Linemon(float ex, float ey, int32_t color);
+	        Linelet(float ex, float ey, int32_t color);
 
 	    public:
 	        void resize(float width, float height) override;
@@ -58,21 +59,21 @@ namespace WarGrey::STEM {
             float epy;
     };
 
-    class HLinemon : public WarGrey::STEM::Linemon {
+    class HLinelet : public WarGrey::STEM::Linelet {
         public:
-            HLinemon(float width, int32_t color) : Linemon(width, 0.0F, color) {}
+            HLinelet(float width, int32_t color) : Linelet(width, 0.0F, color) {}
     };
 
-    class VLinemon : public WarGrey::STEM::Linemon {
+    class VLinelet : public WarGrey::STEM::Linelet {
         public:
-            VLinemon(float height, int32_t color) : Linemon(0.0F, height, color) {}
+            VLinelet(float height, int32_t color) : Linelet(0.0F, height, color) {}
     };
 
     /**********************************************************************************************/
-    class Rectanglemon : public WarGrey::STEM::IShapemon {
+    class Rectanglet : public WarGrey::STEM::IShapelet {
         public:
-	        Rectanglemon(float edge_size, int32_t color, int32_t border_color = -1);
-	        Rectanglemon(float width, float height, int32_t color, int32_t border_color = -1);
+	        Rectanglet(float edge_size, int32_t color, int32_t border_color = -1);
+	        Rectanglet(float width, float height, int32_t color, int32_t border_color = -1);
 
 	    public:
 	        void resize(float width, float height) override;
@@ -87,10 +88,10 @@ namespace WarGrey::STEM {
 	        float height;
     };
 
-    class RoundedRectanglemon : public WarGrey::STEM::IShapemon {
+    class RoundedRectanglet : public WarGrey::STEM::IShapelet {
         public:
-	        RoundedRectanglemon(float edge_size, float radius, int32_t color, int32_t border_color = -1);
-	        RoundedRectanglemon(float width, float height, float radius, int32_t color, int32_t border_color = -1);
+	        RoundedRectanglet(float edge_size, float radius, int32_t color, int32_t border_color = -1);
+	        RoundedRectanglet(float width, float height, float radius, int32_t color, int32_t border_color = -1);
 
 	    public:
 	        void resize(float width, float height) override;
@@ -106,10 +107,10 @@ namespace WarGrey::STEM {
             float radius;
     };
 
-    class Ellipsemon : public WarGrey::STEM::IShapemon {
+    class Ellipselet : public WarGrey::STEM::IShapelet {
         public:
-	        Ellipsemon(float radius, int32_t color, int32_t border_color = -1);
-	        Ellipsemon(float aradius, float bradius, int32_t color, int32_t border_color = -1);
+	        Ellipselet(float radius, int32_t color, int32_t border_color = -1);
+	        Ellipselet(float aradius, float bradius, int32_t color, int32_t border_color = -1);
 
 	    public:
 	        void resize(float width, float height) override;
@@ -124,17 +125,17 @@ namespace WarGrey::STEM {
 	        float bradius;
     };
     
-    class Circlemon : public WarGrey::STEM::Ellipsemon {
+    class Circlet : public WarGrey::STEM::Ellipselet {
         public:
-	        Circlemon(float radius, int32_t color, int32_t border_color = -1)
-                : Ellipsemon(radius, radius, color, border_color) {}
+	        Circlet(float radius, int32_t color, int32_t border_color = -1)
+                : Ellipselet(radius, radius, color, border_color) {}
     };
     
-    class RegularPolygonmon : public WarGrey::STEM::IShapemon {
+    class RegularPolygonlet : public WarGrey::STEM::IShapelet {
         public:
-	        RegularPolygonmon(int n, float radius, int32_t color, int32_t border_color = -1);
-	        RegularPolygonmon(int n, float radius, float rotation, int32_t color, int32_t border_color = -1);
-            virtual ~RegularPolygonmon();
+	        RegularPolygonlet(int n, float radius, int32_t color, int32_t border_color = -1);
+	        RegularPolygonlet(int n, float radius, float rotation, int32_t color, int32_t border_color = -1);
+            virtual ~RegularPolygonlet();
 
 	    public:
 	        void resize(float width, float height) override;
