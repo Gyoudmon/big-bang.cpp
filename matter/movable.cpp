@@ -1,8 +1,17 @@
 #include "movable.hpp"
 
+#include "../mathematics.hpp"
+
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
+void WarGrey::STEM::IMovable::set_speed(float spd, float direction) {
+    float dir_pad = degrees_to_radians(direction);
+
+    this->xspeed = spd * flcos(dir_pad);
+    this->yspeed = spd * flsin(dir_pad);
+}
+
 void WarGrey::STEM::IMovable::on_border(float hoffset, float voffset) {
     BorderStrategy hstrategy = BorderStrategy::IGNORE;
     BorderStrategy vstrategy = BorderStrategy::IGNORE;
@@ -26,7 +35,7 @@ void WarGrey::STEM::IMovable::on_border(float hoffset, float voffset) {
         if (hstrategy == BorderStrategy::BOUNCE) {
             this->xspeed *= -1.0F;
         }
-
+        
         if (vstrategy == BorderStrategy::BOUNCE) {
             this->yspeed *= -1.0F;
         }

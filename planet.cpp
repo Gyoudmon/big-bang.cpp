@@ -865,7 +865,7 @@ bool WarGrey::STEM::Planet::say_goodbye_to_hover_graphlet(uint32_t state, float 
 void WarGrey::STEM::Planet::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
     if (this->head_graphlet != nullptr) {
         IMatter* child = this->head_graphlet;
-        float cwidth, cheight, dwidth, dheight, xspd, yspd;
+        float cwidth, cheight, dwidth, dheight;
 
         do {
             MatterInfo* info = GRAPHLET_INFO(child);
@@ -877,11 +877,11 @@ void WarGrey::STEM::Planet::on_elapse(uint32_t count, uint32_t interval, uint32_
                 child->update(count, interval, uptime);
 
                 if (sprite != nullptr) {
+                    float xspd = sprite->x_speed();
+                    float yspd = sprite->y_speed();
                     float hdist = 0.0F;
                     float vdist = 0.0F;
 
-                    sprite->fill_speed(&xspd, &yspd);
-                
                     if ((xspd != 0.0F) || (yspd != 0.0F)) {
                         info->x += xspd;
                         info->y += yspd;
@@ -902,7 +902,8 @@ void WarGrey::STEM::Planet::on_elapse(uint32_t count, uint32_t interval, uint32_
 
                         if ((hdist != 0.0F) || (vdist != 0.0F)) {
                             sprite->on_border(hdist, vdist);
-                            sprite->fill_speed(&xspd, &yspd);
+                            xspd = sprite->x_speed();
+                            yspd = sprite->y_speed();
                         
                             if ((xspd == 0.0F) || (yspd == 0.0F)) {
                                 if (info->x < 0.0F) {
