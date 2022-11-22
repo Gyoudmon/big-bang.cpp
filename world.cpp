@@ -3,10 +3,10 @@
 using namespace WarGrey::STEM;
 
 namespace {
-    class WorldPlanet : public WarGrey::STEM::Planet {
+    class WorldPlane : public WarGrey::STEM::Plane {
         public:
-            WorldPlanet(World* master, const char* title, int mode = 0)
-                : Planet(title, mode), master(master) {}
+            WorldPlane(World* master, const char* title, int mode = 0)
+                : Plane(title, mode), master(master) {}
 
         public:
             void load(float Width, float Height) override {
@@ -41,6 +41,7 @@ namespace {
 
 /*************************************************************************************************/
 WarGrey::STEM::World::World(const char* title, int fps, uint32_t fgc, uint32_t bgc) : Cosmos(fps, fgc, bgc) {
-    this->self = new WorldPlanet(this, title);
-    this->push_planet(this->self);
+    this->plane = new WorldPlane(this, title);
+    this->push_plane(this->plane);
 }
+

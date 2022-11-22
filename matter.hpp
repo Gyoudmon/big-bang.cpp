@@ -11,10 +11,10 @@ namespace WarGrey::STEM {
     class IMatterInfo {
         public:
             virtual ~IMatterInfo() {};
-            IMatterInfo(IPlanet* master) : master(master) {};
+            IMatterInfo(IPlane* master) : master(master) {};
         
         public:
-            IPlanet* master;
+            IPlane* master;
     };
 
     class IMatter {
@@ -26,7 +26,7 @@ namespace WarGrey::STEM {
             virtual void post_construct() {}    // pseudo constructor for special derived classes after constructing
 
         public:
-            WarGrey::STEM::IPlanet* master();
+            WarGrey::STEM::IPlane* master();
 
         public:
             virtual void construct() {}

@@ -5,40 +5,40 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-#define PLANET_INFO(planet) (static_cast<LinkedPlanetInfo*>(planet->info))
+#define PLANET_INFO(plane) (static_cast<LinkedPlaneInfo*>(plane->info))
 
 namespace {
-    struct LinkedPlanetInfo : public IPlanetInfo {
-        LinkedPlanetInfo(IScreen* master) : IPlanetInfo(master) {};
-        IPlanet* next;
-        IPlanet* prev;
+    struct LinkedPlaneInfo : public IPlaneInfo {
+        LinkedPlaneInfo(IScreen* master) : IPlaneInfo(master) {};
+        IPlane* next;
+        IPlane* prev;
     };
 }
 
 /*************************************************************************************************/
-static inline LinkedPlanetInfo* bind_planet_owership(IScreen* master, IPlanet* planet) {
-    auto info = new LinkedPlanetInfo(master);
+static inline LinkedPlaneInfo* bind_plane_owership(IScreen* master, IPlane* plane) {
+    auto info = new LinkedPlaneInfo(master);
     
-    planet->info = info;
+    plane->info = info;
 
     return info;
 }
 
-static inline void construct_planet(IPlanet* planet, float flwidth, float flheight) {
-    planet->begin_update_sequence();
+static inline void construct_plane(IPlane* plane, float flwidth, float flheight) {
+    plane->begin_update_sequence();
 
-    planet->construct(flwidth, flheight);
-    planet->load(flwidth, flheight);
+    plane->construct(flwidth, flheight);
+    plane->load(flwidth, flheight);
 
-    planet->end_update_sequence();
+    plane->end_update_sequence();
 }
 
-static inline void reflow_planet(IPlanet* planet, float width, float height) {
-    planet->reflow(width, height);
+static inline void reflow_plane(IPlane* plane, float width, float height) {
+    plane->reflow(width, height);
 }
 
-static inline void draw_planet(SDL_Renderer* renderer, IPlanet* planet, float x, float y, float width, float height) {
-    planet->draw(renderer, x, y, width, height);
+static inline void draw_plane(SDL_Renderer* renderer, IPlane* plane, float x, float y, float width, float height) {
+    plane->draw(renderer, x, y, width, height);
 }
 
 /*************************************************************************************************/
@@ -50,82 +50,82 @@ WarGrey::STEM::Cosmos::~Cosmos() {
     this->collapse();
 }
 
-void WarGrey::STEM::Cosmos::push_planet(IPlanet* planet) {
+void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
     // NOTE: this method is designed to be invoked in Cosmos::construct()
 
-    if (planet->info == nullptr) {
-        LinkedPlanetInfo* info = bind_planet_owership(this->screen, planet);
+    if (plane->info == nullptr) {
+        LinkedPlaneInfo* info = bind_plane_owership(this->screen, plane);
         
-        if (this->head_planet == nullptr) {
-            this->head_planet = planet;
-            this->recent_planet = planet;
-            info->prev = this->head_planet;
+        if (this->head_plane == nullptr) {
+            this->head_plane = plane;
+            this->recent_plane = plane;
+            info->prev = this->head_plane;
         } else { 
-            LinkedPlanetInfo* head_info = PLANET_INFO(this->head_planet);
-            LinkedPlanetInfo* prev_info = PLANET_INFO(head_info->prev);
+            LinkedPlaneInfo* head_info = PLANET_INFO(this->head_plane);
+            LinkedPlaneInfo* prev_info = PLANET_INFO(head_info->prev);
              
             info->prev = head_info->prev;
-            prev_info->next = planet;
-            head_info->prev = planet;
+            prev_info->next = plane;
+            head_info->prev = plane;
         }
 
-        info->next = this->head_planet;
+        info->next = this->head_plane;
     }
 }
 
 void WarGrey::STEM::Cosmos::collapse() {
-    if (this->head_planet != nullptr) {
-        IPlanet* temp_head = this->head_planet;
-        LinkedPlanetInfo* temp_info = PLANET_INFO(temp_head);
-        LinkedPlanetInfo* prev_info = PLANET_INFO(temp_info->prev);
+    if (this->head_plane != nullptr) {
+        IPlane* temp_head = this->head_plane;
+        LinkedPlaneInfo* temp_info = PLANET_INFO(temp_head);
+        LinkedPlaneInfo* prev_info = PLANET_INFO(temp_info->prev);
 
-        this->head_planet = nullptr;
-        this->recent_planet = nullptr;
+        this->head_plane = nullptr;
+        this->recent_plane = nullptr;
         prev_info->next = nullptr;
 
         do {
-            IPlanet* child = temp_head;
+            IPlane* child = temp_head;
 
             temp_head = PLANET_INFO(temp_head)->next;
 
-            delete child; // planet's destructor will delete the associated info object
+            delete child; // plane's destructor will delete the associated info object
         } while (temp_head != nullptr);
     }
 }
 
 bool WarGrey::STEM::Cosmos::can_exit() {
-    return (this->recent_planet != nullptr) && this->recent_planet->can_exit();
+    return (this->recent_plane != nullptr) && this->recent_plane->can_exit();
 }
 
 /*************************************************************************************************/
 void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
-    if (this->head_planet != nullptr) {
-        IPlanet* child = this->head_planet;
+    if (this->head_plane != nullptr) {
+        IPlane* child = this->head_plane;
         float flwidth = float(width);
         float flheight = float(height);
 
         do {
-            LinkedPlanetInfo* info = PLANET_INFO(child);
+            LinkedPlaneInfo* info = PLANET_INFO(child);
 
-            construct_planet(child, flwidth, flheight);
+            construct_plane(child, flwidth, flheight);
             child = info->next;
-        } while (child != this->head_planet);
+        } while (child != this->head_plane);
 
-        this->set_window_title("%s", this->recent_planet->name());
+        this->set_window_title("%s", this->recent_plane->name());
     }
 }
 
 void WarGrey::STEM::Cosmos::reflow(float width, float height) {
     if ((width > 0.0F) && (height > 0.0F)) {
-        if (this->head_planet != nullptr) {
-            IPlanet* child = this->head_planet;
+        if (this->head_plane != nullptr) {
+            IPlane* child = this->head_plane;
 
             do {
-                LinkedPlanetInfo* info = PLANET_INFO(child);
+                LinkedPlaneInfo* info = PLANET_INFO(child);
 
-                reflow_planet(child, width, height);
+                reflow_plane(child, width, height);
                 child = info->next;
-            } while (child != this->head_planet);
+            } while (child != this->head_plane);
         }
     }
 }
@@ -133,14 +133,14 @@ void WarGrey::STEM::Cosmos::reflow(float width, float height) {
 void WarGrey::STEM::Cosmos::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
     this->begin_update_sequence();
 
-    if (this->head_planet != nullptr) {
-        IPlanet* child = PLANET_INFO(this->recent_planet)->next;
+    if (this->head_plane != nullptr) {
+        IPlane* child = PLANET_INFO(this->recent_plane)->next;
         
-        this->recent_planet->begin_update_sequence();
-        this->recent_planet->on_elapse(count, interval, uptime);
-        this->recent_planet->end_update_sequence();
+        this->recent_plane->begin_update_sequence();
+        this->recent_plane->on_elapse(count, interval, uptime);
+        this->recent_plane->end_update_sequence();
 
-        while (child != this->recent_planet) {
+        while (child != this->recent_plane) {
             child->on_elapse(count, interval, uptime);
             child = PLANET_INFO(child)->next;
         }
@@ -157,16 +157,16 @@ void WarGrey::STEM::Cosmos::draw(SDL_Renderer* renderer, int x, int y, int width
     float flwidth = float(width);
     float flheight = float(height);
 
-    // NOTE: only the current planet needs to be drawn
+    // NOTE: only the current plane needs to be drawn
 
-    if (this->recent_planet != nullptr) {
-        draw_planet(renderer, this->recent_planet, flx, fly, flwidth, flheight);
+    if (this->recent_plane != nullptr) {
+        draw_plane(renderer, this->recent_plane, flx, fly, flwidth, flheight);
     }
 }
 
 /*************************************************************************************************/
 void WarGrey::STEM::Cosmos::on_mouse_event(SDL_MouseButtonEvent& m, bool pressed) {
-    if (this->recent_planet != nullptr) {
+    if (this->recent_plane != nullptr) {
         uint8_t button = m.button;
         float flx = float(m.x);
         float fly = float(m.y);
@@ -174,57 +174,57 @@ void WarGrey::STEM::Cosmos::on_mouse_event(SDL_MouseButtonEvent& m, bool pressed
 
         this->begin_update_sequence();
         if (pressed) {
-            this->recent_planet->on_pointer_pressed(button, flx, fly, clicks, false);
+            this->recent_plane->on_pointer_pressed(button, flx, fly, clicks, false);
         } else {
-            this->recent_planet->on_pointer_released(button, flx, fly, clicks, false);
+            this->recent_plane->on_pointer_released(button, flx, fly, clicks, false);
         }
         this->end_update_sequence();
     }
 }
 
 void WarGrey::STEM::Cosmos::on_mouse_move(uint32_t state, int x, int y, int dx, int dy) {
-    if (this->recent_planet != nullptr) {
+    if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
-        this->recent_planet->on_pointer_move(state, float(x), float(y), float(dx), float(dy), false);
+        this->recent_plane->on_pointer_move(state, float(x), float(y), float(dx), float(dy), false);
         this->end_update_sequence();
     }
 }
 
 void WarGrey::STEM::Cosmos::on_scroll(int horizon, int vertical, float hprecise, float vprecise) {
-    if (this->recent_planet != nullptr) {
+    if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
-        this->recent_planet->on_scroll(horizon, vertical, hprecise, vprecise);
+        this->recent_plane->on_scroll(horizon, vertical, hprecise, vprecise);
         this->end_update_sequence();
     }
 }
 
 void WarGrey::STEM::Cosmos::on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {
-    if (this->recent_planet != nullptr) {
+    if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
-        this->recent_planet->on_char(key, modifiers, repeats, pressed);
+        this->recent_plane->on_char(key, modifiers, repeats, pressed);
         this->end_update_sequence();
     }
 }
 
 void WarGrey::STEM::Cosmos::on_text(const char* text, size_t size, bool entire) {
-    if (this->recent_planet != nullptr) {
+    if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
-        this->recent_planet->on_text(text, size, entire);
+        this->recent_plane->on_text(text, size, entire);
         this->end_update_sequence();
     }
 }
 
 void WarGrey::STEM::Cosmos::on_editing_text(const char* text, int pos, int span) {
-    if (this->recent_planet != nullptr) {
+    if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
-        this->recent_planet->on_editing_text(text, pos, span);
+        this->recent_plane->on_editing_text(text, pos, span);
         this->end_update_sequence();
     }
 }
             
 void WarGrey::STEM::Cosmos::on_save() {
-    if (this->recent_planet != nullptr) {
-        this->recent_planet->on_save();
+    if (this->recent_plane != nullptr) {
+        this->recent_plane->on_save();
     }
 }
 

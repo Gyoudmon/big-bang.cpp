@@ -1,7 +1,7 @@
 #pragma once
 
 #include "universe.hpp"
-#include "planet.hpp"
+#include "plane.hpp"
 #include "virtualization/screen.hpp"
 
 namespace WarGrey::STEM {
@@ -32,15 +32,15 @@ namespace WarGrey::STEM {
             void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) override;
 
         protected:
-            void push_planet(WarGrey::STEM::IPlanet* planet);
+            void push_plane(WarGrey::STEM::IPlane* plane);
 
         private:
             void collapse();
 
         private:
             WarGrey::STEM::IScreen* screen = nullptr;
-            WarGrey::STEM::IPlanet* head_planet = nullptr;
-            WarGrey::STEM::IPlanet* recent_planet = nullptr;
+            WarGrey::STEM::IPlane* head_plane = nullptr;
+            WarGrey::STEM::IPlane* recent_plane = nullptr;
     };
 }
 

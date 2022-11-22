@@ -1,5 +1,5 @@
 #include "matter.hpp"
-#include "planet.hpp"
+#include "plane.hpp"
 
 #include "datum/string.hpp"
 #include "datum/box.hpp"
@@ -16,14 +16,14 @@ WarGrey::STEM::IMatter::~IMatter() {
     }
 }
 
-IPlanet* WarGrey::STEM::IMatter::master() {
-    IPlanet* planet = nullptr;
+IPlane* WarGrey::STEM::IMatter::master() {
+    IPlane* plane = nullptr;
 
     if (this->info != nullptr) {
-        planet = this->info->master;
+        plane = this->info->master;
     }
 
-    return planet;
+    return plane;
 }
 
 void WarGrey::STEM::IMatter::fill_extent(float x, float y, float* w, float* h) {
@@ -50,7 +50,7 @@ void WarGrey::STEM::IMatter::moor(MatterAnchor anchor) {
     if (anchor != MatterAnchor::LT) {
         if (this->info != nullptr) {
             this->anchor = anchor;
-            this->info->master->fill_graphlet_location(this, &this->anchor_x, &this->anchor_y, anchor);
+            this->info->master->fill_matter_location(this, &this->anchor_x, &this->anchor_y, anchor);
         }
     }
 }
@@ -63,7 +63,7 @@ bool WarGrey::STEM::IMatter::has_caret() {
     bool careted = false;
 
     if (this->info != nullptr) {
-        careted = (this->info->master->get_focus_graphlet() == this);
+        careted = (this->info->master->get_focus_matter() == this);
     }
 
     return careted;
@@ -71,7 +71,7 @@ bool WarGrey::STEM::IMatter::has_caret() {
 
 void WarGrey::STEM::IMatter::fill_location(float* x, float* y, WarGrey::STEM::MatterAnchor a) {
     if (this->info != nullptr) {
-        this->info->master->fill_graphlet_location(this, x, y, a);
+        this->info->master->fill_matter_location(this, x, y, a);
     }
 }
 
