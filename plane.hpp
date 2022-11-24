@@ -74,7 +74,7 @@ namespace WarGrey::STEM {
             virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
             virtual void on_text(const char* text, size_t size, bool entire) {}
             virtual void on_editing_text(const char* text, int pos, int span) {}
-            virtual void on_elapse(uint32_t count, u_int32_t interval, uint32_t uptime) {}
+            virtual void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {}
             virtual void on_hover(WarGrey::STEM::IMatter* g, float local_x, float local_y) {}
             virtual void on_goodbye(WarGrey::STEM::IMatter* g, float local_x, float local_y) {}
             virtual void on_tap(WarGrey::STEM::IMatter* g, float local_x, float local_y) {}
@@ -198,7 +198,7 @@ namespace WarGrey::STEM {
             void on_text(const char* text, size_t size, bool entire) override;
             void on_editing_text(const char* text, int pos, int span) override;
             void on_tap(WarGrey::STEM::IMatter* g, float x, float y) override;
-            void on_elapse(uint32_t count, u_int32_t interval, uint32_t uptime) override;
+            void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
 
         public:
             void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;

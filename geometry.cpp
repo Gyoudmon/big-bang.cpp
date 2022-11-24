@@ -112,7 +112,7 @@ static void draw_filled_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, 
 static void draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float r, float rotation) {
     // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
     float start = degrees_to_radians(rotation);
-    float delta = 2.0 * pi_f / float(n);
+    float delta = 2.0F * pi_f / float(n);
     float x0, y0, px, py;
 
     x0 = px = r * flcos(start) + cx;
@@ -138,12 +138,17 @@ static void draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float 
 static void fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float r, float rotation) {
     // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
     float start = degrees_to_radians(rotation);
-    float delta = 2.0 * pi_f / float(n);
+    float delta = 2.0F * pi_f / float(n);
     float xmin = cx - r;
     float xmax = cx + r;
     float ymin = +r + cy;
     float ymax = -r + cy;
+
+#ifndef __windows__
     SDL_FPoint pts[n + 1];
+#else
+    SDL_FPoint* pts = new SDL_FPoint[n + 1];
+#endif
 
     for (int idx = 0; idx < n; idx ++) {
         float theta = start + delta * float(idx);
@@ -200,6 +205,10 @@ static void fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float 
             SDL_RenderDrawPointF(renderer, cx, cy);
         }
     }
+
+#ifdef __windows__
+    delete [] pts;
+#endif
 }
 
 /*************************************************************************************************/

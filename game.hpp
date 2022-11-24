@@ -4,10 +4,8 @@
 
 #include "named_colors.hpp"
 #include "geometry.hpp"
-#include "universe.hpp"
+#include "world.hpp"
 #include "font.hpp"
-
-#include "graphlet/graphlet.hpp"
 
 /**
  * 为兼容 Windows 而变得丑陋
