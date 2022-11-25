@@ -5,6 +5,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <cstdint>
 #include <string>
 
 namespace WarGrey::STEM {
@@ -33,7 +34,7 @@ namespace WarGrey::STEM {
             virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
             virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
             virtual void resize(float width, float height) {}
-            virtual void update(long long count, long long interval, long long uptime) {}
+            virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
             virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
             virtual bool ready() { return true; }
 
