@@ -24,7 +24,7 @@ namespace WarGrey::STEM {
             void set_text_color(uint32_t color_hex = SILVER, float alpha = 1.0F);
 
         public:
-            void fill_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
+            void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
             void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
 
         protected:

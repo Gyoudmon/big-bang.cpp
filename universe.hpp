@@ -6,7 +6,6 @@
 #include <cstdint>
 
 #include "graphics/font.hpp"
-#include "graphics/image.hpp"
 
 #include "virtualization/display.hpp"
 
@@ -48,7 +47,7 @@ namespace WarGrey::STEM {
             void set_window_title(std::string& title);
             void set_window_title(const char* fmt, ...);
             void set_window_size(int width, int height, bool centerize = true);
-            void fill_window_size(int* width, int* height);
+            void feed_window_size(int* width, int* height);
             void set_window_fullscreen(bool yes);
             int get_frame_per_second() { return this->_fps; }
             uint32_t get_background_color() { return this->_bgc; }
@@ -56,7 +55,7 @@ namespace WarGrey::STEM {
 
         public: // 窗体相关方法
             void refresh() override;
-            void fill_extent(float* width, float* height) override;
+            void feed_extent(float* width, float* height) override;
 
         public: // 用户 IME 输入输出
             void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_font::unicode);

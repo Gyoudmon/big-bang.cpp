@@ -29,8 +29,8 @@ namespace WarGrey::STEM {
             }
 
         public:
-            bool fill_matter_location(IMatter* g, float* x, float* y, MatterAnchor a) {
-                return this->plane->fill_matter_location(g, x, y, a);
+            bool feed_matter_location(IMatter* g, float* x, float* y, MatterAnchor a) {
+                return this->plane->feed_matter_location(g, x, y, a);
             }
 
             void insert_at(IMatter* g, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F) {

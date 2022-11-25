@@ -190,7 +190,7 @@ void WarGrey::STEM::IUniverse::big_bang() {
                 0, "定时器创建失败: ", SDL_GetError);
     }
 
-    this->fill_window_size(&this->window_width, &this->window_height);
+    this->feed_window_size(&this->window_width, &this->window_height);
     this->begin_update_sequence();
     this->on_big_bang(this->window_width, this->window_height);
     this->on_resize(this->window_width, this->window_height);
@@ -438,7 +438,7 @@ void WarGrey::STEM::IUniverse::set_window_size(int width, int height, bool cente
     }
 }
 
-void WarGrey::STEM::IUniverse::fill_window_size(int* width, int* height) {
+void WarGrey::STEM::IUniverse::feed_window_size(int* width, int* height) {
     SDL_GetWindowSize(this->window, width, height);
 }
 
@@ -455,7 +455,7 @@ void WarGrey::STEM::IUniverse::refresh() {
     game_world_refresh(this->renderer, this->texture);
 }
 
-void WarGrey::STEM::IUniverse::fill_extent(float* width, float* height) {
+void WarGrey::STEM::IUniverse::feed_extent(float* width, float* height) {
     int fxw, fxh;
 
     SDL_GetWindowSize(this->window, &fxw, &fxh);

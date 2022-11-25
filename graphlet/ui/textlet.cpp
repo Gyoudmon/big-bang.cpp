@@ -58,12 +58,12 @@ void WarGrey::STEM::ITextlet::set_text(const char* fmt, ...) {
     this->set_text(content);
 }
 
-void WarGrey::STEM::ITextlet::fill_extent(float x, float y, float* w, float* h) {
+void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) {
     if (this->text_surface != nullptr) {
         SET_BOX(w, float(this->text_surface->w));
         SET_BOX(h, float(this->text_surface->h));
     } else {
-        IGraphlet::fill_extent(x, y, w, h);
+        IGraphlet::feed_extent(x, y, w, h);
     }
 }
 

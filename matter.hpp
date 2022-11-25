@@ -30,8 +30,8 @@ namespace WarGrey::STEM {
 
         public:
             virtual void construct() {}
-            virtual void fill_extent(float x, float y, float* width = nullptr, float* height = nullptr);
-            virtual void fill_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
+            virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
+            virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
             virtual void resize(float width, float height) {}
             virtual void update(long long count, long long interval, long long uptime) {}
             virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
@@ -76,7 +76,7 @@ namespace WarGrey::STEM {
 
         public:
             void notify_updated();
-            void fill_location(float* x, float* y, WarGrey::STEM::MatterAnchor a = MatterAnchor::LT);
+            void feed_location(float* x, float* y, WarGrey::STEM::MatterAnchor a = MatterAnchor::LT);
             void log_message(int fgc, const char* fmt, ...);
             void log_message(int fgc, const std::string& msg);
             void log_message(const char* fmt, ...);

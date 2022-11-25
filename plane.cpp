@@ -1,6 +1,7 @@
 #include "plane.hpp"
 #include "matter.hpp"
 
+#include "graphics/image.hpp"
 #include "graphics/geometry.hpp"
 #include "graphics/colorspace.hpp"
 
@@ -16,7 +17,7 @@ using namespace WarGrey::STEM;
  *   `static_cast` almost costs nothing for subtype casting;
  *   `reinterpret_cast` might be harmful for multi-inheritances.
  */
-#define MATTER_INFO(g) (static_cast<MatterInfo*>(g->info))
+#define MATTER_INFO(m) (static_cast<MatterInfo*>(m->info))
 
 namespace {
     struct AsyncInfo {
@@ -44,20 +45,20 @@ namespace {
     };
 }
 
-static inline MatterInfo* bind_matter_owership(WarGrey::STEM::IPlane* master, unsigned int mode, IMatter* g) {
+static inline MatterInfo* bind_matter_owership(WarGrey::STEM::IPlane* master, unsigned int mode, IMatter* m) {
     auto info = new MatterInfo(master, mode);
     
-    g->info = info;
+    m->info = info;
 
     return info;
 }
 
-static inline MatterInfo* planet_matter_info(WarGrey::STEM::IPlane* master, IMatter* g) {
+static inline MatterInfo* planet_matter_info(WarGrey::STEM::IPlane* master, IMatter* m) {
     MatterInfo* info = nullptr;
 
-    if ((g != nullptr) && (g->info != nullptr)) {
-        if (g->info->master == master) {
-            info = MATTER_INFO(g);
+    if ((m != nullptr) && (m->info != nullptr)) {
+        if (m->info->master == master) {
+            info = MATTER_INFO(m);
         }
     }
     
@@ -68,24 +69,24 @@ static inline bool unsafe_matter_unmasked(MatterInfo* info, unsigned int mode) {
     return ((info->mode & mode) == info->mode);
 }
 
-static void unsafe_fill_matter_bound(IMatter* g, MatterInfo* info, float* x, float* y, float* width, float* height) {
-    g->fill_extent(info->x, info->y, width, height);
+static void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float* x, float* y, float* width, float* height) {
+    m->feed_extent(info->x, info->y, width, height);
 
     (*x) = info->x;
     (*y) = info->y;
 }
 
-static inline void unsafe_add_selected(WarGrey::STEM::IPlane* master, IMatter* g, MatterInfo* info) {
-    master->before_select(g, true);
+static inline void unsafe_add_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info) {
+    master->before_select(m, true);
     info->selected = true;
-    master->after_select(g, true);
+    master->after_select(m, true);
     master->notify_updated();
 }
 
-static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* g, MatterInfo* info) {
+static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info) {
     master->begin_update_sequence();
     master->no_selected();
-    unsafe_add_selected(master, g, info);
+    unsafe_add_selected(master, m, info);
     master->end_update_sequence();
 }
 
@@ -130,14 +131,14 @@ static bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x
     return moved;
 }
 
-static bool unsafe_move_matter_via_info(Plane* master, IMatter* g, MatterInfo* info
+static bool unsafe_move_matter_via_info(Plane* master, IMatter* m, MatterInfo* info
     , float x, float y, float fx, float fy, float dx, float dy, bool absolute) {
     float sx, sy, sw, sh;
     float ax = 0.0F;
     float ay = 0.0F;
     
-    if (g->ready()) {
-        unsafe_fill_matter_bound(g, info, &sx, &sy, &sw, &sh);
+    if (m->ready()) {
+        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
         ax = (sw * fx);
         ay = (sh * fy);
     } else {
@@ -172,19 +173,19 @@ static IMatter* do_search_selected_matter(IMatter* start, unsigned int mode, IMa
     return found;
 }
 
-static void do_resize(Plane* master, IMatter* g, MatterInfo* info, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
+static void do_resize(Plane* master, IMatter* m, MatterInfo* info, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
     MatterAnchor resize_anchor;
 
     // TODO: the theory or implementation seems incorrect. 
 
-    if (g->resizable(&resize_anchor)) {
+    if (m->resizable(&resize_anchor)) {
         float sx, sy, sw, sh, fx, fy, nx, ny, nw, nh;
 
-        unsafe_fill_matter_bound(g, info, &sx, &sy, &sw, &sh);
+        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
         matter_anchor_fraction(resize_anchor, &fx, &fy);
 
-        g->resize((sw / prev_scale_x) * scale_x, (sh / prev_scale_y) * scale_y);
-        g->fill_extent(sx, sy, &nw, &nh);
+        m->resize((sw / prev_scale_x) * scale_x, (sh / prev_scale_y) * scale_y);
+        m->feed_extent(sx, sy, &nw, &nh);
 
         nx = sx + (sw - nw) * fx;
         ny = sy + (sh - nh) * fy;
@@ -221,68 +222,68 @@ unsigned int WarGrey::STEM::Plane::current_mode() {
     return this->mode;
 }
 
-bool WarGrey::STEM::Plane::matter_unmasked(IMatter* g) {
-    MatterInfo* info = planet_matter_info(this, g);
+bool WarGrey::STEM::Plane::matter_unmasked(IMatter* m) {
+    MatterInfo* info = planet_matter_info(this, m);
 
     return ((info != nullptr) && unsafe_matter_unmasked(info, this->mode));
 }
 
-void WarGrey::STEM::Plane::notify_matter_ready(IMatter* g) {
-    MatterInfo* info = planet_matter_info(this, g);
+void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
+    MatterInfo* info = planet_matter_info(this, m);
 
     if (info != nullptr) {
         if (info->async != nullptr) {
             this->size_cache_invalid();
             this->begin_update_sequence();
 
-            unsafe_move_matter_via_info(this, g, info,
+            unsafe_move_matter_via_info(this, m, info,
                 info->async->x0, info->async->y0, info->async->fx0, info->async->fy0, info->async->dx0, info->async->dy0,
                 true);
 
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
-                do_resize(this, g, info, this->scale_x, this->scale_y);
+                do_resize(this, m, info, this->scale_x, this->scale_y);
             }
 
             delete info->async;
             info->async = nullptr;
 
             this->notify_updated();
-            this->on_matter_ready(g);
+            this->on_matter_ready(m);
             this->end_update_sequence();
         }
     }
 }
 
-void WarGrey::STEM::Plane::insert_at(IMatter* g, float x, float y, float fx, float fy, float dx, float dy) {
-    if (g->info == nullptr) {
-        MatterInfo* info = bind_matter_owership(this, this->mode, g);
+void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
+    if (m->info == nullptr) {
+        MatterInfo* info = bind_matter_owership(this, this->mode, m);
 
         if (this->head_matter == nullptr) {
-            this->head_matter = g;
+            this->head_matter = m;
             info->prev = this->head_matter;
         } else {
             MatterInfo* head_info = MATTER_INFO(this->head_matter);
             MatterInfo* prev_info = MATTER_INFO(head_info->prev);
             
             info->prev = head_info->prev;
-            prev_info->next = g;
-            head_info->prev = g;
+            prev_info->next = m;
+            head_info->prev = m;
         }
         info->next = this->head_matter;
 
         this->begin_update_sequence();
-        g->pre_construct();
-        g->construct();
-        g->post_construct();
-        unsafe_move_matter_via_info(this, g, info, x, y, fx, fy, dx, dy, true);
+        m->pre_construct();
+        m->construct();
+        m->post_construct();
+        unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy, true);
 
-        if (g->ready()) {
+        if (m->ready()) {
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
-                do_resize(this, g, info, this->scale_x, this->scale_y);
+                do_resize(this, m, info, this->scale_x, this->scale_y);
             }
 
             this->notify_updated();
-            this->on_matter_ready(g);
+            this->on_matter_ready(m);
             this->end_update_sequence();
         } else {
             this->notify_updated(); // is it necessary?
@@ -291,8 +292,8 @@ void WarGrey::STEM::Plane::insert_at(IMatter* g, float x, float y, float fx, flo
     }
 }
 
-void WarGrey::STEM::Plane::insert_at(IMatter* g, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
-    if (g->info == nullptr) {
+void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+    if (m->info == nullptr) {
         MatterInfo* tinfo = planet_matter_info(this, target);
         float x = 0.0F;
         float y = 0.0F;
@@ -302,17 +303,17 @@ void WarGrey::STEM::Plane::insert_at(IMatter* g, IMatter* target, float tfx, flo
         if ((tinfo != nullptr) && unsafe_matter_unmasked(tinfo, this->mode)) {
             float tsx, tsy, tsw, tsh;
 
-            unsafe_fill_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
+            unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
             x = tsx + tsw * tfx;
             y = tsy + tsh * tfy;
         }
 
-        this->insert_at(g, x, y, fx, fy, dx, dy);
+        this->insert_at(m, x, y, fx, fy, dx, dy);
     }
 }
 
-void WarGrey::STEM::Plane::insert_at(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
-    if (g->info == nullptr) {
+void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+    if (m->info == nullptr) {
         MatterInfo* xinfo = planet_matter_info(this, xtarget);
         MatterInfo* yinfo = planet_matter_info(this, ytarget);
         float x = 0.0F;
@@ -324,18 +325,18 @@ void WarGrey::STEM::Plane::insert_at(IMatter* g, IMatter* xtarget, float xfx, IM
             && (yinfo != nullptr) && unsafe_matter_unmasked(yinfo, this->mode)) {
             float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
 
-            unsafe_fill_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
-            unsafe_fill_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
+            unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
+            unsafe_feed_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
             x = xsx + xsw * xfx;
             y = ysy + ysh * yfy;
         }
 
-        this->insert_at(g, x, y, fx, fy, dx, dy);
+        this->insert_at(m, x, y, fx, fy, dx, dy);
     }
 }
 
-void WarGrey::STEM::Plane::remove(IMatter* g) {
-    MatterInfo* info = planet_matter_info(this, g);
+void WarGrey::STEM::Plane::remove(IMatter* m) {
+    MatterInfo* info = planet_matter_info(this, m);
 
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         MatterInfo* prev_info = MATTER_INFO(info->prev);
@@ -344,7 +345,7 @@ void WarGrey::STEM::Plane::remove(IMatter* g) {
         prev_info->next = info->next;
         next_info->prev = info->prev;
 
-        if (this->head_matter == g) {
+        if (this->head_matter == m) {
             if (this->head_matter == info->next) {
                 this->head_matter = nullptr;
             } else {
@@ -352,11 +353,11 @@ void WarGrey::STEM::Plane::remove(IMatter* g) {
             }
         }
 
-        if (this->hovering_matter == g) {
+        if (this->hovering_matter == m) {
             this->hovering_matter = nullptr;
         }
         
-        delete g; // g's destructor will delete the associated info object
+        delete m; // m's destructor will delete the associated info object
         this->notify_updated();
         this->size_cache_invalid();
     }
@@ -384,17 +385,17 @@ void WarGrey::STEM::Plane::erase() {
     }
 }
 
-void WarGrey::STEM::Plane::move_to(IMatter* g, float x, float y, float fx, float fy, float dx, float dy) {
-    MatterInfo* info = planet_matter_info(this, g);
+void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
+    MatterInfo* info = planet_matter_info(this, m);
     
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
-        if (unsafe_move_matter_via_info(this, g, info, x, y, fx, fy, dx, dy, true)) {
+        if (unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy, true)) {
             this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::Plane::move_to(IMatter* g, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
     MatterInfo* tinfo = planet_matter_info(this, target);
     float x = 0.0F;
     float y = 0.0F;
@@ -402,15 +403,15 @@ void WarGrey::STEM::Plane::move_to(IMatter* g, IMatter* target, float tfx, float
     if ((tinfo != nullptr) && unsafe_matter_unmasked(tinfo, this->mode)) {
         float tsx, tsy, tsw, tsh;
 
-        unsafe_fill_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
+        unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
         x = tsx + tsw * tfx;
         y = tsy + tsh * tfy;
     }
         
-    this->move_to(g, x, y, fx, fy, dx, dy);
+    this->move_to(m, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::Plane::move_to(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
     MatterInfo* xinfo = planet_matter_info(this, xtarget);
     MatterInfo* yinfo = planet_matter_info(this, ytarget);
     float x = 0.0F;
@@ -420,17 +421,17 @@ void WarGrey::STEM::Plane::move_to(IMatter* g, IMatter* xtarget, float xfx, IMat
         && (yinfo != nullptr) && unsafe_matter_unmasked(yinfo, this->mode)) {
         float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
 
-        unsafe_fill_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
-        unsafe_fill_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
+        unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
+        unsafe_feed_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
         x = xsx + xsw * xfx;
         y = ysy + ysh * yfy;
     }
 
-    this->move_to(g, x, y, fx, fy, dx, dy);
+    this->move_to(m, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::Plane::move(IMatter* g, float x, float y) {
-    MatterInfo* info = planet_matter_info(this, g);
+void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
+    MatterInfo* info = planet_matter_info(this, m);
 
     if (info != nullptr) {
         if (unsafe_matter_unmasked(info, this->mode)) {
@@ -469,7 +470,7 @@ IMatter* WarGrey::STEM::Plane::find_matter(float x, float y) {
                 if (!child->concealled()) {
                     float sx, sy, sw, sh;
 
-                    unsafe_fill_matter_bound(child, info, &sx, &sy, &sw, &sh);
+                    unsafe_feed_matter_bound(child, info, &sx, &sy, &sw, &sh);
 
                     sx += (this->translate_x * this->scale_x);
                     sy += (this->translate_y * this->scale_y);
@@ -508,14 +509,14 @@ IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
     return found;
 }
 
-bool WarGrey::STEM::Plane::fill_matter_location(IMatter* g, float* x, float* y, float fx, float fy) {
+bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, float fx, float fy) {
     bool okay = false;
-    MatterInfo* info = planet_matter_info(this, g);
+    MatterInfo* info = planet_matter_info(this, m);
     
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
 
-        unsafe_fill_matter_bound(g, info, &sx, &sy, &sw, &sh);
+        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
         if (x != nullptr) (*x) = sx + sw * fx;
         if (y != nullptr) (*y) = sy + sh * fy;
 
@@ -525,14 +526,14 @@ bool WarGrey::STEM::Plane::fill_matter_location(IMatter* g, float* x, float* y, 
     return okay;
 }
 
-bool WarGrey::STEM::Plane::fill_matter_boundary(IMatter* g, float* x, float* y, float* width, float* height) {
+bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) {
     bool okay = false;
-    MatterInfo* info = planet_matter_info(this, g);
+    MatterInfo* info = planet_matter_info(this, m);
 
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
             
-        unsafe_fill_matter_bound(g, info, &sx, &sy, &sw, &sh);
+        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
         if (x != nullptr) (*x) = sx;
         if (y != nullptr) (*y) = sy;
         if (width != nullptr) (*width) = sw;
@@ -544,7 +545,7 @@ bool WarGrey::STEM::Plane::fill_matter_boundary(IMatter* g, float* x, float* y, 
     return okay;
 }
 
-void WarGrey::STEM::Plane::fill_matters_boundary(float* x, float* y, float* width, float* height) {
+void WarGrey::STEM::Plane::feed_matters_boundary(float* x, float* y, float* width, float* height) {
     this->recalculate_matters_extent_when_invalid();
 
     if (x != nullptr) (*x) = this->matters_left;
@@ -578,7 +579,7 @@ void WarGrey::STEM::Plane::recalculate_matters_extent_when_invalid() {
                 MatterInfo* info = MATTER_INFO(child);
 
                 if (unsafe_matter_unmasked(info, this->mode)) {
-                    unsafe_fill_matter_bound(child, info, &rx, &ry, &width, &height);
+                    unsafe_feed_matter_bound(child, info, &rx, &ry, &width, &height);
                     this->matters_left = flmin(this->matters_left, rx);
                     this->matters_top = flmin(this->matters_top, ry);
                     this->matters_right = flmax(this->matters_right, rx + width);
@@ -591,24 +592,24 @@ void WarGrey::STEM::Plane::recalculate_matters_extent_when_invalid() {
     }
 }
 
-void WarGrey::STEM::Plane::add_selected(IMatter* g) {
+void WarGrey::STEM::Plane::add_selected(IMatter* m) {
     if (this->can_select_multiple()) {
-        MatterInfo* info = planet_matter_info(this, g);
+        MatterInfo* info = planet_matter_info(this, m);
 
         if ((info != nullptr) && (!info->selected)) {
-            if (unsafe_matter_unmasked(info, this->mode) && this->can_select(g)) {
-                unsafe_add_selected(this, g, info);
+            if (unsafe_matter_unmasked(info, this->mode) && this->can_select(m)) {
+                unsafe_add_selected(this, m, info);
             }
         }
     }
 }
 
-void WarGrey::STEM::Plane::set_selected(IMatter* g) {
-    MatterInfo* info = planet_matter_info(this, g);
+void WarGrey::STEM::Plane::set_selected(IMatter* m) {
+    MatterInfo* info = planet_matter_info(this, m);
 
     if ((info != nullptr) && (!info->selected)) {
-        if (unsafe_matter_unmasked(info, this->mode) && (this->can_select(g))) {
-            unsafe_set_selected(this, g, info);
+        if (unsafe_matter_unmasked(info, this->mode) && (this->can_select(m))) {
+            unsafe_set_selected(this, m, info);
         }
     }
 }
@@ -636,8 +637,8 @@ void WarGrey::STEM::Plane::no_selected() {
     }
 }
 
-bool WarGrey::STEM::Plane::is_selected(IMatter* g) {
-    MatterInfo* info = planet_matter_info(this, g);
+bool WarGrey::STEM::Plane::is_selected(IMatter* m) {
+    MatterInfo* info = planet_matter_info(this, m);
     bool selected = false;
 
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
@@ -667,14 +668,14 @@ unsigned int WarGrey::STEM::Plane::count_selected() {
     return n;
 }
 
-IMatter* WarGrey::STEM::Plane::get_focus_matter() {
+IMatter* WarGrey::STEM::Plane::get_focused_matter() {
     return (this->matter_unmasked(this->focused_matter) ? this->focused_matter : nullptr);
 }
 
-void WarGrey::STEM::Plane::set_caret_owner(IMatter* g) {
-    if (this->focused_matter != g) {
-        if ((g != nullptr) && (g->handle_events())) {
-            MatterInfo* info = planet_matter_info(this, g);
+void WarGrey::STEM::Plane::set_caret_owner(IMatter* m) {
+    if (this->focused_matter != m) {
+        if ((m != nullptr) && (m->handle_events())) {
+            MatterInfo* info = planet_matter_info(this, m);
 
             if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
                 if (this->focused_matter != nullptr) {
@@ -682,18 +683,18 @@ void WarGrey::STEM::Plane::set_caret_owner(IMatter* g) {
                     this->on_focus(this->focused_matter, false);
                 }
 
-                this->focused_matter = g;
-                g->own_caret(true);
+                this->focused_matter = m;
+                m->own_caret(true);
 
-                this->on_focus(g, true);
+                this->on_focus(m, true);
             }
         } else if (this->focused_matter != nullptr) {
             this->focused_matter->own_caret(false);
             this->on_focus(this->focused_matter, false);
             this->focused_matter = nullptr;
         }
-    } else if (g != nullptr) {
-        this->on_focus(g, true);
+    } else if (m != nullptr) {
+        this->on_focus(m, true);
     }
 }
 
@@ -716,16 +717,16 @@ void WarGrey::STEM::Plane::on_editing_text(const char* text, int pos, int span) 
     }
 }
 
-void WarGrey::STEM::Plane::on_tap(IMatter* g, float local_x, float local_y) {
-    if (g != nullptr) {
-        MatterInfo* info = MATTER_INFO(g);
+void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
+    if (m != nullptr) {
+        MatterInfo* info = MATTER_INFO(m);
 
         if (!info->selected) {
-            if (this->can_select(g)) {
-                unsafe_set_selected(this, g, info);
+            if (this->can_select(m)) {
+                unsafe_set_selected(this, m, info);
 
-                if (g->handle_events()) {
-                    this->set_caret_owner(g);
+                if (m->handle_events()) {
+                    this->set_caret_owner(m);
                 }
             } else {
                 this->no_selected();
@@ -870,7 +871,7 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
 
         do {
             MatterInfo* info = MATTER_INFO(child);
-            this->info->master->fill_extent(&dwidth, &dheight);
+            this->info->master->feed_extent(&dwidth, &dheight);
 
             if (unsafe_matter_unmasked(info, this->mode)) {
                 IMovable* sprite = child->as_sprite();
@@ -887,7 +888,7 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
                         info->x += xspd;
                         info->y += yspd;
 
-                        child->fill_extent(info->x, info->y, &cwidth, &cheight);
+                        child->feed_extent(info->x, info->y, &cwidth, &cheight);
 
                         if (info->x < 0) {
                             hdist = info->x;
@@ -952,7 +953,7 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
             MatterInfo* info = MATTER_INFO(child);
 
             if (unsafe_matter_unmasked(info, this->mode)) {
-                child->fill_extent(info->x, info->y, &gwidth, &gheight);
+                child->feed_extent(info->x, info->y, &gwidth, &gheight);
 
                 gx = (info->x + this->translate_x) * this->scale_x + X;
                 gy = (info->y + this->translate_y) * this->scale_y + Y;
@@ -1009,7 +1010,7 @@ IScreen* WarGrey::STEM::IPlane::master() {
     return screen;
 }
 
-void WarGrey::STEM::IPlane::fill_background(SDL_Color* c) {
+void WarGrey::STEM::IPlane::feed_background(SDL_Color* c) {
     RGB_FillColor(c, this->background, this->bg_alpha);
 }
 
@@ -1125,93 +1126,93 @@ bool WarGrey::STEM::IPlane::save_snapshot(const char* png, float x, float y, flo
     return game_save_image(this->snapshot(x, y, width, height, bgcolor, alpha), png);
 }
 
-bool WarGrey::STEM::IPlane::fill_matter_location(IMatter* g, float* x, float* y, MatterAnchor a) {
+bool WarGrey::STEM::IPlane::feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a) {
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
 
-    return this->fill_matter_location(g, x, y, fx, fy);
+    return this->feed_matter_location(m, x, y, fx, fy);
 }
 
-void WarGrey::STEM::IPlane::insert_at(IMatter* g, float x, float y, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::insert_at(IMatter* m, float x, float y, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->insert_at(g, x, y, fx, fy, dx, dy);
+    this->insert_at(m, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::insert_at(IMatter* g, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
     float tfx, tfy, fx, fy;
 
     matter_anchor_fraction(ta, &tfx, &tfy);
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->insert_at(g, target, tfx, tfy, fx, fy, dx, dy);
+    this->insert_at(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::insert_at(IMatter* g, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->insert_at(g, target, tfx, tfy, fx, fy, dx, dy);
+    this->insert_at(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::insert_at(IMatter* g, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
     float tfx, tfy;
 
     matter_anchor_fraction(ta, &tfx, &tfy);
     
-    this->insert_at(g, target, tfx, tfy, fx, fy, dx, dy);
+    this->insert_at(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::insert_at(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->insert_at(g, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
+    this->insert_at(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to(IMatter* g, float x, float y, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::move_to(IMatter* m, float x, float y, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->move_to(g, x, y, fx, fy, dx, dy);
+    this->move_to(m, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to(IMatter* g, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
     float tfx, tfy, fx, fy;
 
     matter_anchor_fraction(ta, &tfx, &tfy);
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
+    this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to(IMatter* g, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
+    this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to(IMatter* g, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
     float tfx, tfy;
 
     matter_anchor_fraction(ta, &tfx, &tfy);
 
-    this->move_to(g, target, tfx, tfy, fx, fy, dx, dy);
+    this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to(IMatter* g, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
     float fx, fy;
     
     matter_anchor_fraction(a, &fx, &fy);
 
-    this->move_to(g, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
+    this->move_to(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
 

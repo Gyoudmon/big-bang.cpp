@@ -26,11 +26,11 @@ IPlane* WarGrey::STEM::IMatter::master() {
     return plane;
 }
 
-void WarGrey::STEM::IMatter::fill_extent(float x, float y, float* w, float* h) {
+void WarGrey::STEM::IMatter::feed_extent(float x, float y, float* w, float* h) {
     SET_VALUES(w, 0.0F, h, 0.0F);
 }
 
-void WarGrey::STEM::IMatter::fill_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
+void WarGrey::STEM::IMatter::feed_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
     SET_VALUES(top, 0.0F, bottom, 0.0F);
     SET_VALUES(left, 0.0F, right, 0.0F);
 }
@@ -50,7 +50,7 @@ void WarGrey::STEM::IMatter::moor(MatterAnchor anchor) {
     if (anchor != MatterAnchor::LT) {
         if (this->info != nullptr) {
             this->anchor = anchor;
-            this->info->master->fill_matter_location(this, &this->anchor_x, &this->anchor_y, anchor);
+            this->info->master->feed_matter_location(this, &this->anchor_x, &this->anchor_y, anchor);
         }
     }
 }
@@ -63,15 +63,15 @@ bool WarGrey::STEM::IMatter::has_caret() {
     bool careted = false;
 
     if (this->info != nullptr) {
-        careted = (this->info->master->get_focus_matter() == this);
+        careted = (this->info->master->get_focused_matter() == this);
     }
 
     return careted;
 }
 
-void WarGrey::STEM::IMatter::fill_location(float* x, float* y, WarGrey::STEM::MatterAnchor a) {
+void WarGrey::STEM::IMatter::feed_location(float* x, float* y, WarGrey::STEM::MatterAnchor a) {
     if (this->info != nullptr) {
-        this->info->master->fill_matter_location(this, x, y, a);
+        this->info->master->feed_matter_location(this, x, y, a);
     }
 }
 
@@ -100,7 +100,7 @@ SDL_Surface* WarGrey::STEM::IMatter::snapshot() {
     SDL_Surface* photograph = nullptr;
     float width, height;
 
-    this->fill_extent(0.0F, 0.0F, &width, &height);
+    this->feed_extent(0.0F, 0.0F, &width, &height);
     photograph = game_blank_image(width, height);
 
     if (photograph != nullptr) {
