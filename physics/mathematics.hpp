@@ -1,6 +1,6 @@
 #pragma once
 
-#include "datum/flonum.hpp"
+#include "../datum/flonum.hpp"
 
 namespace WarGrey::STEM {
     float radians_to_degrees(float degrees);

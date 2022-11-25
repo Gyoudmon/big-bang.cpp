@@ -3,9 +3,9 @@
 
 #include "colorspace.hpp"
 
-#include "datum/flonum.hpp"
-#include "datum/fixnum.hpp"
-#include "datum/box.hpp"
+#include "../datum/flonum.hpp"
+#include "../datum/fixnum.hpp"
+#include "../datum/box.hpp"
 
 using namespace WarGrey::STEM;
 

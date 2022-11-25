@@ -1,12 +1,13 @@
 #include "universe.hpp"
-#include "geometry.hpp"
-#include "colorspace.hpp"
-#include "text.hpp"
-#include "time.hpp"
-#include "image.hpp"
+
+#include "graphics/geometry.hpp"
+#include "graphics/colorspace.hpp"
+#include "graphics/text.hpp"
+#include "graphics/image.hpp"
 
 #include "datum/string.hpp"
 #include "datum/box.hpp"
+#include "datum/time.hpp"
 
 #include <filesystem>
 

@@ -1,8 +1,10 @@
-#include "game.hpp"                 // 放最前面以兼容 macOS
+#include <SDL2/SDL.h>                 // 放最前面以兼容 macOS
+
 #include "image.hpp"
+#include "geometry.hpp"
 #include "colorspace.hpp"
 
-#include "datum/flonum.hpp"
+#include "../datum/flonum.hpp"
 
 #include <filesystem>
 

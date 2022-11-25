@@ -1,9 +1,10 @@
 #include "shapelet.hpp"
 
-#include "../image.hpp"
-#include "../geometry.hpp"
-#include "../colorspace.hpp"
-#include "../mathematics.hpp"
+#include "../graphics/image.hpp"
+#include "../graphics/geometry.hpp"
+#include "../graphics/colorspace.hpp"
+
+#include "../physics/mathematics.hpp"
 
 #include "../datum/box.hpp"
 #include "../datum/flonum.hpp"

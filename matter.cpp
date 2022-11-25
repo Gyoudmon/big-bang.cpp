@@ -4,7 +4,7 @@
 #include "datum/string.hpp"
 #include "datum/box.hpp"
 
-#include "image.hpp"
+#include "graphics/image.hpp"
 
 using namespace WarGrey::STEM;
 

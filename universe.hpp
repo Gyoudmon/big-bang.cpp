@@ -5,10 +5,10 @@
 
 #include <cstdint>
 
-#include "font.hpp"
-#include "image.hpp"
+#include "graphics/font.hpp"
+#include "graphics/image.hpp"
 
-#include "display.hpp"
+#include "virtualization/display.hpp"
 
 namespace WarGrey::STEM {
     class IUniverse : public WarGrey::STEM::IDisplay {

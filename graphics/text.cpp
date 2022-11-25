@@ -1,8 +1,11 @@
-#include "game.hpp"                 // 放最前面以兼容 macOS
+#include <SDL2/SDL.h>                 // 放最前面以兼容 macOS
+
 #include "text.hpp"
+#include "font.hpp"
+#include "geometry.hpp"
 #include "colorspace.hpp"
 
-#include "datum/string.hpp"
+#include "../datum/string.hpp"
 
 #include <cstdarg>
 #include <iostream>

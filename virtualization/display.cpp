@@ -1,7 +1,7 @@
 #include "display.hpp"
-#include "image.hpp"
 
-#include "datum/string.hpp"
+#include "../graphics/image.hpp"
+#include "../datum/string.hpp"
 
 using namespace WarGrey::STEM;
 

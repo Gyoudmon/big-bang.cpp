@@ -1,9 +1,10 @@
 #include "geometry.hpp"
 #include "colorspace.hpp"
-#include "mathematics.hpp"
 
-#include "datum/flonum.hpp"
-#include "datum/fixnum.hpp"
+#include "../physics/mathematics.hpp"
+
+#include "../datum/flonum.hpp"
+#include "../datum/fixnum.hpp"
 
 using namespace WarGrey::STEM;
 

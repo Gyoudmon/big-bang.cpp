@@ -2,10 +2,11 @@
 
 #include <SDL2/SDL.h>
 
-#include "named_colors.hpp"
-#include "geometry.hpp"
 #include "world.hpp"
-#include "font.hpp"
+
+#include "graphics/named_colors.hpp"
+#include "graphics/geometry.hpp"
+#include "graphics/font.hpp"
 
 /**
  * 为兼容 Windows 而变得丑陋

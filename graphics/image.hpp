@@ -2,6 +2,9 @@
 
 #include <SDL2/SDL_image.h>
 
+#include <cstdint>
+#include <string>
+
 namespace WarGrey::STEM {
     typedef void (*game_lambda_image_f)(SDL_Renderer*, float, float, void*);
 

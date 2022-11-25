@@ -1,9 +1,9 @@
 #include "textlet.hpp"
 
-#include "../../font.hpp"
-#include "../../text.hpp"
-#include "../../colorspace.hpp"
-#include "../../geometry.hpp"
+#include "../../graphics/font.hpp"
+#include "../../graphics/text.hpp"
+#include "../../graphics/colorspace.hpp"
+#include "../../graphics/geometry.hpp"
 
 #include "../../datum/string.hpp"
 #include "../../datum/box.hpp"

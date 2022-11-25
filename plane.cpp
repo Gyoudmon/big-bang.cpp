@@ -1,9 +1,10 @@
 #include "plane.hpp"
 #include "matter.hpp"
 
-#include "geometry.hpp"
-#include "mathematics.hpp"
-#include "colorspace.hpp"
+#include "graphics/geometry.hpp"
+#include "graphics/colorspace.hpp"
+
+#include "physics/mathematics.hpp"
 
 #include "datum/string.hpp"
 #include "datum/flonum.hpp"

@@ -1,6 +1,6 @@
 #include "movable.hpp"
 
-#include "../mathematics.hpp"
+#include "../physics/mathematics.hpp"
 
 using namespace WarGrey::STEM;
 

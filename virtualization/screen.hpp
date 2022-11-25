@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../display.hpp"
+#include "display.hpp"
 
 namespace WarGrey::STEM {
     class IScreen {
