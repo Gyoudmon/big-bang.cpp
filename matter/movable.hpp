@@ -4,11 +4,14 @@
 
 namespace WarGrey::STEM {
     class IMovable {
+        public:
+            IMovable();
+
         public: // gameplay events
             virtual void on_border(float hoffset, float voffset);
 
         public:
-            void set_speed(float spd, float dir);
+            void set_speed(float spd, float deg);
             float x_speed() { return this->xspeed; }
             float y_speed() { return this->yspeed; }
 

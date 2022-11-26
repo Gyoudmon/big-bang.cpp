@@ -5,11 +5,15 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-void WarGrey::STEM::IMovable::set_speed(float spd, float direction) {
-    float dir_pad = degrees_to_radians(direction);
+WarGrey::STEM::IMovable::IMovable() {
+    this->set_border_strategy(BorderStrategy::IGNORE);
+}
 
-    this->xspeed = spd * flcos(dir_pad);
-    this->yspeed = spd * flsin(dir_pad);
+void WarGrey::STEM::IMovable::set_speed(float spd, float dir_deg) {
+    float rad = degrees_to_radians(dir_deg);
+
+    this->xspeed = spd * flcos(rad);
+    this->yspeed = spd * flsin(rad);
 }
 
 void WarGrey::STEM::IMovable::on_border(float hoffset, float voffset) {

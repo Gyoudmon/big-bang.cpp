@@ -94,8 +94,7 @@ static void matter_anchor_fraction(MatterAnchor& a, float* ofx, float* ofy) {
     float fx = 0.0F;
     float fy = 0.0F;
 
-    if (a != MatterAnchor::LT) {
-        switch (a) {
+    switch (a) {
         case MatterAnchor::LT:                       break;
         case MatterAnchor::LC:            fy = 0.5F; break;
         case MatterAnchor::LB:            fy = 1.0F; break;
@@ -105,7 +104,6 @@ static void matter_anchor_fraction(MatterAnchor& a, float* ofx, float* ofy) {
         case MatterAnchor::RT: fx = 1.0F;            break;
         case MatterAnchor::RC: fx = 1.0F; fy = 0.5F; break;
         case MatterAnchor::RB: fx = 1.0F; fy = 1.0F; break;
-        }
     }
 
     (*ofx) = fx;
@@ -132,7 +130,7 @@ static bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x
 }
 
 static bool unsafe_move_matter_via_info(Plane* master, IMatter* m, MatterInfo* info
-    , float x, float y, float fx, float fy, float dx, float dy, bool absolute) {
+    , float x, float y, float fx, float fy, float dx, float dy) {
     float sx, sy, sw, sh;
     float ax = 0.0F;
     float ay = 0.0F;
@@ -237,8 +235,9 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
             this->begin_update_sequence();
 
             unsafe_move_matter_via_info(this, m, info,
-                info->async->x0, info->async->y0, info->async->fx0, info->async->fy0, info->async->dx0, info->async->dy0,
-                true);
+                info->async->x0, info->async->y0,
+                info->async->fx0, info->async->fy0,
+                info->async->dx0, info->async->dy0);
 
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
                 do_resize(this, m, info, this->scale_x, this->scale_y);
@@ -275,7 +274,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
         m->pre_construct();
         m->construct();
         m->post_construct();
-        unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy, true);
+        unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy);
 
         if (m->ready()) {
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
@@ -389,7 +388,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float
     MatterInfo* info = planet_matter_info(this, m);
     
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
-        if (unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy, true)) {
+        if (unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy)) {
             this->notify_updated();
         }
     }
@@ -674,7 +673,7 @@ IMatter* WarGrey::STEM::Plane::get_focused_matter() {
 
 void WarGrey::STEM::Plane::set_caret_owner(IMatter* m) {
     if (this->focused_matter != m) {
-        if ((m != nullptr) && (m->handle_events())) {
+        if ((m != nullptr) && (m->events_allowed())) {
             MatterInfo* info = planet_matter_info(this, m);
 
             if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
@@ -725,7 +724,7 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
             if (this->can_select(m)) {
                 unsafe_set_selected(this, m, info);
 
-                if (m->handle_events()) {
+                if (m->events_allowed()) {
                     this->set_caret_owner(m);
                 }
             } else {
@@ -747,7 +746,7 @@ bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, 
                     this->set_caret_owner(unmasked_matter);
                     this->no_selected();
                     
-                    if ((unmasked_matter != nullptr) && (unmasked_matter->handle_low_level_events())) {
+                    if ((unmasked_matter != nullptr) && (unmasked_matter->low_level_events_allowed())) {
                         MatterInfo* info = MATTER_INFO(unmasked_matter);
                         float local_x = x - info->x;
                         float local_y = y - info->y;
@@ -779,10 +778,10 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
 
             this->hovering_matter = unmasked_matter;
 
-            if (unmasked_matter->handle_events()) {
+            if (unmasked_matter->events_allowed()) {
                 unmasked_matter->on_hover(local_x, local_y);
 
-                if (unmasked_matter->handle_low_level_events()) {
+                if (unmasked_matter->low_level_events_allowed()) {
                     unmasked_matter->on_pointer_move(state, local_x, local_y, dx, dy, false);
                 }
             }
@@ -810,10 +809,10 @@ bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y,
                         float local_x = x - info->x;
                         float local_y = y - info->y;
 
-                        if (unmasked_matter->handle_events()) {
+                        if (unmasked_matter->events_allowed()) {
                             unmasked_matter->on_tap(local_x, local_y);
 
-                            if (unmasked_matter->handle_low_level_events()) {
+                            if (unmasked_matter->low_level_events_allowed()) {
                                 unmasked_matter->on_pointer_released(button, local_x, local_y, clicks);
                             }
                         }
@@ -848,10 +847,10 @@ bool WarGrey::STEM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, 
         float local_x = x - info->x;
         float local_y = y - info->y;
 
-        if (this->hovering_matter->handle_events()) {
+        if (this->hovering_matter->events_allowed()) {
             done |= this->hovering_matter->on_goodbye(local_x, local_y);
 
-            if (this->hovering_matter->handle_low_level_events()) {
+            if (this->hovering_matter->low_level_events_allowed()) {
                 done |= this->hovering_matter->on_pointer_move(state, local_x, local_y, dx, dy, true);
             }
         }

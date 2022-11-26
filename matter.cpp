@@ -107,7 +107,7 @@ SDL_Surface* WarGrey::STEM::IMatter::snapshot() {
         SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(photograph);
         
         if (renderer != nullptr) {
-            this->draw(renderer, 0, 0, width, height);
+            this->draw(renderer, 0.0F, 0.0F, width, height);
             SDL_RenderPresent(renderer);
             SDL_DestroyRenderer(renderer);
         }

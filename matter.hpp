@@ -40,9 +40,9 @@ namespace WarGrey::STEM {
 
         public:
             virtual void own_caret(bool is_own) {}
-            virtual bool is_colliding_with_mouse(float local_x, float local_y) { return true; }
-
+            
         public:
+            virtual bool is_colliding_with_mouse(float local_x, float local_y) { return true; }
             virtual bool on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) { return false; }
             virtual bool on_text(const char* text, size_t size, bool entire) { return false; }
             virtual bool on_editing_text(const char* text, int pos, int span) { return false; }
@@ -61,8 +61,8 @@ namespace WarGrey::STEM {
 
         public:
             void enable_events(bool yes_no, bool low_level = false) { this->deal_with_events = yes_no; this->deal_with_low_level_events = low_level; }
-            bool handle_events() { return this->deal_with_events; }
-            bool handle_low_level_events() { return (this->handle_events() && this->deal_with_low_level_events); }
+            bool events_allowed() { return this->deal_with_events; }
+            bool low_level_events_allowed() { return (this->events_allowed() && this->deal_with_low_level_events); }
         
         public:
             bool has_caret();
@@ -106,8 +106,8 @@ namespace WarGrey::STEM {
         
         private:
             WarGrey::STEM::MatterAnchor anchor = WarGrey::STEM::MatterAnchor::LT;
-            float anchor_x;
-            float anchor_y;
+            float anchor_x = 0.0F;
+            float anchor_y = 0.0F;
     };
 }
 
