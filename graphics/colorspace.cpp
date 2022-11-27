@@ -64,7 +64,7 @@ static int set_render_color_from_hsi_sector(SDL_Renderer* renderer, float hue, f
 
 /*************************************************************************************************/
 void WarGrey::STEM::RGB_FillColor(SDL_Color* c, unsigned int hex, float alpha) {
-    return RGB_FillColor(c, hex, UCHAR(alpha));
+    RGB_FillColor(c, hex, UCHAR(alpha));
 }
 
 void WarGrey::STEM::RGB_FillColor(SDL_Color* c, unsigned int hex, unsigned char alpha) {

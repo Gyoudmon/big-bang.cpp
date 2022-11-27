@@ -53,7 +53,7 @@ static inline MatterInfo* bind_matter_owership(WarGrey::STEM::IPlane* master, un
     return info;
 }
 
-static inline MatterInfo* planet_matter_info(WarGrey::STEM::IPlane* master, IMatter* m) {
+static inline MatterInfo* plane_matter_info(WarGrey::STEM::IPlane* master, IMatter* m) {
     MatterInfo* info = nullptr;
 
     if ((m != nullptr) && (m->info != nullptr)) {
@@ -200,10 +200,6 @@ Plane::Plane(const std::string& name, unsigned int initial_mode)
     : Plane(name.c_str(), initial_mode) {}
 
 Plane::~Plane() {
-    this->collapse();
-}
-
-void Plane::collapse() {
     this->erase();
 }
 
@@ -221,13 +217,13 @@ unsigned int WarGrey::STEM::Plane::current_mode() {
 }
 
 bool WarGrey::STEM::Plane::matter_unmasked(IMatter* m) {
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
 
     return ((info != nullptr) && unsafe_matter_unmasked(info, this->mode));
 }
 
 void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
         if (info->async != nullptr) {
@@ -293,7 +289,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
 
 void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
     if (m->info == nullptr) {
-        MatterInfo* tinfo = planet_matter_info(this, target);
+        MatterInfo* tinfo = plane_matter_info(this, target);
         float x = 0.0F;
         float y = 0.0F;
 
@@ -313,8 +309,8 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* target, float tfx, flo
 
 void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
     if (m->info == nullptr) {
-        MatterInfo* xinfo = planet_matter_info(this, xtarget);
-        MatterInfo* yinfo = planet_matter_info(this, ytarget);
+        MatterInfo* xinfo = plane_matter_info(this, xtarget);
+        MatterInfo* yinfo = plane_matter_info(this, ytarget);
         float x = 0.0F;
         float y = 0.0F;
 
@@ -335,7 +331,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* xtarget, float xfx, IM
 }
 
 void WarGrey::STEM::Plane::remove(IMatter* m) {
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         MatterInfo* prev_info = MATTER_INFO(info->prev);
@@ -379,13 +375,12 @@ void WarGrey::STEM::Plane::erase() {
             delete child; // child's destructor will delete the associated info object
         } while (temp_head != nullptr);
 
-        this->head_matter = nullptr;
         this->size_cache_invalid();
     }
 }
 
 void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
     
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         if (unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy)) {
@@ -395,7 +390,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float
 }
 
 void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
-    MatterInfo* tinfo = planet_matter_info(this, target);
+    MatterInfo* tinfo = plane_matter_info(this, target);
     float x = 0.0F;
     float y = 0.0F;
 
@@ -411,8 +406,8 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* target, float tfx, float
 }
 
 void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
-    MatterInfo* xinfo = planet_matter_info(this, xtarget);
-    MatterInfo* yinfo = planet_matter_info(this, ytarget);
+    MatterInfo* xinfo = plane_matter_info(this, xtarget);
+    MatterInfo* yinfo = plane_matter_info(this, ytarget);
     float x = 0.0F;
     float y = 0.0F;
 
@@ -430,7 +425,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMat
 }
 
 void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
         if (unsafe_matter_unmasked(info, this->mode)) {
@@ -498,7 +493,7 @@ IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
             found = do_search_selected_matter(this->head_matter, this->mode, this->head_matter);
         }
     } else {
-        MatterInfo* info = planet_matter_info(this, start);
+        MatterInfo* info = plane_matter_info(this, start);
 
         if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
             found = do_search_selected_matter(info->next, this->mode, this->head_matter);
@@ -510,7 +505,7 @@ IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
 
 bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, float fx, float fy) {
     bool okay = false;
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
     
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
@@ -527,7 +522,7 @@ bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, 
 
 bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) {
     bool okay = false;
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
@@ -593,7 +588,7 @@ void WarGrey::STEM::Plane::recalculate_matters_extent_when_invalid() {
 
 void WarGrey::STEM::Plane::add_selected(IMatter* m) {
     if (this->can_select_multiple()) {
-        MatterInfo* info = planet_matter_info(this, m);
+        MatterInfo* info = plane_matter_info(this, m);
 
         if ((info != nullptr) && (!info->selected)) {
             if (unsafe_matter_unmasked(info, this->mode) && this->can_select(m)) {
@@ -604,7 +599,7 @@ void WarGrey::STEM::Plane::add_selected(IMatter* m) {
 }
 
 void WarGrey::STEM::Plane::set_selected(IMatter* m) {
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (!info->selected)) {
         if (unsafe_matter_unmasked(info, this->mode) && (this->can_select(m))) {
@@ -637,7 +632,7 @@ void WarGrey::STEM::Plane::no_selected() {
 }
 
 bool WarGrey::STEM::Plane::is_selected(IMatter* m) {
-    MatterInfo* info = planet_matter_info(this, m);
+    MatterInfo* info = plane_matter_info(this, m);
     bool selected = false;
 
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
@@ -674,7 +669,7 @@ IMatter* WarGrey::STEM::Plane::get_focused_matter() {
 void WarGrey::STEM::Plane::set_caret_owner(IMatter* m) {
     if (this->focused_matter != m) {
         if ((m != nullptr) && (m->events_allowed())) {
-            MatterInfo* info = planet_matter_info(this, m);
+            MatterInfo* info = plane_matter_info(this, m);
 
             if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
                 if (this->focused_matter != nullptr) {
