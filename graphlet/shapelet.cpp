@@ -293,7 +293,7 @@ WarGrey::STEM::RegularPolygonlet::~RegularPolygonlet() {
 void WarGrey::STEM::RegularPolygonlet::initialize_vertice() {
     // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
     float start = degrees_to_radians(rotation);
-    float delta = 2.0 * pi_f / float(n);
+    float delta = 2.0F * pi_f / float(n);
     float rx = this->aradius - 0.5F;
     float ry = this->bradius - 0.5F;
 
@@ -305,8 +305,8 @@ void WarGrey::STEM::RegularPolygonlet::initialize_vertice() {
     for (int idx = 0; idx < n; idx++) {
         float theta = start + delta * float(idx);
         
-        this->xs[idx] = rx * flcos(theta) + rx;
-        this->ys[idx] = ry * flsin(theta) + ry;
+        this->xs[idx] = fl2fx<short>(rx * flcos(theta) + rx);
+        this->ys[idx] = fl2fx<short>(ry * flsin(theta) + ry);
     }
 }
 
