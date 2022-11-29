@@ -32,7 +32,7 @@ namespace WarGrey::STEM {
         protected:
             virtual void feed_shape_extent(float* width, float* height) = 0;
             virtual void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
-            virtual void feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
+            virtual void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
 
         private:
             SDL_Surface* geometry = nullptr;
@@ -52,7 +52,7 @@ namespace WarGrey::STEM {
         protected:
             void feed_shape_extent(float* width, float* height) override;
             void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override {}
-            void feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+            void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
         private:
             float epx;
@@ -81,7 +81,7 @@ namespace WarGrey::STEM {
         protected:
             void feed_shape_extent(float* width, float* height) override;
             void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-            void feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+            void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	    private:
 	        float width;
@@ -99,7 +99,7 @@ namespace WarGrey::STEM {
         protected:
             void feed_shape_extent(float* width, float* height) override;
             void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-            void feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+            void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	    private:
 	        float width;
@@ -118,7 +118,7 @@ namespace WarGrey::STEM {
         protected:
             void feed_shape_extent(float* width, float* height) override;
             void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-            void feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+            void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	    private:
 	        float aradius;
@@ -143,7 +143,7 @@ namespace WarGrey::STEM {
         protected:
             void feed_shape_extent(float* width, float* height) override;
             void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-            void feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+            void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
         private:
             void initialize_vertice();

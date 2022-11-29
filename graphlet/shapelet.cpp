@@ -29,15 +29,17 @@ WarGrey::STEM::IShapelet::~IShapelet() {
 
 void WarGrey::STEM::IShapelet::construct() {
     SDL_Surface* geometry = nullptr;
-    float width, height;
+    float flwidth, flheight;
 
-    this->feed_shape_extent(&width, &height);
-    geometry = game_blank_image(width, height, this->alpha_color_key);
+    this->feed_shape_extent(&flwidth, &flheight);
+    geometry = game_blank_image(flwidth, flheight, this->alpha_color_key);
         
     if (geometry != nullptr) {
         SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(geometry);
         
         if (renderer != nullptr) {
+            int width = fl2fxi(flwidth);
+            int height = fl2fxi(flheight);
             uint8_t r, g, b;
 
             RGB_SetRenderDrawColor(renderer, this->alpha_color_key);
@@ -45,7 +47,7 @@ void WarGrey::STEM::IShapelet::construct() {
     
             if (color >= 0) {
                 RGB_FromHexadecimal(color, &r, &g, &b);
-                this->feed_shape(renderer, width, height, r, g, b, 0xFFU);
+                this->fill_shape(renderer, width, height, r, g, b, 0xFFU);
             }
 
             if (border_color >= 0) {
@@ -63,9 +65,9 @@ void WarGrey::STEM::IShapelet::construct() {
 
 void WarGrey::STEM::IShapelet::feed_extent(float x, float y, float* w, float* h) {
     if (this->geometry == nullptr) {
-	SET_VALUES(w, 0.0F, h, 0.0F);
+	    SET_VALUES(w, 0.0F, h, 0.0F);
     } else {
-	SET_VALUES(w, this->geometry->w, h, this->geometry->h);
+	    SET_VALUES(w, this->geometry->w, h, this->geometry->h);
     }
 }
 
@@ -99,7 +101,7 @@ void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float x, float y, fl
         float ox, oy;
 
         this->feed_shape_origin(&ox, &oy);
-	game_render_surface(renderer, this->geometry, x - ox, y - oy);
+	    game_render_surface(renderer, this->geometry, x - ox, y - oy);
     }
 }
 
@@ -122,11 +124,11 @@ void WarGrey::STEM::Linelet::resize(float w, float h) {
         
         this->feed_shape_extent(&width, &height);
 
-	if ((width != w) || (height != h)) {
+	    if ((width != w) || (height != h)) {
             this->epx *= w / width;
             this->epy *= h / height;
-	    this->construct();
-	}
+	        this->construct();
+	    }
     }
 }
 
@@ -134,7 +136,7 @@ void WarGrey::STEM::Linelet::feed_shape_extent(float* width, float* height) {
     SET_VALUES(width, flmax(flabs(this->epx), 1.0F), height, flmax(flabs(this->epy), 1.0F));
 }
 
-void WarGrey::STEM::Linelet::feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void WarGrey::STEM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     float x0 = 0.0F;
     float y0 = 0.0F;
 
@@ -158,11 +160,11 @@ WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, int32_t color, 
 
 void WarGrey::STEM::Rectanglet::resize(float w, float h) {
     if ((w > 0.0F) && (h > 0.0F)) {
-	if ((this->width != w) || (this->height != h)) {
+	    if ((this->width != w) || (this->height != h)) {
             this->width = w;
             this->height = h;
-	    this->construct();
-	}
+	        this->construct();
+	    }
     }
 }
 
@@ -174,7 +176,7 @@ void WarGrey::STEM::Rectanglet::draw_shape(SDL_Renderer* renderer, int width, in
     rectangleRGBA(renderer, 1, 1, width - 1, height - 1, r, g, b, a);
 }
 
-void WarGrey::STEM::Rectanglet::feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void WarGrey::STEM::Rectanglet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     boxRGBA(renderer, 1, 1, width - 1, height - 1, r, g, b, a);
 }
 
@@ -187,11 +189,11 @@ WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, f
 
 void WarGrey::STEM::RoundedRectanglet::resize(float w, float h) {
     if ((w > 0.0F) && (h > 0.0F)) {
-	if ((this->width != w) || (this->height != h)) {
+	    if ((this->width != w) || (this->height != h)) {
             this->width = w;
             this->height = h;
-	    this->construct();
-	}
+	        this->construct();
+	    }
     }
 }
 
@@ -209,7 +211,7 @@ void WarGrey::STEM::RoundedRectanglet::draw_shape(SDL_Renderer* renderer, int wi
     roundedRectangleRGBA(renderer, 1, 1, width - 1, height - 1, fl2fxi(rad), r, g, b, a);
 }
 
-void WarGrey::STEM::RoundedRectanglet::feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void WarGrey::STEM::RoundedRectanglet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     float rad = this->radius;
 
     if (rad < 0.0F) {
@@ -231,11 +233,11 @@ void WarGrey::STEM::Ellipselet::resize(float w, float h) {
         float a = w * 0.5F;
         float b = h * 0.5F;
 
-	if ((this->aradius != a) || (this->bradius != b)) {
+	    if ((this->aradius != a) || (this->bradius != b)) {
             this->aradius = a;
             this->bradius = b;
-	    this->construct();
-	}
+	        this->construct();
+	    }
     }
 }
 
@@ -254,7 +256,7 @@ void WarGrey::STEM::Ellipselet::draw_shape(SDL_Renderer* renderer, int width, in
     }
 }
 
-void WarGrey::STEM::Ellipselet::feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void WarGrey::STEM::Ellipselet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     short rx = fl2fx<short>(this->aradius) - 1;
     short ry = fl2fx<short>(this->bradius) - 1;
 
@@ -311,12 +313,12 @@ void WarGrey::STEM::RegularPolygonlet::resize(float w, float h) {
         float a = w * 0.5F;
         float b = h * 0.5F;
 
-	if ((this->aradius != a) || (this->bradius != b)) {
+	    if ((this->aradius != a) || (this->bradius != b)) {
             this->aradius = a;
             this->bradius = b;
             this->initialize_vertice();
-	    this->construct();
-	}
+	        this->construct();
+	    }
     }
 }
 
@@ -328,7 +330,7 @@ void WarGrey::STEM::RegularPolygonlet::draw_shape(SDL_Renderer* renderer, int wi
     aapolygonRGBA(renderer, this->xs, this->ys, this->n, r, g, b, a);
 }
 
-void WarGrey::STEM::RegularPolygonlet::feed_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void WarGrey::STEM::RegularPolygonlet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     filledPolygonRGBA(renderer, this->xs, this->ys, this->n, r, g, b, a);
     aapolygonRGBA(renderer, this->xs, this->ys, this->n, r, g, b, a);
 }
