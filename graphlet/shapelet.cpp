@@ -67,7 +67,7 @@ void WarGrey::STEM::IShapelet::feed_extent(float x, float y, float* w, float* h)
     if (this->geometry == nullptr) {
 	    SET_VALUES(w, 0.0F, h, 0.0F);
     } else {
-	    SET_VALUES(w, this->geometry->w, h, this->geometry->h);
+	    SET_VALUES(w, float(this->geometry->w), h, float(this->geometry->h));
     }
 }
 
@@ -137,18 +137,20 @@ void WarGrey::STEM::Linelet::feed_shape_extent(float* width, float* height) {
 }
 
 void WarGrey::STEM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    float x0 = 0.0F;
-    float y0 = 0.0F;
+    int x0 = 0;
+    int y0 = 0;
+    int xn = fl2fxi(this->epx);
+    int yn = fl2fxi(this->epy);
 
     if (this->epx < 0.0F) {
-        x0 = -this->epx;
+        x0 = -xn;
     }
 
     if (this->epy < 0.0F) {
-        y0 = -this->epy;
+        y0 = -yn;
     }
 
-    aalineRGBA(renderer, x0, y0, x0 + this->epx, y0 + this->epy, r, g, b, a);
+    aalineRGBA(renderer, x0, y0, x0 + xn, y0 + yn, r, g, b, a);
 }
 
 /*************************************************************************************************/
