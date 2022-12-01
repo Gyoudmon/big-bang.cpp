@@ -280,54 +280,10 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
 
             this->notify_updated();
             this->on_matter_ready(m);
-            this->end_update_sequence();
         } else {
             this->notify_updated(); // is it necessary?
-            this->end_update_sequence();
         }
-    }
-}
-
-void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
-    if (m->info == nullptr) {
-        MatterInfo* tinfo = plane_matter_info(this, target);
-        float x = 0.0F;
-        float y = 0.0F;
-
-        // TODO: what if the target matter is not ready?
-
-        if ((tinfo != nullptr) && unsafe_matter_unmasked(tinfo, this->mode)) {
-            float tsx, tsy, tsw, tsh;
-
-            unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
-            x = tsx + tsw * tfx;
-            y = tsy + tsh * tfy;
-        }
-
-        this->insert_at(m, x, y, fx, fy, dx, dy);
-    }
-}
-
-void WarGrey::STEM::Plane::insert_at(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
-    if (m->info == nullptr) {
-        MatterInfo* xinfo = plane_matter_info(this, xtarget);
-        MatterInfo* yinfo = plane_matter_info(this, ytarget);
-        float x = 0.0F;
-        float y = 0.0F;
-
-        // TODO: what if the target matter is not ready?
-
-        if ((xinfo != nullptr) && unsafe_matter_unmasked(xinfo, this->mode)
-            && (yinfo != nullptr) && unsafe_matter_unmasked(yinfo, this->mode)) {
-            float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
-
-            unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
-            unsafe_feed_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
-            x = xsx + xsw * xfx;
-            y = ysy + ysh * yfy;
-        }
-
-        this->insert_at(m, x, y, fx, fy, dx, dy);
+        this->end_update_sequence();
     }
 }
 
@@ -1136,39 +1092,6 @@ void WarGrey::STEM::IPlane::insert_at(IMatter* m, float x, float y, MatterAnchor
     matter_anchor_fraction(a, &fx, &fy);
 
     this->insert_at(m, x, y, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
-    float tfx, tfy, fx, fy;
-
-    matter_anchor_fraction(ta, &tfx, &tfy);
-    matter_anchor_fraction(a, &fx, &fy);
-
-    this->insert_at(m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-
-    this->insert_at(m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
-    float tfx, tfy;
-
-    matter_anchor_fraction(ta, &tfx, &tfy);
-    
-    this->insert_at(m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::insert_at(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-
-    this->insert_at(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
 
 void WarGrey::STEM::IPlane::move_to(IMatter* m, float x, float y, MatterAnchor a, float dx, float dy) {

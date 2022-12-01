@@ -23,34 +23,8 @@ namespace WarGrey::STEM {
             virtual void after_select(IMatter* g, bool on_or_off) {}
 
         public:
-            template<class G>
-            G* insert(G* g, float x = 0.0F, float y = 0.0F, MatterAnchor a = MatterAnchor::LT) {
-                return this->plane->insert(g, x, y, a);
-            }
-
-        public:
             bool feed_matter_location(IMatter* g, float* x, float* y, MatterAnchor a) {
                 return this->plane->feed_matter_location(g, x, y, a);
-            }
-
-            void insert_at(IMatter* g, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F) {
-                this->plane->insert_at(g, x, y, a, dx, dy);
-            }
-
-            void insert_at(IMatter* g, IMatter* tg, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F) {
-                this->plane->insert_at(g, tg, ta, a, dx, dy);
-            }
-
-            void insert_at(IMatter* g, IMatter* tg, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) {
-                this->plane->insert_at(g, tg, ta, fx, fy, dx, dy);
-            }
-
-            void insert_at(IMatter* g, IMatter* tg, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F) {
-                this->plane->insert_at(g, tg, tfx, tfy, a, dx, dy);
-            }
-
-            void insert_at(IMatter* g, IMatter* xtg, float xfx, IMatter* ytg, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F) {
-                this->plane->insert_at(g, xtg, xfx, ytg, yfy, a, dx, dy);
             }
 
             void move(IMatter* g, float x, float y) {
@@ -83,6 +57,12 @@ namespace WarGrey::STEM {
 
             void erase() {
                 this->plane->erase();
+            }
+        
+        public:
+            template<class M>
+            M* insert(M* m, float x = 0.0F, float y = 0.0F, MatterAnchor a = MatterAnchor::LT, float dx = 0.0F, float dy = 0.0F) {
+                return this->plane->insert(m, x, y, a, dx, dy);
             }
 
         protected:

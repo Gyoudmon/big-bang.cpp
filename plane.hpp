@@ -40,16 +40,14 @@ namespace WarGrey::STEM {
         
         public:
             virtual WarGrey::STEM::IMatter* find_matter(float x, float y) = 0;
-            virtual bool feed_matter_location(IMatter* m, float* x, float* y, float fx = 0.0F, float fy = 0.0F) = 0;
+            virtual bool feed_matter_location(IMatter* m, float* x, float* y, float fx, float fy) = 0;
             virtual bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) = 0;
             virtual void feed_matters_boundary(float* x, float* y, float* width, float* height) = 0;
-            virtual void insert_at(IMatter* m, float x = 0.0F, float y = 0.0F, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) = 0;
-            virtual void insert_at(IMatter* m, IMatter* tg, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) = 0;
-            virtual void insert_at(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) = 0;
+            virtual void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
             virtual void move(IMatter* m, float x, float y) = 0;
-            virtual void move_to(IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) = 0;
-            virtual void move_to(IMatter* m, IMatter* tg, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) = 0;
-            virtual void move_to(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) = 0;
+            virtual void move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
+            virtual void move_to(IMatter* m, IMatter* tg, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
+            virtual void move_to(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, float fx, float fy, float dx, float dy) = 0;
             virtual void remove(IMatter* m) = 0;
             virtual void erase() = 0;
 
@@ -123,10 +121,6 @@ namespace WarGrey::STEM {
         public:
             bool feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a);
             void insert_at(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-            void insert_at(IMatter* m, IMatter* tg, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-            void insert_at(IMatter* m, IMatter* tg, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
-            void insert_at(IMatter* m, IMatter* tg, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-            void insert_at(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
             void move_to(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
             void move_to(IMatter* m, IMatter* tg, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
             void move_to(IMatter* m, IMatter* tg, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
@@ -134,11 +128,11 @@ namespace WarGrey::STEM {
             void move_to(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
 
         public:
-            template<class G>
-            G* insert(G* g, float x = 0.0F, float y = 0.0F, MatterAnchor a = MatterAnchor::LT) {
-                this->insert_at(g, x, y, a);
+            template<class M>
+            M* insert(M* m, float x = 0.0F, float y = 0.0F, MatterAnchor a = MatterAnchor::LT, float dx = 0.0F, float dy = 0.0F) {
+                this->insert_at(m, x, y, a, dx, dy);
 
-                return g;
+                return m;
             }
 
         public:
@@ -176,9 +170,7 @@ namespace WarGrey::STEM {
             bool feed_matter_location(IMatter* m, float* x, float* y, float fx = 0.0F, float fy = 0.0F) override;
             bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) override;
             void feed_matters_boundary(float* x, float* y, float* width, float* height) override;
-            void insert_at(IMatter* m, float x = 0.0F, float y = 0.0F, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
-            void insert_at(IMatter* m, IMatter* tg, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
-            void insert_at(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
+            void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) override;
             void move(IMatter* m, float x, float y) override;
             void move_to(IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
             void move_to(IMatter* m, IMatter* tg, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
