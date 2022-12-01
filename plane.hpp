@@ -106,9 +106,9 @@ namespace WarGrey::STEM {
 
         public:
             void begin_update_sequence();
-            bool in_update_sequence();
+            bool is_in_update_sequence();
             void end_update_sequence();
-            bool needs_update();
+            bool should_update();
             void notify_updated();
 
         public:

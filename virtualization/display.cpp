@@ -21,7 +21,7 @@ bool WarGrey::STEM::IDisplay::save_snapshot(const char* pname) {
 
 /*************************************************************************************************/
 void WarGrey::STEM::IDisplay::notify_updated() {
-    if (this->in_update_sequence()) {
+    if (this->is_in_update_sequence()) {
         this->update_is_needed = true;
     } else {
         this->refresh();
@@ -35,12 +35,11 @@ void WarGrey::STEM::IDisplay::end_update_sequence() {
     if (this->update_sequence_depth < 1) {
         this->update_sequence_depth = 0;
 
-        if (this->update_is_needed) {
+        if (this->should_update()) {
             this->refresh();
             this->update_is_needed = false;
         }
     }
-
 }
 
 /*************************************************************************************************/

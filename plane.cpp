@@ -131,11 +131,12 @@ static bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x
 
 static bool unsafe_move_matter_via_info(Plane* master, IMatter* m, MatterInfo* info
     , float x, float y, float fx, float fy, float dx, float dy) {
-    float sx, sy, sw, sh;
     float ax = 0.0F;
     float ay = 0.0F;
     
     if (m->ready()) {
+        float sx, sy, sw, sh;
+        
         unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
         ax = (sw * fx);
         ay = (sh * fy);
@@ -504,8 +505,8 @@ IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
 }
 
 bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, float fx, float fy) {
-    bool okay = false;
     MatterInfo* info = plane_matter_info(this, m);
+    bool okay = false;
     
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
@@ -521,9 +522,9 @@ bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, 
 }
 
 bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) {
-    bool okay = false;
     MatterInfo* info = plane_matter_info(this, m);
-
+    bool okay = false;
+    
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
         float sx, sy, sw, sh;
             
@@ -935,7 +936,7 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     float dsHeight = Y + Height;
     
     if (this->bg_alpha > 0.0F) {
-        game_fill_rect(renderer, X, Y, Width, Height, this->background, this->bg_alpha);
+        game_fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background, this->bg_alpha);
     }
 
     if (this->head_matter != nullptr) {
@@ -1047,8 +1048,8 @@ void WarGrey::STEM::IPlane::begin_update_sequence() {
     }
 }
 
-bool WarGrey::STEM::IPlane::in_update_sequence() {
-    return ((this->info != nullptr) && this->info->master->in_update_sequence());
+bool WarGrey::STEM::IPlane::is_in_update_sequence() {
+    return ((this->info != nullptr) && this->info->master->is_in_update_sequence());
 }
 
 void WarGrey::STEM::IPlane::end_update_sequence() {
@@ -1057,8 +1058,8 @@ void WarGrey::STEM::IPlane::end_update_sequence() {
     }
 }
 
-bool WarGrey::STEM::IPlane::needs_update() {
-    return ((this->info != nullptr) && this->info->master->needs_update());
+bool WarGrey::STEM::IPlane::should_update() {
+    return ((this->info != nullptr) && this->info->master->should_update());
 }
 
 void WarGrey::STEM::IPlane::notify_updated() {
@@ -1072,14 +1073,9 @@ SDL_Surface* WarGrey::STEM::IPlane::snapshot(float width, float height, uint32_t
 }
 
 SDL_Surface* WarGrey::STEM::IPlane::snapshot(float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
-    static SDL_Surface* photograph = nullptr;
-    SDL_Renderer* renderer = nullptr;
+    SDL_Surface* photograph = nullptr;
     int saved_bgc = this->background;
     float saved_alpha = this->bg_alpha;
-
-    if (photograph != nullptr) {
-        SDL_FreeSurface(photograph);
-    }
 
     if (x != 0.0F) width += x;
     if (y != 0.0F) height += y;
@@ -1087,19 +1083,20 @@ SDL_Surface* WarGrey::STEM::IPlane::snapshot(float x, float y, float width, floa
     photograph = game_blank_image(width, height);
 
     if (photograph != nullptr) {
-        renderer = SDL_CreateSoftwareRenderer(photograph);
+        SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(photograph);
         
         if (renderer != nullptr) {
             this->background = bgcolor;
             this->bg_alpha = alpha;
+            
             this->draw(renderer, -x, -y, width, height);
             SDL_RenderPresent(renderer);
             SDL_DestroyRenderer(renderer);
+
+            this->background = saved_bgc;
+            this->bg_alpha = saved_alpha;
         }
     }
-
-    this->background = saved_bgc;
-    this->bg_alpha = saved_alpha;
 
     return photograph;
 }
@@ -1117,7 +1114,12 @@ bool WarGrey::STEM::IPlane::save_snapshot(const std::string& png, float x, float
 }
 
 bool WarGrey::STEM::IPlane::save_snapshot(const char* png, float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
-    return game_save_image(this->snapshot(x, y, width, height, bgcolor, alpha), png);
+    SDL_Surface* photograph = this->snapshot(x, y, width, height, bgcolor, alpha);
+    bool okay = game_save_image(photograph, png);
+    
+    SDL_FreeSurface(photograph);
+
+    return okay;
 }
 
 bool WarGrey::STEM::IPlane::feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a) {

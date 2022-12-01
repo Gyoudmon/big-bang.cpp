@@ -16,9 +16,9 @@ namespace WarGrey::STEM {
         
         public:
             void begin_update_sequence() override { this->_display->begin_update_sequence(); }
-            bool in_update_sequence() override { return this->_display->in_update_sequence(); }
+            bool is_in_update_sequence() override { return this->_display->is_in_update_sequence(); }
             void end_update_sequence() override { this->_display->end_update_sequence(); }
-            bool needs_update() override { return this->_display->needs_update(); }
+            bool should_update() override { return this->_display->should_update(); }
             void notify_updated() override { this->_display->notify_updated(); }
 
         public:

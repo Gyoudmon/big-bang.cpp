@@ -17,9 +17,9 @@ namespace WarGrey::STEM {
             
         public:
             virtual void begin_update_sequence() = 0;
-            virtual bool in_update_sequence() = 0;
+            virtual bool is_in_update_sequence() = 0;
             virtual void end_update_sequence() = 0;
-            virtual bool needs_update() = 0;
+            virtual bool should_update() = 0;
             virtual void notify_updated() = 0;
 
         public:

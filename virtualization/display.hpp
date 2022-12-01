@@ -21,9 +21,9 @@ namespace WarGrey::STEM {
 
         public:
             void begin_update_sequence() { this->update_sequence_depth += 1; }
-            bool in_update_sequence() { return (this->update_sequence_depth > 0); }
+            bool is_in_update_sequence() { return (this->update_sequence_depth > 0); }
             void end_update_sequence();
-            bool needs_update() { return this->update_is_needed; }
+            bool should_update() { return this->update_is_needed; }
             void notify_updated();
 
         public:
