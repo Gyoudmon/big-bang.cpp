@@ -45,13 +45,13 @@ void WarGrey::STEM::IShapelet::construct() {
             RGB_SetRenderDrawColor(renderer, this->alpha_color_key);
             SDL_RenderClear(renderer);
     
-            if (color >= 0) {
-                RGB_FromHexadecimal(color, &r, &g, &b);
+            if (this->color >= 0) {
+                RGB_FromHexadecimal(this->color, &r, &g, &b);
                 this->fill_shape(renderer, width, height, r, g, b, 0xFFU);
             }
 
-            if (border_color >= 0) {
-                RGB_FromHexadecimal(border_color, &r, &g, &b);
+            if (this->border_color >= 0) {
+                RGB_FromHexadecimal(this->border_color, &r, &g, &b);
                 this->draw_shape(renderer, width, height, r, g, b, 0xFFU);
             }
         
@@ -220,7 +220,7 @@ void WarGrey::STEM::RoundedRectanglet::fill_shape(SDL_Renderer* renderer, int wi
         rad = -flmin(this->width, this->height) * rad;
     }
     
-    roundedBoxRGBA(renderer, 1, 1, width - 1, height - 1, fl2fxi(this->radius), r, g, b, a);
+    roundedBoxRGBA(renderer, 1, 1, width - 1, height - 1, fl2fxi(rad), r, g, b, a);
 }
 
 /*************************************************************************************************/
@@ -292,8 +292,8 @@ WarGrey::STEM::RegularPolygonlet::~RegularPolygonlet() {
 
 void WarGrey::STEM::RegularPolygonlet::initialize_vertice() {
     // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
-    float start = degrees_to_radians(rotation);
-    float delta = 2.0F * pi_f / float(n);
+    float start = degrees_to_radians(this->rotation);
+    float delta = 2.0F * pi_f / float(this->n);
     float rx = this->aradius - 0.5F;
     float ry = this->bradius - 0.5F;
 

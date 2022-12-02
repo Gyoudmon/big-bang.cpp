@@ -5,8 +5,8 @@
 #include "movable.hpp"
 
 namespace WarGrey::STEM {
-    class Sprite : public WarGrey::STEM::IMatter, public WarGrey::STEM::IMovable {
+    class ISprite : public WarGrey::STEM::IMatter, public WarGrey::STEM::IMovable {
         public:
-            Sprite();
+            ISprite();
     };
 }

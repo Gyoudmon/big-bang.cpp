@@ -10,28 +10,28 @@ namespace {
 
         public:
             void load(float Width, float Height) override {
-                master->load(Width, Height);
+                this->master->load(Width, Height);
             }
 
         public:
             bool can_interactive_move(IMatter* g, float local_x, float local_y) override {
-                return master->can_interactive_move(g, local_x, local_y);
+                return this->master->can_interactive_move(g, local_x, local_y);
             }
 
             bool can_select(IMatter* g) override {
-                return master->can_select(g);
+                return this->master->can_select(g);
             }
 
             bool can_select_multiple() override {
-                return master->can_select_multiple();
+                return this->master->can_select_multiple();
             }
 
             void before_select(IMatter* g, bool on_or_off) override {
-                return master->before_select(g, on_or_off);
+                return this->master->before_select(g, on_or_off);
             }
 
             void after_select(IMatter* g, bool on_or_off) override {
-                return master->after_select(g, on_or_off);
+                return this->master->after_select(g, on_or_off);
             }
 
         private:
@@ -44,4 +44,3 @@ WarGrey::STEM::World::World(const char* title, int fps, uint32_t fgc, uint32_t b
     this->plane = new WorldPlane(this, title, initial_mode);
     this->push_plane(this->plane);
 }
-

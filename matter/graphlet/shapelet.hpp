@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphlet.hpp"
+#include "../graphlet.hpp"
 #include "../movable.hpp"
 
 namespace WarGrey::STEM {
@@ -88,6 +88,12 @@ namespace WarGrey::STEM {
 	        float height;
     };
 
+    class Squarelet : public WarGrey::STEM::Rectanglet {
+        public:
+            Squarelet(float edge_size, int32_t color, int32_t border_color = -1)
+                : Rectanglet(edge_size, color, border_color) {}
+    };
+
     class RoundedRectanglet : public WarGrey::STEM::IShapelet {
         public:
 	        RoundedRectanglet(float edge_size, float radius, int32_t color, int32_t border_color = -1);
@@ -105,6 +111,12 @@ namespace WarGrey::STEM {
 	        float width;
 	        float height;
             float radius;
+    };
+
+    class RoundedSquarelet : public WarGrey::STEM::RoundedRectanglet {
+        public:
+            RoundedSquarelet(float edge_size, float radius, int32_t color, int32_t border_color = -1)
+                : RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
     };
 
     class Ellipselet : public WarGrey::STEM::IShapelet {

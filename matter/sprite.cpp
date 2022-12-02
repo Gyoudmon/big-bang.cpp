@@ -3,7 +3,6 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-WarGrey::STEM::Sprite::Sprite() {
+WarGrey::STEM::ISprite::ISprite() {
     this->_sprite = this;
 }
-
