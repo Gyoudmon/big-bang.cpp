@@ -897,30 +897,30 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
 
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
-        float gx, gy, gwidth, gheight;
+        float mx, my, mwidth, mheight;
         SDL_Rect clip;
         
         do {
             MatterInfo* info = MATTER_INFO(child);
 
             if (unsafe_matter_unmasked(info, this->mode)) {
-                child->feed_extent(info->x, info->y, &gwidth, &gheight);
+                child->feed_extent(info->x, info->y, &mwidth, &mheight);
 
-                gx = (info->x + this->translate_x) * this->scale_x + X;
-                gy = (info->y + this->translate_y) * this->scale_y + Y;
+                mx = (info->x + this->translate_x) * this->scale_x + X;
+                my = (info->y + this->translate_y) * this->scale_y + Y;
                 
-                if (rectangle_overlay(gx, gy, gx + gwidth, gy + gheight, dsX, dsY, dsWidth, dsHeight)) {
-                    clip.x = fl2fxi(flfloor(gx));
-                    clip.y = fl2fxi(flfloor(gy));
-                    clip.w = fl2fxi(flceiling(gwidth));
-                    clip.h = fl2fxi(flceiling(gheight));
+                if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
+                    clip.x = fl2fxi(flfloor(mx));
+                    clip.y = fl2fxi(flfloor(my));
+                    clip.w = fl2fxi(flceiling(mwidth));
+                    clip.h = fl2fxi(flceiling(mheight));
 
                     SDL_RenderSetClipRect(renderer, &clip);
-                    child->draw(renderer, gx, gy, gwidth, gheight);
+                    child->draw(renderer, mx, my, mwidth, mheight);
 
                     if (info->selected) {
                         SDL_RenderSetClipRect(renderer, nullptr);
-                        this->draw_visible_selection(renderer, gx, gy, gwidth, gheight);
+                        this->draw_visible_selection(renderer, mx, my, mwidth, mheight);
                     }
                 }
             }
@@ -1134,4 +1134,3 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMa
 
     this->move_to(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
-

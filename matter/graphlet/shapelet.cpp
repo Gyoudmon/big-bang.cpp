@@ -175,11 +175,11 @@ void WarGrey::STEM::Rectanglet::feed_shape_extent(float* w, float* h) {
 }
 
 void WarGrey::STEM::Rectanglet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    rectangleRGBA(renderer, 1, 1, width - 1, height - 1, r, g, b, a);
+    rectangleRGBA(renderer, 0, 0, width, height, r, g, b, a);
 }
 
 void WarGrey::STEM::Rectanglet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    boxRGBA(renderer, 1, 1, width - 1, height - 1, r, g, b, a);
+    boxRGBA(renderer, 0, 0, width, height, r, g, b, a);
 }
 
 /*************************************************************************************************/
@@ -210,7 +210,7 @@ void WarGrey::STEM::RoundedRectanglet::draw_shape(SDL_Renderer* renderer, int wi
         rad = -flmin(this->width, this->height) * rad;
     }
 
-    roundedRectangleRGBA(renderer, 1, 1, width - 1, height - 1, fl2fxi(rad), r, g, b, a);
+    roundedRectangleRGBA(renderer, 0, 0, width, height, fl2fxi(rad), r, g, b, a);
 }
 
 void WarGrey::STEM::RoundedRectanglet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -220,7 +220,7 @@ void WarGrey::STEM::RoundedRectanglet::fill_shape(SDL_Renderer* renderer, int wi
         rad = -flmin(this->width, this->height) * rad;
     }
     
-    roundedBoxRGBA(renderer, 1, 1, width - 1, height - 1, fl2fxi(rad), r, g, b, a);
+    roundedBoxRGBA(renderer, 0, 0, width, height, fl2fxi(rad), r, g, b, a);
 }
 
 /*************************************************************************************************/
