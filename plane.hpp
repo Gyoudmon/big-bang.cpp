@@ -46,8 +46,8 @@ namespace WarGrey::STEM {
             virtual void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
             virtual void move(IMatter* m, float x, float y) = 0;
             virtual void move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
-            virtual void move_to(IMatter* m, IMatter* tg, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
-            virtual void move_to(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, float fx, float fy, float dx, float dy) = 0;
+            virtual void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
+            virtual void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx, float fy, float dx, float dy) = 0;
             virtual void remove(IMatter* m) = 0;
             virtual void erase() = 0;
 
@@ -122,10 +122,10 @@ namespace WarGrey::STEM {
             bool feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a);
             void insert_at(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
             void move_to(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-            void move_to(IMatter* m, IMatter* tg, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-            void move_to(IMatter* m, IMatter* tg, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
-            void move_to(IMatter* m, IMatter* tg, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-            void move_to(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+            void move_to(IMatter* m, IMatter* tm, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+            void move_to(IMatter* m, IMatter* tm, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
+            void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+            void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
 
         public:
             template<class M>
@@ -173,8 +173,8 @@ namespace WarGrey::STEM {
             void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) override;
             void move(IMatter* m, float x, float y) override;
             void move_to(IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
-            void move_to(IMatter* m, IMatter* tg, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
-            void move_to(IMatter* m, IMatter* xtg, float xfx, IMatter* ytg, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
+            void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
+            void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
             void remove(IMatter* m) override;
             void erase() override;
             void size_cache_invalid();

@@ -40,8 +40,8 @@ namespace {
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::World::World(const char* title, int fps, uint32_t fgc, uint32_t bgc) : Cosmos(fps, fgc, bgc) {
-    this->plane = new WorldPlane(this, title);
+WarGrey::STEM::World::World(const char* title, int fps, uint32_t fgc, uint32_t bgc, unsigned int initial_mode) : Cosmos(fps, fgc, bgc) {
+    this->plane = new WorldPlane(this, title, initial_mode);
     this->push_plane(this->plane);
 }
 
