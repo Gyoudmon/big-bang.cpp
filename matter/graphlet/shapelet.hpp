@@ -1,7 +1,7 @@
 #pragma once
 
 #include "graphlet.hpp"
-#include "../matter/movable.hpp"
+#include "../movable.hpp"
 
 namespace WarGrey::STEM {
     class IShapelet : public WarGrey::STEM::IGraphlet, public WarGrey::STEM::IMovable {
@@ -157,4 +157,3 @@ namespace WarGrey::STEM {
             short* ys = nullptr;
     };
 }
-

@@ -1,12 +1,12 @@
 #include "textlet.hpp"
 
-#include "../../graphics/font.hpp"
-#include "../../graphics/text.hpp"
-#include "../../graphics/colorspace.hpp"
-#include "../../graphics/geometry.hpp"
+#include "../../../graphics/font.hpp"
+#include "../../../graphics/text.hpp"
+#include "../../../graphics/colorspace.hpp"
+#include "../../../graphics/geometry.hpp"
 
-#include "../../datum/string.hpp"
-#include "../../datum/box.hpp"
+#include "../../../datum/string.hpp"
+#include "../../../datum/box.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -127,4 +127,3 @@ WarGrey::STEM::Labellet::Labellet(unsigned int color_hex, float alpha, const cha
     this->set_text_color(color_hex, alpha);
     this->set_text(caption);
 }
-

@@ -1,14 +1,14 @@
 #include "shapelet.hpp"
 
-#include "../graphics/image.hpp"
-#include "../graphics/geometry.hpp"
-#include "../graphics/colorspace.hpp"
+#include "../../graphics/image.hpp"
+#include "../../graphics/geometry.hpp"
+#include "../../graphics/colorspace.hpp"
 
-#include "../physics/mathematics.hpp"
+#include "../../physics/mathematics.hpp"
 
-#include "../datum/box.hpp"
-#include "../datum/flonum.hpp"
-#include "../datum/fixnum.hpp"
+#include "../../datum/box.hpp"
+#include "../../datum/flonum.hpp"
+#include "../../datum/fixnum.hpp"
 
 // https://www.ferzkopp.net/Software/SDL2_gfx/Docs/html/index.html
 #include <SDL2/SDL2_gfxPrimitives.h>
@@ -336,4 +336,3 @@ void WarGrey::STEM::RegularPolygonlet::fill_shape(SDL_Renderer* renderer, int wi
     filledPolygonRGBA(renderer, this->xs, this->ys, this->n, r, g, b, a);
     aapolygonRGBA(renderer, this->xs, this->ys, this->n, r, g, b, a);
 }
-

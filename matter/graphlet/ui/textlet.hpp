@@ -7,7 +7,7 @@
 
 #include "../graphlet.hpp"
 
-#include "../../graphics/named_colors.hpp"
+#include "../../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
     class ITextlet : public virtual WarGrey::STEM::IGraphlet {
@@ -52,4 +52,3 @@ namespace WarGrey::STEM {
             Labellet(TTF_Font* font, unsigned int color_hex, float alpha, const char* fmt, ...);
     };
 }
-
