@@ -686,7 +686,7 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
     }
 }
 
-bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) {
+bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) {
     bool handled = false;
 
     switch (clicks) {
@@ -713,7 +713,7 @@ bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, 
     return handled;
 }
 
-bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, float dx, float dy, bool touch) {
+bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, float dx, float dy) {
     bool handled = false;
 
     if (state == 0) {
@@ -747,7 +747,7 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
     return handled;
 }
 
-bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y, uint8_t clicks, bool touch) {
+bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) {
     bool handled = false;
 
     switch (clicks) {

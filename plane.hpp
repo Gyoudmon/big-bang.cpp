@@ -61,9 +61,9 @@ namespace WarGrey::STEM {
             void log_message(const char* fmt, ...);
 
         public:
-            virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) { return false; }
-            virtual bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks, bool touch) { return false; }
-            virtual bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy, bool touch) { return false; }
+            virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) { return false; }
+            virtual bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) { return false; }
+            virtual bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy) { return false; }
             virtual bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) { return false; }
 
         public:
@@ -180,9 +180,9 @@ namespace WarGrey::STEM {
             void size_cache_invalid();
 
         public:
-            bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks, bool touch) override;
-            bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy, bool touch) override;
-            bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks, bool touch) override;
+            bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) override;
+            bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy) override;
+            bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) override;
             bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) override;
             
             void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
