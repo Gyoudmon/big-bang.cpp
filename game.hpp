@@ -2,11 +2,14 @@
 
 #include <SDL2/SDL.h>
 
-#include "world.hpp"
-
+#include "graphics/colorspace.hpp"
 #include "graphics/named_colors.hpp"
 #include "graphics/geometry.hpp"
 #include "graphics/font.hpp"
+#include "graphics/text.hpp"
+
+#include "world.hpp"
+#include "matter/graphlet/ui/textlet.hpp"
 
 /**
  * 为兼容 Windows 而变得丑陋
@@ -21,4 +24,3 @@
 #ifdef main
 #undef main
 #endif
-

@@ -21,6 +21,7 @@ namespace WarGrey::STEM {
      *  Do not `delete` it on your own.
      */
     class IPlane {
+        friend class WarGrey::STEM::Cosmos;
         public:
             virtual ~IPlane();
             IPlane(const std::string& name);
@@ -61,26 +62,6 @@ namespace WarGrey::STEM {
             void log_message(const char* fmt, ...);
 
         public:
-            virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) { return false; }
-            virtual bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) { return false; }
-            virtual bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy) { return false; }
-            virtual bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) { return false; }
-
-        public:
-            virtual void on_focus(WarGrey::STEM::IMatter* m, bool on_off) {}
-            virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
-            virtual void on_text(const char* text, size_t size, bool entire) {}
-            virtual void on_editing_text(const char* text, int pos, int span) {}
-            virtual void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {}
-            virtual void on_hover(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
-            virtual void on_goodbye(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
-            virtual void on_tap(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
-            virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
-
-            virtual void on_save() {}
-
-        public:
-            virtual void draw_visible_selection(SDL_Renderer* renderer, float X, float Y, float width, float height) = 0;
             virtual IMatter* find_next_selected_matter(IMatter* start = nullptr) = 0;
             virtual IMatter* thumbnail_matter() = 0;
             virtual void add_selected(IMatter* m) = 0;
@@ -100,8 +81,7 @@ namespace WarGrey::STEM {
             virtual WarGrey::STEM::IMatter* get_focused_matter() = 0;
             virtual void set_caret_owner(IMatter* m) = 0;
             virtual void notify_matter_ready(IMatter* m) = 0;
-            virtual void on_matter_ready(IMatter* m) = 0;
-
+            
         public:
             void begin_update_sequence();
             bool is_in_update_sequence();
@@ -126,6 +106,30 @@ namespace WarGrey::STEM {
             void move_to(IMatter* m, IMatter* tm, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
             void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
             void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+
+        protected:
+            virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) { return false; }
+            virtual bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) { return false; }
+            virtual bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy) { return false; }
+            virtual bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) { return false; }
+
+        protected:
+            virtual void on_focus(WarGrey::STEM::IMatter* m, bool on_off) {}
+            virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
+            virtual void on_text(const char* text, size_t size, bool entire) {}
+            virtual void on_editing_text(const char* text, int pos, int span) {}
+            virtual void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {}
+            virtual void on_hover(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
+            virtual void on_goodbye(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
+            virtual void on_tap(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
+            virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
+
+        protected:
+            virtual void on_matter_ready(IMatter* m) = 0;
+            virtual void on_save() {}
+
+        protected:
+            virtual void draw_visible_selection(SDL_Renderer* renderer, float X, float Y, float width, float height) = 0;
 
         public:
             template<class M>
@@ -180,19 +184,6 @@ namespace WarGrey::STEM {
             void size_cache_invalid();
 
         public:
-            bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) override;
-            bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy) override;
-            bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) override;
-            bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) override;
-            
-            void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
-            void on_text(const char* text, size_t size, bool entire) override;
-            void on_editing_text(const char* text, int pos, int span) override;
-            void on_tap(WarGrey::STEM::IMatter* m, float x, float y) override;
-            void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
-
-        public:
-            void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
             IMatter* find_next_selected_matter(IMatter* start = nullptr) override;
             IMatter* thumbnail_matter() override { return nullptr; }
             void add_selected(IMatter* m) override;
@@ -205,6 +196,22 @@ namespace WarGrey::STEM {
             WarGrey::STEM::IMatter* get_focused_matter() override;
             void set_caret_owner(IMatter* m) override;
             void notify_matter_ready(IMatter* m) override;
+
+        protected:
+            void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
+            
+        protected:
+            bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) override;
+            bool on_pointer_move(uint32_t state, float x, float y, float dx, float dy) override;
+            bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) override;
+            bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) override;
+            
+            void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
+            void on_text(const char* text, size_t size, bool entire) override;
+            void on_editing_text(const char* text, int pos, int span) override;
+            void on_tap(WarGrey::STEM::IMatter* m, float x, float y) override;
+            void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
+
             void on_matter_ready(IMatter* m) override {}
 
         private:
@@ -230,4 +237,3 @@ namespace WarGrey::STEM {
             float scale_y = 1.0F;
     };
 }
-
