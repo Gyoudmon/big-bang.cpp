@@ -228,4 +228,3 @@ void WarGrey::STEM::Cosmos::on_save() {
         this->recent_plane->on_save();
     }
 }
-
