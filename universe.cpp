@@ -588,4 +588,3 @@ void WarGrey::STEM::Universe::on_elapse(uint32_t interval, uint32_t count, uint3
     this->update(interval, count, uptime);
     this->notify_updated();
 }
-

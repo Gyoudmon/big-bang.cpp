@@ -76,7 +76,7 @@ namespace WarGrey::STEM {
 
             virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {} // 处理键盘事件
             virtual void on_text(const char* text, size_t size, bool entire) {}                  // 处理文本输入事件
-            virtual void on_editing_text(const char* text, int pos, int span) {}                         // 处理文本输入事件
+            virtual void on_editing_text(const char* text, int pos, int span) {}                 // 处理文本输入事件
             
             virtual void on_save() {}                                                            // 处理保存事件
 
@@ -107,7 +107,7 @@ namespace WarGrey::STEM {
 
             /* 处理预设事件  */
             virtual void take_snapshot();
-        
+
         private:
             void do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height);
             bool display_usr_input_and_caret(SDL_Renderer* renderer, bool yes);
@@ -170,4 +170,3 @@ namespace WarGrey::STEM {
             void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) override;
     };
 }
-

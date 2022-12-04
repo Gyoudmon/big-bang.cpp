@@ -613,4 +613,3 @@ void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, flo
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
-
