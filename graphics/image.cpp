@@ -142,4 +142,3 @@ bool WarGrey::STEM::game_save_image(SDL_Surface* png, const char* pname) {
 
     return okay;
 }
-

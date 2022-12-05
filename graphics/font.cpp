@@ -83,22 +83,11 @@ TTF_Font* WarGrey::STEM::game_create_font(const char* face, int fontsize) {
     std::string face_key(face);
     TTF_Font* font = nullptr;
 
-#if defined(__macosx__)
-    int fs = fontsize / 2;
-    int dpi = 96 * 2;
-
-    if (system_fonts.find(face_key) == system_fonts.end()) {
-        font = TTF_OpenFontDPI(face, fs, dpi, dpi);
-    } else {
-        font = TTF_OpenFontDPI(system_fonts[face_key].c_str(), fs, dpi, dpi);
-    }
-#else
     if (system_fonts.find(face_key) == system_fonts.end()) {
         font = TTF_OpenFont(face, fontsize);
     } else {
         font = TTF_OpenFont(system_fonts[face_key].c_str(), fontsize);
     }
-#endif
 
     if (font == nullptr) {
         fprintf(stderr, "无法加载字体 '%s': %s\n", face, TTF_GetError());

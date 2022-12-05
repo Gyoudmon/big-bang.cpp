@@ -97,20 +97,40 @@ static void game_initialize(uint32_t flags, int fontsize = 16) {
     }
 }
 
-static SDL_Texture* game_create_texture(SDL_Window* window, SDL_Renderer* renderer) {
+static SDL_Texture* game_create_texture(SDL_Window* window, SDL_Renderer* renderer, float* backing_scale = nullptr) {
     SDL_Texture* texture;
-    int width, height;
+    int r_width, r_height;
 
-    SDL_GetWindowSize(window, &width, &height);
+    SDL_GetRendererOutputSize(renderer, &r_width, &r_height);
+
+    if (backing_scale != nullptr) {
+        int win_width, win_height;
+    
+        SDL_GetWindowSize(window, &win_width, &win_height);
+        (*backing_scale) = float(r_width) / float(win_width);
+    }
+
     Call_For_Variable(texture,
-        SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height),
+        SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, r_width, r_height),
         nullptr, "纹理创建失败: ", SDL_GetError);
 
     return texture;
 }
 
 static void game_create_world(int width, int height, SDL_Window** window, SDL_Renderer** renderer) {
-    uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
+    /**
+     * WARNING
+     *   Don't use `SDL_WINDOW_ALLOW_HIGHDPI` as it makes everything aliasing.
+     *   By default, SDL handles the scaling automatically.
+     *   With `SDL_WINDOW_ALLOW_HIGHDPI` you have to handle the scaling on your own.
+     *
+     * TODO:
+     *   Without `SDL_WINDOW_ALLOW_HIGHDPI`,
+     *   onscreen text looks either aliasing or blur
+     *   as TTF_Font has its own strategy of antialiasing...
+     */
+
+    uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 
     if ((width <= 0) || (height <= 0)) {
         if ((width <= 0) && (height <= 0))  {
@@ -423,6 +443,14 @@ void WarGrey::STEM::IUniverse::set_window_title(const char* fmt, ...) {
     this->set_window_title(title);
 }
 
+const char* WarGrey::STEM::IUniverse::get_renderer_name() {
+    SDL_RendererInfo rinfo;
+
+    SDL_GetRendererInfo(this->renderer, &rinfo);
+    
+    return rinfo.name; 
+}
+
 void WarGrey::STEM::IUniverse::set_window_size(int width, int height, bool centerize) {
     SDL_SetWindowSize(this->window, width, height);
 
@@ -438,8 +466,12 @@ void WarGrey::STEM::IUniverse::set_window_size(int width, int height, bool cente
     }
 }
 
-void WarGrey::STEM::IUniverse::feed_window_size(int* width, int* height) {
-    SDL_GetWindowSize(this->window, width, height);
+void WarGrey::STEM::IUniverse::feed_window_size(int* width, int* height, bool logical) {
+    if (logical) {
+        SDL_GetRendererOutputSize(this->renderer, width, height);
+    } else {
+        SDL_GetWindowSize(this->window, width, height);
+    }
 }
 
 void WarGrey::STEM::IUniverse::set_window_fullscreen(bool yes) {
@@ -458,7 +490,7 @@ void WarGrey::STEM::IUniverse::refresh() {
 void WarGrey::STEM::IUniverse::feed_extent(float* width, float* height) {
     int fxw, fxh;
 
-    SDL_GetWindowSize(this->window, &fxw, &fxh);
+    this->feed_window_size(&fxw, &fxh);
     SET_VALUES(width, float(fxw), height, float(fxh));
 }
 
@@ -466,7 +498,7 @@ void WarGrey::STEM::IUniverse::feed_extent(float* width, float* height) {
 void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int bgc, TTF_Font* font) {
     int width, height;
 
-    SDL_GetWindowSize(this->window, &width, &height);
+    this->feed_window_size(&width, &height);
 
     this->echo.y = height - cmdwinheight;
     this->echo.h = cmdwinheight;
