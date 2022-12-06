@@ -1,9 +1,6 @@
 #include "shapelet.hpp"
 
-#include "../../graphics/image.hpp"
-#include "../../graphics/geometry.hpp"
 #include "../../graphics/colorspace.hpp"
-
 #include "../../physics/mathematics.hpp"
 
 #include "../../datum/box.hpp"
@@ -76,18 +73,9 @@ void WarGrey::STEM::IShapelet::dirty_cached_position() {
 /*************************************************************************************************/
 WarGrey::STEM::Linelet::Linelet(float ex, float ey, int32_t color) : IShapelet(color, -1), epx(ex), epy(ey) {}
 
-void WarGrey::STEM::Linelet::resize(float w, float h) {
-    if ((w > 0.0F) && (h > 0.0F)) {
-        float width, height;
-        
-        this->feed_extent(0.0F, 0.0F, &width, &height);
-
-	    if ((width != w) || (height != h)) {
-            this->epx *= w / width;
-            this->epy *= h / height;
-            this->notify_updated();
-	    }
-    }
+void WarGrey::STEM::Linelet::on_resize(float w, float h, float width, float height) {
+    this->epx *= w / width;
+    this->epy *= h / height;
 }
 
 void WarGrey::STEM::Linelet::feed_extent(float x, float y, float* width, float* height) {
@@ -116,14 +104,9 @@ WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, int32_t color, int32_t bo
 WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), width(width), height(height) {}
 
-void WarGrey::STEM::Rectanglet::resize(float w, float h) {
-    if ((w > 0.0F) && (h > 0.0F)) {
-	    if ((this->width != w) || (this->height != h)) {
-            this->width = w;
-            this->height = h;
-	        this->notify_updated();
-	    }
-    }
+void WarGrey::STEM::Rectanglet::on_resize(float w, float h, float width, float height) {
+    this->width = w;
+    this->height = h;
 }
 
 void WarGrey::STEM::Rectanglet::feed_extent(float x, float y, float* w, float* h) {
@@ -145,14 +128,9 @@ WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float edge_size, float radiu
 WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, float radius, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), width(width), height(height), radius(radius) {}
 
-void WarGrey::STEM::RoundedRectanglet::resize(float w, float h) {
-    if ((w > 0.0F) && (h > 0.0F)) {
-	    if ((this->width != w) || (this->height != h)) {
-            this->width = w;
-            this->height = h;
-	        this->notify_updated();
-	    }
-    }
+void WarGrey::STEM::RoundedRectanglet::on_resize(float w, float h, float width, float height) {
+    this->width = w;
+    this->height = h;
 }
 
 void WarGrey::STEM::RoundedRectanglet::feed_extent(float x, float y, float* w, float* h) {
@@ -186,17 +164,9 @@ WarGrey::STEM::Ellipselet::Ellipselet(float radius, int32_t color, int32_t borde
 WarGrey::STEM::Ellipselet::Ellipselet(float a, float b, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), aradius(a), bradius(b) {}
 
-void WarGrey::STEM::Ellipselet::resize(float w, float h) {
-    if ((w > 0.0F) && (h > 0.0F)) {
-        float a = w * 0.5F;
-        float b = h * 0.5F;
-
-	    if ((this->aradius != a) || (this->bradius != b)) {
-            this->aradius = a;
-            this->bradius = b;
-	        this->notify_updated();
-	    }
-    }
+void WarGrey::STEM::Ellipselet::on_resize(float w, float h, float width, float height) {
+    this->aradius = w * 0.5F;
+    this->bradius = h * 0.5F;
 }
 
 void WarGrey::STEM::Ellipselet::feed_extent(float x, float y, float* w, float* h) {
@@ -299,29 +269,14 @@ void WarGrey::STEM::RegularPolygonlet::on_moved(float new_x, float new_y) {
     }
 }
 
-void WarGrey::STEM::RegularPolygonlet::resize(float w, float h) {
-    if ((w > 0.0F) && (h > 0.0F)) {
-        float flw, flh;
-        
-        this->feed_extent(0.0F, 0.0F, &flw, &flh);
-
-        if ((flw != w) || (flh != h)) {
-            this->aradius *= (w / flw);
-            this->bradius *= (h / flh);
-            this->initialize_vertice();
-            this->dirty_cached_position();
-	        this->notify_updated();
-	    }
-    }
+void WarGrey::STEM::RegularPolygonlet::on_resize(float w, float h, float width, float height) {
+    this->aradius *= (w / width);
+    this->bradius *= (h / height);
+    this->initialize_vertice();
+    this->dirty_cached_position();
 }
 
 void WarGrey::STEM::RegularPolygonlet::feed_extent(float x, float y, float* w, float* h) {
-    /**
-     * Please don't ask me why use `1.5F` here (All floats between 1.5 and 2.0 are okay)
-     *   If you see ugly onscreen polygons, try to resize the window by mouse,
-     *   you have chances to get a smooth shape
-     **/
-
     SET_VALUES(w, float(this->rx - this->lx) + 1.0F, h, float(this->by - this->ty) + 1.0F);
 }
 

@@ -33,7 +33,7 @@ namespace WarGrey::STEM {
             virtual void construct() {}
             virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
             virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
-            virtual void resize(float width, float height) {}
+            virtual void resize(float width, float height);
             virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
             virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
             virtual bool ready() { return true; }
@@ -94,6 +94,9 @@ namespace WarGrey::STEM {
             bool save_snapshot(const char* pname);
 
         protected:
+            virtual void on_resize(float width, float height, float old_width, float old_height) {}
+
+        protected:
             WarGrey::STEM::IMovable* _sprite = nullptr;
 
         private:
@@ -110,4 +113,3 @@ namespace WarGrey::STEM {
             float anchor_y = 0.0F;
     };
 }
-

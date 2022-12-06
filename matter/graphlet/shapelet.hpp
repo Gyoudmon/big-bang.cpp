@@ -46,9 +46,9 @@ namespace WarGrey::STEM {
 
 	    public:
             void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-            void resize(float width, float height) override;
-
+            
         protected:
+            void on_resize(float new_width, float new_height, float old_width, float old_height) override;
             void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override {}
             void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
@@ -75,9 +75,9 @@ namespace WarGrey::STEM {
 
 	    public:
             void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-	        void resize(float width, float height) override;
-
+	        
         protected:
+            void on_resize(float new_width, float new_height, float old_width, float old_height) override;
             void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
             void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
@@ -99,9 +99,9 @@ namespace WarGrey::STEM {
 
 	    public:
 	        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-	        void resize(float width, float height) override;
-
+	        
         protected:
+            void on_resize(float new_width, float new_height, float old_width, float old_height) override;
             void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
             void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
@@ -124,9 +124,9 @@ namespace WarGrey::STEM {
 
 	    public:
 	        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-	        void resize(float width, float height) override;
-
+	        
         protected:
+            void on_resize(float new_width, float new_height, float old_width, float old_height) override;
             void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
             void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
@@ -149,10 +149,10 @@ namespace WarGrey::STEM {
 
 	    public:
 	        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-	        void resize(float width, float height) override;
-
+	        
         protected:
             void on_moved(float new_x, float new_y) override;
+            void on_resize(float new_width, float new_height, float old_width, float old_height) override;
             void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
             void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
