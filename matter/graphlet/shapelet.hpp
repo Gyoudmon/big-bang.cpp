@@ -19,9 +19,6 @@ namespace WarGrey::STEM {
             void set_border_color(int32_t color);
             int32_t get_border_color() { return this->border_color; }
  
-        public:
-            virtual void feed_shape_origin(float* x, float* y);
-
         protected:
             virtual void on_moved(float new_x, float new_y) {}
             virtual void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
@@ -141,6 +138,25 @@ namespace WarGrey::STEM {
                 : Ellipselet(radius, radius, color, border_color) {}
     };
     
+    class Trianglet : public WarGrey::STEM::IShapelet {
+        public:
+	        Trianglet(float x2, float y2, float x3, float y3, int32_t color, int32_t border_color = -1);
+
+	    public:
+	        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+	        
+        protected:
+            void on_resize(float new_width, float new_height, float old_width, float old_height) override;
+            void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+            void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+
+        private:
+            float x2;
+            float y2;
+            float x3;
+            float y3;
+    };
+
     class RegularPolygonlet : public WarGrey::STEM::IShapelet {
         public:
 	        RegularPolygonlet(int n, float radius, int32_t color, int32_t border_color = -1);

@@ -24,10 +24,6 @@ WarGrey::STEM::IShapelet::IShapelet(int32_t color, int32_t bcolor) : color(color
     this->last_y = flnan_f;
 }
 
-void WarGrey::STEM::IShapelet::feed_shape_origin(float* x, float* y) {
-    SET_VALUES(x, 0.0F, y, 0.0F);
-}
-
 void WarGrey::STEM::IShapelet::set_border_color(int32_t color) {
     if (this->border_color != color) {
         this->border_color = color;
@@ -202,6 +198,44 @@ void WarGrey::STEM::Ellipselet::fill_shape(SDL_Renderer* renderer, int x, int y,
 }
 
 /*************************************************************************************************/
+WarGrey::STEM::Trianglet::Trianglet(float x2, float y2, float x3, float y3, int32_t color, int32_t border_color)
+	: IShapelet(color, border_color), x2(x2), y2(y2), x3(x3), y3(y3) {}
+
+void WarGrey::STEM::Trianglet::on_resize(float w, float h, float width, float height) {
+    float xratio = w / width;
+    float yratio = h / height;
+
+    this->x2 *= xratio;
+    this->y2 *= yratio;
+    this->x3 *= xratio;
+    this->y3 *= yratio;
+}
+
+void WarGrey::STEM::Trianglet::feed_extent(float x, float y, float* w, float* h) {
+    float xmin = flmin(0.0F, this->x2, this->x3);
+    float ymin = flmin(0.0F, this->y2, this->y3);
+    float xmax = flmax(0.0F, this->x2, this->x3);
+    float ymax = flmax(0.0F, this->y2, this->y3);
+
+    SET_VALUES(w, xmax - xmin + 1.0F, h, ymax - ymin + 1.0F);
+}
+
+void WarGrey::STEM::Trianglet::draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    x -= fl2fxi(flmin(0.0F, this->x2, this->x3));
+    y -= fl2fxi(flmin(0.0F, this->y2, this->y3));
+
+    aatrigonRGBA(renderer, x, y, fl2fxi(this->x2) + x, fl2fxi(this->y2) + y, fl2fxi(this->x3) + x, fl2fxi(this->y3) + y, r, g, b, a);
+}
+
+void WarGrey::STEM::Trianglet::fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    x -= fl2fxi(flmin(0.0F, this->x2, this->x3));
+    y -= fl2fxi(flmin(0.0F, this->y2, this->y3));
+    
+    filledTrigonRGBA(renderer, x, y, fl2fxi(this->x2) + x, fl2fxi(this->y2) + y, fl2fxi(this->x3) + x, fl2fxi(this->y3) + y, r, g, b, a);
+    aatrigonRGBA(renderer, x, y, fl2fxi(this->x2) + x, fl2fxi(this->y2) + y, fl2fxi(this->x3) + x, fl2fxi(this->y3) + y, r, g, b, a);
+}
+
+/*************************************************************************************************/
 WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, int32_t color, int32_t border_color)
 	: RegularPolygonlet(n, radius, 0.0F, color, border_color) {}
 
@@ -260,8 +294,8 @@ void WarGrey::STEM::RegularPolygonlet::initialize_vertice() {
 }
 
 void WarGrey::STEM::RegularPolygonlet::on_moved(float new_x, float new_y) {
-    int xoff = new_x - this->lx;
-    int yoff = new_y - this->ty;
+    float xoff = new_x - this->lx;
+    float yoff = new_y - this->ty;
 
     for (int idx = 0; idx < this->n; idx ++) {
         this->txs[idx] = fl2fx<short>(this->xs[idx] + xoff);
@@ -277,7 +311,7 @@ void WarGrey::STEM::RegularPolygonlet::on_resize(float w, float h, float width, 
 }
 
 void WarGrey::STEM::RegularPolygonlet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, float(this->rx - this->lx) + 1.0F, h, float(this->by - this->ty) + 1.0F);
+    SET_VALUES(w, this->rx - this->lx + 1.0F, h, this->by - this->ty + 1.0F);
 }
 
 void WarGrey::STEM::RegularPolygonlet::draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {

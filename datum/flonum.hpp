@@ -73,10 +73,14 @@ namespace WarGrey::STEM {
     double inline flexpt(double flb, double fle) { return std::pow(flb, fle); }
 
     float inline flmin(float f1, float f2) { return std::fmin(f1, f2); }
+    float inline flmin(float f1, float f2, float f3) { return std::fmin(std::fmin(f1, f2), f3); }
     double inline flmin(double fl1, double fl2) { return std::fmin(fl1, fl2); }
+    double inline flmin(double fl1, double fl2, double fl3) { return std::fmin(std::fmin(fl1, fl2), fl3); }
 
     float inline flmax(float f1, float f2) { return std::fmax(f1, f2); }
+    float inline flmax(float f1, float f2, float f3) { return std::fmax(std::fmax(f1, f2), f3); }
     double inline flmax(double fl1, double fl2) { return std::fmax(fl1, fl2); }
+    double inline flmax(double fl1, double fl2, double fl3) { return std::fmax(std::fmax(fl1, fl2), fl3); }
 
     float inline flround(float f) { return std::round(f); }
     double inline flround(double fl) { return std::round(fl); }
