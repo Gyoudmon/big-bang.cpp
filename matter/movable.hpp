@@ -11,7 +11,7 @@ namespace WarGrey::STEM {
             virtual void on_border(float hoffset, float voffset);
 
         public:
-            void set_speed(float spd, float deg);
+            void set_speed(float spd, float dir, bool is_rad = false);
             float x_speed() { return this->xspeed; }
             float y_speed() { return this->yspeed; }
 
@@ -30,4 +30,3 @@ namespace WarGrey::STEM {
             float yspeed = 0.0F;
     };
 }
-

@@ -9,8 +9,12 @@ WarGrey::STEM::IMovable::IMovable() {
     this->set_border_strategy(BorderStrategy::IGNORE);
 }
 
-void WarGrey::STEM::IMovable::set_speed(float spd, float dir_deg) {
-    float rad = degrees_to_radians(dir_deg);
+void WarGrey::STEM::IMovable::set_speed(float spd, float dir, bool is_radian) {
+    float rad = dir;
+    
+    if (!is_radian) {
+        rad = degrees_to_radians(dir);
+    }
 
     this->xspeed = spd * flcos(rad);
     this->yspeed = spd * flsin(rad);
@@ -80,4 +84,3 @@ void WarGrey::STEM::IMovable::motion_stop(bool horizon, bool vertical) {
         this->yspeed = 0.0F;
     }
 }
-
