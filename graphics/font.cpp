@@ -18,6 +18,8 @@ TTF_Font* WarGrey::STEM::game_font::unicode = nullptr;
 
 /*************************************************************************************************/
 static std::unordered_map<std::string, std::string> system_fonts;
+static std::unordered_map<std::string, std::string> basenames;
+
 static std::string system_fontdirs[] = {
     "/System/Library/Fonts",
     "/Library/Fonts",
@@ -91,6 +93,8 @@ TTF_Font* WarGrey::STEM::game_create_font(const char* face, int fontsize) {
 
     if (font == nullptr) {
         fprintf(stderr, "无法加载字体 '%s': %s\n", face, TTF_GetError());
+    } else {
+        basenames[std::string(TTF_FontFaceFamilyName(font))] = std::string(face);
     }
 
     return font;
@@ -134,4 +138,18 @@ const std::string* WarGrey::STEM::game_font_list(int* n, int fontsize) {
     }
 
     return (const std::string*)font_list;
+}
+
+const char* WarGrey::STEM::font_basename(const TTF_Font* font) {
+    if (font == nullptr) {
+        return font_basename(game_font::DEFAULT);
+    } else {
+        std::string family_name(TTF_FontFaceFamilyName(font));
+        
+        if (basenames.find(family_name) == basenames.end()) {
+            return nullptr;
+        } else {
+            return basenames[family_name].c_str();
+        }
+    }
 }

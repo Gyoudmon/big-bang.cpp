@@ -16,8 +16,6 @@ WarGrey::STEM::ITextlet::ITextlet() {
 }
 
 WarGrey::STEM::ITextlet::~ITextlet() {
-    game_font_destroy(this->text_font);
-
     if (this->text_surface != nullptr) {
         SDL_FreeSurface(this->text_surface);
     }
