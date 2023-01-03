@@ -33,7 +33,6 @@ namespace WarGrey::STEM {
             virtual void construct() {}
             virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
             virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
-            virtual void resize(float width, float height);
             virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
             virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
             virtual bool ready() { return true; }
@@ -56,6 +55,8 @@ namespace WarGrey::STEM {
             virtual bool on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) { return false; }
 
         public:
+            void resize(float ratio);
+            void resize(float width, float height);
             void enable_resizing(bool yes_no, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->can_resize = yes_no; this->resize_anchor = anchor; }
             bool resizable(WarGrey::STEM::MatterAnchor* anchor) { (*anchor) = this->resize_anchor; return this->can_resize; }
 

@@ -26,8 +26,17 @@ void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* 
     } else {
         SDL_Surface* custome = this->customes[this->current_custome_idx];
 
-        SET_BOX(width, float(custome->w));
-        SET_BOX(height, float(custome->h));
+        SET_BOX(width, float(custome->w) * this->xscale);
+        SET_BOX(height, float(custome->h) * this->yscale);
+    }
+}
+
+void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
+    if (this->current_custome_idx < this->customes.size()) {
+        SDL_Surface* custome = this->customes[this->current_custome_idx];
+        
+        this->xscale = width / float(custome->w);
+        this->yscale = height / float(custome->h);
     }
 }
 

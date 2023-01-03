@@ -27,6 +27,9 @@ namespace WarGrey::STEM {
             void switch_to_next_custome() { this->switch_to_custome(this->current_custome_idx + 1); }
 
         protected:
+            void on_resize(float width, float height, float old_width, float old_height) override;
+
+        protected:
             void push_custome(const std::string& name, SDL_Surface* custome);
             void push_custome(const char* name, SDL_Surface* custome);
 
@@ -36,6 +39,8 @@ namespace WarGrey::STEM {
 
         private:
             int current_custome_idx = 0;
+            float xscale = 1.0F;
+            float yscale = 1.0F;
     };
 
     class Sprite : public WarGrey::STEM::ISprite {

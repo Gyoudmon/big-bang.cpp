@@ -35,6 +35,23 @@ void WarGrey::STEM::IMatter::feed_margin(float x, float y, float* top, float* ri
     SET_VALUES(left, 0.0F, right, 0.0F);
 }
 
+void WarGrey::STEM::IMatter::resize(float ratio) {
+    if (this->can_resize) {
+        if (ratio != 1.0F) {
+            float width, height;
+            float x = 0.0F;
+            float y = 0.0F;
+
+            this->feed_location(&x, &y, MatterAnchor::LT);
+            this->feed_extent(x, y, &width, &height);
+
+	        this->moor(this->resize_anchor);
+            this->on_resize(width * ratio, height * ratio, width, height);
+	        this->notify_updated();
+        }
+    }
+}
+
 void WarGrey::STEM::IMatter::resize(float w, float h) {
     if (this->can_resize) {
         if ((w > 0.0F) && (h > 0.0F)) {
