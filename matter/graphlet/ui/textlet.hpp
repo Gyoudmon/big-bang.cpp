@@ -17,7 +17,8 @@ namespace WarGrey::STEM {
 
         public:
             void set_text(const char* fmt, ...);
-            void set_text(std::string& content, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
+            void set_text(WarGrey::STEM::MatterAnchor anchor, const char* fmt, ...);
+            void set_text(const std::string& content, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         
         public:
             void set_font(TTF_Font* font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);

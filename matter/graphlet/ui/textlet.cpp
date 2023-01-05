@@ -37,7 +37,7 @@ void WarGrey::STEM::ITextlet::set_font(TTF_Font* font, MatterAnchor anchor) {
     this->notify_updated();
 }
 
-void WarGrey::STEM::ITextlet::set_text(std::string& content, MatterAnchor anchor) {
+void WarGrey::STEM::ITextlet::set_text(const std::string& content, MatterAnchor anchor) {
     this->raw = content;
 
     this->moor(anchor);
@@ -54,6 +54,11 @@ void WarGrey::STEM::ITextlet::set_text(std::string& content, MatterAnchor anchor
 void WarGrey::STEM::ITextlet::set_text(const char* fmt, ...) {
     VSNPRINT(content, fmt);
     this->set_text(content);
+}
+
+void WarGrey::STEM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...) {
+    VSNPRINT(content, fmt);
+    this->set_text(content, anchor);
 }
 
 void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) {
