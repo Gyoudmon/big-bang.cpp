@@ -29,7 +29,7 @@ namespace WarGrey::STEM {
             virtual void reflow(float window, float height) = 0;
 
             /* 更新游戏世界，定时器到期时自动调用 */
-            virtual void update(uint32_t interval, uint32_t count, uint32_t uptime) = 0;
+            virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) = 0;
             
             /* 绘制游戏世界，在合适的时候自动调用 */
             virtual void draw(SDL_Renderer* renderer, int x, int y, int width, int height) = 0;
@@ -89,7 +89,7 @@ namespace WarGrey::STEM {
             virtual void on_big_bang(int width, int height) {}
 
             /* 响应定时器事件，刷新游戏世界 */
-            virtual void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) = 0;
+            virtual void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) = 0;
 
             /* 响应鼠标事件，并按需触发单击、右击、双击、移动、滚轮事件 */
             virtual void on_mouse_event(SDL_MouseButtonEvent& mouse, bool pressed); 
@@ -162,12 +162,12 @@ namespace WarGrey::STEM {
             void reflow(float window, float height) override {}
 
             /* 更新游戏世界，定时器到期时自动调用，默认什么都不做 */
-            void update(uint32_t interval, uint32_t count, uint32_t uptime) override {}
+            void update(uint32_t count, uint32_t interval, uint32_t uptime) override {}
             
             /* 绘制游戏世界，在合适的时候自动调用，默认什么都不做 */
             void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override {}
 
         protected:
-            void on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) override;
+            void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
     };
 }

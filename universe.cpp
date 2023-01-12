@@ -227,7 +227,7 @@ void WarGrey::STEM::IUniverse::big_bang() {
                 auto parcel = reinterpret_cast<timer_parcel_t*>(e.user.data1);
 
                 if (parcel->universe == this) {
-                    this->on_elapse(parcel->interval, parcel->count, parcel->uptime);
+                    this->on_elapse(parcel->count, parcel->interval, parcel->uptime);
                 }
             }; break;
             case SDL_MOUSEMOTION: this->on_mouse_event(e.motion); break;
@@ -616,7 +616,7 @@ WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint
     this->set_window_title("%s", title);
 }
 
-void WarGrey::STEM::Universe::on_elapse(uint32_t interval, uint32_t count, uint32_t uptime) {
-    this->update(interval, count, uptime);
+void WarGrey::STEM::Universe::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
+    this->update(count, interval, uptime);
     this->notify_updated();
 }

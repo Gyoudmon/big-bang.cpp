@@ -16,6 +16,7 @@ namespace WarGrey::STEM {
 
         public:
             void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+            void update(uint32_t count, uint32_t interval, uint32_t uptime) override;
             void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
         public:
@@ -26,6 +27,13 @@ namespace WarGrey::STEM {
             void switch_to_prev_custome() { this->switch_to_custome(this->current_custome_idx - 1); }
             void switch_to_next_custome() { this->switch_to_custome(this->current_custome_idx + 1); }
 
+        public:
+            void set_fps(int fps = 16);
+            size_t play(const std::string& action, int repetition = -1) { return this->play(action.c_str(), repetition); }
+            size_t play(const char* action, int repetition = -1);
+            bool in_playing() { return this->animation_rest != 0; }
+            void stop();
+
         protected:
             void on_resize(float width, float height, float old_width, float old_height) override;
 
@@ -34,13 +42,19 @@ namespace WarGrey::STEM {
             void push_custome(const char* name, SDL_Surface* custome);
 
         private:
-            std::vector<std::string> names;
-            std::vector<SDL_Surface*> customes;
+            std::vector<std::pair<std::string, SDL_Surface*>> customes;
 
         private:
             int current_custome_idx = 0;
             float xscale = 1.0F;
             float yscale = 1.0F;
+
+        private:
+            int animation_interval = 0;
+            int animation_subframe_count = 1;
+            int animation_rest = 0;
+            std::vector<int> frame_refs;
+            int current_subframe_idx;
     };
 
     class Sprite : public WarGrey::STEM::ISprite {
