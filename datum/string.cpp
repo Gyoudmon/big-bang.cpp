@@ -361,3 +361,25 @@ bool WarGrey::STEM::string_popback_utf8_char(std::string& src) {
     return okay;
 }
 
+bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
+    bool yes = true;
+    size_t max = src.size();
+    size_t n = strnlen(sub, max + 1);
+
+    if (max >= n) {
+        for (size_t i = 0; i < n; i ++) {
+            if (src[i] != sub[i]) {
+                yes = false;
+                break;
+            }
+        }
+    } else {
+        yes = false;
+    }
+
+    return yes;
+}
+
+bool WarGrey::STEM::string_prefix(const std::string& src, const std::string& sub) {
+    return string_prefix(src, sub.c_str());
+}
