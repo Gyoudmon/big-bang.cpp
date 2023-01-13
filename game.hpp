@@ -12,6 +12,8 @@
 #include "matter/graphlet/ui/textlet.hpp"
 #include "matter/sprite.hpp"
 
+#include "datum/path.hpp"
+
 /**
  * 为兼容 Windows 而变得丑陋
  *

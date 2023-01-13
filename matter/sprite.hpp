@@ -59,8 +59,8 @@ namespace WarGrey::STEM {
 
     class Sprite : public WarGrey::STEM::ISprite {
         public:
-            Sprite(const char* pathname) : Sprite(std::string(pathname)) {}
-            Sprite(const std::string& pathname) : _pathname(pathname) {}
+            Sprite(const char* pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
+            Sprite(const std::string& pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
 
             void pre_construct() override;
 

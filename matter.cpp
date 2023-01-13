@@ -35,7 +35,7 @@ void WarGrey::STEM::IMatter::feed_margin(float x, float y, float* top, float* ri
     SET_VALUES(left, 0.0F, right, 0.0F);
 }
 
-void WarGrey::STEM::IMatter::resize(float ratio) {
+void WarGrey::STEM::IMatter::scale(float ratio) {
     if (this->can_resize) {
         if (ratio != 1.0F) {
             float width, height;

@@ -158,6 +158,11 @@ void WarGrey::STEM::ISprite::stop() {
 }
 
 /*************************************************************************************************/
+WarGrey::STEM::Sprite::Sprite(const char* pathname, MatterAnchor resize_anchor) : Sprite(std::string(pathname), resize_anchor) {}
+WarGrey::STEM::Sprite::Sprite(const std::string& pathname, MatterAnchor resize_anchor) : _pathname(pathname) {
+    this->enable_resize(true, resize_anchor);
+}
+
 void WarGrey::STEM::Sprite::pre_construct() {
     path target(this->_pathname);
 
