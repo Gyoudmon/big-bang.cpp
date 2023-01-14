@@ -16,6 +16,14 @@ namespace WarGrey::STEM {
             void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override;
             bool can_exit() override;
 
+        public:
+            void transfer(int delta_idx);
+            void transfer_to_plane(const char* name);
+            void transfer_to_plane(const std::string& name);
+            void transfer_to_plane(int idx);
+            void transfer_to_next_plane() { this->transfer(1); }
+            void transfer_to_prev_plane() { this->transfer(-1); }
+
         protected: // 常规事件处理和分派函数
             void on_mouse_event(SDL_MouseButtonEvent& mouse, bool pressed) override; 
             void on_mouse_move(uint32_t state, int x, int y, int dx, int dy) override;
