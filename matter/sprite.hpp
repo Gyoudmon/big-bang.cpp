@@ -10,64 +10,64 @@
 
 namespace WarGrey::STEM {
     class ISprite : public WarGrey::STEM::IMatter, public WarGrey::STEM::IMovable {
-        public:
-            ISprite();
-            virtual ~ISprite();
+    public:
+        ISprite();
+        virtual ~ISprite();
 
-        public:
-            void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-            void update(uint32_t count, uint32_t interval, uint32_t uptime) override;
-            void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+    public:
+        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+        void update(uint32_t count, uint32_t interval, uint32_t uptime) override;
+        void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
-        public:
-            size_t custome_count();
-            void switch_to_custome(int idx);
-            void switch_to_custome(const std::string& name);
-            void switch_to_custome(const char* name);
-            void switch_to_prev_custome() { this->switch_to_custome(this->current_custome_idx - 1); }
-            void switch_to_next_custome() { this->switch_to_custome(this->current_custome_idx + 1); }
+    public:
+        size_t custome_count();
+        void switch_to_custome(int idx);
+        void switch_to_custome(const std::string& name);
+        void switch_to_custome(const char* name);
+        void switch_to_prev_custome() { this->switch_to_custome(this->current_custome_idx - 1); }
+        void switch_to_next_custome() { this->switch_to_custome(this->current_custome_idx + 1); }
 
-        public:
-            void set_fps(int fps = 16);
-            size_t play(const std::string& action, int repetition = -1) { return this->play(action.c_str(), repetition); }
-            size_t play(const char* action, int repetition = -1);
-            bool in_playing() { return this->animation_rest != 0; }
-            void stop();
+    public:
+        void set_fps(int fps = 16);
+        size_t play(const std::string& action, int repetition = -1) { return this->play(action.c_str(), repetition); }
+        size_t play(const char* action, int repetition = -1);
+        bool in_playing() { return this->animation_rest != 0; }
+        void stop();
 
-        protected:
-            void on_resize(float width, float height, float old_width, float old_height) override;
+    protected:
+        void on_resize(float width, float height, float old_width, float old_height) override;
 
-        protected:
-            void push_custome(const std::string& name, SDL_Surface* custome);
-            void push_custome(const char* name, SDL_Surface* custome);
+    protected:
+        void push_custome(const std::string& name, SDL_Surface* custome);
+        void push_custome(const char* name, SDL_Surface* custome);
 
-        private:
-            std::vector<std::pair<std::string, SDL_Surface*>> customes;
+    private:
+        std::vector<std::pair<std::string, SDL_Surface*>> customes;
 
-        private:
-            int current_custome_idx = 0;
-            float xscale = 1.0F;
-            float yscale = 1.0F;
+    private:
+        int current_custome_idx = 0;
+        float xscale = 1.0F;
+        float yscale = 1.0F;
 
-        private:
-            int animation_interval = 0;
-            int animation_subframe_count = 1;
-            int animation_rest = 0;
-            std::vector<int> frame_refs;
-            int current_subframe_idx;
+    private:
+        int animation_interval = 0;
+        int animation_subframe_count = 1;
+        int animation_rest = 0;
+        std::vector<int> frame_refs;
+        int current_subframe_idx;
     };
 
     class Sprite : public WarGrey::STEM::ISprite {
-        public:
-            Sprite(const char* pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
-            Sprite(const std::string& pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
+    public:
+        Sprite(const char* pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
+        Sprite(const std::string& pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
 
-            void pre_construct() override;
+        void pre_construct() override;
 
-        private:
-            void load_custome(std::string& png);
-            
-        private:
-            std::string _pathname;
+    private:
+        void load_custome(std::string& png);
+        
+    private:
+        std::string _pathname;
     };
 }
