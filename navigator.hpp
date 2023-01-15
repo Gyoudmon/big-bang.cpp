@@ -7,13 +7,13 @@
 namespace WarGrey::STEM {
 	class INavigatorListener {
 	public:
-		void on_navigate(int from_index, int to_index) = 0;
+		virtual void on_navigate(int from_index, int to_index) = 0;
 	};
 
 	class INavigator {
 	public:
-		virtual void insert(WarGrey::STEM::IPlanet* planet) = 0;
-		virtual void select(WarGrey::STEM::IPlanet* planet) = 0;
+		virtual void insert(WarGrey::STEM::IPlane* planet) = 0;
+		virtual void select(WarGrey::STEM::IPlane* planet) = 0;
 		virtual int selected_index() = 0;
 
 	public:

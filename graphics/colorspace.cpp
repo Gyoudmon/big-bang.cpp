@@ -161,4 +161,3 @@ void WarGrey::STEM::RGB_FromHexadecimal(int hex, unsigned char* r, unsigned char
 void WarGrey::STEM::RGB_FromHexadecimal(int hex, unsigned char* r, unsigned char* g, unsigned char* b, float* a) {
     RGB_FromHexadecimal(static_cast<unsigned int>(hex), r, g, b, a);
 }
-

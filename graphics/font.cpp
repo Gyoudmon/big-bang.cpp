@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <filesystem>
 
+#include "../datum/flonum.hpp"
+
 using namespace WarGrey::STEM;
 using namespace std::filesystem;
 
@@ -100,6 +102,10 @@ TTF_Font* WarGrey::STEM::game_create_font(const char* face, int fontsize) {
     return font;
 }
 
+TTF_Font* WarGrey::STEM::game_create_font(const char* face, float fontsize) {
+    return game_create_font(face, fl2fxi(fontsize));
+}
+
 void WarGrey::STEM::game_font_destroy(TTF_Font* font, bool usr_only) {
     if (font != nullptr) {
         if (!usr_only) {
@@ -151,5 +157,49 @@ const char* WarGrey::STEM::font_basename(const TTF_Font* font) {
         } else {
             return basenames[family_name].c_str();
         }
+    }
+}
+
+void WarGrey::STEM::feed_text_extent(TTF_Font* font, const char* unicode, int* width, int* height) {
+    if (font == nullptr) {
+        feed_text_extent(game_font::DEFAULT, unicode, width, height);
+    } else {
+        TTF_SizeUTF8(font, unicode, width, height);
+    }
+}
+
+int WarGrey::STEM::font_width(TTF_Font* font, const char* unicode) {
+    if (font == nullptr) {
+        return font_width(game_font::DEFAULT, unicode);
+    } else {
+        int width;
+
+        feed_text_extent(font, unicode, &width);
+
+        return width;
+    }
+}
+
+int WarGrey::STEM::font_height(TTF_Font* font) {
+    if (font == nullptr) {
+        return font_height(game_font::DEFAULT);
+    } else {
+        return TTF_FontHeight(font);
+    }
+}
+
+int WarGrey::STEM::font_ascent(TTF_Font* font) {
+    if (font == nullptr) {
+        return font_ascent(game_font::DEFAULT);
+    } else {
+        return TTF_FontAscent(font);
+    }
+}
+
+int WarGrey::STEM::font_descent(TTF_Font* font) {
+    if (font == nullptr) {
+        return font_descent(game_font::DEFAULT);
+    } else {
+        return TTF_FontDescent(font);
     }
 }

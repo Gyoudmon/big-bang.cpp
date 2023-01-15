@@ -19,8 +19,16 @@ namespace WarGrey::STEM {
     void game_fonts_destroy();
 
     TTF_Font* game_create_font(const char* basename, int fontsize);
+    TTF_Font* game_create_font(const char* basename, float fontsize);
     void game_font_destroy(TTF_Font* font, bool usr_only = true);
     const std::string* game_font_list(int* n, int fontsize = 16);
 
     const char* font_basename(const TTF_Font* font);
+
+    void feed_text_extent(TTF_Font* font, const char* unicode, int* width = nullptr, int* height = nullptr);
+
+    int font_width(TTF_Font* font, const char* unicode);
+    int font_height(TTF_Font* font);
+    int font_ascent(TTF_Font* font);
+    int font_descent(TTF_Font* font);
 }
