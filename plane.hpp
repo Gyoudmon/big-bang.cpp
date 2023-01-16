@@ -123,6 +123,7 @@ namespace WarGrey::STEM {
         virtual void on_goodbye(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         virtual void on_tap(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
+        virtual void on_transfer(WarGrey::STEM::IPlane* from, WarGrey::STEM::IPlane* to) {}
 
     protected:
         virtual void on_matter_ready(IMatter* m) = 0;

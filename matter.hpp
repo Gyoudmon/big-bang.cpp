@@ -55,7 +55,8 @@ namespace WarGrey::STEM {
         virtual bool on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) { return false; }
 
     public:
-        void scale(float ratio);
+        void scale(float ratio) { this->scale(ratio, ratio); }
+        void scale(float x_ratio, float y_ratio);
         void resize(float width, float height);
         void enable_resize(bool yes_no, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->can_resize = yes_no; this->resize_anchor = anchor; }
         bool resizable(WarGrey::STEM::MatterAnchor* anchor) { (*anchor) = this->resize_anchor; return this->can_resize; }

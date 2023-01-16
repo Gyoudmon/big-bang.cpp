@@ -12,6 +12,9 @@ namespace WarGrey::STEM {
 
 	class INavigator {
 	public:
+		virtual ~INavigator() {}
+		
+	public:
 		virtual void insert(WarGrey::STEM::IPlane* planet) = 0;
 		virtual void select(WarGrey::STEM::IPlane* planet) = 0;
 		virtual int selected_index() = 0;

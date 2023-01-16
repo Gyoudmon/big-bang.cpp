@@ -2,12 +2,14 @@
 
 #include "universe.hpp"
 #include "plane.hpp"
+#include "navigator.hpp"
 #include "virtualization/screen.hpp"
 
 namespace WarGrey::STEM {
-    class Cosmos : public WarGrey::STEM::IUniverse {
+    class Cosmos : public WarGrey::STEM::IUniverse, public WarGrey::STEM::INavigatorListener {
     public:
-        Cosmos(int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
+        Cosmos(WarGrey::STEM::INavigator* navigator, int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
+        Cosmos(int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU) : Cosmos(nullptr, fps, fgc, bgc) {}
         virtual ~Cosmos();
 
     public:
@@ -18,11 +20,12 @@ namespace WarGrey::STEM {
 
     public:
         void transfer(int delta_idx);
-        void transfer_to_plane(const char* name);
+        void transfer_to_plane(const char* name) { this->transfer_to_plane(std::string(name)); }
         void transfer_to_plane(const std::string& name);
         void transfer_to_plane(int idx);
         void transfer_to_next_plane() { this->transfer(1); }
         void transfer_to_prev_plane() { this->transfer(-1); }
+        void on_navigate(int from_index, int to_index) override;
 
     protected: // 常规事件处理和分派函数
         void on_mouse_event(SDL_MouseButtonEvent& mouse, bool pressed) override; 
@@ -44,10 +47,15 @@ namespace WarGrey::STEM {
 
     private:
         void collapse();
+        void notify_transfer(WarGrey::STEM::IPlane* from, WarGrey::STEM::IPlane* to);
 
     private:
         WarGrey::STEM::IScreen* screen = nullptr;
         WarGrey::STEM::IPlane* head_plane = nullptr;
         WarGrey::STEM::IPlane* recent_plane = nullptr;
+
+    private:
+        WarGrey::STEM::INavigator* navigator = nullptr;
+        WarGrey::STEM::IPlane* from_plane = nullptr;
     };
 }

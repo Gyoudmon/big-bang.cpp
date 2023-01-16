@@ -1,11 +1,13 @@
 #include "cosmos.hpp"
+#include "matter.hpp"
 
 #include "virtualization/screen/onionskin.hpp"
+#include "navigator/null.hpp"
 
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-#define PLANET_INFO(plane) (static_cast<LinkedPlaneInfo*>(plane->info))
+#define PLANE_INFO(plane) (static_cast<LinkedPlaneInfo*>(plane->info))
 
 namespace {
     struct LinkedPlaneInfo : public IPlaneInfo {
@@ -42,17 +44,29 @@ static inline void draw_plane(SDL_Renderer* renderer, IPlane* plane, float x, fl
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Cosmos::Cosmos(int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
+WarGrey::STEM::Cosmos::Cosmos(INavigator* navigator, int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
     this->screen = new OnionSkin(this);
+    this->navigator = ((navigator == nullptr) ? new NullNavigator() : navigator);
+    this->navigator->push_navigation_listener(this);
 }
 
 WarGrey::STEM::Cosmos::~Cosmos() {
+    if (this->navigator != nullptr) {
+        if (dynamic_cast<IPlane*>(this->navigator) != nullptr) {
+            // leave it to `Cosmos::collapse`
+        } else if (dynamic_cast<IMatter*>(this->navigator) != nullptr) {
+            // leave it to the `IPlane` instance managing it
+        } else {
+            delete this->navigator;
+        }
+    }
+
     this->collapse();
     delete this->screen;
 }
 
 void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
-    // NOTE: this method is designed to be invoked in Cosmos::construct()
+    // NOTE: this method is designed to be invoked in `Cosmos::construct()`
 
     if (plane->info == nullptr) {
         LinkedPlaneInfo* info = bind_plane_owership(this->screen, plane);
@@ -61,13 +75,18 @@ void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
             this->head_plane = plane;
             this->recent_plane = plane;
             info->prev = this->head_plane;
+
+            this->navigator->insert(plane);
+            this->navigator->select(plane);
         } else { 
-            LinkedPlaneInfo* head_info = PLANET_INFO(this->head_plane);
-            LinkedPlaneInfo* prev_info = PLANET_INFO(head_info->prev);
+            LinkedPlaneInfo* head_info = PLANE_INFO(this->head_plane);
+            LinkedPlaneInfo* prev_info = PLANE_INFO(head_info->prev);
              
             info->prev = head_info->prev;
             prev_info->next = plane;
             head_info->prev = plane;
+
+            this->navigator->insert(plane);
         }
 
         info->next = this->head_plane;
@@ -77,8 +96,8 @@ void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
 void WarGrey::STEM::Cosmos::collapse() {
     if (this->head_plane != nullptr) {
         IPlane* temp_head = this->head_plane;
-        LinkedPlaneInfo* temp_info = PLANET_INFO(temp_head);
-        LinkedPlaneInfo* prev_info = PLANET_INFO(temp_info->prev);
+        LinkedPlaneInfo* temp_info = PLANE_INFO(temp_head);
+        LinkedPlaneInfo* prev_info = PLANE_INFO(temp_info->prev);
 
         this->head_plane = nullptr;
         this->recent_plane = nullptr;
@@ -87,7 +106,7 @@ void WarGrey::STEM::Cosmos::collapse() {
         do {
             IPlane* child = temp_head;
 
-            temp_head = PLANET_INFO(temp_head)->next;
+            temp_head = PLANE_INFO(temp_head)->next;
 
             delete child; // plane's destructor will delete the associated info object
         } while (temp_head != nullptr);
@@ -106,7 +125,7 @@ void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
         float flheight = float(height);
 
         do {
-            LinkedPlaneInfo* info = PLANET_INFO(child);
+            LinkedPlaneInfo* info = PLANE_INFO(child);
 
             construct_plane(child, flwidth, flheight);
             child = info->next;
@@ -114,6 +133,10 @@ void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
 
         this->set_window_title("%s", this->recent_plane->name());
     }
+
+    if ((this->recent_plane == this->head_plane) && (this->recent_plane != nullptr)) {
+		this->notify_transfer(nullptr, this->recent_plane);
+	}
 }
 
 void WarGrey::STEM::Cosmos::reflow(float width, float height) {
@@ -122,7 +145,7 @@ void WarGrey::STEM::Cosmos::reflow(float width, float height) {
             IPlane* child = this->head_plane;
 
             do {
-                LinkedPlaneInfo* info = PLANET_INFO(child);
+                LinkedPlaneInfo* info = PLANE_INFO(child);
 
                 reflow_plane(child, width, height);
                 child = info->next;
@@ -134,17 +157,15 @@ void WarGrey::STEM::Cosmos::reflow(float width, float height) {
 void WarGrey::STEM::Cosmos::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
     this->begin_update_sequence();
 
-    if (this->head_plane != nullptr) {
-        IPlane* child = PLANET_INFO(this->recent_plane)->next;
-        
+    /**
+     * By designe, the `Plane`s are abstracted as world chunks,
+     *   As such, no need to update other planes here.
+     **/
+
+    if (this->recent_plane != nullptr) {    
         this->recent_plane->begin_update_sequence();
         this->recent_plane->on_elapse(count, interval, uptime);
         this->recent_plane->end_update_sequence();
-
-        while (child != this->recent_plane) {
-            child->on_elapse(count, interval, uptime);
-            child = PLANET_INFO(child)->next;
-        }
     }
 
     this->update(count, interval, uptime);
@@ -227,4 +248,80 @@ void WarGrey::STEM::Cosmos::on_save() {
     if (this->recent_plane != nullptr) {
         this->recent_plane->on_save();
     }
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
+	if ((this->recent_plane != nullptr) && (delta_idx != 0)) {
+		if (this->from_plane == nullptr) {
+			this->from_plane = this->recent_plane;
+		}
+
+		if (delta_idx > 0) {
+			for (int i = 0; i < delta_idx; i++) {
+				this->recent_plane = PLANE_INFO(this->recent_plane)->next;
+			}
+		} else {
+			for (int i = 0; i > delta_idx; i--) {
+				this->recent_plane = PLANE_INFO(this->recent_plane)->prev;
+			}
+		}
+
+		this->navigator->select(this->recent_plane);
+		this->notify_transfer(this->from_plane, this->recent_plane);
+
+		this->from_plane = nullptr;
+		this->refresh();
+	}
+}
+
+void WarGrey::STEM::Cosmos::transfer_to_plane(const std::string& name) {
+	int to_idx = -1;
+	
+	if ((this->head_plane != nullptr) && (!name.empty())) {
+		IPlane* child = this->head_plane;
+		int idx = 0;
+
+		do {
+			LinkedPlaneInfo* info = PLANE_INFO(child);
+
+			if (name.compare(child->name())) {
+				to_idx = idx;
+				break;
+			}
+
+			idx += 1;
+			child = info->next;
+		} while (child != this->head_plane);
+	}
+
+	if (to_idx >= 0) {
+		this->transfer_to_plane(to_idx);
+	}
+}
+
+void WarGrey::STEM::Cosmos::transfer_to_plane(int to_idx) {
+	this->on_navigate(this->navigator->selected_index(), to_idx);
+}
+
+void WarGrey::STEM::Cosmos::on_navigate(int from_idx, int to_idx) {
+    int delta_idx = to_idx - from_idx;
+
+    if (delta_idx != 0) {
+        this->from_plane = this->recent_plane;
+        this->transfer(delta_idx);
+    }
+}
+
+void WarGrey::STEM::Cosmos::notify_transfer(IPlane* from, IPlane* to) {
+    if (this->head_plane != nullptr) {
+        IPlane* child = this->head_plane;
+
+        do {
+            LinkedPlaneInfo* info = PLANE_INFO(child);
+
+            child->on_transfer(from, to);
+            child = info->next;
+        } while (child != this->head_plane);
+    }    
 }

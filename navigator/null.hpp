@@ -5,8 +5,8 @@
 namespace WarGrey::STEM {
 	class NullNavigator : public WarGrey::STEM::INavigator {
 	public:
-		void insert(WarGrey::SCADA::IPlane* plane) override {}
-		void select(WarGrey::SCADA::IPlane* plane) override {}
-		int selected_index() override { return -1; }
+		void insert(WarGrey::STEM::IPlane* plane) override {}
+		void select(WarGrey::STEM::IPlane* plane) override {}
+		int selected_index() override { return 0; }
 	};
 }
