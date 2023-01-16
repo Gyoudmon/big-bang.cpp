@@ -1,6 +1,6 @@
 #pragma once
 
-namespace WarGrey::SCADA {
+namespace WarGrey::STEM {
 #define _N(e) static_cast<unsigned int>(e::_)
 #define _I(e) static_cast<unsigned int>(e)
 #define _S(e) static_cast<unsigned short>(e)

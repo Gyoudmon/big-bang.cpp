@@ -44,7 +44,7 @@ namespace WarGrey::STEM {
 		virtual T guarded_value(T value) { return flsafe(value, this->value); }
 
 	private:
-		T value;
+		T value = T();
 	};
 
     template<typename T>
