@@ -6,7 +6,6 @@
 #include "../../../graphics/geometry.hpp"
 
 #include "../../../datum/string.hpp"
-#include "../../../datum/fixnum.hpp"
 #include "../../../datum/box.hpp"
 #include "../../../datum/slot.hpp"
 
@@ -158,6 +157,7 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
         
         self->x += x;
         self->y = bottom - self->h;
+        self->h = Height;
 
         if (bgcolor >= 0) {
             game_fill_rect(ds, self, static_cast<uint32_t>(bgcolor));
@@ -248,14 +248,13 @@ void WarGrey::STEM::Dimensionlet::update_number_surface(float value, DimensionSt
 
 void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, TTF_Font* font, float leading_space) {
     SDL_Surface* self = this->surfaces[idx];
-    float max_height;
 
-    this->feed_subextent(idx, &this->boxes[idx].x, &max_height);
+    this->feed_subextent(idx, &this->boxes[idx].x);
     this->boxes[idx].x += leading_space;
 
     if (self != nullptr) {
         this->boxes[idx].w = flmax(float(self->w), min_width);
-        this->boxes[idx].h = flmax(float(self->h), max_height);
+        this->boxes[idx].h = float(self->h);
     } else if (min_width > 0) {
         this->boxes[idx].w = flmax(min_width, 0.0F);
         this->boxes[idx].h = float(font_height(font));
@@ -263,14 +262,14 @@ void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, T
 }
 
 void WarGrey::STEM::Dimensionlet::feed_subextent(int n, float* w, float* h) {
-    float fxw = 0.0F;
-    float fxh = 0.0F;
+    float flw = 0.0F;
+    float flh = 0.0F;
 
     for (int idx = 0; idx < n; idx ++) {
-        fxw = this->boxes[idx].x + this->boxes[idx].w;
-        fxh = flmax(this->boxes[idx].h, fxh);
+        flw = this->boxes[idx].x + this->boxes[idx].w;
+        flh = flmax(this->boxes[idx].h, flh);
     }
 
-    SET_BOX(w, fxw);
-    SET_BOX(h, fxh);
+    SET_BOX(w, flw);
+    SET_BOX(h, flh);
 }
