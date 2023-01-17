@@ -18,6 +18,10 @@ namespace WarGrey::STEM {
     SDL_Surface* game_load_image(const std::string& file);
     void game_unload_image(SDL_Surface* image);
 
+    SDL_Texture* game_load_image_as_texture(SDL_Renderer* renderer, const char* file);
+    SDL_Texture* game_load_image_as_texture(SDL_Renderer* renderer, const std::string& file);
+    void game_unload_image(SDL_Texture* image);
+
     void game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     void game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     void game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);

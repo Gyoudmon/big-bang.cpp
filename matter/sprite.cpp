@@ -47,9 +47,9 @@ void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_widt
 
 void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if (this->current_custome_idx < this->customes.size()) {
-        SDL_RendererFlip flip = game_scales_to_flip(this->xscale, this->yscale);
-
-        game_draw_image(renderer, this->customes[this->current_custome_idx].second, x, y, Width, Height, flip);
+        game_draw_image(renderer, this->customes[this->current_custome_idx].second,
+                            x, y, Width, Height,
+                            game_scales_to_flip(this->xscale, this->yscale));
     }
 }
 

@@ -13,10 +13,12 @@ namespace WarGrey::STEM {
     void game_fill_grid(SDL_Renderer* renderer, int* grids[], int nx, int ny, int grid_size, int xoff = 0, int yoff = 0);
 
     void game_render_surface(SDL_Renderer* target, SDL_Surface* surface, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    void game_render_surface(SDL_Renderer* target, SDL_Surface* surface, int x, int y, int widht, int height, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     void game_render_surface(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
 
-    void game_render_texture(SDL_Renderer* target, SDL_Texture* texture, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
-    void game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, int x, int y, int width, int height, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
 
     void game_draw_point(SDL_Renderer* renderer, int x, int y, uint32_t rgb, float alpha = 1.0F);
     void game_draw_point(SDL_Renderer* renderer, int x, int y, float hue, float saturation = 1.0f , float value = 1.0f, float alpha = 1.0F);
@@ -58,10 +60,12 @@ namespace WarGrey::STEM {
     void game_fill_grid(SDL_Renderer* renderer, int* grids[], int nx, int ny, float grid_size, float xoff = 0.0F, float yoff = 0.0F);
 
     void game_render_surface(SDL_Renderer* target, SDL_Surface* surface, float x, float y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    void game_render_surface(SDL_Renderer* target, SDL_Surface* surface, float x, float y, float width, float height, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     void game_render_surface(SDL_Renderer* target, SDL_Surface* surface, SDL_FRect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
 
-    void game_render_texture(SDL_Renderer* target, SDL_Texture* texture, float x, float y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
-    void game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_FRect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, float x, float y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, float x, float y, float width, float height, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
+    int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_FRect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     
     void game_draw_point(SDL_Renderer* renderer, float x, float y, uint32_t rgb, float alpha = 1.0F);
     void game_draw_point(SDL_Renderer* renderer, float x, float y, float hue, float saturation = 1.0f , float value = 1.0f, float alpha = 1.0F);
