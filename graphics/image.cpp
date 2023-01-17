@@ -57,72 +57,86 @@ void WarGrey::STEM::game_unload_image(SDL_Surface* image) {
     SDL_FreeSurface(image);
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y) {
-    game_render_surface(renderer, image, x, y);
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, SDL_RendererFlip flip, double angle) {
+    game_render_surface(renderer, image, x, y, flip, angle);
 }
     
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y) {
-    game_draw_image(renderer, file.c_str(), x, y);
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, SDL_RendererFlip flip, double angle) {
+    game_draw_image(renderer, file.c_str(), x, y, flip, angle);
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y) {
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, SDL_RendererFlip flip, double angle) {
     SDL_Surface* image = game_load_image(file);
 
     if (image != nullptr) {
-        game_draw_image(renderer, image, x, y);
+        game_draw_image(renderer, image, x, y, flip, angle);
         game_unload_image(image);
     }
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, int width, int height) {
-    if ((image->w == width) && (image->h == height)) {
-        game_render_surface(renderer, image, x, y);
-    } else {
-        SDL_Rect region;
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
+    SDL_Rect region;
 
-        region.x = x;
-        region.y = y;
-        region.w = (width <= 0) ? image->w : width;
-        region.h = (height <= 0) ? image->h : height;
-        game_render_surface(renderer, image, &region);
-    }
+    region.x = x;
+    region.y = y;
+    region.w = (width <= 0) ? image->w : width;
+    region.h = (height <= 0) ? image->h : height;
+    
+    game_render_surface(renderer, image, &region, flip, angle);
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, int width, int height) {
-    game_draw_image(renderer, file.c_str(), x, y, width, height);
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
+    game_draw_image(renderer, file.c_str(), x, y, width, height, flip, angle);
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, int width, int height) {
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
     SDL_Surface* image = game_load_image(file);
 
     if (image != nullptr) {
-        game_draw_image(renderer, image, x, y, width, height);
+        game_draw_image(renderer, image, x, y, width, height, flip, angle);
         game_unload_image(image);
     }
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y) {
-    game_render_surface(renderer, image, fl2fxi(x), fl2fxi(y));
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, SDL_RendererFlip flip, double angle) {
+    game_render_surface(renderer, image, x, y, flip, angle);
 }
     
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y) {
-    game_draw_image(renderer, file.c_str(), fl2fxi(x), fl2fxi(y));
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, SDL_RendererFlip flip, double angle) {
+    game_draw_image(renderer, file.c_str(), x, y, flip, angle);
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y) {
-    game_draw_image(renderer, file, fl2fxi(x), fl2fxi(y));
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, SDL_RendererFlip flip, double angle) {
+    SDL_Surface* image = game_load_image(file);
+
+    if (image != nullptr) {
+        game_draw_image(renderer, image, x, y, flip, angle);
+        game_unload_image(image);
+    }
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, float width, float height) {
-    game_draw_image(renderer, image, fl2fxi(x), fl2fxi(y), fl2fxi(width), fl2fxi(height));
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
+    SDL_FRect region;
+
+    region.x = x;
+    region.y = y;
+    region.w = (width <= 0) ? float(image->w) : width;
+    region.h = (height <= 0) ? float(image->h) : height;
+    
+    game_render_surface(renderer, image, &region, flip, angle);
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, float width, float height) {
-    game_draw_image(renderer, file.c_str(), fl2fxi(x), fl2fxi(y), fl2fxi(width), fl2fxi(height));
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
+    game_draw_image(renderer, file.c_str(), x, y, width, height, flip, angle);
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, float width, float height) {
-    game_draw_image(renderer, file, fl2fxi(x), fl2fxi(y), fl2fxi(width), fl2fxi(height));
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
+    SDL_Surface* image = game_load_image(file);
+
+    if (image != nullptr) {
+        game_draw_image(renderer, image, x, y, width, height, flip, angle);
+        game_unload_image(image);
+    }
 }
 
 /*************************************************************************************************/

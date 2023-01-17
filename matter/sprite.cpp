@@ -3,6 +3,9 @@
 #include "../datum/box.hpp"
 #include "../datum/path.hpp"
 #include "../datum/string.hpp"
+#include "../datum/flonum.hpp"
+
+#include "../graphics/geometry.hpp"
 
 #include <filesystem>
 
@@ -28,8 +31,8 @@ void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* 
     } else {
         SDL_Surface* custome = this->customes[this->current_custome_idx].second;
 
-        SET_BOX(width, float(custome->w) * this->xscale);
-        SET_BOX(height, float(custome->h) * this->yscale);
+        SET_BOX(width, float(custome->w) * flabs(this->xscale));
+        SET_BOX(height, float(custome->h) * flabs(this->yscale));
     }
 }
 
@@ -44,7 +47,9 @@ void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_widt
 
 void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if (this->current_custome_idx < this->customes.size()) {
-        game_draw_image(renderer, this->customes[this->current_custome_idx].second, x, y, Width, Height);
+        SDL_RendererFlip flip = game_scales_to_flip(this->xscale, this->yscale);
+
+        game_draw_image(renderer, this->customes[this->current_custome_idx].second, x, y, Width, Height, flip);
     }
 }
 
