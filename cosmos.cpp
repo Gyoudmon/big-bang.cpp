@@ -76,6 +76,8 @@ void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
             this->recent_plane = plane;
             info->prev = this->head_plane;
 
+            this->recent_plane_idx = 0;
+            this->chunk_count = 1;
             this->navigator->insert(plane);
             this->navigator->select(plane);
         } else { 
@@ -86,6 +88,7 @@ void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
             prev_info->next = plane;
             head_info->prev = plane;
 
+            this->chunk_count ++;
             this->navigator->insert(plane);
         }
 
@@ -113,8 +116,13 @@ void WarGrey::STEM::Cosmos::collapse() {
     }
 }
 
+bool WarGrey::STEM::Cosmos::has_current_mission_completed() {
+    return (this->recent_plane != nullptr) && this->recent_plane->has_mission_completed();
+}
+
 bool WarGrey::STEM::Cosmos::can_exit() {
-    return (this->recent_plane != nullptr) && this->recent_plane->can_exit();
+    return this->has_current_mission_completed()
+            && (this->recent_plane == PLANE_INFO(this->recent_plane)->next);
 }
 
 /*************************************************************************************************/
@@ -251,31 +259,28 @@ void WarGrey::STEM::Cosmos::on_save() {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
-	if ((this->recent_plane != nullptr) && (delta_idx != 0)) {
-		if (this->from_plane == nullptr) {
-			this->from_plane = this->recent_plane;
-		}
+const char* WarGrey::STEM::Cosmos::plane_name(int idx) {
+    const char* pname = nullptr;
 
-		if (delta_idx > 0) {
-			for (int i = 0; i < delta_idx; i++) {
-				this->recent_plane = PLANE_INFO(this->recent_plane)->next;
+	if (this->head_plane != nullptr) {
+		IPlane* child = this->head_plane;
+		int current_idx = 0;
+
+		do {
+			if (current_idx == idx) {
+				pname = child->name();
+                break;
 			}
-		} else {
-			for (int i = 0; i > delta_idx; i--) {
-				this->recent_plane = PLANE_INFO(this->recent_plane)->prev;
-			}
-		}
 
-		this->navigator->select(this->recent_plane);
-		this->notify_transfer(this->from_plane, this->recent_plane);
-
-		this->from_plane = nullptr;
-		this->refresh();
+			current_idx += 1;
+			child = PLANE_INFO(child)->next;
+		} while (child != this->head_plane);
 	}
+
+    return pname;
 }
 
-void WarGrey::STEM::Cosmos::transfer_to_plane(const std::string& name) {
+int WarGrey::STEM::Cosmos::plane_index(const std::string& name) {
 	int to_idx = -1;
 	
 	if ((this->head_plane != nullptr) && (!name.empty())) {
@@ -295,13 +300,57 @@ void WarGrey::STEM::Cosmos::transfer_to_plane(const std::string& name) {
 		} while (child != this->head_plane);
 	}
 
+	return to_idx;
+}
+
+void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
+	if ((this->recent_plane != nullptr) && (delta_idx != 0)) {
+		if (this->from_plane == nullptr) {
+			this->from_plane = this->recent_plane;
+		}
+
+		if (delta_idx > 0) {
+            delta_idx = delta_idx % this->chunk_count;
+            this->recent_plane_idx += delta_idx;
+            
+            if (this->recent_plane_idx >= this->chunk_count) {
+                this->recent_plane_idx -= this->chunk_count;
+            }
+
+			for (int i = 0; i < delta_idx; i++) {
+				this->recent_plane = PLANE_INFO(this->recent_plane)->next;
+			}
+		} else {
+            delta_idx = -((-delta_idx) % this->chunk_count);
+            this->recent_plane_idx += delta_idx;
+            
+            if (this->recent_plane_idx < 0) {
+                this->recent_plane_idx += this->chunk_count;
+            }
+
+			for (int i = 0; i > delta_idx; i--) {
+				this->recent_plane = PLANE_INFO(this->recent_plane)->prev;
+			}
+		}
+
+		this->navigator->select(this->recent_plane);
+        this->notify_transfer(this->from_plane, this->recent_plane);
+
+		this->from_plane = nullptr;
+		this->refresh();
+	}
+}
+
+void WarGrey::STEM::Cosmos::transfer_to_plane(const std::string& name) {
+	int to_idx = plane_index(name);
+	
 	if (to_idx >= 0) {
 		this->transfer_to_plane(to_idx);
 	}
 }
 
 void WarGrey::STEM::Cosmos::transfer_to_plane(int to_idx) {
-	this->on_navigate(this->navigator->selected_index(), to_idx);
+	this->on_navigate(this->recent_plane_idx, to_idx);
 }
 
 void WarGrey::STEM::Cosmos::on_navigate(int from_idx, int to_idx) {

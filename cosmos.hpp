@@ -16,6 +16,7 @@ namespace WarGrey::STEM {
         void reflow(float window, float height) override;
         void update(uint32_t count, uint32_t interval, uint32_t uptime) override {};
         void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override;
+        bool has_current_mission_completed();
         bool can_exit() override;
 
     public:
@@ -27,6 +28,12 @@ namespace WarGrey::STEM {
         void transfer_to_prev_plane() { this->transfer(-1); }
         void on_navigate(int from_index, int to_index) override;
 
+    public:
+        size_t plane_count() { return this->chunk_count; }
+        const char* plane_name(int idx);
+        int plane_index(const std::string& name);
+        int plane_index(const char* name) { return this->plane_index(std::string(name)); }
+        
     protected: // 常规事件处理和分派函数
         void on_mouse_event(SDL_MouseButtonEvent& mouse, bool pressed) override; 
         void on_mouse_move(uint32_t state, int x, int y, int dx, int dy) override;
@@ -53,6 +60,8 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IScreen* screen = nullptr;
         WarGrey::STEM::IPlane* head_plane = nullptr;
         WarGrey::STEM::IPlane* recent_plane = nullptr;
+        size_t chunk_count = 0;
+        int recent_plane_idx = 0;
 
     private:
         WarGrey::STEM::INavigator* navigator = nullptr;
