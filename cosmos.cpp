@@ -363,14 +363,11 @@ void WarGrey::STEM::Cosmos::on_navigate(int from_idx, int to_idx) {
 }
 
 void WarGrey::STEM::Cosmos::notify_transfer(IPlane* from, IPlane* to) {
-    if (this->head_plane != nullptr) {
-        IPlane* child = this->head_plane;
+    if (from != nullptr) {
+        from->on_leave(to);
+    }
 
-        do {
-            LinkedPlaneInfo* info = PLANE_INFO(child);
-
-            child->on_transfer(from, to);
-            child = info->next;
-        } while (child != this->head_plane);
-    }    
+    if (to != nullptr) {
+        to->on_enter(from);
+    }
 }

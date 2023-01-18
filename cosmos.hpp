@@ -42,7 +42,7 @@ namespace WarGrey::STEM {
         void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
         void on_text(const char* text, size_t size, bool entire) override;
         void on_editing_text(const char* text, int pos, int span) override;
-        
+
         void on_save() override;
 
     protected:
