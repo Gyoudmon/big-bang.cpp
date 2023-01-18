@@ -281,10 +281,14 @@ void WarGrey::STEM::game_render_surface(SDL_Renderer* target, SDL_Surface* surfa
 }
 
 void WarGrey::STEM::game_render_surface(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* region, SDL_RendererFlip flip, double angle) {
+    game_render_surface(target, surface, nullptr, region, flip, angle);
+}
+
+void WarGrey::STEM::game_render_surface(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* src, SDL_Rect* dst, SDL_RendererFlip flip, double angle) {
     SDL_Texture* texture = SDL_CreateTextureFromSurface(target, surface);
 
     if (texture != nullptr) {
-        game_render_texture(target, texture, region, flip, angle);
+        game_render_texture(target, texture, src, dst, flip, angle);
         SDL_DestroyTexture(texture);
     }
 }
@@ -306,10 +310,14 @@ int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* textur
 }
 
 int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* region, SDL_RendererFlip flip, double angle) {
+    return game_render_texture(target, texture, nullptr, region, flip, angle);
+}
+
+int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dst, SDL_RendererFlip flip, double angle) {
     if ((flip == SDL_FLIP_NONE) && (angle == 0.0)) {
-        return SDL_RenderCopy(target, texture, nullptr, region);
+        return SDL_RenderCopy(target, texture, src, dst);
     } else {
-        return SDL_RenderCopyEx(target, texture, nullptr, region, angle, nullptr, flip);
+        return SDL_RenderCopyEx(target, texture, src, dst, angle, nullptr, flip);
     }
 }
 
@@ -508,10 +516,14 @@ void WarGrey::STEM::game_render_surface(SDL_Renderer* target, SDL_Surface* surfa
 }
 
 void WarGrey::STEM::game_render_surface(SDL_Renderer* target, SDL_Surface* surface, SDL_FRect* region, SDL_RendererFlip flip, double angle) {
+    game_render_surface(target, surface, nullptr, region, flip, angle);
+}
+
+void WarGrey::STEM::game_render_surface(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* src, SDL_FRect* dst, SDL_RendererFlip flip, double angle) {
     SDL_Texture* texture = SDL_CreateTextureFromSurface(target, surface);
 
     if (texture != nullptr) {
-        game_render_texture(target, texture, region, flip, angle);
+        game_render_texture(target, texture, src, dst, flip, angle);
         SDL_DestroyTexture(texture);
     }
 }
@@ -533,10 +545,14 @@ int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* textur
 }
 
 int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_FRect* region, SDL_RendererFlip flip, double angle) {
+    return game_render_texture(target, texture, nullptr, region, flip, angle);
+}
+
+int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_FRect* dst, SDL_RendererFlip flip, double angle) {
     if ((flip == SDL_FLIP_NONE) && (angle == 0.0)) {
-        return SDL_RenderCopyF(target, texture, nullptr, region);
+        return SDL_RenderCopyF(target, texture, src, dst);
     } else {
-        return SDL_RenderCopyExF(target, texture, nullptr, region, angle, nullptr, flip);
+        return SDL_RenderCopyExF(target, texture, src, dst, angle, nullptr, flip);
     }
 }
 

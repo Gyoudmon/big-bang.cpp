@@ -12,7 +12,7 @@ namespace WarGrey::STEM {
     class ISprite : public WarGrey::STEM::IMatter, public WarGrey::STEM::IMovable {
     public:
         ISprite();
-        virtual ~ISprite();
+        virtual ~ISprite() {}
 
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -20,10 +20,12 @@ namespace WarGrey::STEM {
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:
-        size_t custome_count();
+        virtual size_t custome_count() = 0;
+        
+    public:
         void switch_to_custome(int idx);
-        void switch_to_custome(const std::string& name);
         void switch_to_custome(const char* name);
+        void switch_to_custome(const std::string& name) { this->switch_to_custome(name.c_str()); }
         void switch_to_prev_custome() { this->switch_to_custome(this->current_custome_idx - 1); }
         void switch_to_next_custome() { this->switch_to_custome(this->current_custome_idx + 1); }
 
@@ -35,14 +37,16 @@ namespace WarGrey::STEM {
         void stop();
 
     protected:
+        virtual void feed_custome_extent(int idx, float* width, float* height) = 0;
+        virtual bool is_key_frame(int idx, const char* action) = 0;
+        virtual int custome_name_to_index(const char* name) = 0;
+        virtual void draw_custome(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) = 0;
+
+    protected:
         void on_resize(float width, float height, float old_width, float old_height) override;
 
     protected:
-        void push_custome(const std::string& name, SDL_Texture* custome);
-        void push_custome(const char* name, SDL_Texture* custome);
-
-    private:
-        std::vector<std::pair<std::string, SDL_Texture*>> customes;
+        SDL_RendererFlip current_flip_status();
 
     private:
         int current_custome_idx = 0;
@@ -55,19 +59,5 @@ namespace WarGrey::STEM {
         int animation_rest = 0;
         std::vector<int> frame_refs;
         int current_subframe_idx;
-    };
-
-    class Sprite : public WarGrey::STEM::ISprite {
-    public:
-        Sprite(const char* pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
-        Sprite(const std::string& pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
-
-        void pre_construct(SDL_Renderer* renderer) override;
-
-    private:
-        void load_custome(SDL_Renderer* renderer, std::string& png);
-        
-    private:
-        std::string _pathname;
     };
 }

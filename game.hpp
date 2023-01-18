@@ -13,6 +13,7 @@
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
 #include "matter/sprite.hpp"
+#include "matter/sprite/folder.hpp"
 
 #include "datum/path.hpp"
 
