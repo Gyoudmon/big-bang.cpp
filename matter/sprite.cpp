@@ -2,6 +2,7 @@
 
 #include "../datum/box.hpp"
 #include "../datum/flonum.hpp"
+#include "../datum/string.hpp"
 
 #include "../graphics/geometry.hpp"
 
@@ -109,7 +110,7 @@ size_t WarGrey::STEM::ISprite::play(const char* action, int repetition) {
     this->current_subframe_idx = 0;
     
     for (int i = 0; i < this->custome_count(); i++) {
-        if (this->is_key_frame(i, action)) {
+        if (string_prefix(this->custome_index_to_name(i), action)) {
             this->frame_refs.push_back(i);
         }
     }

@@ -3,7 +3,6 @@
 #include "../sprite.hpp"
 
 #include <vector>
-#include <string>
 
 namespace WarGrey::STEM {
     class Sprite : public WarGrey::STEM::ISprite {
@@ -19,7 +18,7 @@ namespace WarGrey::STEM {
 
     protected:
         void feed_custome_extent(int idx, float* width, float* height) override;
-        bool is_key_frame(int idx, const char* action) override;
+        const std::string& custome_index_to_name(int idx) override;
         int custome_name_to_index(const char* name) override;
         void draw_custome(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) override;
 

@@ -14,6 +14,7 @@
 #include "matter/graphlet/dimensionlet.hpp"
 #include "matter/sprite.hpp"
 #include "matter/sprite/folder.hpp"
+#include "matter/sprite/sheet.hpp"
 
 #include "datum/path.hpp"
 

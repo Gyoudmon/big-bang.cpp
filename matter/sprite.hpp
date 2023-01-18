@@ -38,7 +38,7 @@ namespace WarGrey::STEM {
 
     protected:
         virtual void feed_custome_extent(int idx, float* width, float* height) = 0;
-        virtual bool is_key_frame(int idx, const char* action) = 0;
+        virtual const std::string& custome_index_to_name(int idx) = 0;
         virtual int custome_name_to_index(const char* name) = 0;
         virtual void draw_custome(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) = 0;
 

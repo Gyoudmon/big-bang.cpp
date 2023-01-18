@@ -74,8 +74,8 @@ int WarGrey::STEM::Sprite::custome_name_to_index(const char* name) {
     return cidx;
 }
 
-bool WarGrey::STEM::Sprite::is_key_frame(int idx, const char* action) {
-    return string_prefix(this->customes[idx].first, action);
+const std::string& WarGrey::STEM::Sprite::custome_index_to_name(int idx) {
+    return this->customes[idx].first;
 }
 
 void WarGrey::STEM::Sprite::load_custome(SDL_Renderer* renderer, std::string& png) {
