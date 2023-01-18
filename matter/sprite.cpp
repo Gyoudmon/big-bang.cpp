@@ -40,8 +40,15 @@ void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* 
 }
 
 void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
-    this->xscale = width / old_width;
-    this->yscale = height / old_height;
+    SDL_Texture* custome = this->customes[this->current_custome_idx].second;
+    
+    if (custome != nullptr) {
+        int tw, th;
+
+        SDL_QueryTexture(custome, nullptr, nullptr, &tw, &th);
+        this->xscale = width  / float(tw);
+        this->yscale = height / float(th);
+    }
 }
 
 void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {

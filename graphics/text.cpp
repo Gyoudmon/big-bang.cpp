@@ -162,6 +162,15 @@ SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, TTF_Font*
     return surface;
 }
 
+SDL_Texture* WarGrey::STEM::game_text_texture(SDL_Renderer* renderer, const std::string& text, TTF_Font* font, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
+    SDL_Surface* surface = game_text_surface(text, font, mode, fgc, bgc, wrap);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
 /*************************************************************************************************/
 void WarGrey::STEM::game_draw_solid_text(TTF_Font* font, SDL_Renderer* renderer, uint32_t rgb, int x, int y, const std::string& text, int wrap) {
     SDL_Surface* message = solid_text_surface(font, rgb, text, wrap);
@@ -243,4 +252,3 @@ void WarGrey::STEM::game_draw_blended_text(TTF_Font* font, SDL_Renderer* rendere
     VSNPRINT(text, fmt);
     game_draw_blended_text(font, renderer, rgb, x, y, text);
 }
-

@@ -16,14 +16,18 @@ WarGrey::STEM::ITextlet::ITextlet() {
 }
 
 WarGrey::STEM::ITextlet::~ITextlet() {
-    if (this->text_surface != nullptr) {
-        SDL_FreeSurface(this->text_surface);
+    if (this->texture != nullptr) {
+        SDL_DestroyTexture(this->texture);
     }
+}
+
+void WarGrey::STEM::ITextlet::construct(SDL_Renderer* renderer) {
+    this->update_texture();
 }
 
 void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, float alpha) {
     RGB_FillColor(&this->text_color, color_hex, alpha);
-    this->update_text_surface();
+    this->update_texture();
     this->notify_updated();
 }
 
@@ -45,7 +49,7 @@ void WarGrey::STEM::ITextlet::set_text(const std::string& content, MatterAnchor 
     if (this->text_font == nullptr) {
         this->set_font(nullptr, anchor);
     } else {
-        this->update_text_surface();
+        this->update_texture();
     }
 
     this->notify_updated();
@@ -62,30 +66,37 @@ void WarGrey::STEM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...
 }
 
 void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) {
-    if (this->text_surface != nullptr) {
-        SET_BOX(w, float(this->text_surface->w));
-        SET_BOX(h, float(this->text_surface->h));
+    if (this->texture != nullptr) {
+        int width, height;
+
+        SDL_QueryTexture(this->texture, nullptr, nullptr, &width, &height);
+
+        SET_BOX(w, float(width));
+        SET_BOX(h, float(height));
     } else {
         IGraphlet::feed_extent(x, y, w, h);
     }
 }
 
 void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
-    if (this->text_surface != nullptr) {
-        game_render_surface(renderer, this->text_surface, x, y);
+    if (this->texture != nullptr) {
+        game_render_texture(renderer, this->texture, x, y);
     }
 }
 
-void WarGrey::STEM::ITextlet::update_text_surface() {
-    if (this->text_surface != nullptr) {
-        SDL_FreeSurface(this->text_surface);
+void WarGrey::STEM::ITextlet::update_texture() {
+    SDL_Renderer* renderer = this->master_renderer();
+
+    if (this->texture != nullptr) {
+        SDL_DestroyTexture(this->texture);
     }
 
-    if (this->raw.empty()) {
-        this->text_surface = nullptr;
+    if ((this->raw.empty()) || (renderer == nullptr)) {
+        this->texture = nullptr;
     } else {
-        this->text_surface = game_text_surface(this->raw, this->text_font,
-                TextRenderMode::Blender, this->text_color, this->text_color, 0);
+        this->texture = game_text_texture(renderer,
+                this->raw, this->text_font, TextRenderMode::Blender,
+                this->text_color, this->text_color, 0);
     }
 }
 

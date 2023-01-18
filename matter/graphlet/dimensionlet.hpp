@@ -79,17 +79,17 @@ namespace WarGrey::STEM {
 		void apply_style(WarGrey::STEM::DimensionStyle& style, SDL_Renderer* renderer) override;
 
     protected:
-        void on_value_changed(float value) override;
+        void on_value_changed(SDL_Renderer* ds, float value) override;
 
     private:
-        void surface_collapse();
+        void texture_collapse();
         void feed_subextent(int n, float* w = nullptr, float* h = nullptr);
         void update_drawing_box(int idx, float minimize_width, TTF_Font* font, float leading_space);
-        void update_number_surface(float value, WarGrey::STEM::DimensionStyle& style);
+        void update_number_texture(SDL_Renderer* ds, float value, WarGrey::STEM::DimensionStyle& style);
         void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor);
 
     private:
-        SDL_Surface* surfaces[3] = {};
+        SDL_Texture* textures[3] = {};
         SDL_FRect boxes[3]; // `FRect.y` is useless
 
     private:

@@ -31,14 +31,14 @@ namespace WarGrey::STEM {
 				} else {
 					this->moor(anchor);
 					this->value = value;
-					this->on_value_changed(value);
+					this->on_value_changed(this->master_renderer(), value);
 					this->notify_updated();
 				}
 			}
 		}
 		
 	protected:
-		virtual void on_value_changed(T value) {}
+		virtual void on_value_changed(SDL_Renderer* renderer, T value) {}
 
 	protected:
 		virtual T guarded_value(T value) { return flsafe(value, this->value); }
@@ -85,13 +85,13 @@ namespace WarGrey::STEM {
 
 				if (force_update || changed) {
 					this->moor(anchor);
-					this->on_range_changed(this->vmin, this->vmax);
+					this->on_range_changed(this->master_renderer(), this->vmin, this->vmax);
 					this->notify_updated();
 				}
 			}
 		}
 
-		virtual void on_range_changed(T vmin, T vmax) {}
+		virtual void on_range_changed(SDL_Renderer* ds, T vmin, T vmax) {}
 
 	public:
 		double get_percentage(T value) {

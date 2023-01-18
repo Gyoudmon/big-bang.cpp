@@ -15,6 +15,8 @@ namespace WarGrey::STEM {
         ITextlet();
         virtual ~ITextlet();
 
+        void construct(SDL_Renderer* render) override;
+
     public:
         void set_text(const char* fmt, ...);
         void set_text(WarGrey::STEM::MatterAnchor anchor, const char* fmt, ...);
@@ -32,12 +34,12 @@ namespace WarGrey::STEM {
         virtual void on_font_changed() {}
 
     private:
-        void update_text_surface();
+        void update_texture();
 
     protected:
         SDL_Color text_color;
         TTF_Font* text_font = nullptr;
-        SDL_Surface* text_surface = nullptr;
+        SDL_Texture* texture = nullptr;
 
     private:
         std::string raw;

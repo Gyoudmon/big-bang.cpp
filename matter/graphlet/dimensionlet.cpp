@@ -128,22 +128,22 @@ WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle&
 }
 
 WarGrey::STEM::Dimensionlet::~Dimensionlet() {
-    this->surface_collapse();
+    this->texture_collapse();
 }
 
-void WarGrey::STEM::Dimensionlet::surface_collapse() {
-    size_t n = sizeof(this->surfaces) / sizeof(SDL_Surface*);
+void WarGrey::STEM::Dimensionlet::texture_collapse() {
+    size_t n = sizeof(this->textures) / sizeof(SDL_Texture*);
 
     for (size_t idx = 0; idx < n; idx ++) {
-        if (this->surfaces[idx] != nullptr) {
-            SDL_FreeSurface(this->surfaces[idx]);
-            this->surfaces[idx] = nullptr;
+        if (this->textures[idx] != nullptr) {
+            SDL_DestroyTexture(this->textures[idx]);
+            this->textures[idx] = nullptr;
         }
     }
 }
 
 void WarGrey::STEM::Dimensionlet::feed_extent(float x, float y, float* w, float* h) {
-    size_t n = sizeof(this->surfaces) / sizeof(SDL_Surface*);
+    size_t n = sizeof(this->textures) / sizeof(SDL_Texture*);
     
     this->feed_subextent(n, w, h);
 }
@@ -153,7 +153,7 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
     
     if (self->w > 0.0F) {
         float bottom = y + Height;
-        SDL_Surface* surface = this->surfaces[idx];
+        SDL_Texture* texture = this->textures[idx];
         
         self->x += x;
         self->y = bottom - self->h;
@@ -167,10 +167,11 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
             game_draw_rect(ds, self, static_cast<uint32_t>(bcolor));
         }
 
-        if (surface != nullptr) {
-            game_render_surface(ds, surface,
-                    self->x + (self->w - float(surface->w)) * xfraction,
-                    bottom - float(surface->h));
+        if (texture != nullptr) {
+            int width, height;
+
+            SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
+            game_render_texture(ds, texture, self->x + (self->w - width) * xfraction, bottom - height);
         }
 
         self->x -= x;
@@ -213,20 +214,20 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
     SDL_Color color;
 
-    this->surface_collapse();
+    this->texture_collapse();
 	
     if (!this->label.empty()) {
         RGB_FillColor(&color, style.label_color);
-        this->surfaces[label_idx] = game_text_surface(this->label, style.label_font,
-                TextRenderMode::Blender, color, color, 0);
+        this->textures[label_idx] = game_text_texture(renderer,
+                this->label, style.label_font, TextRenderMode::Blender, color, color, 0);
     }
 
-    this->update_number_surface(this->get_value(), style);
+    this->update_number_texture(renderer, this->get_value(), style);
 
     if (!this->unit.empty()) {
         RGB_FillColor(&color, style.unit_color);
-        this->surfaces[unit_idx] = game_text_surface(this->unit, style.unit_font,
-                TextRenderMode::Blender, color, color, 0);
+        this->textures[unit_idx] = game_text_texture(renderer,
+                this->unit, style.unit_font, TextRenderMode::Blender, color, color, 0);
     }
 	
     this->update_drawing_box(label_idx, style.minimize_label_width, style.label_font, 0.0F);
@@ -234,27 +235,31 @@ void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Rendere
     this->update_drawing_box( unit_idx, -1.0F, style.unit_font, style.unit_leading_space);
 }
 
-void WarGrey::STEM::Dimensionlet::on_value_changed(float value) {
-	this->update_number_surface(value, this->get_style());
+void WarGrey::STEM::Dimensionlet::on_value_changed(SDL_Renderer* ds, float value) {
+	this->update_number_texture(ds, value, this->get_style());
 }
 
-void WarGrey::STEM::Dimensionlet::update_number_surface(float value, DimensionStyle& style) {
+void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, float value, DimensionStyle& style) {
     SDL_Color color;
 
     RGB_FillColor(&color, style.number_color);
-	this->surfaces[datum_idx] = game_text_surface(flstring(value, style.precision), style.number_font,
+	this->textures[datum_idx] = game_text_texture(renderer,
+            flstring(value, style.precision), style.number_font,
             TextRenderMode::Blender, color, color, 0);
 }
 
 void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, TTF_Font* font, float leading_space) {
-    SDL_Surface* self = this->surfaces[idx];
+    SDL_Texture* self = this->textures[idx];
+    int width, height;
 
     this->feed_subextent(idx, &this->boxes[idx].x);
     this->boxes[idx].x += leading_space;
 
     if (self != nullptr) {
-        this->boxes[idx].w = flmax(float(self->w), min_width);
-        this->boxes[idx].h = float(self->h);
+        SDL_QueryTexture(self, nullptr, nullptr, &width, &height);
+
+        this->boxes[idx].w = flmax(float(width), min_width);
+        this->boxes[idx].h = float(height);
     } else if (min_width > 0) {
         this->boxes[idx].w = flmax(min_width, 0.0F);
         this->boxes[idx].h = float(font_height(font));
