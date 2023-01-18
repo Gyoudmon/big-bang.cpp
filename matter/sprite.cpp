@@ -29,20 +29,19 @@ void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* 
     if (this->current_custome_idx >= this->customes.size()) {
         SET_BOXES(width, height, 0.0F);
     } else {
-        SDL_Surface* custome = this->customes[this->current_custome_idx].second;
+        SDL_Texture* custome = this->customes[this->current_custome_idx].second;
+        int tw, th;
 
-        SET_BOX(width, float(custome->w) * flabs(this->xscale));
-        SET_BOX(height, float(custome->h) * flabs(this->yscale));
+        SDL_QueryTexture(custome, nullptr, nullptr, &tw, &th);
+
+        SET_BOX(width, float(tw) * flabs(this->xscale));
+        SET_BOX(height, float(th) * flabs(this->yscale));
     }
 }
 
 void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
-    if (this->current_custome_idx < this->customes.size()) {
-        SDL_Surface* custome = this->customes[this->current_custome_idx].second;
-        
-        this->xscale = width / float(custome->w);
-        this->yscale = height / float(custome->h);
-    }
+    this->xscale = width / old_width;
+    this->yscale = height / old_height;
 }
 
 void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
@@ -135,13 +134,13 @@ size_t WarGrey::STEM::ISprite::play(const char* action, int repetition) {
     return this->frame_refs.size();
 }
 
-void WarGrey::STEM::ISprite::push_custome(const char* name, SDL_Surface* custome) {
+void WarGrey::STEM::ISprite::push_custome(const char* name, SDL_Texture* custome) {
     this->push_custome(std::string(name), custome);
 }
 
-void WarGrey::STEM::ISprite::push_custome(const std::string& name, SDL_Surface* custome) {
+void WarGrey::STEM::ISprite::push_custome(const std::string& name, SDL_Texture* custome) {
     if (custome != nullptr) {
-        auto datum = std::pair<std::string, SDL_Surface*>(name, custome);
+        auto datum = std::pair<std::string, SDL_Texture*>(name, custome);
         
         for (auto it = this->customes.begin(); ; it++) {
             if (it == this->customes.end()) {
@@ -168,7 +167,7 @@ WarGrey::STEM::Sprite::Sprite(const std::string& pathname, MatterAnchor resize_a
     this->enable_resize(true, resize_anchor);
 }
 
-void WarGrey::STEM::Sprite::pre_construct() {
+void WarGrey::STEM::Sprite::pre_construct(SDL_Renderer* renderer) {
     path target(this->_pathname);
 
     if (exists(target)) {
@@ -178,18 +177,18 @@ void WarGrey::STEM::Sprite::pre_construct() {
                     std::string pathname = entry.path().string();
 
                     if (file_extension_from_path(pathname) == ".png") { 
-                        this->load_custome(pathname);
+                        this->load_custome(renderer, pathname);
                     } 
                 }
             }
         } else {
-            this->load_custome(this->_pathname);
+            this->load_custome(renderer, this->_pathname);
         }
     }
 }
 
-void WarGrey::STEM::Sprite::load_custome(std::string& png) {
-    SDL_Surface* custome = game_load_image(png);
+void WarGrey::STEM::Sprite::load_custome(SDL_Renderer* renderer, std::string& png) {
+    SDL_Texture* custome = game_load_image_as_texture(renderer, png);
 
     if (custome != nullptr) {
         this->push_custome(file_basename_from_path(png), custome);       

@@ -5,9 +5,9 @@
 
 #include <cstdint>
 
-#include "../../graphlet.hpp"
+#include "../graphlet.hpp"
 
-#include "../../../graphics/named_colors.hpp"
+#include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
     class ITextlet : public virtual WarGrey::STEM::IGraphlet {

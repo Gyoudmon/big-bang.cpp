@@ -1,12 +1,12 @@
 #include "textlet.hpp"
 
-#include "../../../graphics/font.hpp"
-#include "../../../graphics/text.hpp"
-#include "../../../graphics/colorspace.hpp"
-#include "../../../graphics/geometry.hpp"
+#include "../../graphics/font.hpp"
+#include "../../graphics/text.hpp"
+#include "../../graphics/colorspace.hpp"
+#include "../../graphics/geometry.hpp"
 
-#include "../../../datum/string.hpp"
-#include "../../../datum/box.hpp"
+#include "../../datum/string.hpp"
+#include "../../datum/box.hpp"
 
 using namespace WarGrey::STEM;
 

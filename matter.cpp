@@ -26,6 +26,17 @@ IPlane* WarGrey::STEM::IMatter::master() {
     return plane;
 }
 
+SDL_Renderer* WarGrey::STEM::IMatter::master_renderer() {
+    IPlane* master = this->master();
+    SDL_Renderer* renderer = nullptr;
+
+    if (master != nullptr) {
+        renderer = master->master_renderer();
+    }
+
+    return renderer;
+}
+
 void WarGrey::STEM::IMatter::feed_extent(float x, float y, float* w, float* h) {
     SET_VALUES(w, 0.0F, h, 0.0F);
 }
@@ -129,38 +140,4 @@ void WarGrey::STEM::IMatter::log_message(int fgc, const std::string& msg) {
     if (this->info != nullptr) {
         this->info->master->log_message(fgc, msg);
     }
-}
-
-/**************************************************************************************************/
-SDL_Surface* WarGrey::STEM::IMatter::snapshot() {
-    SDL_Surface* photograph = nullptr;
-    float width, height;
-
-    this->feed_extent(0.0F, 0.0F, &width, &height);
-    photograph = game_blank_image(width, height);
-
-    if (photograph != nullptr) {
-        SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(photograph);
-        
-        if (renderer != nullptr) {
-            this->draw(renderer, 0.0F, 0.0F, width, height);
-            SDL_RenderPresent(renderer);
-            SDL_DestroyRenderer(renderer);
-        }
-    }
-
-    return photograph;
-}
-
-bool WarGrey::STEM::IMatter::save_snapshot(const std::string& pname) {
-    return this->save_snapshot(pname.c_str());
-}
-
-bool WarGrey::STEM::IMatter::save_snapshot(const char* pname) {
-    SDL_Surface* photograph = this->snapshot();
-    bool okay = game_save_image(photograph, pname);
-
-    SDL_FreeSurface(photograph);
-
-    return okay;
 }

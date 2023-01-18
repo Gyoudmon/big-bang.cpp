@@ -41,6 +41,7 @@ namespace WarGrey::STEM {
         void set_snapshot_folder(const char* path);
         void set_snapshot_folder(const std::string& path);
         SDL_Surface* snapshot() override;
+        SDL_Renderer* master_renderer() override;
         
     public: // 窗体 setter 和 getter
         void set_blend_mode(SDL_BlendMode bmode);

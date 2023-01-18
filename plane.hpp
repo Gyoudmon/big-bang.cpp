@@ -30,6 +30,7 @@ namespace WarGrey::STEM {
     public:
         const char* name();
         WarGrey::STEM::IScreen* master();
+        SDL_Renderer* master_renderer();
 
     public:
         virtual void construct(float Width, float Height) {}
@@ -88,15 +89,6 @@ namespace WarGrey::STEM {
         void end_update_sequence();
         bool should_update();
         void notify_updated();
-
-    public:
-        SDL_Surface* snapshot(float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
-        SDL_Surface* snapshot(float x, float y, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
-    
-        bool save_snapshot(const std::string& pname, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
-        bool save_snapshot(const char* pname, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F );
-        bool save_snapshot(const std::string& pname, float x, float y, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
-        bool save_snapshot(const char* pname, float x, float y, float width, float height, uint32_t bgcolor = 0U, float alpha = 0.0F);
 
     public:
         bool feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a);

@@ -137,8 +137,8 @@ namespace WarGrey::STEM {
 		}
 
 	public:
-		void post_construct() override {
-			this->update_state();
+		void post_construct(SDL_Renderer* renderer) override {
+			this->update_state(renderer);
 		}
 
 	public:		
@@ -147,7 +147,7 @@ namespace WarGrey::STEM {
 
 			if (this->current_state != new_state) {
 				this->current_state = new_state;
-				this->update_state();
+				this->update_state(this->master_renderer());
 				this->notify_updated();
 			}
 		}
@@ -177,7 +177,7 @@ namespace WarGrey::STEM {
 			this->style_ready[idx] = false;
 
 			if (idx == this->current_state) {
-				this->update_state();
+				this->update_state(this->master_renderer());
 				this->notify_updated();
 			}
 		}
@@ -200,15 +200,15 @@ namespace WarGrey::STEM {
 		}
 
 	protected:
-		void update_state() {
-			this->apply_style(this->get_style());
+		void update_state(SDL_Renderer* renderer) {
+			this->apply_style(this->get_style(), renderer);
 			this->on_state_changed(_E(State, this->current_state));
 		}
 
 	protected:
 		virtual void prepare_style(State status, Style& style) = 0;
 		virtual void on_state_changed(State status) {}
-		virtual void apply_style(Style& style) {}
+		virtual void apply_style(Style& style, SDL_Renderer* renderer) {}
 
 	private:
 		unsigned int default_state;

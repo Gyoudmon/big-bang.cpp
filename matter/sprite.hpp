@@ -38,11 +38,11 @@ namespace WarGrey::STEM {
         void on_resize(float width, float height, float old_width, float old_height) override;
 
     protected:
-        void push_custome(const std::string& name, SDL_Surface* custome);
-        void push_custome(const char* name, SDL_Surface* custome);
+        void push_custome(const std::string& name, SDL_Texture* custome);
+        void push_custome(const char* name, SDL_Texture* custome);
 
     private:
-        std::vector<std::pair<std::string, SDL_Surface*>> customes;
+        std::vector<std::pair<std::string, SDL_Texture*>> customes;
 
     private:
         int current_custome_idx = 0;
@@ -62,10 +62,10 @@ namespace WarGrey::STEM {
         Sprite(const char* pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
         Sprite(const std::string& pathname, WarGrey::STEM::MatterAnchor resize_anchor = MatterAnchor::CC);
 
-        void pre_construct() override;
+        void pre_construct(SDL_Renderer* renderer) override;
 
     private:
-        void load_custome(std::string& png);
+        void load_custome(SDL_Renderer* renderer, std::string& png);
         
     private:
         std::string _pathname;

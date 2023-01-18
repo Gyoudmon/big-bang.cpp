@@ -168,9 +168,7 @@ static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* textu
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IUniverse::IUniverse(int fps, uint32_t fgc, uint32_t bgc)
-    : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
-    
+WarGrey::STEM::IUniverse::IUniverse(int fps, uint32_t fgc, uint32_t bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     game_create_world(1, 0, &this->window, &this->renderer);
@@ -443,6 +441,10 @@ void WarGrey::STEM::IUniverse::set_window_title(const char* fmt, ...) {
     this->set_window_title(title);
 }
 
+SDL_Renderer* WarGrey::STEM::IUniverse::master_renderer() {
+    return this->renderer;
+}
+
 const char* WarGrey::STEM::IUniverse::get_renderer_name() {
     SDL_RendererInfo rinfo;
 
@@ -573,15 +575,12 @@ void WarGrey::STEM::IUniverse::popback_input_text() {
 
 /*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
-    SDL_Surface* photograph = game_blank_image(this->window_width, this->window_height);
+    uint32_t format = SDL_PIXELFORMAT_RGBA8888;
+    SDL_Surface* photograph = game_formatted_image(this->window_width, this->window_height, format);
 
     if (photograph != nullptr) {
-        SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(photograph);
-        
-        if (renderer != nullptr) {
-            this->do_redraw(renderer, 0, 0, this->window_width, this->window_height);
-            SDL_RenderPresent(renderer);
-            SDL_DestroyRenderer(renderer);
+        if (SDL_RenderReadPixels(this->renderer, NULL, format, photograph->pixels, photograph->pitch) < 0) {
+            this->log_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
         }
     }
 

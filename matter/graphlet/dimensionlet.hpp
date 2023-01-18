@@ -5,8 +5,8 @@
 
 #include <cstdint>
 
-#include "../../graphlet.hpp"
-#include "../../../graphics/named_colors.hpp"
+#include "../graphlet.hpp"
+#include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
     /*********************************************************************************************/
@@ -50,6 +50,7 @@ namespace WarGrey::STEM {
 
 	WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_n, int precision = -1,
             uint32_t number_bgcolor = GOLDENROD, uint32_t label_bgcolor = FORESTGREEN, uint32_t color = GHOSTWHITE);
+    
 	WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_label, unsigned int min_n, int precision,
             uint32_t number_bgcolor = GOLDENROD, uint32_t label_bgcolor = FORESTGREEN, uint32_t color = GHOSTWHITE);
 
@@ -75,7 +76,7 @@ namespace WarGrey::STEM {
 
     protected:
         void prepare_style(WarGrey::STEM::DimensionState status, WarGrey::STEM::DimensionStyle& style) override;
-		void apply_style(WarGrey::STEM::DimensionStyle& style) override;
+		void apply_style(WarGrey::STEM::DimensionStyle& style, SDL_Renderer* renderer) override;
 
     protected:
         void on_value_changed(float value) override;

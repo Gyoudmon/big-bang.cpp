@@ -45,6 +45,14 @@ SDL_Surface* WarGrey::STEM::game_blank_image(float width, float height, uint32_t
     return game_blank_image(fl2fxi(width), fl2fxi(height), alpha_color_key);
 }
 
+SDL_Surface* WarGrey::STEM::game_formatted_image(int width, int height, uint32_t format) {
+    return SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, format);
+}
+
+SDL_Surface* WarGrey::STEM::game_formatted_image(float width, float height, uint32_t format) {
+    return game_formatted_image(fl2fxi(width), fl2fxi(height), format);
+}
+
 SDL_Surface* WarGrey::STEM::game_load_image(const std::string& file) {
     return game_load_image(file.c_str());
 }
@@ -87,14 +95,11 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, in
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
-    SDL_Rect region;
+    game_render_surface(renderer, image, x, y, width, height, flip, angle);
+}
 
-    region.x = x;
-    region.y = y;
-    region.w = (width <= 0) ? image->w : width;
-    region.h = (height <= 0) ? image->h : height;
-    
-    game_render_surface(renderer, image, &region, flip, angle);
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
+    game_render_texture(renderer, image, x, y, width, height, flip, angle);
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
@@ -113,7 +118,11 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, in
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, SDL_RendererFlip flip, double angle) {
     game_render_surface(renderer, image, x, y, flip, angle);
 }
-    
+
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, float x, float y, SDL_RendererFlip flip, double angle) {
+    game_render_texture(renderer, image, x, y, flip, angle);
+}
+
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, SDL_RendererFlip flip, double angle) {
     game_draw_image(renderer, file.c_str(), x, y, flip, angle);
 }
@@ -128,14 +137,11 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, fl
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
-    SDL_FRect region;
+    game_render_surface(renderer, image, x, y, width, height, flip, angle);
+}
 
-    region.x = x;
-    region.y = y;
-    region.w = (width <= 0) ? float(image->w) : width;
-    region.h = (height <= 0) ? float(image->h) : height;
-    
-    game_render_surface(renderer, image, &region, flip, angle);
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
+    game_render_texture(renderer, image, x, y, width, height, flip, angle);
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {

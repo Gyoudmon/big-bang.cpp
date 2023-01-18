@@ -10,8 +10,8 @@
 
 #include "world.hpp"
 #include "matter/graphlet.hpp"
-#include "matter/graphlet/ui/textlet.hpp"
-#include "matter/graphlet/ui/dimensionlet.hpp"
+#include "matter/graphlet/textlet.hpp"
+#include "matter/graphlet/dimensionlet.hpp"
 #include "matter/sprite.hpp"
 
 #include "datum/path.hpp"

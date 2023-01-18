@@ -23,14 +23,15 @@ namespace WarGrey::STEM {
         IMatter() {}
         virtual ~IMatter();
 
-        virtual void pre_construct() {}     // pseudo constructor for special derived classes before constructing
-        virtual void post_construct() {}    // pseudo constructor for special derived classes after constructing
+        virtual void pre_construct(SDL_Renderer* renderer) {}     // pseudo constructor for special derived classes before constructing
+        virtual void post_construct(SDL_Renderer* renderer) {}    // pseudo constructor for special derived classes after constructing
 
     public:
         WarGrey::STEM::IPlane* master();
+        SDL_Renderer* master_renderer();
 
     public:
-        virtual void construct() {}
+        virtual void construct(SDL_Renderer* renderer) {}
         virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
         virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
         virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
@@ -89,11 +90,6 @@ namespace WarGrey::STEM {
 
     public:
         IMatterInfo* info = nullptr;
-
-    public:
-        SDL_Surface* snapshot();
-        bool save_snapshot(const std::string& pname);
-        bool save_snapshot(const char* pname);
 
     protected:
         virtual void on_resize(float width, float height, float old_width, float old_height) {}

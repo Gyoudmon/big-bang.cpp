@@ -18,6 +18,7 @@ namespace WarGrey::STEM {
         virtual void log_message(int fgc, const std::string& message) = 0;
         virtual void start_input_text(const std::string& prompt) = 0;
         virtual SDL_Surface* snapshot() = 0;
+        virtual SDL_Renderer* master_renderer() = 0;
 
     public:
         void begin_update_sequence() { this->update_sequence_depth += 1; }

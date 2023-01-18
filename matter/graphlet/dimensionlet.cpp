@@ -1,13 +1,13 @@
 #include "dimensionlet.hpp"
 
-#include "../../../graphics/font.hpp"
-#include "../../../graphics/text.hpp"
-#include "../../../graphics/colorspace.hpp"
-#include "../../../graphics/geometry.hpp"
+#include "../../graphics/font.hpp"
+#include "../../graphics/text.hpp"
+#include "../../graphics/colorspace.hpp"
+#include "../../graphics/geometry.hpp"
 
-#include "../../../datum/string.hpp"
-#include "../../../datum/box.hpp"
-#include "../../../datum/slot.hpp"
+#include "../../datum/string.hpp"
+#include "../../datum/box.hpp"
+#include "../../datum/slot.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -210,7 +210,7 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 	// NOTE: the others can be `nullptr`
 }
 
-void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style) {
+void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
     SDL_Color color;
 
     this->surface_collapse();

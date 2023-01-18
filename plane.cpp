@@ -253,6 +253,7 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
 void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
     if (m->info == nullptr) {
         MatterInfo* info = bind_matter_owership(this, this->mode, m);
+        SDL_Renderer* master_renderer = this->master_renderer();
 
         if (this->head_matter == nullptr) {
             this->head_matter = m;
@@ -268,9 +269,9 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
         info->next = this->head_matter;
 
         this->begin_update_sequence();
-        m->pre_construct();
-        m->construct();
-        m->post_construct();
+        m->pre_construct(master_renderer);
+        m->construct(master_renderer);
+        m->post_construct(master_renderer);
         unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy);
 
         if (m->ready()) {
@@ -961,6 +962,17 @@ IScreen* WarGrey::STEM::IPlane::master() {
     return screen;
 }
 
+SDL_Renderer* WarGrey::STEM::IPlane::master_renderer() {
+    SDL_Renderer* renderer = nullptr;
+    IScreen* screen = this->master();
+    
+    if (screen != nullptr) {
+        renderer = screen->display()->master_renderer();
+    }
+
+    return renderer;
+}
+
 void WarGrey::STEM::IPlane::feed_background(SDL_Color* c) {
     RGB_FillColor(c, this->background, this->bg_alpha);
 }
@@ -1022,60 +1034,6 @@ void WarGrey::STEM::IPlane::notify_updated() {
     if (this->info != nullptr) {
         this->info->master->notify_updated();
     }
-}
-
-SDL_Surface* WarGrey::STEM::IPlane::snapshot(float width, float height, uint32_t bgcolor, float alpha) {
-    return this->snapshot(0.0F, 0.0F, width, height, bgcolor, alpha);
-}
-
-SDL_Surface* WarGrey::STEM::IPlane::snapshot(float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
-    SDL_Surface* photograph = nullptr;
-    int saved_bgc = this->background;
-    float saved_alpha = this->bg_alpha;
-
-    if (x != 0.0F) width += x;
-    if (y != 0.0F) height += y;
-
-    photograph = game_blank_image(width, height);
-
-    if (photograph != nullptr) {
-        SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(photograph);
-        
-        if (renderer != nullptr) {
-            this->background = bgcolor;
-            this->bg_alpha = alpha;
-            
-            this->draw(renderer, -x, -y, width, height);
-            SDL_RenderPresent(renderer);
-            SDL_DestroyRenderer(renderer);
-
-            this->background = saved_bgc;
-            this->bg_alpha = saved_alpha;
-        }
-    }
-
-    return photograph;
-}
-
-bool WarGrey::STEM::IPlane::save_snapshot(const std::string& png, float width, float height, uint32_t bgcolor, float alpha) {
-    return this->save_snapshot(png.c_str(), 0.0F, 0.0F, width, height, bgcolor, alpha);
-}
-
-bool WarGrey::STEM::IPlane::save_snapshot(const char* png, float width, float height, uint32_t bgcolor, float alpha) {
-    return this->save_snapshot(png, 0.0F, 0.0F, width, height, bgcolor, alpha);
-}
-
-bool WarGrey::STEM::IPlane::save_snapshot(const std::string& png, float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
-    return this->save_snapshot(png.c_str(), x, y, width, height, bgcolor, alpha);
-}
-
-bool WarGrey::STEM::IPlane::save_snapshot(const char* png, float x, float y, float width, float height, uint32_t bgcolor, float alpha) {
-    SDL_Surface* photograph = this->snapshot(x, y, width, height, bgcolor, alpha);
-    bool okay = game_save_image(photograph, png);
-    
-    SDL_FreeSurface(photograph);
-
-    return okay;
 }
 
 bool WarGrey::STEM::IPlane::feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a) {

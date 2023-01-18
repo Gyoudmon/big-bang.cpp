@@ -6,9 +6,9 @@
 namespace WarGrey::STEM {
     class World : public WarGrey::STEM::Cosmos {
     public:
-        World(const char* title
-            , int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU
-            , unsigned int initial_mode = 0U);
+        World(const char* title,
+                int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU,
+                unsigned int initial_mode = 0U);
 
     public:
         void change_mode(unsigned int mode) { this->plane->change_mode(mode); }
