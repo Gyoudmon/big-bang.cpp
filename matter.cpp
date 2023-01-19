@@ -63,6 +63,27 @@ void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio) {
     }
 }
 
+void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio) {
+    if (this->can_resize) {
+        float cwidth, cheight, owidth, oheight, nwidth, nheight;
+        float x = 0.0F;
+        float y = 0.0F;
+
+        this->feed_location(&x, &y, MatterAnchor::LT);
+        this->feed_extent(x, y, &cwidth, &cheight);
+        this->feed_original_extent(x, y, &owidth, &oheight);
+
+        nwidth = owidth * x_ratio;
+        nheight = oheight * y_ratio;
+
+        if ((nwidth != cwidth) || (nheight != cheight)) {
+	        this->moor(this->resize_anchor);
+            this->on_resize(nwidth, nheight, cwidth, cheight);
+	        this->notify_updated();
+        }
+    }
+}
+
 void WarGrey::STEM::IMatter::resize(float w, float h) {
     if (this->can_resize) {
         if ((w > 0.0F) && (h > 0.0F)) {

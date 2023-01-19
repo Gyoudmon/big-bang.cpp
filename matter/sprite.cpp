@@ -16,14 +16,18 @@ WarGrey::STEM::ISprite::ISprite() {
 }
 
 void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* height) {
+    float owidth, oheight;
+
+    this->feed_original_extent(x, y, &owidth, &oheight);
+    SET_BOX(width, owidth * flabs(this->xscale));
+    SET_BOX(height, oheight * flabs(this->yscale));
+}
+
+void WarGrey::STEM::ISprite::feed_original_extent(float x, float y, float* width, float* height) {
     if (this->current_custome_idx >= this->custome_count()) {
         SET_BOXES(width, height, 0.0F);
     } else {
-        float cwidth, cheight;
-
-        this->feed_custome_extent(this->current_custome_idx, &cwidth, &cheight);
-        SET_BOX(width, cwidth * flabs(this->xscale));
-        SET_BOX(height, cheight * flabs(this->yscale));
+        this->feed_custome_extent(this->current_custome_idx, width, height);
     }
 }
 

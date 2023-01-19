@@ -33,6 +33,7 @@ namespace WarGrey::STEM {
     public:
         virtual void construct(SDL_Renderer* renderer) {}
         virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
+        virtual void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) { this->feed_extent(x, y, width, height); }
         virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
         virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
         virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
@@ -56,11 +57,12 @@ namespace WarGrey::STEM {
         virtual bool on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) { return false; }
 
     public:
+        bool resizable(WarGrey::STEM::MatterAnchor* anchor) { (*anchor) = this->resize_anchor; return this->can_resize; }
         void scale(float ratio) { this->scale(ratio, ratio); }
         void scale(float x_ratio, float y_ratio);
+        void scale_to(float ratio) { this->scale_to(ratio, ratio); }
+        void scale_to(float x_ratio, float y_ratio);
         void resize(float width, float height);
-        void enable_resize(bool yes_no, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->can_resize = yes_no; this->resize_anchor = anchor; }
-        bool resizable(WarGrey::STEM::MatterAnchor* anchor) { (*anchor) = this->resize_anchor; return this->can_resize; }
 
     public:
         void enable_events(bool yes_no, bool low_level = false) { this->deal_with_events = yes_no; this->deal_with_low_level_events = low_level; }
@@ -92,6 +94,7 @@ namespace WarGrey::STEM {
         IMatterInfo* info = nullptr;
 
     protected:
+        void enable_resize(bool yes_no, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->can_resize = yes_no; this->resize_anchor = anchor; }
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
 
     protected:
