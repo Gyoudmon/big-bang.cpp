@@ -64,7 +64,7 @@ std::string WarGrey::STEM::sstring(unsigned long long bytes, int precision) {
 }
 
 /*************************************************************************************************/
-std::string WarGrey::STEM::substring(std::string& src, int start, int endplus1) {
+std::string WarGrey::STEM::substring(const std::string& src, int start, int endplus1) {
     std::string substr;
     size_t max_size = src.size();
     size_t subsize = ((endplus1 > 0) ? fxmin(static_cast<size_t>(endplus1), max_size) : max_size) - start;
@@ -107,12 +107,12 @@ std::string WarGrey::STEM::hexnumber(unsigned long long n, size_t bytecount) {
 }
 
 /**************************************************************************************************/
-long long WarGrey::STEM::string_to_fixnum(std::string& string) {
-    return atoll(string.c_str());
+long long WarGrey::STEM::string_to_fixnum(const std::string& string) {
+    return std::atoll(string.c_str());
 }
 
 /**************************************************************************************************/
-std::string WarGrey::STEM::string_first_line(std::string& src) {
+std::string WarGrey::STEM::string_first_line(const std::string& src) {
     const char* raw_src = src.c_str();
     size_t total = src.size();
     size_t line_size = newline_position(raw_src, 0, total, &total);
@@ -120,7 +120,7 @@ std::string WarGrey::STEM::string_first_line(std::string& src) {
     return std::string(raw_src, line_size);
 }
 
-std::vector<std::string> WarGrey::STEM::string_lines(std::string& src, bool skip_empty_line) {
+std::vector<std::string> WarGrey::STEM::string_lines(const std::string& src, bool skip_empty_line) {
     std::vector<std::string> lines;
     const char* raw_src = src.c_str();
     size_t total = src.size();
@@ -382,4 +382,27 @@ bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
 
 bool WarGrey::STEM::string_prefix(const std::string& src, const std::string& sub) {
     return string_prefix(src, sub.c_str());
+}
+
+bool WarGrey::STEM::string_suffix(const std::string& src, const char* sub) {
+    bool yes = true;
+    size_t max = src.size();
+    size_t n = strnlen(sub, max + 1);
+
+    if (max >= n) {
+        for (size_t i = n; i > 0; i --) {
+            if (src[--max] != sub[i - 1]) {
+                yes = false;
+                break;
+            }
+        }
+    } else {
+        yes = false;
+    }
+
+    return yes;
+}
+
+bool WarGrey::STEM::string_suffix(const std::string& src, const std::string& sub) {
+    return string_suffix(src, sub.c_str());
 }

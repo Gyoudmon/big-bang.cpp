@@ -26,17 +26,17 @@ namespace WarGrey::STEM {
     if (pool != chpool) delete[] pool;
 
     /************************************************************************************************/
-    std::string substring(std::string& src, int start, int endplus1 = -1);
+    std::string substring(const std::string& src, int start, int endplus1 = -1);
     std::string flstring(double flonum, int precision);
     std::string fxstring(long long fixnum, int width);
     std::string sstring(unsigned long long bytes, int precision);
     std::string gpstring(double position, char suffix, int precision = 3);
 
-    long long string_to_fixnum(std::string& string);
+    long long string_to_fixnum(const std::string& string);
 
     std::string make_nstring(const char* fmt, ...);
-    std::string string_first_line(std::string& src);
-    std::vector<std::string> string_lines(std::string& src, bool skip_empty_line = false);
+    std::string string_first_line(const std::string& src);
+    std::vector<std::string> string_lines(const std::string& src, bool skip_empty_line = false);
 
     /************************************************************************************************/
     std::string binumber(unsigned long long n, size_t bitsize = 0);
@@ -63,4 +63,6 @@ namespace WarGrey::STEM {
     /************************************************************************************************/
     bool string_prefix(const std::string& src, const char* sub);
     bool string_prefix(const std::string& src, const std::string& sub);
+    bool string_suffix(const std::string& src, const char* sub);
+    bool string_suffix(const std::string& src, const std::string& sub);
 }

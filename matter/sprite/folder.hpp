@@ -3,6 +3,7 @@
 #include "../sprite.hpp"
 
 #include <vector>
+#include <unordered_map>
 
 namespace WarGrey::STEM {
     class Sprite : public WarGrey::STEM::ISprite {
@@ -14,6 +15,11 @@ namespace WarGrey::STEM {
         void pre_construct(SDL_Renderer* renderer) override;
     
     public:
+        void wear(const char* name) { this->wear(std::string(name)); }
+        void wear(const std::string& name);
+        void take_off();
+
+    public:
         size_t custome_count() override;
 
     protected:
@@ -23,11 +29,16 @@ namespace WarGrey::STEM {
         void draw_custome(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) override;
 
     private:
-        void load_custome(SDL_Renderer* renderer, std::string& png);
+        void load_custome(SDL_Renderer* renderer, const std::string& png);
+        void load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png);
         void push_custome(const std::string& name, SDL_Texture* custome);
         
     private:
         std::vector<std::pair<std::string, SDL_Texture*>> customes;
+        std::unordered_map<std::string, std::unordered_map<std::string, SDL_Texture*>> decorates;
+        std::string current_decorate;
+
+    private:
         std::string _pathname;
     };
 }

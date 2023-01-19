@@ -24,8 +24,6 @@ namespace WarGrey::STEM {
 
     private:
         std::string _pathname;
-        int row;
-        int col;
     };
 
     class SpriteGridSheet : public WarGrey::STEM::ISpriteSheet {
