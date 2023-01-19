@@ -39,6 +39,9 @@ namespace WarGrey::STEM {
         void feed_custome_region(SDL_Rect* custome, int idx) override;
         const std::string& custome_index_to_name(int idx) override;
         int custome_name_to_index(const char* name) override;
+
+    protected:
+        virtual const std::string& custome_grid_to_name(int r, int c);
     
     protected:
         int row;
@@ -49,5 +52,8 @@ namespace WarGrey::STEM {
         int grid_height = 0;
         int grid_xgap;
         int grid_ygap;
+
+    private:
+        std::string __virtual_name;
     };
 }

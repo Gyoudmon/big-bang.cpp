@@ -74,11 +74,29 @@ void WarGrey::STEM::SpriteGridSheet::feed_custome_region(SDL_Rect* region, int i
 }
 
 const std::string& WarGrey::STEM::SpriteGridSheet::custome_index_to_name(int idx) {
-    static std::string name = std::to_string(idx);
-
-    return name;
+    int r = idx / this->col;
+    int c = idx % this->col;
+    
+    return this->custome_grid_to_name(r, c);
 }
 
 int WarGrey::STEM::SpriteGridSheet::custome_name_to_index(const char* name) {
-    return std::atoi(name);
+    int idx = -1;
+
+    for (int r = 0; r < this->row; r++) {
+        for (int c = 0; c < this->col; c++) {
+            if (this->custome_grid_to_name(r, c).compare(name) == 0) {
+                idx = r * this->col + c;
+                break;
+            }
+        }
+    }
+
+    return idx;
+}
+
+const std::string& WarGrey::STEM::SpriteGridSheet::custome_grid_to_name(int r, int c) {
+    this->__virtual_name = std::to_string(r) + "-" + std::to_string(c);
+
+    return this->__virtual_name;
 }

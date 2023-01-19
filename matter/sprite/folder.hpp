@@ -17,6 +17,8 @@ namespace WarGrey::STEM {
     public:
         void wear(const char* name) { this->wear(std::string(name)); }
         void wear(const std::string& name);
+        bool is_wearing() { return !this->current_decorate.empty(); }
+        const std::string& decorate_name() { return this->current_decorate; }
         void take_off();
 
     public:
