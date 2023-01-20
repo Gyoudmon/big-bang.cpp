@@ -11,7 +11,7 @@ namespace WarGrey::STEM {
                 unsigned int initial_mode = 0U);
 
     public:
-        void change_mode(unsigned int mode) { this->plane->change_mode(mode); }
+        void shift_to_mode(unsigned int mode) { this->plane->shift_to_mode(mode); }
         unsigned int current_mode() { return this->plane->current_mode(); }
         bool matter_unmasked(WarGrey::STEM::IMatter* m) { return this->plane->matter_unmasked(m); }
 

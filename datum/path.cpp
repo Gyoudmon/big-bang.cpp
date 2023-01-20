@@ -1,7 +1,10 @@
 #include "string.hpp"
 #include "path.hpp"
 
+#include <filesystem>
+
 using namespace WarGrey::STEM;
+using namespace std::filesystem;
 
 /*************************************************************************************************/
 static int last_slash_position(const char* raw, int size, int fallback = -1) {
@@ -94,11 +97,28 @@ std::string WarGrey::STEM::file_extension_from_path(const std::string& path) {
 	return ext;
 }
 
+std::string WarGrey::STEM::directory_path(const char* path) {
+	return directory_path(std::string(path));
+}
+
+std::string WarGrey::STEM::directory_path(const std::string& path) {
+	char sep = path::preferred_separator;
+	std::string npath = path;
+	
+	if (npath.empty()) {
+		npath = sep;
+	} else if (path.back() != sep) {
+	 	npath.push_back(sep);
+	}
+
+	return npath;
+}
+
 std::string WarGrey::STEM::digimon_path(const char* file, const char* ext, const char* rootdir) {
 	std::string file_raw(file);
 	std::string root_dir(rootdir);
 	std::string file_ext = (file_extension_from_path(file_raw) == "") ? (file_raw.append(ext)) : file_raw;
-	std::string path_ext = ((root_dir == "") ? file_ext : (root_dir.append("/").append(file_ext)));
+	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(root_dir).append(file_ext)));
 
-	return std::string(__ZONE__).append(path_ext);
+    return std::string(__ZONE__).append(path_ext);
 }

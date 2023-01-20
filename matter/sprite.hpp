@@ -21,14 +21,14 @@ namespace WarGrey::STEM {
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:
-        virtual size_t custome_count() = 0;
+        virtual size_t costume_count() = 0;
         
     public:
-        void switch_to_custome(int idx);
-        void switch_to_custome(const char* name);
-        void switch_to_custome(const std::string& name) { this->switch_to_custome(name.c_str()); }
-        void switch_to_prev_custome() { this->switch_to_custome(this->current_custome_idx - 1); }
-        void switch_to_next_custome() { this->switch_to_custome(this->current_custome_idx + 1); }
+        void switch_to_costume(int idx);
+        void switch_to_costume(const char* name);
+        void switch_to_costume(const std::string& name) { this->switch_to_costume(name.c_str()); }
+        void switch_to_prev_costume() { this->switch_to_costume(this->current_costume_idx - 1); }
+        void switch_to_next_costume() { this->switch_to_costume(this->current_costume_idx + 1); }
 
     public:
         void set_fps(int fps = 16);
@@ -38,10 +38,10 @@ namespace WarGrey::STEM {
         void stop();
 
     protected:
-        virtual void feed_custome_extent(int idx, float* width, float* height) = 0;
-        virtual const std::string& custome_index_to_name(int idx) = 0;
-        virtual int custome_name_to_index(const char* name) = 0;
-        virtual void draw_custome(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) = 0;
+        virtual void feed_costume_extent(int idx, float* width, float* height) = 0;
+        virtual const char* costume_index_to_name(int idx) = 0;
+        virtual int costume_name_to_index(const char* name) = 0;
+        virtual void draw_costume(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) = 0;
 
     protected:
         void on_resize(float width, float height, float old_width, float old_height) override;
@@ -50,7 +50,7 @@ namespace WarGrey::STEM {
         SDL_RendererFlip current_flip_status();
 
     private:
-        int current_custome_idx = 0;
+        int current_costume_idx = 0;
         float xscale = 1.0F;
         float yscale = 1.0F;
 

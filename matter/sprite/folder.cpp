@@ -12,90 +12,63 @@ using namespace WarGrey::STEM;
 using namespace std::filesystem;
 
 /*************************************************************************************************/
-WarGrey::STEM::Sprite::Sprite(const char* pathname, MatterAnchor resize_anchor) : Sprite(std::string(pathname), resize_anchor) {}
 WarGrey::STEM::Sprite::Sprite(const std::string& pathname, MatterAnchor resize_anchor) : _pathname(pathname) {
     this->enable_resize(true, resize_anchor);
 }
 
-WarGrey::STEM::Sprite::~Sprite() {
-    for (auto custome : this->customes) {
-        game_unload_image(custome.second);
-    }
-
-    for (auto decorate : this->decorates) {
-        for (auto custome : decorate.second) {
-            game_unload_image(custome.second);
-        }
-    }
-}
-
 void WarGrey::STEM::Sprite::pre_construct(SDL_Renderer* renderer) {
-    path target(this->_pathname);
+    path target = imgdb_absolute_path(this->_pathname);
 
     if (exists(target)) {
         if (is_directory(target)) {
             for (auto entry : directory_iterator(target)) {
                 if (entry.is_regular_file()) {
-                    std::string pathname = entry.path().string();
-
-                    if (string_suffix(pathname, ".png")) { 
-                        this->load_custome(renderer, pathname);
-                    } 
+                    this->load_costume(renderer, entry.path().string());
                 } else if (entry.is_directory()) {
                     std::string decorate_name = file_basename_from_path(entry.path().string());
 
                     for (auto subentry : directory_iterator(entry)) {
                         if (subentry.is_regular_file()) {
-                            std::string subpath = subentry.path().string();
-
-                            if (string_suffix(subpath, ".png")) {
-                                this->load_decorate(renderer, decorate_name, subpath);
-                            }
+                            this->load_decorate(renderer, decorate_name, subentry.path().string());
                         }
                     }
                 }
             }
         } else {
-            this->load_custome(renderer, this->_pathname);
+            this->load_costume(renderer, this->_pathname);
         }
     }
 }
 
-void WarGrey::STEM::Sprite::feed_custome_extent(int idx, float* width, float* height) {
-    SDL_Texture* custome = this->customes[idx].second;
-    int original_width, original_height;
-
-    SDL_QueryTexture(custome, nullptr, nullptr, &original_width, &original_height);
-
-    SET_BOX(width, float(original_width));
-    SET_BOX(height, float(original_height));
+void WarGrey::STEM::Sprite::feed_costume_extent(int idx, float* width, float* height) {
+    this->costumes[idx].second->feed_extent(width, height);
 }
 
-void WarGrey::STEM::Sprite::draw_custome(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) {
+void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) {
     SDL_RendererFlip flip = this->current_flip_status();
     SDL_FRect region = { x, y, Width, Height };
 
-    game_render_texture(renderer, this->customes[idx].second, &region, flip);
+    game_render_texture(renderer, this->costumes[idx].second->texture(), &region, flip);
 
     if (this->current_decorate.size() > 0) {
-        std::string c_name = this->customes[idx].first;
+        std::string c_name = this->costumes[idx].first;
         auto decorate = this->decorates[this->current_decorate];
 
         if (decorate.find(c_name) != decorate.end()) {
-            game_render_texture(renderer, decorate[c_name], &region, flip);
+            game_render_texture(renderer, decorate[c_name]->texture(), &region, flip);
         }
     }
 }
 
-size_t WarGrey::STEM::Sprite::custome_count() {
-    return this->customes.size();
+size_t WarGrey::STEM::Sprite::costume_count() {
+    return this->costumes.size();
 }
 
-int WarGrey::STEM::Sprite::custome_name_to_index(const char* name) {
+int WarGrey::STEM::Sprite::costume_name_to_index(const char* name) {
     int cidx = -1;
 
-    for (int idx = 0; idx < this->customes.size(); idx ++) {
-        if (this->customes[idx].first.compare(name) == 0) {
+    for (int idx = 0; idx < this->costumes.size(); idx ++) {
+        if (this->costumes[idx].first.compare(name) == 0) {
             cidx = idx;
             break;
         }
@@ -104,8 +77,8 @@ int WarGrey::STEM::Sprite::custome_name_to_index(const char* name) {
     return cidx;
 }
 
-const std::string& WarGrey::STEM::Sprite::custome_index_to_name(int idx) {
-    return this->customes[idx].first;
+const char* WarGrey::STEM::Sprite::costume_index_to_name(int idx) {
+    return this->costumes[idx].first.c_str();
 }
 
 void WarGrey::STEM::Sprite::wear(const std::string& name) {
@@ -122,42 +95,37 @@ void WarGrey::STEM::Sprite::take_off() {
     }
 }
 
-void WarGrey::STEM::Sprite::load_custome(SDL_Renderer* renderer, const std::string& png) {
-    SDL_Texture* custome = game_load_image_as_texture(renderer, png);
+void WarGrey::STEM::Sprite::load_costume(SDL_Renderer* renderer, const std::string& png) {
+    shared_costume_t costume = imgdb_ref(png, renderer);
 
-    if (custome != nullptr) {
-        this->push_custome(file_basename_from_path(png), custome);       
+    if (costume->okay()) {
+        std::string name = file_basename_from_path(png);
+        auto datum = std::pair<std::string, shared_costume_t>(name, costume);
+        
+        for (auto it = this->costumes.begin(); ; it++) {
+            if (it == this->costumes.end()) {
+                this->costumes.push_back(datum);
+                break;
+            } else {
+                if (name.compare((*it).first) < 0) {
+                    this->costumes.insert(it, datum);
+                    break;
+                }
+            }
+        }     
     }
 }
 
 void WarGrey::STEM::Sprite::load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png) {
-    SDL_Texture* obj = game_load_image_as_texture(renderer, png);
+    shared_costume_t deco_costume = imgdb_ref(png, renderer);
 
-    if (obj != nullptr) {
+    if (deco_costume->okay()) {
         std::string c_name = file_basename_from_path(png);
 
         if (this->decorates.find(d_name) == this->decorates.end()) {
-            this->decorates[d_name] = { { c_name, obj } };
+            this->decorates[d_name] = { { c_name, deco_costume } };
         } else {
-            this->decorates[d_name][c_name] = obj;
-        }
-    }
-}
-
-void WarGrey::STEM::Sprite::push_custome(const std::string& name, SDL_Texture* custome) {
-    if (custome != nullptr) {
-        auto datum = std::pair<std::string, SDL_Texture*>(name, custome);
-        
-        for (auto it = this->customes.begin(); ; it++) {
-            if (it == this->customes.end()) {
-                this->customes.push_back(datum);
-                break;
-            } else {
-                if (name.compare((*it).first) < 0) {
-                    this->customes.insert(it, datum);
-                    break;
-                }
-            }
+            this->decorates[d_name][c_name] = deco_costume;
         }
     }
 }

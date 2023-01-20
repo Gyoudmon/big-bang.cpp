@@ -11,7 +11,7 @@ using namespace WarGrey::STEM;
 /*************************************************************************************************/
 WarGrey::STEM::ISprite::ISprite() {
     this->_sprite = this;
-    this->current_custome_idx = 0;
+    this->current_costume_idx = 0;
     this->set_fps();
 }
 
@@ -24,18 +24,18 @@ void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* 
 }
 
 void WarGrey::STEM::ISprite::feed_original_extent(float x, float y, float* width, float* height) {
-    if (this->current_custome_idx >= this->custome_count()) {
+    if (this->current_costume_idx >= this->costume_count()) {
         SET_BOXES(width, height, 0.0F);
     } else {
-        this->feed_custome_extent(this->current_custome_idx, width, height);
+        this->feed_costume_extent(this->current_costume_idx, width, height);
     }
 }
 
 void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
-    if (this->current_custome_idx < this->custome_count()) {
+    if (this->current_costume_idx < this->costume_count()) {
         float cwidth, cheight;
 
-        this->feed_custome_extent(this->current_custome_idx, &cwidth, &cheight);
+        this->feed_costume_extent(this->current_costume_idx, &cwidth, &cheight);
 
         if ((cwidth > 0.0F) && (cheight > 0.0F)) {
             this->xscale = width  / cwidth;
@@ -45,13 +45,13 @@ void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_widt
 }
 
 void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
-    if (this->current_custome_idx < this->custome_count()) {
-        this->draw_custome(renderer, this->current_custome_idx, x, y, Width, Height);
+    if (this->current_costume_idx < this->costume_count()) {
+        this->draw_costume(renderer, this->current_costume_idx, x, y, Width, Height);
     }
 }
 
-void WarGrey::STEM::ISprite::switch_to_custome(int idx) {
-    size_t maxsize = this->custome_count();
+void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
+    size_t maxsize = this->costume_count();
 
     if (maxsize > 0) {
         int actual_idx = idx;
@@ -62,18 +62,18 @@ void WarGrey::STEM::ISprite::switch_to_custome(int idx) {
             actual_idx = maxsize - (-actual_idx % maxsize);
         }
 
-        if (actual_idx != this->current_custome_idx) {
-            this->current_custome_idx = actual_idx;
+        if (actual_idx != this->current_costume_idx) {
+            this->current_costume_idx = actual_idx;
             this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::ISprite::switch_to_custome(const char* name) {
-    int cidx = this->custome_name_to_index(name);
+void WarGrey::STEM::ISprite::switch_to_costume(const char* name) {
+    int cidx = this->costume_name_to_index(name);
 
     if (cidx >= 0) {
-        this->switch_to_custome(cidx);
+        this->switch_to_costume(cidx);
     }
 }
 
@@ -88,14 +88,14 @@ void WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t 
 
             if (this->current_subframe_idx >= frame_size) {
                 if (this->animation_rest != 0) {
-                    this->switch_to_custome(this->frame_refs[0]);
+                    this->switch_to_costume(this->frame_refs[0]);
                     this->current_subframe_idx = 1;
                     if (this->animation_rest > 0) {
                         this->animation_rest --;
                     }
                 }
             } else {
-                this->switch_to_custome(this->frame_refs[this->current_subframe_idx]);
+                this->switch_to_costume(this->frame_refs[this->current_subframe_idx]);
                 this->current_subframe_idx ++;
             }
         }
@@ -113,14 +113,14 @@ size_t WarGrey::STEM::ISprite::play(const char* action, int repetition) {
     this->frame_refs.clear();
     this->current_subframe_idx = 0;
     
-    for (int i = 0; i < this->custome_count(); i++) {
-        if (string_prefix(this->custome_index_to_name(i), action)) {
+    for (int i = 0; i < this->costume_count(); i++) {
+        if (string_prefix(this->costume_index_to_name(i), action)) {
             this->frame_refs.push_back(i);
         }
     }
 
     if (this->frame_refs.size()) {
-        this->switch_to_custome(this->frame_refs[0]);
+        this->switch_to_costume(this->frame_refs[0]);
         this->current_subframe_idx = 1;
     }
 

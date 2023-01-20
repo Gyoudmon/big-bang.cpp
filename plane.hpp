@@ -153,7 +153,7 @@ namespace WarGrey::STEM {
         Plane(const char* caption, unsigned int initial_mode = 0);
 
     public:
-        void change_mode(unsigned int mode); // NOTE: mode 0 is designed for UI graphlets which will be unmasked in all modes;
+        void shift_to_mode(unsigned int mode); // NOTE: mode 0 is designed for UI graphlets which will be unmasked in all modes;
         unsigned int current_mode();
 
         bool matter_unmasked(WarGrey::STEM::IMatter* m);

@@ -16,7 +16,7 @@
 #include "matter/sprite/folder.hpp"
 #include "matter/sprite/sheet.hpp"
 
-#include "datum/path.hpp"
+#include "virtualization/filesystem/imgdb.hpp"
 
 /**
  * 为兼容 Windows 而变得丑陋

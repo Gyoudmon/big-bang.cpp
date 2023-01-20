@@ -8,5 +8,8 @@ namespace WarGrey::STEM {
 	std::string file_basename_from_path(const std::string& path);
 	std::string file_extension_from_path(const std::string& path);
 
+	std::string directory_path(const char* path);
+	std::string directory_path(const std::string& path);
+
 	std::string digimon_path(const char* file, const char* ext = "", const char* rootdir = "stone");
 }

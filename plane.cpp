@@ -203,7 +203,7 @@ Plane::~Plane() {
     this->erase();
 }
 
-void WarGrey::STEM::Plane::change_mode(unsigned int mode) {
+void WarGrey::STEM::Plane::shift_to_mode(unsigned int mode) {
     if (mode != this->mode) {
         this->no_selected();
         this->mode = mode;
