@@ -212,6 +212,7 @@ void WarGrey::STEM::IUniverse::big_bang() {
     this->begin_update_sequence();
     this->on_big_bang(this->window_width, this->window_height);
     this->on_resize(this->window_width, this->window_height);
+    this->on_game_start();
     this->notify_updated();
     this->end_update_sequence();
 

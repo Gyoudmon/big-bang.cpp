@@ -47,6 +47,7 @@ namespace WarGrey::STEM {
 
     protected:
         void on_big_bang(int width, int height) override;
+        void on_game_start() override;
         void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
 
     protected:

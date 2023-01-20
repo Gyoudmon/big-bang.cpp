@@ -89,6 +89,9 @@ namespace WarGrey::STEM {
         /* 大爆炸之前最后的初始化宇宙机会，默认什么都不做 */
         virtual void on_big_bang(int width, int height) {}
 
+        /* 宇宙初始化之后，游戏世界开始运行，默认什么都不做 */
+        virtual void on_game_start() {}
+
         /* 响应定时器事件，刷新游戏世界 */
         virtual void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) = 0;
 

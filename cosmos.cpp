@@ -141,10 +141,6 @@ void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
 
         this->set_window_title("%s", this->recent_plane->name());
     }
-
-    if ((this->recent_plane == this->head_plane) && (this->recent_plane != nullptr)) {
-		this->notify_transfer(nullptr, this->recent_plane);
-	}
 }
 
 void WarGrey::STEM::Cosmos::reflow(float width, float height) {
@@ -160,6 +156,12 @@ void WarGrey::STEM::Cosmos::reflow(float width, float height) {
             } while (child != this->head_plane);
         }
     }
+}
+
+void WarGrey::STEM::Cosmos::on_game_start() {
+    if ((this->recent_plane == this->head_plane) && (this->recent_plane != nullptr)) {
+		this->notify_transfer(nullptr, this->recent_plane);
+	}
 }
 
 void WarGrey::STEM::Cosmos::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
