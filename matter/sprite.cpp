@@ -51,7 +51,12 @@ void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, floa
 }
 
 void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
-    size_t maxsize = this->costume_count();
+    /** WARNING
+     * `size_t` will implicitly convert the `actual_idx` into a nonnegative integer,
+     *      and cause it always be true for `actual_idx >= maxsize`.
+     **/
+
+    long maxsize = this->costume_count();
 
     if (maxsize > 0) {
         int actual_idx = idx;
@@ -59,7 +64,7 @@ void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
         if (actual_idx >= maxsize) {
             actual_idx %= maxsize;
         } else if (actual_idx < 0) {
-            actual_idx = maxsize - (-actual_idx % maxsize);
+            actual_idx = maxsize - ((-actual_idx) % maxsize);
         }
 
         if (actual_idx != this->current_costume_idx) {
@@ -107,7 +112,8 @@ void WarGrey::STEM::ISprite::set_fps(int fps) {
     this->animation_subframe_count = 1;
 }
 
-size_t WarGrey::STEM::ISprite::play(const char* action, int repetition) {
+size_t WarGrey::STEM::ISprite::play(const char* action0, int repetition) {
+    const char* action = (action0 == nullptr) ? "" : action0;
     this->animation_rest = repetition;
     this->animation_subframe_count = 1;
     this->frame_refs.clear();

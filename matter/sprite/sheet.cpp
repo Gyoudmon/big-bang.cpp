@@ -13,6 +13,20 @@ WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname, MatterAnc
     this->enable_resize(true, resize_anchor);
 }
 
+WarGrey::STEM::ISpriteSheet::ISpriteSheet(const char* pathname_fmt, ...) {
+    VSNPRINT(pathname, pathname_fmt);
+
+    this->_pathname = pathname;
+    this->enable_resize(true, MatterAnchor::CC);
+}
+
+WarGrey::STEM::ISpriteSheet::ISpriteSheet(MatterAnchor resize_anchor, const char* pathname_fmt, ...) {
+     VSNPRINT(pathname, pathname_fmt);
+
+    this->_pathname = pathname;
+    this->enable_resize(true, resize_anchor);
+}
+
 void WarGrey::STEM::ISpriteSheet::pre_construct(SDL_Renderer* renderer) {
     this->sprite_sheet = imgdb_ref(this->_pathname, renderer);
 

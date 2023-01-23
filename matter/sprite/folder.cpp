@@ -16,6 +16,20 @@ WarGrey::STEM::Sprite::Sprite(const std::string& pathname, MatterAnchor resize_a
     this->enable_resize(true, resize_anchor);
 }
 
+WarGrey::STEM::Sprite::Sprite(const char* pathname_fmt, ...) {
+    VSNPRINT(pathname, pathname_fmt);
+
+    this->_pathname = pathname;
+    this->enable_resize(true, MatterAnchor::CC);
+}
+
+WarGrey::STEM::Sprite::Sprite(MatterAnchor resize_anchor, const char* pathname_fmt, ...) {
+     VSNPRINT(pathname, pathname_fmt);
+
+    this->_pathname = pathname;
+    this->enable_resize(true, resize_anchor);
+}
+
 void WarGrey::STEM::Sprite::pre_construct(SDL_Renderer* renderer) {
     path target = imgdb_absolute_path(this->_pathname);
 

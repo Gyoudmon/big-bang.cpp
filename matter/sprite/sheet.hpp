@@ -7,6 +7,8 @@ namespace WarGrey::STEM {
     class ISpriteSheet : public WarGrey::STEM::ISprite {
     public:
         ISpriteSheet(const std::string& pathname, WarGrey::STEM::MatterAnchor resize_anchor);
+        ISpriteSheet(WarGrey::STEM::MatterAnchor resize_anchor, const char* pathname_fmt, ...);
+        ISpriteSheet(const char* pathname_fmt, ...);
         virtual ~ISpriteSheet() {}
 
         void pre_construct(SDL_Renderer* renderer) override;

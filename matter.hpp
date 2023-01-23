@@ -62,6 +62,7 @@ namespace WarGrey::STEM {
         void scale(float x_ratio, float y_ratio);
         void scale_to(float ratio) { this->scale_to(ratio, ratio); }
         void scale_to(float x_ratio, float y_ratio);
+        void resize(float size) { this->resize(size, size); }
         void resize(float width, float height);
 
     public:
