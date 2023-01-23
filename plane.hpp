@@ -99,6 +99,19 @@ namespace WarGrey::STEM {
         void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
 
+    public:
+        void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
+        void create_grid(int row, int col, float x = 0.0F, float y = 0.0F, float width = 0.0F, float height = 0.0F);
+        void create_grid(float cell_width, float x = 0.0F, float y = 0.0F, int col = 0);
+        void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0);
+        void feed_grid_cell_extent(float* width, float* height);
+        void feed_grid_cell_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
+        void feed_grid_cell_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
+        void insert_at_grid(IMatter* m, int idx, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
+        void insert_at_grid(IMatter* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
+        void move_to_grid(IMatter* m, int idx, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
+        void move_to_grid(IMatter* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
+        
     protected:
         virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) { return false; }
         virtual bool on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) { return false; }
@@ -134,6 +147,20 @@ namespace WarGrey::STEM {
 
             return m;
         }
+        
+        template<class M>
+        M* insert(M* m, int idx, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F) {
+            this->insert_at_grid(m, idx, a, dx, dy);
+
+            return m;
+        }
+
+        template<class M>
+        M* insert(M* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F) {
+            this->insert_at_grid(m, row, col, a, dx, dy);
+
+            return m;
+        }
 
     public:
         IPlaneInfo* info = nullptr;
@@ -142,6 +169,14 @@ namespace WarGrey::STEM {
         uint32_t background = 0U;
         float bg_alpha = 0.0F;
 
+    private:
+        int column = 0;
+        int row = 0;
+        float grid_x = 0.0F;
+        float grid_y = 0.0F;
+        float cell_width = 0.0F;
+        float cell_height = 0.0F;
+        
     private:
         std::string caption;
     };

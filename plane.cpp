@@ -9,6 +9,8 @@
 
 #include "datum/string.hpp"
 #include "datum/flonum.hpp"
+#include "datum/fixnum.hpp"
+#include "datum/box.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -485,10 +487,8 @@ bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, 
         float sx, sy, sw, sh;
             
         unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-        if (x != nullptr) (*x) = sx;
-        if (y != nullptr) (*y) = sy;
-        if (width != nullptr) (*width) = sw;
-        if (height != nullptr) (*height) = sh;
+        SET_VALUES(x, sx, y, sy);
+        SET_VALUES(width, sw, height, sh);
 
         okay = true;
     }
@@ -499,10 +499,9 @@ bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, 
 void WarGrey::STEM::Plane::feed_matters_boundary(float* x, float* y, float* width, float* height) {
     this->recalculate_matters_extent_when_invalid();
 
-    if (x != nullptr) (*x) = this->matters_left;
-    if (y != nullptr) (*y) = this->matters_top;
-    if (width != nullptr) (*width) = this->matters_right - this->matters_left;
-    if (height != nullptr) (*height) = this->matters_bottom - this->matters_top;
+    SET_VALUES(x, this->matters_left, y, this->matters_top);
+    SET_BOX(width, this->matters_right - this->matters_left);
+    SET_BOX(height, this->matters_bottom - this->matters_top);
 }
 
 void WarGrey::STEM::Plane::size_cache_invalid() {
@@ -1090,4 +1089,190 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMa
     matter_anchor_fraction(a, &fx, &fy);
 
     this->move_to(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::create_grid(int col, float x, float y, float width) {
+    IScreen* master = this->master();
+    float height;
+
+    this->column = col;
+
+    this->grid_x = x;
+    this->grid_y = y;
+
+    if (master != nullptr) {
+        float Width;
+        
+        master->feed_extent(&Width, &height);
+
+        if (width <= 0.0F) {
+            width = Width - this->grid_x;
+        }
+
+        height -= this->grid_y;
+    }
+    
+    if (this->column > 0) {
+        this->cell_width = width / float(this->column);
+        this->cell_height = this->cell_width;
+        this->row = int(flfloor(height / this->cell_height));
+    } else {
+        this->cell_width = 0.0F;
+        this->cell_height = 0.0F;
+        this->row = col;
+    }
+}
+
+void WarGrey::STEM::IPlane::create_grid(int row, int col, float x, float y, float width, float height) {
+    this->row = row;
+    this->column = col;
+
+    this->grid_x = x;
+    this->grid_y = y;
+
+    if ((width <= 0.0F) || (height <= 0.0F)) {
+        IScreen* master = this->master();
+
+        if (master != nullptr) {
+            float Width, Height;
+        
+            master->feed_extent(&Width, &Height);
+            
+            if (width <= 0.0F) {
+                width = Width - this->grid_x;
+            }
+
+            if (height <= 0.0F) {
+                height = Height - this->grid_y;
+            }
+        }
+    }
+    
+    if (this->column > 0) {
+        this->cell_width = width / float(this->column);
+    }
+
+    if (this->row > 0) {
+        this->cell_height = height / float(this->row);
+    }
+}
+
+void WarGrey::STEM::IPlane::create_grid(float cell_width, float x, float y, int col) {
+    IScreen* master = this->master();
+    float height;
+
+    this->column = col;
+    this->row = col;
+
+    this->grid_x = x;
+    this->grid_y = y;
+    this->cell_width = cell_width;
+    this->cell_height = cell_width;
+
+    if (master != nullptr) {
+        float Width;
+        
+        master->feed_extent(&Width, &height);
+            
+        if ((this->column <= 0) && (this->cell_width > 0.0F)) {
+            this->column = int(flfloor((Width - this->grid_x) / this->cell_width));
+            this->row = int(flfloor((height - this->grid_y) / this->cell_height));
+        }
+    }
+}
+
+void WarGrey::STEM::IPlane::create_grid(float cell_width, float cell_height, float x, float y, int row, int col) {
+    this->column = col;
+    this->row = row;
+
+    this->grid_x = x;
+    this->grid_y = y;
+    this->cell_width = cell_width;
+    this->cell_height = cell_height;
+
+    if ((this->row <= 0) || (this->column <= 0)) {
+        IScreen* master = this->master();
+
+        if (master != nullptr) {
+            float width, height;
+        
+            master->feed_extent(&width, &height);
+            
+            width -= x;
+            height -= y;
+            
+            if ((this->column <= 0) && (this->cell_width > 0.0F)) {
+                this->column = int(flfloor(width / this->cell_width));
+            }
+
+            if ((this->row <= 0) && (this->cell_height > 0.0F)) {
+                this->row = int(flfloor(height / this->cell_height));
+            }
+        }
+    }
+}
+
+void WarGrey::STEM::IPlane::feed_grid_cell_extent(float* width, float* height) {
+    SET_BOX(width, this->cell_width);
+    SET_BOX(height, this->cell_height);
+}
+
+void WarGrey::STEM::IPlane::feed_grid_cell_location(int idx, float* x, float* y, MatterAnchor a) {
+    if (idx < 0) {
+        idx += this->column * this->row;
+    }
+
+    if (this->column > 0) {
+        int c = idx % this->column;
+        int r = idx / this->column;
+
+        this->feed_grid_cell_location(r, c, x, y, a);
+    } else {
+        this->feed_grid_cell_location(idx, 0, x, y, a);
+    }
+}
+
+void WarGrey::STEM::IPlane::feed_grid_cell_location(int row, int col, float* x, float* y, MatterAnchor a) {
+    float fx, fy;
+
+    if (row < 0) {
+        row += this->row;
+    }
+
+    if (col < 0) {
+        col += this->column;
+    }
+
+    matter_anchor_fraction(a, &fx, &fy);
+    
+    SET_BOX(x, this->grid_x + this->cell_width * (float(col) + fx));
+    SET_BOX(y, this->grid_y + this->cell_height * (float(row) + fy));
+}
+
+void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int idx, MatterAnchor a, float dx, float dy) {
+    float x, y;
+
+    this->feed_grid_cell_location(idx, &x, &y, a);
+    this->insert_at(m, x, y, a, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int row, int col, MatterAnchor a, float dx, float dy) {
+    float x, y;
+
+    this->feed_grid_cell_location(row, col, &x, &y, a);
+    this->insert_at(m, x, y, a, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int idx, MatterAnchor a, float dx, float dy) {
+    float x, y;
+
+    this->feed_grid_cell_location(idx, &x, &y, a);
+    this->move_to(m, x, y, a, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int row, int col, MatterAnchor a, float dx, float dy) {
+    float x, y;
+
+    this->feed_grid_cell_location(row, col, &x, &y, a);
+    this->move_to(m, x, y, a, dx, dy);
 }

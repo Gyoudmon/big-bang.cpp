@@ -67,9 +67,56 @@ namespace WarGrey::STEM {
         }
     
     public:
+        void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F) {
+            this->plane->create_grid(col, x, y, width);
+        }
+
+        void create_grid(int row, int col, float x = 0.0F, float y = 0.0F, float width = 0.0F, float height = 0.0F) {
+            this->plane->create_grid(row, col, x, y, width, height);
+        }
+
+        void create_grid(float cell_width, float x = 0.0F, float y = 0.0F, int col = 0) {
+            this->plane->create_grid(cell_width, x, y, col);
+        }
+
+        void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0) {
+            this->plane->create_grid(cell_width, cell_height, x, y, row, col);
+        }
+
+        void feed_grid_cell_extent(float* width, float* height) {
+            this->plane->feed_grid_cell_extent(width, height);
+        }
+
+        void feed_grid_cell_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC) {
+            this->plane->feed_grid_cell_location(idx, x, y, a);
+        }
+
+        void feed_grid_cell_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC) {
+            this->plane->feed_grid_cell_location(row, col, x, y, a);
+        }
+
+        void move_to_grid(IMatter* m, int idx, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F) {
+            this->plane->move_to_grid(m, idx, a, dx, dy);
+        }
+
+        void move_to_grid(IMatter* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F) {
+            this->plane->move_to_grid(m, row, col, a, dx, dy);
+        }
+
+    public:
         template<class M>
         M* insert(M* m, float x = 0.0F, float y = 0.0F, MatterAnchor a = MatterAnchor::LT, float dx = 0.0F, float dy = 0.0F) {
             return this->plane->insert(m, x, y, a, dx, dy);
+        }
+        
+        template<class M>
+        M* insert(M* m, int idx, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F) {
+            return this->plane->insert(m, idx, a, dx, dy);
+        }
+
+        template<class M>
+        M* insert(M* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F) {
+            return this->plane->insert(m, row, col, a, dx, dy);
         }
 
     protected:
