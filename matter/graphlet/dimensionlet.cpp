@@ -103,6 +103,7 @@ WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, const char* uni
 WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const std::string& label) {
     this->unit = std::string(unit);
     this->label = label;
+    this->set_style(style);
 }
 
 WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const char* label_fmt, ...) {
@@ -151,14 +152,14 @@ void WarGrey::STEM::Dimensionlet::feed_extent(float x, float y, float* w, float*
 void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor) {
     SDL_FRect* self = &this->boxes[idx];
     
-    if (self->w > 0.0F) {
+    if ((self->w > 0.0F) && (self->h > 0.0F)) {
         float bottom = y + Height;
         SDL_Texture* texture = this->textures[idx];
         
         self->x += x;
-        self->y = bottom - self->h;
         self->h = Height;
-
+        self->y = bottom - self->h;
+        
         if (bgcolor >= 0) {
             game_fill_rect(ds, self, static_cast<uint32_t>(bgcolor));
         }
@@ -250,19 +251,23 @@ void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, 
 
 void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, TTF_Font* font, float leading_space) {
     SDL_Texture* self = this->textures[idx];
+    SDL_FRect* sbox = &this->boxes[idx];
     int width, height;
 
-    this->feed_subextent(idx, &this->boxes[idx].x);
-    this->boxes[idx].x += leading_space;
+    this->feed_subextent(idx, &sbox->x);
+    sbox->x += leading_space;
 
     if (self != nullptr) {
         SDL_QueryTexture(self, nullptr, nullptr, &width, &height);
 
-        this->boxes[idx].w = flmax(float(width), min_width);
-        this->boxes[idx].h = float(height);
-    } else if (min_width > 0) {
-        this->boxes[idx].w = flmax(min_width, 0.0F);
-        this->boxes[idx].h = float(font_height(font));
+        sbox->w = flmax(float(width), min_width);
+        sbox->h = float(height);
+    } else if (min_width > 0.0F) {
+        sbox->w = flmax(min_width, 0.0F);
+        sbox->h = float(font_height(font));
+    } else {
+        sbox->w = 0.0F;
+        sbox->h = 0.0F;
     }
 }
 

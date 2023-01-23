@@ -90,7 +90,7 @@ namespace WarGrey::STEM {
 
     private:
         SDL_Texture* textures[3] = {};
-        SDL_FRect boxes[3]; // `FRect.y` is useless
+        SDL_FRect boxes[3] = {}; // `FRect.y` is useless
 
     private:
         std::string label;
