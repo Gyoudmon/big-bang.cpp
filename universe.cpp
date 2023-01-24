@@ -210,7 +210,7 @@ void WarGrey::STEM::IUniverse::big_bang() {
 
     this->feed_window_size(&this->window_width, &this->window_height);
     this->begin_update_sequence();
-    this->on_big_bang(this->window_width, this->window_height);
+    this->on_big_bang(this->window_width, this->window_height - this->get_cmdwin_height());
     this->on_resize(this->window_width, this->window_height);
     this->on_game_start();
     this->notify_updated();
@@ -495,6 +495,14 @@ void WarGrey::STEM::IUniverse::feed_extent(float* width, float* height) {
 
     this->feed_window_size(&fxw, &fxh);
     SET_VALUES(width, float(fxw), height, float(fxh));
+}
+
+void WarGrey::STEM::IUniverse::feed_client_extent(float* width, float* height) {
+    int fxw, fxh;
+
+    this->feed_window_size(&fxw, &fxh);
+    SET_BOX(width, float(fxw));
+    SET_BOX(height, float(fxh - this->get_cmdwin_height()));
 }
 
 /*************************************************************************************************/

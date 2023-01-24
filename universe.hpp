@@ -58,6 +58,7 @@ namespace WarGrey::STEM {
     public: // 窗体相关方法
         void refresh() override;
         void feed_extent(float* width, float* height) override;
+        void feed_client_extent(float* width, float* height) override;
 
     public: // 用户 IME 输入输出
         void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_font::unicode);

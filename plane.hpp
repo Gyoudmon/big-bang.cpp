@@ -104,6 +104,8 @@ namespace WarGrey::STEM {
         void create_grid(int row, int col, float x = 0.0F, float y = 0.0F, float width = 0.0F, float height = 0.0F);
         void create_grid(float cell_width, float x = 0.0F, float y = 0.0F, int col = 0);
         void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0);
+        void feed_grid_cell_index(float x, float y, int* r, int* c);
+        void feed_grid_cell_index(IMatter* m, int* r, int* c, MatterAnchor a = MatterAnchor::CC);
         void feed_grid_cell_extent(float* width, float* height);
         void feed_grid_cell_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
         void feed_grid_cell_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
@@ -111,6 +113,7 @@ namespace WarGrey::STEM {
         void insert_at_grid(IMatter* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
         void move_to_grid(IMatter* m, int idx, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
         void move_to_grid(IMatter* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
+        void set_grid_color(uint32_t color, float a = 1.0F) { this->grid_color = color; this->grid_alpha = a; }
         
     protected:
         virtual bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) { return false; }
@@ -169,13 +172,15 @@ namespace WarGrey::STEM {
         uint32_t background = 0U;
         float bg_alpha = 0.0F;
 
-    private:
+    protected:
         int column = 0;
         int row = 0;
         float grid_x = 0.0F;
         float grid_y = 0.0F;
         float cell_width = 0.0F;
         float cell_height = 0.0F;
+        uint32_t grid_color = 0U;
+        float grid_alpha = 0.0F;
         
     private:
         std::string caption;

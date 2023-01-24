@@ -821,7 +821,7 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
 
         do {
             MatterInfo* info = MATTER_INFO(child);
-            this->info->master->feed_extent(&dwidth, &dheight);
+            this->info->master->feed_client_extent(&dwidth, &dheight);
 
             if (unsafe_matter_unmasked(info, this->mode)) {
                 IMovable* sprite = child->as_sprite();
@@ -892,6 +892,15 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     
     if (this->bg_alpha > 0.0F) {
         game_fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background, this->bg_alpha);
+    }
+
+    if ((this->grid_alpha > 0.0F)
+            && (this->column > 0) && (this->row > 0)
+            && (this->cell_width > 0.0F) && (this->cell_height > 0.0F)) {
+        RGB_SetRenderDrawColor(renderer, this->grid_color, this->grid_alpha);
+        game_draw_grid(renderer, this->row, this->column,
+                        this->cell_width, this->cell_height,
+                        this->grid_x, this->grid_y);
     }
 
     if (this->head_matter != nullptr) {
@@ -1103,7 +1112,7 @@ void WarGrey::STEM::IPlane::create_grid(int col, float x, float y, float width) 
     if (master != nullptr) {
         float Width;
         
-        master->feed_extent(&Width, &height);
+        master->feed_client_extent(&Width, &height);
 
         if (width <= 0.0F) {
             width = Width - this->grid_x;
@@ -1136,7 +1145,7 @@ void WarGrey::STEM::IPlane::create_grid(int row, int col, float x, float y, floa
         if (master != nullptr) {
             float Width, Height;
         
-            master->feed_extent(&Width, &Height);
+            master->feed_client_extent(&Width, &Height);
             
             if (width <= 0.0F) {
                 width = Width - this->grid_x;
@@ -1172,7 +1181,7 @@ void WarGrey::STEM::IPlane::create_grid(float cell_width, float x, float y, int 
     if (master != nullptr) {
         float Width;
         
-        master->feed_extent(&Width, &height);
+        master->feed_client_extent(&Width, &height);
             
         if ((this->column <= 0) && (this->cell_width > 0.0F)) {
             this->column = int(flfloor((Width - this->grid_x) / this->cell_width));
@@ -1196,7 +1205,7 @@ void WarGrey::STEM::IPlane::create_grid(float cell_width, float cell_height, flo
         if (master != nullptr) {
             float width, height;
         
-            master->feed_extent(&width, &height);
+            master->feed_client_extent(&width, &height);
             
             width -= x;
             height -= y;
@@ -1210,6 +1219,18 @@ void WarGrey::STEM::IPlane::create_grid(float cell_width, float cell_height, flo
             }
         }
     }
+}
+
+void WarGrey::STEM::IPlane::feed_grid_cell_index(float x, float y, int* r, int* c) {
+    SET_BOX(r, int(flfloor((y - this->grid_y) / this->cell_height)));
+    SET_BOX(c, int(flfloor((x - this->grid_x) / this->cell_width)));
+}
+
+void WarGrey::STEM::IPlane::feed_grid_cell_index(IMatter* m, int* r, int* c, MatterAnchor a) {
+    float x, y;
+
+    this->feed_matter_location(m, &x, &y, a);
+    this->feed_grid_cell_index(x, y, r, c);    
 }
 
 void WarGrey::STEM::IPlane::feed_grid_cell_extent(float* width, float* height) {
