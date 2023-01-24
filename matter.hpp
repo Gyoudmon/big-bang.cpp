@@ -41,6 +41,7 @@ namespace WarGrey::STEM {
 
     public:
         virtual void own_caret(bool is_own) {}
+        virtual int preferred_supframe_rate() { return 0; }
         
     public:
         virtual bool is_colliding_with_mouse(float local_x, float local_y) { return true; }

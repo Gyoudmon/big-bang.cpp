@@ -12,7 +12,6 @@ using namespace WarGrey::STEM;
 WarGrey::STEM::ISprite::ISprite() {
     this->_sprite = this;
     this->current_costume_idx = 0;
-    this->set_fps();
 }
 
 void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* height) {
@@ -86,36 +85,24 @@ void WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t 
     size_t frame_size = this->frame_refs.size();
 
     if (frame_size > 1) {
-        if (interval * this->animation_subframe_count <= this->animation_interval) {
-            this->animation_subframe_count ++;
-        } else {
-            this->animation_subframe_count = 1;
-
-            if (this->current_subframe_idx >= frame_size) {
-                if (this->animation_rest != 0) {
-                    this->switch_to_costume(this->frame_refs[0]);
-                    this->current_subframe_idx = 1;
-                    if (this->animation_rest > 0) {
-                        this->animation_rest --;
-                    }
+        if (this->current_subframe_idx >= frame_size) {
+            if (this->animation_rest != 0) {
+                this->switch_to_costume(this->frame_refs[0]);
+                this->current_subframe_idx = 1;
+                if (this->animation_rest > 0) {
+                    this->animation_rest --;
                 }
-            } else {
-                this->switch_to_costume(this->frame_refs[this->current_subframe_idx]);
-                this->current_subframe_idx ++;
             }
+        } else {
+            this->switch_to_costume(this->frame_refs[this->current_subframe_idx]);
+            this->current_subframe_idx ++;
         }
     }
-}
-
-void WarGrey::STEM::ISprite::set_fps(int fps) {
-    this->animation_interval = 1000 / fps;
-    this->animation_subframe_count = 1;
 }
 
 size_t WarGrey::STEM::ISprite::play(const char* action0, int repetition) {
     const char* action = (action0 == nullptr) ? "" : action0;
     this->animation_rest = repetition;
-    this->animation_subframe_count = 1;
     this->frame_refs.clear();
     this->current_subframe_idx = 0;
     

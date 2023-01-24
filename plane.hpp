@@ -233,6 +233,9 @@ namespace WarGrey::STEM {
         void set_caret_owner(IMatter* m) override;
         void notify_matter_ready(IMatter* m) override;
 
+    public:
+        void set_supframe_rate(IMatter* m, int fps);
+
     protected:
         void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
         

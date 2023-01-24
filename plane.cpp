@@ -39,6 +39,9 @@ namespace {
         bool selected = false;
         unsigned int mode = 0U;
 
+        int animation_interval = 0;
+        int animation_supframe_count = 1;
+
         // for asynchronously loaded matters
         AsyncInfo* async = nullptr;
 
@@ -47,15 +50,26 @@ namespace {
     };
 }
 
-static inline MatterInfo* bind_matter_owership(WarGrey::STEM::IPlane* master, unsigned int mode, IMatter* m) {
+static inline void unsafe_set_subfps(MatterInfo* info, int fps) {
+    if (fps > 0) {
+        info->animation_interval = 1000 / fps;
+    } else {
+        info->animation_interval = 0;
+    }
+
+    info->animation_supframe_count = 1;
+}
+
+static inline MatterInfo* bind_matter_owership(IPlane* master, unsigned int mode, IMatter* m) {
     auto info = new MatterInfo(master, mode);
     
+    unsafe_set_subfps(info, m->preferred_supframe_rate());
     m->info = info;
 
     return info;
 }
 
-static inline MatterInfo* plane_matter_info(WarGrey::STEM::IPlane* master, IMatter* m) {
+static inline MatterInfo* plane_matter_info(IPlane* master, IMatter* m) {
     MatterInfo* info = nullptr;
 
     if ((m != nullptr) && (m->info != nullptr)) {
@@ -191,6 +205,55 @@ static void do_resize(Plane* master, IMatter* m, MatterInfo* info, float scale_x
         ny = sy + (sh - nh) * fy;
 
         unsafe_move_matter_via_info(master, info, nx, ny, true);
+    }
+}
+
+static void do_move(IMovable* sprite, IMatter* child, MatterInfo* info, float dwidth, float dheight) {
+    float xspd = sprite->x_speed();
+    float yspd = sprite->y_speed();
+    float hdist = 0.0F;
+    float vdist = 0.0F;
+    float cwidth, cheight;
+
+    if ((xspd != 0.0F) || (yspd != 0.0F)) {
+        info->x += xspd;
+        info->y += yspd;
+
+        child->feed_extent(info->x, info->y, &cwidth, &cheight);
+
+        if (info->x < 0) {
+            hdist = info->x;
+        } else if (info->x + cwidth > dwidth) {
+            hdist = info->x + cwidth - dwidth;
+        }
+
+        if (info->y < 0) {
+            vdist = info->y;
+        } else if (info->y + cheight > dheight) {
+            vdist = info->y + cheight - dheight;
+        }
+
+        if ((hdist != 0.0F) || (vdist != 0.0F)) {
+            sprite->on_border(hdist, vdist);
+            xspd = sprite->x_speed();
+            yspd = sprite->y_speed();
+                        
+            if ((xspd == 0.0F) || (yspd == 0.0F)) {
+                if (info->x < 0.0F) {
+                    info->x = 0.0F;
+                } else if (info->x + cwidth > dwidth) {
+                    info->x = dwidth - cwidth;
+                }
+
+                if (info->y < 0.0F) {
+                    info->y = 0.0F;
+                } else if (info->y + cheight > dheight) {
+                    info->y = dheight - cheight;
+                }
+            }
+        }
+                        
+        info->master->notify_updated();
     }
 }
 
@@ -814,65 +877,36 @@ bool WarGrey::STEM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, 
 }
 
 /************************************************************************************************/
+void WarGrey::STEM::Plane::set_supframe_rate(IMatter* m, int fps) {
+    unsafe_set_subfps(MATTER_INFO(m), fps);
+}
+
 void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
-        float cwidth, cheight, dwidth, dheight;
+        float dwidth, dheight;
+
+        this->info->master->feed_client_extent(&dwidth, &dheight);
 
         do {
             MatterInfo* info = MATTER_INFO(child);
-            this->info->master->feed_client_extent(&dwidth, &dheight);
-
+            
             if (unsafe_matter_unmasked(info, this->mode)) {
-                IMovable* sprite = child->as_sprite();
+                if (interval * info->animation_supframe_count < info->animation_interval) {
+                    info->animation_supframe_count ++;
+                } else {    
+                    if (info->animation_interval > 0) {
+                        info->animation_supframe_count = 1;
+                    }
 
-                child->update(count, interval, uptime);
+                    child->update(count, interval, uptime);
+                }
 
-                if (sprite != nullptr) {
-                    float xspd = sprite->x_speed();
-                    float yspd = sprite->y_speed();
-                    float hdist = 0.0F;
-                    float vdist = 0.0F;
+                /* seems to be more smoothly if move is not controlled by supframes */ {
+                    IMovable* sprite = child->as_sprite();
 
-                    if ((xspd != 0.0F) || (yspd != 0.0F)) {
-                        info->x += xspd;
-                        info->y += yspd;
-
-                        child->feed_extent(info->x, info->y, &cwidth, &cheight);
-
-                        if (info->x < 0) {
-                            hdist = info->x;
-                        } else if (info->x + cwidth > dwidth) {
-                            hdist = info->x + cwidth - dwidth;
-                        }
-
-                        if (info->y < 0) {
-                            vdist = info->y;
-                        } else if (info->y + cheight > dheight) {
-                            vdist = info->y + cheight - dheight;
-                        }
-
-                        if ((hdist != 0.0F) || (vdist != 0.0F)) {
-                            sprite->on_border(hdist, vdist);
-                            xspd = sprite->x_speed();
-                            yspd = sprite->y_speed();
-                        
-                            if ((xspd == 0.0F) || (yspd == 0.0F)) {
-                                if (info->x < 0.0F) {
-                                    info->x = 0.0F;
-                                } else if (info->x + cwidth > dwidth) {
-                                    info->x = dwidth - cwidth;
-                                }
-
-                                if (info->y < 0.0F) {
-                                    info->y = 0.0F;
-                                } else if (info->y + cheight > dheight) {
-                                    info->y = dheight - cheight;
-                                }
-                            }
-                        }
-                        
-                        this->notify_updated();
+                    if (sprite != nullptr) {
+                        do_move(sprite, child, info, dwidth, dheight);
                     }
                 }
             }
