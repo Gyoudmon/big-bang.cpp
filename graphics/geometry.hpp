@@ -9,8 +9,6 @@ namespace WarGrey::STEM {
     SDL_RendererFlip game_scales_to_flip(float x_scale, float y_scale);
 
     void game_draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height);
-    void game_draw_grid(SDL_Renderer* renderer, int row, int col, int cell_size, int xoff = 0, int yoff = 0);
-    void game_fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_size, int xoff = 0, int yoff = 0);
     void game_draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, int xoff = 0, int yoff = 0);
     void game_fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, int xoff = 0, int yoff = 0);
 
@@ -60,8 +58,6 @@ namespace WarGrey::STEM {
 
     /**********************************************************************************************/
     void game_draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height);
-    void game_draw_grid(SDL_Renderer* renderer, int row, int col, float cell_size, float xoff = 0.0F, float yoff = 0.0F);
-    void game_fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_size, float xoff = 0.0F, float yoff = 0.0F);
     void game_draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, float xoff = 0.0F, float yoff = 0.0F);
     void game_fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_width, float cell_height, float xoff = 0.0F, float yoff = 0.0F);
 

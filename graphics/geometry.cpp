@@ -235,14 +235,6 @@ void WarGrey::STEM::game_draw_frame(SDL_Renderer* renderer, int x, int y, int wi
     SDL_RenderDrawRect(renderer, &box);
 }
 
-void WarGrey::STEM::game_draw_grid(SDL_Renderer* renderer, int row, int col, int cell_size, int xoff, int yoff) {
-    game_draw_grid(renderer, row, col, cell_size, cell_size, xoff, yoff);
-}
-
-void WarGrey::STEM::game_fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_size, int xoff, int yoff) {
-    game_fill_grid(renderer, grids, row, col, cell_size, cell_size, xoff, yoff);
-}
-
 void WarGrey::STEM::game_draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, int xoff, int yoff) {
     int xend = xoff + col * cell_width;
     int yend = yoff + row * cell_height;
@@ -476,14 +468,6 @@ void WarGrey::STEM::game_draw_frame(SDL_Renderer* renderer, float x, float y, fl
 
     FILL_BOX(box, x - 1.0F, y - 1.0F, width + 3.0F, height + 3.0F);
     SDL_RenderDrawRectF(renderer, &box);
-}
-
-void WarGrey::STEM::game_draw_grid(SDL_Renderer* renderer, int row, int col, float cell_size, float xoff, float yoff) {
-    game_draw_grid(renderer, row, col, cell_size, cell_size, xoff, yoff);
-}
-
-void WarGrey::STEM::game_fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_size, float xoff, float yoff) {
-    game_fill_grid(renderer, grids, row, col, cell_size, cell_size, xoff, yoff);
 }
 
 void WarGrey::STEM::game_draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, float xoff, float yoff) {
