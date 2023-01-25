@@ -85,17 +85,17 @@ void WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t 
     size_t frame_size = this->frame_refs.size();
 
     if (frame_size > 1) {
-        if (this->current_subframe_idx >= frame_size) {
+        uint32_t frame_idx = count % frame_size;
+        
+        if (frame_idx >= frame_size) {
             if (this->animation_rest != 0) {
                 this->switch_to_costume(this->frame_refs[0]);
-                this->current_subframe_idx = 1;
                 if (this->animation_rest > 0) {
                     this->animation_rest --;
                 }
             }
         } else {
-            this->switch_to_costume(this->frame_refs[this->current_subframe_idx]);
-            this->current_subframe_idx ++;
+            this->switch_to_costume(this->frame_refs[frame_idx]);
         }
     }
 }
@@ -104,7 +104,6 @@ size_t WarGrey::STEM::ISprite::play(const char* action0, int repetition) {
     const char* action = (action0 == nullptr) ? "" : action0;
     this->animation_rest = repetition;
     this->frame_refs.clear();
-    this->current_subframe_idx = 0;
     
     for (int i = 0; i < this->costume_count(); i++) {
         if (string_prefix(this->costume_index_to_name(i), action)) {
@@ -112,9 +111,9 @@ size_t WarGrey::STEM::ISprite::play(const char* action0, int repetition) {
         }
     }
 
-    if (this->frame_refs.size()) {
+    if (this->frame_refs.size() > 0) {
         this->switch_to_costume(this->frame_refs[0]);
-        this->current_subframe_idx = 1;
+        this->notify_timeline_restart(1);
     }
 
     return this->frame_refs.size();

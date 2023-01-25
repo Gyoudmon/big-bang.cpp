@@ -36,8 +36,9 @@ using namespace std::filesystem;
 typedef struct timer_parcel {
     IUniverse* universe;
     uint32_t interval;
-    uint32_t count;
-    uint32_t uptime;
+    uint32_t count = 0;
+    uint32_t uptime = 0;
+    uint32_t last_timestamp = 0;
 } timer_parcel_t;
 
 /**
@@ -200,8 +201,6 @@ void WarGrey::STEM::IUniverse::big_bang() {
     if (this->_fps > 0) {
         parcel.universe = this;
         parcel.interval = 1000 / this->_fps;
-        parcel.count = 0;
-        parcel.uptime = 0;
 
         this->timer = Call_For_Variable(timer,
                 SDL_AddTimer(parcel.interval, trigger_timer_event, reinterpret_cast<void*>(&parcel)),
@@ -226,7 +225,14 @@ void WarGrey::STEM::IUniverse::big_bang() {
                 auto parcel = reinterpret_cast<timer_parcel_t*>(e.user.data1);
 
                 if (parcel->universe == this) {
-                    this->on_elapse(parcel->count, parcel->interval, parcel->uptime);
+                    /** TODO
+                     * Is SDL2 really pumping duplicate events?
+                     * Why the first `count` is much larger then 1?
+                     */
+                    if (parcel->last_timestamp != parcel->uptime) {
+                        this->on_elapse(parcel->count, parcel->interval, parcel->uptime);
+                        parcel->last_timestamp = parcel->uptime;
+                    }
                 }
             }; break;
             case SDL_MOUSEMOTION: this->on_mouse_event(e.motion); break;

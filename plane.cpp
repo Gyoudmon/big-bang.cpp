@@ -39,8 +39,9 @@ namespace {
         bool selected = false;
         unsigned int mode = 0U;
 
-        int animation_interval = 0;
-        int animation_supframe_count = 1;
+        uint32_t local_frame_delta = 0;
+        uint32_t local_frame_count = 0;
+        uint32_t local_interval = 0;
 
         // for asynchronously loaded matters
         AsyncInfo* async = nullptr;
@@ -50,20 +51,44 @@ namespace {
     };
 }
 
-static inline void unsafe_set_subfps(MatterInfo* info, int fps) {
-    if (fps > 0) {
-        info->animation_interval = 1000 / fps;
+static inline void reset_timeline(uint32_t& frame_count, uint32_t& interval, uint32_t count0 = 1U) {
+    interval = 0U;
+    frame_count = count0;
+}
+
+static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_delta, uint32_t& frame_count, uint32_t& interval) {
+    frame_delta = (fps > 0) ? (1000U / fps) : 0U;
+
+    if (restart) {
+        reset_timeline(frame_count, interval);
+    }
+}
+
+static inline void unsafe_set_matter_fps(MatterInfo* info, int fps, bool restart) {
+    unsafe_set_local_fps(fps, restart, info->local_frame_delta, info->local_frame_count, info->local_interval);
+}
+
+static uint32_t local_timeline_interval(uint32_t global_interval, uint32_t local_frame_delta, uint32_t& local_interval) {
+    uint32_t interval = 0;
+
+    if (local_frame_delta > 0) {
+        if (local_interval < local_frame_delta) {
+            local_interval += global_interval;
+        } else {
+            interval = local_interval;
+            local_interval = 0U;
+        }
     } else {
-        info->animation_interval = 0;
+        interval = global_interval;
     }
 
-    info->animation_supframe_count = 1;
+    return interval;
 }
 
 static inline MatterInfo* bind_matter_owership(IPlane* master, unsigned int mode, IMatter* m) {
     auto info = new MatterInfo(master, mode);
     
-    unsafe_set_subfps(info, m->preferred_supframe_rate());
+    unsafe_set_matter_fps(info, m->preferred_local_fps(), true);
     m->info = info;
 
     return info;
@@ -877,11 +902,30 @@ bool WarGrey::STEM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, 
 }
 
 /************************************************************************************************/
-void WarGrey::STEM::Plane::set_supframe_rate(IMatter* m, int fps) {
-    unsafe_set_subfps(MATTER_INFO(m), fps);
+void WarGrey::STEM::Plane::set_matter_fps(IMatter* m, int fps, bool restart) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        unsafe_set_matter_fps(info, fps, restart);
+    }
+}
+
+void WarGrey::STEM::Plane::set_local_fps(int fps, bool restart) {
+    unsafe_set_local_fps(fps, restart, this->local_frame_delta, this->local_frame_count, this->local_interval);
+}
+
+
+void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t count0) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        reset_timeline(info->local_frame_count, info->local_interval, count0);
+    }
 }
 
 void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
+    uint32_t local_interval = 0U;
+
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
         float dwidth, dheight;
@@ -892,17 +936,13 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
             MatterInfo* info = MATTER_INFO(child);
             
             if (unsafe_matter_unmasked(info, this->mode)) {
-                if (interval * info->animation_supframe_count < info->animation_interval) {
-                    info->animation_supframe_count ++;
-                } else {    
-                    if (info->animation_interval > 0) {
-                        info->animation_supframe_count = 1;
-                    }
-
-                    child->update(count, interval, uptime);
+                local_interval = local_timeline_interval(interval, info->local_frame_delta, info->local_interval);
+                
+                if (local_interval > 0U) {
+                    child->update(info->local_frame_count ++, local_interval, uptime);
                 }
 
-                /* seems to be more smoothly if move is not controlled by supframes */ {
+                /* seems to be more smoothly if move is not controlled by local timeline */ {
                     IMovable* sprite = child->as_sprite();
 
                     if (sprite != nullptr) {
@@ -915,7 +955,10 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
         } while (child != this->head_matter);
     }
 
-    this->update(count, interval, uptime);
+    local_interval = local_timeline_interval(interval, this->local_frame_delta, this->local_interval);
+    if (local_interval > 0) {
+        this->update(this->local_frame_count ++, local_interval, uptime);
+    }
 }
 
 void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {
@@ -1071,7 +1114,7 @@ bool WarGrey::STEM::IPlane::should_update() {
     return ((this->info != nullptr) && this->info->master->should_update());
 }
 
-void WarGrey::STEM::IPlane::notify_updated() {
+void WarGrey::STEM::IPlane::notify_updated(IMatter* m) {
     if (this->info != nullptr) {
         this->info->master->notify_updated();
     }

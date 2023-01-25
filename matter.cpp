@@ -110,7 +110,13 @@ void WarGrey::STEM::IMatter::notify_updated() {
             this->clear_moor();
         }
 
-        this->info->master->notify_updated();
+        this->info->master->notify_updated(this);
+    }
+}
+
+void WarGrey::STEM::IMatter::notify_timeline_restart(uint32_t count0) {
+    if (this->info != nullptr) {
+        this->info->master->notify_matter_timeline_restart(this, count0);
     }
 }
 

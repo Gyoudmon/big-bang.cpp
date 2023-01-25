@@ -63,7 +63,7 @@ namespace WarGrey::STEM {
         void log_message(const char* fmt, ...);
 
     public:
-        virtual IMatter* find_next_selected_matter(IMatter* start = nullptr) = 0;
+        virtual IMatter* find_next_selected_matter(IMatter* start) = 0;
         virtual IMatter* thumbnail_matter() = 0;
         virtual void add_selected(IMatter* m) = 0;
         virtual void set_selected(IMatter* m) = 0;
@@ -82,13 +82,14 @@ namespace WarGrey::STEM {
         virtual WarGrey::STEM::IMatter* get_focused_matter() = 0;
         virtual void set_caret_owner(IMatter* m) = 0;
         virtual void notify_matter_ready(IMatter* m) = 0;
+        virtual void notify_matter_timeline_restart(IMatter* m, u_int32_t count0) = 0;
         
     public:
         void begin_update_sequence();
         bool is_in_update_sequence();
         void end_update_sequence();
         bool should_update();
-        void notify_updated();
+        void notify_updated(IMatter* m = nullptr);
 
     public:
         bool feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a);
@@ -232,9 +233,11 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* get_focused_matter() override;
         void set_caret_owner(IMatter* m) override;
         void notify_matter_ready(IMatter* m) override;
+        void notify_matter_timeline_restart(IMatter* m, u_int32_t count0 = 1) override;
 
     public:
-        void set_supframe_rate(IMatter* m, int fps);
+        void set_matter_fps(IMatter* m, int fps, bool restart = false);
+        void set_local_fps(int fps, bool restart = false);
 
     protected:
         void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
@@ -268,6 +271,9 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* focused_matter = nullptr;
         WarGrey::STEM::IMatter* hovering_matter = nullptr;
         unsigned int mode = 0U;
+        uint32_t local_frame_delta = 0U;
+        uint32_t local_frame_count = 1U;
+        uint32_t local_interval = 0U;
 
     private:
         float translate_x = 0.0F;

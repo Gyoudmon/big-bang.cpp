@@ -41,7 +41,7 @@ namespace WarGrey::STEM {
 
     public:
         virtual void own_caret(bool is_own) {}
-        virtual int preferred_supframe_rate() { return 0; }
+        virtual int preferred_local_fps() { return 0; }
         
     public:
         virtual bool is_colliding_with_mouse(float local_x, float local_y) { return true; }
@@ -84,6 +84,7 @@ namespace WarGrey::STEM {
 
     public:
         void notify_updated();
+        void notify_timeline_restart(uint32_t count0 = 0);
         void feed_location(float* x, float* y, WarGrey::STEM::MatterAnchor a = MatterAnchor::LT);
         void log_message(int fgc, const char* fmt, ...);
         void log_message(int fgc, const std::string& msg);

@@ -33,7 +33,7 @@ namespace WarGrey::STEM {
         const char* current_costume_name() { return costume_index_to_name(this->current_costume_index()); };
 
     public:
-        int preferred_supframe_rate() override { return 16; }
+        int preferred_local_fps() override { return 24; }
         size_t play(const std::string& action, int repetition = -1) { return this->play(action.c_str(), repetition); }
         size_t play(int repetition) { return this->play(nullptr, repetition); }
         size_t play(const char* action = nullptr, int repetition = -1);
@@ -60,6 +60,5 @@ namespace WarGrey::STEM {
     private:
         int animation_rest = 0;
         std::vector<int> frame_refs;
-        int current_subframe_idx;
     };
 }
