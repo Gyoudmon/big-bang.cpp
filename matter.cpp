@@ -86,20 +86,26 @@ void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio, MatterAnchor
 
 void WarGrey::STEM::IMatter::resize(float w, float h, MatterAnchor anchor) {
     if (this->can_resize) {
-        if ((w > 0.0F) && (h > 0.0F)) {
-            float width, height;
-            float x = 0.0F;
-            float y = 0.0F;
+        float width, height;
+        float x = 0.0F;
+        float y = 0.0F;
 
-            this->feed_location(&x, &y, MatterAnchor::LT);
-            this->feed_extent(x, y, &width, &height);
+        this->feed_location(&x, &y, MatterAnchor::LT);
+        this->feed_extent(x, y, &width, &height);
 
-	        if ((width != w) || (height != h)) {
-                this->moor(anchor);
-                this->on_resize(w, h, width, height);
-	            this->notify_updated();
-	        }
+        if (w == 0.0F) {
+            w = width;
         }
+
+        if (h == 0.0F) {
+            h = height;
+        }
+
+	    if ((width != w) || (height != h)) {
+            this->moor(anchor);
+            this->on_resize(w, h, width, height);
+	        this->notify_updated();
+	    }
     }
 }
 

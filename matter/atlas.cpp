@@ -12,6 +12,7 @@ using namespace WarGrey::STEM;
 /*************************************************************************************************/
 WarGrey::STEM::IAtlas::IAtlas(const std::string& pathname) : _pathname(pathname) {
     this->enable_resize(true);
+    this->camouflage(true);
 }
 
 void WarGrey::STEM::IAtlas::pre_construct(SDL_Renderer* renderer) {
