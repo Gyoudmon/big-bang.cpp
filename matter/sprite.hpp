@@ -29,6 +29,8 @@ namespace WarGrey::STEM {
         void switch_to_costume(const std::string& name) { this->switch_to_costume(name.c_str()); }
         void switch_to_prev_costume() { this->switch_to_costume(this->current_costume_idx - 1); }
         void switch_to_next_costume() { this->switch_to_costume(this->current_costume_idx + 1); }
+        void switch_to_random_costume(int idx0, int idxn);
+        void switch_to_random_costume(int idx0 = 0) { this->switch_to_random_costume(idx0, this->costume_count() - 1); }
         int current_costume_index() { return this->current_costume_idx; }
         const char* current_costume_name() { return costume_index_to_name(this->current_costume_index()); };
 

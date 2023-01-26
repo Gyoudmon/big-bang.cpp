@@ -9,12 +9,15 @@
 #include "graphics/text.hpp"
 
 #include "world.hpp"
-#include "matter/graphlet.hpp"
-#include "matter/graphlet/textlet.hpp"
-#include "matter/graphlet/dimensionlet.hpp"
+
+#include "matter/atlas.hpp"
 #include "matter/sprite.hpp"
 #include "matter/sprite/folder.hpp"
 #include "matter/sprite/sheet.hpp"
+
+#include "matter/graphlet.hpp"
+#include "matter/graphlet/textlet.hpp"
+#include "matter/graphlet/dimensionlet.hpp"
 
 #include "virtualization/filesystem/imgdb.hpp"
 

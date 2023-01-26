@@ -62,9 +62,11 @@ WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const std::string& pathname, int
     : ISpriteSheet(pathname, MatterAnchor::CC), row(row), col(col), grid_xgap(xgap), grid_ygap(ygap) {}
 
 void WarGrey::STEM::SpriteGridSheet::on_sheet_load(shared_costume_t sprite_sheet) {
-    sprite_sheet->feed_extent(&this->grid_width, &this->grid_height);
-    this->grid_width = (this->grid_width - ((this->col - 1) * this->grid_xgap)) / this->col;
-    this->grid_height = (this->grid_height - ((this->row - 1) * this->grid_ygap)) / this->row;
+    int w, h;
+
+    sprite_sheet->feed_extent(&w, &h);
+    this->grid_width = (w - ((this->col - 1) * this->grid_xgap)) / this->col;
+    this->grid_height = (h - ((this->row - 1) * this->grid_ygap)) / this->row;
 }
 
 size_t WarGrey::STEM::SpriteGridSheet::costume_count() {

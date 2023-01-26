@@ -6,6 +6,8 @@
 
 #include "../graphics/geometry.hpp"
 
+#include "../physics/random.hpp"
+
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
@@ -79,6 +81,10 @@ void WarGrey::STEM::ISprite::switch_to_costume(const char* name) {
     if (cidx >= 0) {
         this->switch_to_costume(cidx);
     }
+}
+
+void WarGrey::STEM::ISprite::switch_to_random_costume(int idx0, int idxn) {
+    this->switch_to_costume(random_uniform(idx0, idxn));
 }
 
 void WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t uptime) {
