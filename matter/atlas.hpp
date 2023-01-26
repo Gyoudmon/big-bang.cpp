@@ -6,9 +6,8 @@
 namespace WarGrey::STEM {
     class IAtlas : public WarGrey::STEM::IMatter {
     public:
-        IAtlas(const std::string& pathname, WarGrey::STEM::MatterAnchor resize_anchor);
-        IAtlas(WarGrey::STEM::MatterAnchor resize_anchor, const char* pathname_fmt, ...);
-        IAtlas(const char* pathname_fmt, ...);
+        IAtlas(const std::string& pathname);
+        IAtlas(const char* pathname) : IAtlas(std::string(pathname)) {}
         virtual ~IAtlas() {}
 
         void pre_construct(SDL_Renderer* renderer) override;

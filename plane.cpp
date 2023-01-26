@@ -213,15 +213,14 @@ static IMatter* do_search_selected_matter(IMatter* start, unsigned int mode, IMa
     return found;
 }
 
-static void do_resize(Plane* master, IMatter* m, MatterInfo* info, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
-    MatterAnchor resize_anchor;
-
+static void do_resize(Plane* master, IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
     // TODO: the theory or implementation seems incorrect.
-    if (m->resizable(&resize_anchor)) {
-        float sx, sy, sw, sh, fx, fy, nx, ny, nw, nh;
+    if (m->resizable()) {
+        MatterAnchor anchor = MatterAnchor::CC;
+
+        float sx, sy, sw, sh, nx, ny, nw, nh;
 
         unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-        matter_anchor_fraction(resize_anchor, &fx, &fy);
 
         m->resize((sw / prev_scale_x) * scale_x, (sh / prev_scale_y) * scale_y);
         m->feed_extent(sx, sy, &nw, &nh);
@@ -326,7 +325,7 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
                 info->async->dx0, info->async->dy0);
 
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
-                do_resize(this, m, info, this->scale_x, this->scale_y);
+                do_resize(this, m, info, info->async->fx0, info->async->fy0, this->scale_x, this->scale_y);
             }
 
             delete info->async;
@@ -365,7 +364,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
 
         if (m->ready()) {
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
-                do_resize(this, m, info, this->scale_x, this->scale_y);
+                do_resize(this, m, info, fx, fy, this->scale_x, this->scale_y);
             }
 
             this->notify_updated();

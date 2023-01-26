@@ -1,30 +1,15 @@
 #include "sheet.hpp"
 
 #include "../../datum/box.hpp"
-#include "../../datum/path.hpp"
-#include "../../datum/string.hpp"
+#include "../../datum/fixnum.hpp"
 
 #include "../../graphics/geometry.hpp"
 
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname, MatterAnchor resize_anchor) : _pathname(pathname) {
-    this->enable_resize(true, resize_anchor);
-}
-
-WarGrey::STEM::ISpriteSheet::ISpriteSheet(const char* pathname_fmt, ...) {
-    VSNPRINT(pathname, pathname_fmt);
-
-    this->_pathname = pathname;
-    this->enable_resize(true, MatterAnchor::CC);
-}
-
-WarGrey::STEM::ISpriteSheet::ISpriteSheet(MatterAnchor resize_anchor, const char* pathname_fmt, ...) {
-     VSNPRINT(pathname, pathname_fmt);
-
-    this->_pathname = pathname;
-    this->enable_resize(true, resize_anchor);
+WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname) : _pathname(pathname) {
+    this->enable_resize(true);
 }
 
 void WarGrey::STEM::ISpriteSheet::pre_construct(SDL_Renderer* renderer) {
@@ -59,7 +44,9 @@ WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const char* pathname, int row, i
     : SpriteGridSheet(std::string(pathname), row, col, xgap, ygap) {}
 
 WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const std::string& pathname, int row, int col, int xgap, int ygap)
-    : ISpriteSheet(pathname, MatterAnchor::CC), row(row), col(col), grid_xgap(xgap), grid_ygap(ygap) {}
+    : ISpriteSheet(pathname)
+    , row(fxmax(row, 1)), col(fxmax(col, 1))
+    , grid_xgap(xgap), grid_ygap(ygap) {}
 
 void WarGrey::STEM::SpriteGridSheet::on_sheet_load(shared_costume_t sprite_sheet) {
     int w, h;

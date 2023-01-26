@@ -46,7 +46,7 @@ void WarGrey::STEM::IMatter::feed_margin(float x, float y, float* top, float* ri
     SET_VALUES(left, 0.0F, right, 0.0F);
 }
 
-void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio) {
+void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio, MatterAnchor anchor) {
     if (this->can_resize) {
         if ((x_ratio != 1.0F) || (y_ratio != 1.0F)) {
             float width, height;
@@ -56,14 +56,14 @@ void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio) {
             this->feed_location(&x, &y, MatterAnchor::LT);
             this->feed_extent(x, y, &width, &height);
 
-	        this->moor(this->resize_anchor);
+	        this->moor(anchor);
             this->on_resize(width * x_ratio, height * y_ratio, width, height);
 	        this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio) {
+void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio, MatterAnchor anchor) {
     if (this->can_resize) {
         float cwidth, cheight, owidth, oheight, nwidth, nheight;
         float x = 0.0F;
@@ -77,14 +77,14 @@ void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio) {
         nheight = oheight * y_ratio;
 
         if ((nwidth != cwidth) || (nheight != cheight)) {
-	        this->moor(this->resize_anchor);
+	        this->moor(anchor);
             this->on_resize(nwidth, nheight, cwidth, cheight);
 	        this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::IMatter::resize(float w, float h) {
+void WarGrey::STEM::IMatter::resize(float w, float h, MatterAnchor anchor) {
     if (this->can_resize) {
         if ((w > 0.0F) && (h > 0.0F)) {
             float width, height;
@@ -95,7 +95,7 @@ void WarGrey::STEM::IMatter::resize(float w, float h) {
             this->feed_extent(x, y, &width, &height);
 
 	        if ((width != w) || (height != h)) {
-                this->moor(this->resize_anchor);
+                this->moor(anchor);
                 this->on_resize(w, h, width, height);
 	            this->notify_updated();
 	        }

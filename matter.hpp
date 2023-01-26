@@ -58,13 +58,13 @@ namespace WarGrey::STEM {
         virtual bool on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) { return false; }
 
     public:
-        bool resizable(WarGrey::STEM::MatterAnchor* anchor) { (*anchor) = this->resize_anchor; return this->can_resize; }
-        void scale(float ratio) { this->scale(ratio, ratio); }
-        void scale(float x_ratio, float y_ratio);
-        void scale_to(float ratio) { this->scale_to(ratio, ratio); }
-        void scale_to(float x_ratio, float y_ratio);
-        void resize(float size) { this->resize(size, size); }
-        void resize(float width, float height);
+        bool resizable() { return this->can_resize; }
+        void scale(float ratio, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->scale(ratio, ratio, anchor); }
+        void scale(float x_ratio, float y_ratio, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
+        void scale_to(float ratio, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->scale_to(ratio, ratio, anchor); }
+        void scale_to(float x_ratio, float y_ratio, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
+        void resize(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->resize(size, size, anchor); }
+        void resize(float width, float height, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
 
     public:
         void enable_events(bool yes_no, bool low_level = false) { this->deal_with_events = yes_no; this->deal_with_low_level_events = low_level; }
@@ -97,14 +97,13 @@ namespace WarGrey::STEM {
         IMatterInfo* info = nullptr;
 
     protected:
-        void enable_resize(bool yes_no, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->can_resize = yes_no; this->resize_anchor = anchor; }
+        void enable_resize(bool yes_no = true) { this->can_resize = yes_no; }
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
 
     protected:
         WarGrey::STEM::IMovable* _sprite = nullptr;
 
     private:
-        WarGrey::STEM::MatterAnchor resize_anchor;
         bool findable = true;
         bool can_resize = false;
         bool deal_with_events = false;

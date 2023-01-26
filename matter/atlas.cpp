@@ -10,22 +10,8 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-WarGrey::STEM::IAtlas::IAtlas(const std::string& pathname, MatterAnchor resize_anchor) : _pathname(pathname) {
-    this->enable_resize(true, resize_anchor);
-}
-
-WarGrey::STEM::IAtlas::IAtlas(const char* pathname_fmt, ...) {
-    VSNPRINT(pathname, pathname_fmt);
-
-    this->_pathname = pathname;
-    this->enable_resize(true, MatterAnchor::CC);
-}
-
-WarGrey::STEM::IAtlas::IAtlas(MatterAnchor resize_anchor, const char* pathname_fmt, ...) {
-     VSNPRINT(pathname, pathname_fmt);
-
-    this->_pathname = pathname;
-    this->enable_resize(true, resize_anchor);
+WarGrey::STEM::IAtlas::IAtlas(const std::string& pathname) : _pathname(pathname) {
+    this->enable_resize(true);
 }
 
 void WarGrey::STEM::IAtlas::pre_construct(SDL_Renderer* renderer) {
@@ -129,7 +115,7 @@ WarGrey::STEM::GridAtlas::GridAtlas(const char* pathname, int row, int col, int 
     : GridAtlas(std::string(pathname), row, col, xgap, ygap) {}
 
 WarGrey::STEM::GridAtlas::GridAtlas(const std::string& pathname, int row, int col, int xgap, int ygap)
-    : IAtlas(pathname, MatterAnchor::CC)
+    : IAtlas(pathname)
     , atlas_row(fxmax(row, 1)), atlas_col(fxmax(col, 1)), map_row(atlas_row), map_col(atlas_col)
     , atlas_tile_xgap(xgap), atlas_tile_ygap(ygap), map_tile_xgap(0.0F), map_tile_ygap(0.0F) {}
 
