@@ -216,8 +216,6 @@ static IMatter* do_search_selected_matter(IMatter* start, unsigned int mode, IMa
 static void do_resize(Plane* master, IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F) {
     // TODO: the theory or implementation seems incorrect.
     if (m->resizable()) {
-        MatterAnchor anchor = MatterAnchor::CC;
-
         float sx, sy, sw, sh, nx, ny, nw, nh;
 
         unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
