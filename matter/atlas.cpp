@@ -112,27 +112,34 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::GridAtlas::GridAtlas(const char* pathname, int row, int col, int xgap, int ygap)
-    : GridAtlas(std::string(pathname), row, col, xgap, ygap) {}
+WarGrey::STEM::GridAtlas::GridAtlas(const char* pathname, int row, int col, int xgap, int ygap, bool inset)
+    : GridAtlas(std::string(pathname), row, col, xgap, ygap, inset) {}
 
-WarGrey::STEM::GridAtlas::GridAtlas(const std::string& pathname, int row, int col, int xgap, int ygap)
+WarGrey::STEM::GridAtlas::GridAtlas(const std::string& pathname, int row, int col, int xgap, int ygap, bool inset)
     : IAtlas(pathname)
     , atlas_row(fxmax(row, 1)), atlas_col(fxmax(col, 1)), map_row(atlas_row), map_col(atlas_col)
+    , atlas_inset(inset)
     , atlas_tile_xgap(xgap), atlas_tile_ygap(ygap), map_tile_xgap(0.0F), map_tile_ygap(0.0F) {}
 
 void WarGrey::STEM::GridAtlas::on_tilemap_load(shared_costume_t atlas) {
-    float w, h;
+    int w, h;
 
     atlas->feed_extent(&w, &h);
-    this->atlas_tile_width = (w - (float(this->atlas_col - 1) * this->atlas_tile_xgap)) / this->atlas_col;
-    this->atlas_tile_height = (h - (float(this->atlas_row - 1) * this->atlas_tile_ygap)) / this->atlas_row;
-    this->map_tile_width = this->atlas_tile_width;
-    this->map_tile_height = this->atlas_tile_height; 
+
+    if (this->atlas_inset) {
+        w -= this->atlas_tile_xgap * 2;
+        h -= this->atlas_tile_ygap * 2;
+    }
+
+    this->atlas_tile_width = (w - ((this->atlas_col - 1) * this->atlas_tile_xgap)) / this->atlas_col;
+    this->atlas_tile_height = (h - ((this->atlas_row - 1) * this->atlas_tile_ygap)) / this->atlas_row;
+    this->map_tile_width = float(this->atlas_tile_width);
+    this->map_tile_height = float(this->atlas_tile_height);
 }
 
 void WarGrey::STEM::GridAtlas::feed_map_extent(float* width, float* height) {
-    SET_BOX(width, float(this->map_col) * this->map_tile_width + float(this->map_col - 1) * this->map_tile_xgap);
-    SET_BOX(height, float(this->map_row) * this->map_tile_height + float(this->map_row - 1) * this->map_tile_ygap);
+    SET_BOX(width,  float(this->map_col) * (this->map_tile_width  + this->map_tile_xgap) - this->map_tile_xgap);
+    SET_BOX(height, float(this->map_row) * (this->map_tile_height + this->map_tile_ygap) - this->map_tile_ygap);
 }
 
 size_t WarGrey::STEM::GridAtlas::atlas_tile_count() {
@@ -146,9 +153,16 @@ size_t WarGrey::STEM::GridAtlas::map_tile_count() {
 void WarGrey::STEM::GridAtlas::feed_atlas_tile_region(SDL_Rect* region, int idx) {
     int r = idx / this->atlas_col;
     int c = idx % this->atlas_col;
+    int xoff = 0;
+    int yoff = 0;
 
-    region->x = c * (this->atlas_tile_width + this->atlas_tile_xgap);
-    region->y = r * (this->atlas_tile_height + this->atlas_tile_ygap);
+    if (this->atlas_inset) {
+        xoff = this->atlas_tile_xgap;
+        yoff = this->atlas_tile_ygap;
+    }
+
+    region->x = c * (this->atlas_tile_width + this->atlas_tile_xgap)  + xoff;
+    region->y = r * (this->atlas_tile_height + this->atlas_tile_ygap) + yoff;
     region->w = this->atlas_tile_width;
     region->h = this->atlas_tile_height;
 }

@@ -30,8 +30,8 @@ namespace WarGrey::STEM {
 
     class SpriteGridSheet : public WarGrey::STEM::ISpriteSheet {
     public:
-        SpriteGridSheet(const char* pathname, int row, int col, int xgap = 0, int ygap = 0);
-        SpriteGridSheet(const std::string& pathname, int row, int col, int xgap = 0, int ygap = 0);
+        SpriteGridSheet(const char* pathname, int row, int col, int xgap = 0, int ygap = 0, bool inset = false);
+        SpriteGridSheet(const std::string& pathname, int row, int col, int xgap = 0, int ygap = 0, bool inset = false);
 
     public:
         size_t costume_count() override;
@@ -41,15 +41,13 @@ namespace WarGrey::STEM {
         void feed_costume_region(SDL_Rect* costume, int idx) override;
         const char* costume_index_to_name(int idx) override;
         int costume_name_to_index(const char* name) override;
-
-    protected:
-        virtual const char* costume_grid_to_name(int r, int c);
     
     protected:
         int row;
         int col;
 
     private:
+        int grid_inset = false;
         int grid_width = 0;
         int grid_height = 0;
         int grid_xgap;

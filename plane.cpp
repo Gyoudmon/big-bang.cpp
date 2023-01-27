@@ -505,7 +505,7 @@ IMatter* WarGrey::STEM::Plane::find_matter(float x, float y) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (unsafe_matter_unmasked(info, this->mode)) {
-                if (!child->concealled()) {
+                if (!child->concealled() && child->visible()) {
                     float sx, sy, sw, sh;
 
                     unsafe_feed_matter_bound(child, info, &sx, &sy, &sw, &sh);
@@ -985,7 +985,7 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (unsafe_matter_unmasked(info, this->mode)) {
+            if (unsafe_matter_unmasked(info, this->mode) && child->visible()) {
                 child->feed_extent(info->x, info->y, &mwidth, &mheight);
 
                 mx = (info->x + this->translate_x) * this->scale_x + X;

@@ -125,6 +125,23 @@ size_t WarGrey::STEM::ISprite::play(const char* action0, int repetition) {
     return this->frame_refs.size();
 }
 
+size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repeition) {
+    size_t size = this->costume_count();
+
+    this->animation_rest = repeition;
+    this->frame_refs.clear();
+
+    if (count >= size) {
+        count = count % size + size;
+    }
+
+    for (int off = 0; off < count; off ++) {
+        this->frame_refs.push_back(idx0 + off);
+    }
+
+    return this->frame_refs.size();
+}
+
 void WarGrey::STEM::ISprite::stop() {
     this->animation_rest = 0;
     this->frame_refs.clear();

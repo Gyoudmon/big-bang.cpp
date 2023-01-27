@@ -54,8 +54,8 @@ namespace WarGrey::STEM {
 
     class GridAtlas : public WarGrey::STEM::IAtlas {
     public:
-        GridAtlas(const char* pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0);
-        GridAtlas(const std::string& pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0);
+        GridAtlas(const char* pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0, bool inset = false);
+        GridAtlas(const std::string& pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0, bool inset = false);
 
     public:
         size_t atlas_tile_count() override;
@@ -77,6 +77,7 @@ namespace WarGrey::STEM {
         int map_col;
 
     private:
+        bool atlas_inset; 
         int atlas_tile_xgap = 0;
         int atlas_tile_ygap = 0;
         int atlas_tile_width = 0;

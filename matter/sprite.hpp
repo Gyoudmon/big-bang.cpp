@@ -39,6 +39,7 @@ namespace WarGrey::STEM {
         size_t play(const std::string& action, int repetition = -1) { return this->play(action.c_str(), repetition); }
         size_t play(int repetition) { return this->play(nullptr, repetition); }
         size_t play(const char* action = nullptr, int repetition = -1);
+        size_t play(int idx0, size_t count, int repetition = -1);
         bool in_playing() { return this->animation_rest != 0; }
         void stop();
 

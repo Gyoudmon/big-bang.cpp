@@ -40,18 +40,25 @@ void WarGrey::STEM::ISpriteSheet::draw_costume(SDL_Renderer* renderer, int idx, 
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const char* pathname, int row, int col, int xgap, int ygap)
+WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const char* pathname, int row, int col, int xgap, int ygap, bool inset)
     : SpriteGridSheet(std::string(pathname), row, col, xgap, ygap) {}
 
-WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const std::string& pathname, int row, int col, int xgap, int ygap)
+WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const std::string& pathname, int row, int col, int xgap, int ygap, bool inset)
     : ISpriteSheet(pathname)
     , row(fxmax(row, 1)), col(fxmax(col, 1))
+    , grid_inset(inset)
     , grid_xgap(xgap), grid_ygap(ygap) {}
 
 void WarGrey::STEM::SpriteGridSheet::on_sheet_load(shared_costume_t sprite_sheet) {
     int w, h;
 
     sprite_sheet->feed_extent(&w, &h);
+
+    if (this->grid_inset) {
+        w -= this->grid_xgap * 2;
+        h -= this->grid_ygap * 2;
+    }
+
     this->grid_width = (w - ((this->col - 1) * this->grid_xgap)) / this->col;
     this->grid_height = (h - ((this->row - 1) * this->grid_ygap)) / this->row;
 }
@@ -63,37 +70,35 @@ size_t WarGrey::STEM::SpriteGridSheet::costume_count() {
 void WarGrey::STEM::SpriteGridSheet::feed_costume_region(SDL_Rect* region, int idx) {
     int r = idx / this->col;
     int c = idx % this->col;
+    int xoff = 0;
+    int yoff = 0;
 
-    region->x = c * (this->grid_width + this->grid_xgap);
-    region->y = r * (this->grid_height + this->grid_ygap);
+    if (this->grid_inset) {
+        xoff = this->grid_xgap;
+        yoff = this->grid_ygap;
+    }
+
+    region->x = c * (this->grid_width + this->grid_xgap)  + xoff;
+    region->y = r * (this->grid_height + this->grid_ygap) + yoff;
     region->w = this->grid_width;
     region->h = this->grid_height;
 }
 
 const char* WarGrey::STEM::SpriteGridSheet::costume_index_to_name(int idx) {
-    int r = idx / this->col;
-    int c = idx % this->col;
+    this->__virtual_name = std::to_string(idx);
     
-    return this->costume_grid_to_name(r, c);
+    return this->__virtual_name.c_str();
 }
 
 int WarGrey::STEM::SpriteGridSheet::costume_name_to_index(const char* name) {
     int idx = -1;
 
-    for (int r = 0; r < this->row; r++) {
-        for (int c = 0; c < this->col; c++) {
-            if (strcmp(this->costume_grid_to_name(r, c), name) == 0) {
-                idx = r * this->col + c;
-                break;
-            }
+    for (int i = 0; i < this->row * this->col; i++) {
+        if (strcmp(this->costume_index_to_name(i), name) == 0) {
+            idx = i;
+            break;
         }
     }
 
     return idx;
-}
-
-const char* WarGrey::STEM::SpriteGridSheet::costume_grid_to_name(int r, int c) {
-    this->__virtual_name = std::to_string(r) + "-" + std::to_string(c);
-
-    return this->__virtual_name.c_str();
 }

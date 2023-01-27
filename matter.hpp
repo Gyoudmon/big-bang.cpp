@@ -81,6 +81,8 @@ namespace WarGrey::STEM {
     public:
         void camouflage(bool yes_no) { this->findable = !yes_no; }
         bool concealled() { return !this->findable; }
+        void show(bool yes_no) { this->invisible = !yes_no; }
+        bool visible() { return !this->invisible; }
 
     public:
         void notify_updated();
@@ -105,6 +107,7 @@ namespace WarGrey::STEM {
 
     private:
         bool findable = true;
+        bool invisible = false;
         bool can_resize = false;
         bool deal_with_events = false;
         bool deal_with_low_level_events = false;
