@@ -43,7 +43,7 @@ std::shared_ptr<Costume> WarGrey::STEM::imgdb_ref(const std::string& pathname, S
     std::string abspath = path_normalize(pathname);
     shared_costume_t texture = empty_costume;
 
-    if (string_suffix(abspath, ".png")) {
+    if (string_suffix(abspath, ".png") || string_suffix(abspath, ".svg")) {
         if (costumes.find(abspath) != costumes.end()) {
             auto shared_costumes = costumes[abspath];
 
