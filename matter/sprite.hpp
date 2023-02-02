@@ -38,8 +38,8 @@ namespace WarGrey::STEM {
 
     public:
         int preferred_local_fps() override { return 24; }
-        size_t play(const std::string& action, int repetition = -1) { return this->play(action.c_str(), repetition); }
-        size_t play(const char* action = nullptr, int repetition = -1);
+        size_t play(const std::string& action, int repetition = -1);
+        size_t play(const char* action = "", int repetition = -1) { return this->play(std::string(action), repetition); }
         size_t play(int idx0, size_t count, int repetition = -1);
         size_t play_all(int repetition) { return this->play(0, this->costume_count(), repetition); }
         bool in_playing() { return this->animation_rest != 0; }
@@ -53,8 +53,8 @@ namespace WarGrey::STEM {
 
     protected:
         virtual int get_initial_costume_index() { return 0; }
-        virtual int submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const char* action);
-        virtual int update_action_frames(std::vector<std::pair<int, int>>& frame_refs, const char* action) { return 0; }
+        virtual int submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action);
+        virtual int update_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) { return 0; }
 
     protected:
         void on_resize(float width, float height, float old_width, float old_height) override;

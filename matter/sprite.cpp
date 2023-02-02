@@ -103,9 +103,9 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
                     this->animation_rest -= 1;
                 }
 
-                if (this->animation_rest != 0) {
+                if ((this->animation_rest != 0) && !this->current_action_name.empty()) {
                     int start_idx = this->update_action_frames(this->frame_refs, this->current_action_name.c_str());
-                    
+
                     if ((start_idx >= 0) && (start_idx < this->frame_refs.size())) {
                         this->switch_to_costume(this->frame_refs[start_idx].first);
                         duration = this->frame_refs[start_idx].second;
@@ -121,8 +121,7 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
     return duration;
 }
 
-size_t WarGrey::STEM::ISprite::play(const char* action0, int repetition) {
-    const char* action = (action0 == nullptr) ? "" : action0;
+size_t WarGrey::STEM::ISprite::play(const std::string& action, int repetition) {
     int start_idx = 0;
     
     this->current_action_name = action;
@@ -138,19 +137,10 @@ size_t WarGrey::STEM::ISprite::play(const char* action0, int repetition) {
     return this->frame_refs.size();
 }
 
-int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const char* action) {
-    for (int i = 0; i < this->costume_count(); i++) {
-        if (string_prefix(this->costume_index_to_name(i), action)) {
-            frame_refs.push_back({ i, 0 });
-        }
-    }
-
-    return 0;
-}
-
 size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repetition) {
     size_t size = this->costume_count();
 
+    this->current_action_name.clear();
     this->animation_rest = repetition;
     this->frame_refs.clear();
 
@@ -173,4 +163,14 @@ void WarGrey::STEM::ISprite::stop() {
 
 SDL_RendererFlip WarGrey::STEM::ISprite::current_flip_status() {
     return game_scales_to_flip(this->xscale, this->yscale);
+}
+
+int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
+    for (int i = 0; i < this->costume_count(); i++) {
+        if (string_prefix(this->costume_index_to_name(i), action)) {
+            frame_refs.push_back({ i, 0 });
+        }
+    }
+
+    return 0;
 }
