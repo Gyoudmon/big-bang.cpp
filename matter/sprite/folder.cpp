@@ -47,11 +47,11 @@ void WarGrey::STEM::Sprite::pre_construct(SDL_Renderer* renderer) {
     }
 }
 
-void WarGrey::STEM::Sprite::feed_costume_extent(int idx, float* width, float* height) {
+void WarGrey::STEM::Sprite::feed_costume_extent(size_t idx, float* width, float* height) {
     this->costumes[idx].second->feed_extent(width, height);
 }
 
-void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) {
+void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) {
     SDL_RendererFlip flip = this->current_flip_status();
     SDL_FRect region = { x, y, Width, Height };
 
@@ -84,7 +84,7 @@ int WarGrey::STEM::Sprite::costume_name_to_index(const char* name) {
     return cidx;
 }
 
-const char* WarGrey::STEM::Sprite::costume_index_to_name(int idx) {
+const char* WarGrey::STEM::Sprite::costume_index_to_name(size_t idx) {
     return this->costumes[idx].first.c_str();
 }
 

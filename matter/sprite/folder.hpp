@@ -26,10 +26,10 @@ namespace WarGrey::STEM {
         size_t costume_count() override;
 
     protected:
-        void feed_costume_extent(int idx, float* width, float* height) override;
-        const char* costume_index_to_name(int idx) override;
+        void feed_costume_extent(size_t idx, float* width, float* height) override;
+        const char* costume_index_to_name(size_t idx) override;
         int costume_name_to_index(const char* name) override;
-        void draw_costume(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) override;
+        void draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) override;
 
     private:
         void load_costume(SDL_Renderer* renderer, const std::string& png);

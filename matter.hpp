@@ -35,7 +35,7 @@ namespace WarGrey::STEM {
         virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
         virtual void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) { this->feed_extent(x, y, width, height); }
         virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
-        virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
+        virtual int update(uint32_t count, uint32_t interval, uint32_t uptime) { return 0; }
         virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
         virtual bool ready() { return true; }
 
@@ -86,7 +86,7 @@ namespace WarGrey::STEM {
 
     public:
         void notify_updated();
-        void notify_timeline_restart(uint32_t count0 = 0);
+        void notify_timeline_restart(uint32_t count0 = 0, int duration = 0);
         void feed_location(float* x, float* y, WarGrey::STEM::MatterAnchor a = MatterAnchor::LT);
         void log_message(int fgc, const char* fmt, ...);
         void log_message(int fgc, const std::string& msg);

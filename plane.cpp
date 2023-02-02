@@ -41,7 +41,8 @@ namespace {
 
         uint32_t local_frame_delta = 0;
         uint32_t local_frame_count = 0;
-        uint32_t local_interval = 0;
+        uint32_t local_elapse = 0;
+        int duration = 0;
 
         // for asynchronously loaded matters
         AsyncInfo* async = nullptr;
@@ -51,7 +52,7 @@ namespace {
     };
 }
 
-static inline void reset_timeline(uint32_t& frame_count, uint32_t& interval, uint32_t count0 = 1U) {
+static inline void reset_timeline(uint32_t& frame_count, uint32_t& interval, uint32_t count0, int duration) {
     interval = 0U;
     frame_count = count0;
 }
@@ -60,23 +61,23 @@ static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_d
     frame_delta = (fps > 0) ? (1000U / fps) : 0U;
 
     if (restart) {
-        reset_timeline(frame_count, interval);
+        reset_timeline(frame_count, interval, 1U, 0);
     }
 }
 
 static inline void unsafe_set_matter_fps(MatterInfo* info, int fps, bool restart) {
-    unsafe_set_local_fps(fps, restart, info->local_frame_delta, info->local_frame_count, info->local_interval);
+    unsafe_set_local_fps(fps, restart, info->local_frame_delta, info->local_frame_count, info->local_elapse);
 }
 
-static uint32_t local_timeline_interval(uint32_t global_interval, uint32_t local_frame_delta, uint32_t& local_interval) {
+static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_frame_delta, uint32_t& local_elapse, int duration) {
     uint32_t interval = 0;
 
-    if (local_frame_delta > 0) {
-        if (local_interval < local_frame_delta) {
-            local_interval += global_interval;
+    if ((local_frame_delta > 0) || (duration > 0)) {
+        if (local_elapse < ((duration > 0) ? duration : local_frame_delta)) {
+            local_elapse += global_interval;
         } else {
-            interval = local_interval;
-            local_interval = 0U;
+            interval = local_elapse;
+            local_elapse = 0U;
         }
     } else {
         interval = global_interval;
@@ -908,15 +909,15 @@ void WarGrey::STEM::Plane::set_matter_fps(IMatter* m, int fps, bool restart) {
 }
 
 void WarGrey::STEM::Plane::set_local_fps(int fps, bool restart) {
-    unsafe_set_local_fps(fps, restart, this->local_frame_delta, this->local_frame_count, this->local_interval);
+    unsafe_set_local_fps(fps, restart, this->local_frame_delta, this->local_frame_count, this->local_elapse);
 }
 
 
-void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t count0) {
+void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        reset_timeline(info->local_frame_count, info->local_interval, count0);
+        reset_timeline(info->local_frame_count, info->local_elapse, count0, duration);
     }
 }
 
@@ -933,10 +934,10 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
             MatterInfo* info = MATTER_INFO(child);
             
             if (unsafe_matter_unmasked(info, this->mode)) {
-                local_interval = local_timeline_interval(interval, info->local_frame_delta, info->local_interval);
+                local_interval = local_timeline_elapse(interval, info->local_frame_delta, info->local_elapse, info->duration);
                 
                 if (local_interval > 0U) {
-                    child->update(info->local_frame_count ++, local_interval, uptime);
+                    info->duration = child->update(info->local_frame_count ++, local_interval, uptime);
                 }
 
                 /* seems to be more smoothly if move is not controlled by local timeline */ {
@@ -952,7 +953,7 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
         } while (child != this->head_matter);
     }
 
-    local_interval = local_timeline_interval(interval, this->local_frame_delta, this->local_interval);
+    local_interval = local_timeline_elapse(interval, this->local_frame_delta, this->local_elapse, 0);
     if (local_interval > 0) {
         this->update(this->local_frame_count ++, local_interval, uptime);
     }
@@ -1295,16 +1296,21 @@ void WarGrey::STEM::IPlane::create_grid(float cell_width, float cell_height, flo
     }
 }
 
-void WarGrey::STEM::IPlane::feed_grid_cell_index(float x, float y, int* r, int* c) {
-    SET_BOX(r, int(flfloor((y - this->grid_y) / this->cell_height)));
-    SET_BOX(c, int(flfloor((x - this->grid_x) / this->cell_width)));
+int WarGrey::STEM::IPlane::feed_grid_cell_index(float x, float y, int* r, int* c) {
+    int row = int(flfloor((y - this->grid_y) / this->cell_height));
+    int col = int(flfloor((x - this->grid_x) / this->cell_width));
+    
+    SET_VALUES(r, row, c, col);
+
+    return row * this->column + col;
 }
 
-void WarGrey::STEM::IPlane::feed_grid_cell_index(IMatter* m, int* r, int* c, MatterAnchor a) {
+int WarGrey::STEM::IPlane::feed_grid_cell_index(IMatter* m, int* r, int* c, MatterAnchor a) {
     float x, y;
 
     this->feed_matter_location(m, &x, &y, a);
-    this->feed_grid_cell_index(x, y, r, c);    
+    
+    return this->feed_grid_cell_index(x, y, r, c);    
 }
 
 void WarGrey::STEM::IPlane::feed_grid_cell_extent(float* width, float* height) {

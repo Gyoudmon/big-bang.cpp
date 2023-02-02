@@ -15,7 +15,7 @@ namespace WarGrey::STEM {
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        //void update(uint32_t count, uint32_t interval, uint32_t uptime) override;
+        //int update(uint32_t count, uint32_t interval, uint32_t uptime) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:

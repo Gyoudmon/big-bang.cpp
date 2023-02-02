@@ -120,9 +120,9 @@ void WarGrey::STEM::IMatter::notify_updated() {
     }
 }
 
-void WarGrey::STEM::IMatter::notify_timeline_restart(uint32_t count0) {
+void WarGrey::STEM::IMatter::notify_timeline_restart(uint32_t count0, int duration) {
     if (this->info != nullptr) {
-        this->info->master->notify_matter_timeline_restart(this, count0);
+        this->info->master->notify_matter_timeline_restart(this, count0, duration);
     }
 }
 

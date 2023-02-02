@@ -14,10 +14,12 @@ namespace WarGrey::STEM {
         ISprite();
         virtual ~ISprite() {}
 
+        void post_construct(SDL_Renderer* renderer) override;
+
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        void update(uint32_t count, uint32_t interval, uint32_t uptime) override;
+        int update(uint32_t count, uint32_t interval, uint32_t uptime) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:
@@ -37,17 +39,22 @@ namespace WarGrey::STEM {
     public:
         int preferred_local_fps() override { return 24; }
         size_t play(const std::string& action, int repetition = -1) { return this->play(action.c_str(), repetition); }
-        size_t play(int repetition) { return this->play(nullptr, repetition); }
         size_t play(const char* action = nullptr, int repetition = -1);
         size_t play(int idx0, size_t count, int repetition = -1);
+        size_t play_all(int repetition) { return this->play(0, this->costume_count(), repetition); }
         bool in_playing() { return this->animation_rest != 0; }
         void stop();
 
     protected:
-        virtual void feed_costume_extent(int idx, float* width, float* height) = 0;
-        virtual const char* costume_index_to_name(int idx) = 0;
+        virtual void feed_costume_extent(size_t idx, float* width, float* height) = 0;
+        virtual const char* costume_index_to_name(size_t idx) = 0;
         virtual int costume_name_to_index(const char* name) = 0;
-        virtual void draw_costume(SDL_Renderer* renderer, int idx, float x, float y, float Width, float Height) = 0;
+        virtual void draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) = 0;
+
+    protected:
+        virtual int get_initial_costume_index() { return 0; }
+        virtual int submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const char* action);
+        virtual int update_action_frames(std::vector<std::pair<int, int>>& frame_refs, const char* action) { return 0; }
 
     protected:
         void on_resize(float width, float height, float old_width, float old_height) override;
@@ -56,12 +63,13 @@ namespace WarGrey::STEM {
         SDL_RendererFlip current_flip_status();
 
     private:
-        int current_costume_idx = 0;
+        size_t current_costume_idx = 0;
         float xscale = 1.0F;
         float yscale = 1.0F;
 
     private:
+        std::string current_action_name;
         int animation_rest = 0;
-        std::vector<int> frame_refs;
+        std::vector<std::pair<int, int>> frame_refs;
     };
 }
