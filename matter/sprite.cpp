@@ -94,26 +94,51 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
     size_t frame_size = this->frame_refs.size();
     int duration = 0;
 
-    if (frame_size > 1) {
+    if (frame_size > 0) {
         if (this->animation_rest != 0) {
             uint32_t frame_idx = count % frame_size;
         
             if (frame_idx == 0) {
-                if (this->animation_rest > 0) {
-                    this->animation_rest -= 1;
+                if (this->next_branch >= 0) {
+                    this->next_branch = this->update_action_frames(this->frame_refs, this->next_branch);
+                } else {
+                    if (this->animation_rest > 0) {
+                        this->animation_rest -= 1;
+                        
+                        if (this->animation_rest == 0) {
+                            this->idle_time0 = uptime;
+                            this->stop();
+                        }
+                    }
                 }
 
-                if ((this->animation_rest != 0) && !this->current_action_name.empty()) {
-                    int start_idx = this->update_action_frames(this->frame_refs, this->current_action_name.c_str());
-
-                    if ((start_idx >= 0) && (start_idx < this->frame_refs.size())) {
-                        this->switch_to_costume(this->frame_refs[start_idx].first);
-                        duration = this->frame_refs[start_idx].second;
-                    }
+                if (this->frame_refs.size() > 0) {
+                    this->switch_to_costume(this->frame_refs[0].first);
+                    duration = this->frame_refs[0].second;
                 }
             } else {
                 this->switch_to_costume(this->frame_refs[frame_idx].first);
                 duration = this->frame_refs[frame_idx].second;
+            }
+        }
+    } else if (frame_size == 0) {
+        int idle_interval = this->preferred_idle_duration();
+
+        if (idle_interval > 0) {
+            if (this->idle_time0 <= 0) {
+                this->idle_time0 = uptime;
+            }
+
+            if (idle_interval <= (uptime - this->idle_time0)) {
+                int times = 1;
+                
+                this->next_branch = this->submit_idle_frames(this->frame_refs, times);
+
+                if (this->frame_refs.size() > 0) {
+                    this->switch_to_costume(this->frame_refs[0].first);
+                    duration = this->frame_refs[0].second;
+                    this->animation_rest = ((times < 1) ? 1 : times);
+                }
             }
         }
     }
@@ -122,16 +147,13 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
 }
 
 size_t WarGrey::STEM::ISprite::play(const std::string& action, int repetition) {
-    int start_idx = 0;
-    
-    this->current_action_name = action;
     this->animation_rest = repetition;
     this->frame_refs.clear();
+    this->next_branch = this->submit_action_frames(this->frame_refs, action);
     
-    start_idx = this->submit_action_frames(this->frame_refs, action);
-    if ((start_idx >= 0) && (start_idx < this->frame_refs.size())) {
-        this->switch_to_costume(this->frame_refs[start_idx].first);
-        this->notify_timeline_restart(1, this->frame_refs[start_idx].second);
+    if (this->frame_refs.size() > 0) {
+        this->switch_to_costume(this->frame_refs[0].first);
+        this->notify_timeline_restart(1, this->frame_refs[0].second);
     }
 
     return this->frame_refs.size();
@@ -140,9 +162,9 @@ size_t WarGrey::STEM::ISprite::play(const std::string& action, int repetition) {
 size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repetition) {
     size_t size = this->costume_count();
 
-    this->current_action_name.clear();
     this->animation_rest = repetition;
     this->frame_refs.clear();
+    this->next_branch = -1;
 
     if (count >= size) {
         count = count % size + size;
@@ -158,11 +180,6 @@ size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repetition) {
 void WarGrey::STEM::ISprite::stop() {
     this->animation_rest = 0;
     this->frame_refs.clear();
-    this->current_action_name.clear();
-}
-
-SDL_RendererFlip WarGrey::STEM::ISprite::current_flip_status() {
-    return game_scales_to_flip(this->xscale, this->yscale);
 }
 
 int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
@@ -172,5 +189,17 @@ int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>
         }
     }
 
-    return 0;
+    return -1;
+}
+
+int WarGrey::STEM::ISprite::submit_idle_frames(std::vector<std::pair<int, int>>& frame_refs, int& times) {
+    return ISprite::submit_action_frames(frame_refs, "idle");
+}
+
+int WarGrey::STEM::ISprite::preferred_idle_duration() {
+    return random_uniform(2000, 4000);
+}
+
+SDL_RendererFlip WarGrey::STEM::ISprite::current_flip_status() {
+    return game_scales_to_flip(this->xscale, this->yscale);
 }

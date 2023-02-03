@@ -61,7 +61,7 @@ static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_d
     frame_delta = (fps > 0) ? (1000U / fps) : 0U;
 
     if (restart) {
-        reset_timeline(frame_count, interval, 1U, 0);
+        reset_timeline(frame_count, interval, 0U, 0);
     }
 }
 

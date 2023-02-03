@@ -37,7 +37,7 @@ namespace WarGrey::STEM {
         const char* current_costume_name() { return costume_index_to_name(this->current_costume_index()); };
 
     public:
-        int preferred_local_fps() override { return 24; }
+        int preferred_local_fps() override { return 10; }
         size_t play(const std::string& action, int repetition = -1);
         size_t play(const char* action = "", int repetition = -1) { return this->play(std::string(action), repetition); }
         size_t play(int idx0, size_t count, int repetition = -1);
@@ -46,6 +46,7 @@ namespace WarGrey::STEM {
         void stop();
 
     protected:
+        virtual int preferred_idle_duration();
         virtual void feed_costume_extent(size_t idx, float* width, float* height) = 0;
         virtual const char* costume_index_to_name(size_t idx) = 0;
         virtual int costume_name_to_index(const char* name) = 0;
@@ -53,9 +54,10 @@ namespace WarGrey::STEM {
 
     protected:
         virtual int get_initial_costume_index() { return 0; }
+        virtual int submit_idle_frames(std::vector<std::pair<int, int>>& frame_refs, int& times);
         virtual int submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action);
-        virtual int update_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) { return 0; }
-
+        virtual int update_action_frames(std::vector<std::pair<int, int>>& frame_refs, int next_branch) { return -1; }
+        
     protected:
         void on_resize(float width, float height, float old_width, float old_height) override;
 
@@ -68,8 +70,9 @@ namespace WarGrey::STEM {
         float yscale = 1.0F;
 
     private:
-        std::string current_action_name;
-        int animation_rest = 0;
         std::vector<std::pair<int, int>> frame_refs;
+        int animation_rest = 0;
+        int next_branch = -1;
+        int idle_time0 = 0;
     };
 }
