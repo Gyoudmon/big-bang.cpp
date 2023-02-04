@@ -107,10 +107,15 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
                 } else {
                     if (this->animation_rest > 0) {
                         this->animation_rest -= 1;
-                        
-                        if (this->animation_rest == 0) {
-                            this->idle_time0 = uptime;
-                            this->stop();
+                    }
+
+                    if (this->animation_rest == 0) {
+                        this->idle_time0 = uptime;
+                        this->stop();
+                    } else {
+                        this->next_branch = this->submit_action_frames(this->frame_refs, this->current_action_name);
+                        if (this->frame_refs.size() > 0) {
+                            this->notify_timeline_restart(1);
                         }
                     }
                 }
@@ -123,6 +128,9 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
                 this->switch_to_costume(this->frame_refs[frame_idx].first);
                 duration = this->frame_refs[frame_idx].second;
             }
+        } else {
+            this->idle_time0 = uptime;
+            this->stop();
         }
     } else if (frame_size == 0) {
         int idle_interval = this->preferred_idle_duration();
@@ -150,10 +158,13 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
     return duration;
 }
 
-size_t WarGrey::STEM::ISprite::play(const std::string& action, int repetition) {
+size_t WarGrey::STEM::ISprite::play(const char* action, int repetition) {
+    this->current_action_name.clear();
+    this->current_action_name.append((action == nullptr) ? "" : action);
+
     this->animation_rest = repetition;
     this->frame_refs.clear();
-    this->next_branch = this->submit_action_frames(this->frame_refs, action);
+    this->next_branch = this->submit_action_frames(this->frame_refs, this->current_action_name);
     
     if (this->frame_refs.size() > 0) {
         this->switch_to_costume(this->frame_refs[0].first);
@@ -166,6 +177,7 @@ size_t WarGrey::STEM::ISprite::play(const std::string& action, int repetition) {
 size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repetition) {
     size_t size = this->costume_count();
 
+    this->current_action_name.clear();
     this->animation_rest = repetition;
     this->frame_refs.clear();
     this->next_branch = -1;
@@ -181,9 +193,13 @@ size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repetition) {
     return this->frame_refs.size();
 }
 
-void WarGrey::STEM::ISprite::stop() {
-    this->animation_rest = 0;
-    this->frame_refs.clear();
+void WarGrey::STEM::ISprite::stop(int rest) {
+    this->animation_rest = (rest <= 0) ? 0 : rest;
+
+    if (this->animation_rest == 0) {
+        this->current_action_name.clear();
+        this->frame_refs.clear();
+    }
 }
 
 int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
