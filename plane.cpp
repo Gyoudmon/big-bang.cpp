@@ -52,16 +52,16 @@ namespace {
     };
 }
 
-static inline void reset_timeline(uint32_t& frame_count, uint32_t& interval, uint32_t count0, int duration) {
-    interval = 0U;
+static inline void reset_timeline(uint32_t& frame_count, uint32_t& elapse, uint32_t count0) {
+    elapse = 0U;
     frame_count = count0;
 }
 
-static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_delta, uint32_t& frame_count, uint32_t& interval) {
+static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_delta, uint32_t& frame_count, uint32_t& elapse) {
     frame_delta = (fps > 0) ? (1000U / fps) : 0U;
 
     if (restart) {
-        reset_timeline(frame_count, interval, 0U, 0);
+        reset_timeline(frame_count, elapse, 0U);
     }
 }
 
@@ -917,12 +917,13 @@ void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t c
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        reset_timeline(info->local_frame_count, info->local_elapse, count0, duration);
+        info->duration = duration;
+        reset_timeline(info->local_frame_count, info->local_elapse, count0);
     }
 }
 
 void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
-    uint32_t local_interval = 0U;
+    uint32_t elapse = 0U;
 
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
@@ -934,10 +935,10 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
             MatterInfo* info = MATTER_INFO(child);
             
             if (unsafe_matter_unmasked(info, this->mode)) {
-                local_interval = local_timeline_elapse(interval, info->local_frame_delta, info->local_elapse, info->duration);
+                elapse = local_timeline_elapse(interval, info->local_frame_delta, info->local_elapse, info->duration);
                 
-                if (local_interval > 0U) {
-                    info->duration = child->update(info->local_frame_count ++, local_interval, uptime);
+                if (elapse > 0U) {
+                    info->duration = child->update(info->local_frame_count ++, elapse, uptime);
                 }
 
                 /* seems to be more smoothly if move is not controlled by local timeline */ {
@@ -953,9 +954,9 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
         } while (child != this->head_matter);
     }
 
-    local_interval = local_timeline_elapse(interval, this->local_frame_delta, this->local_elapse, 0);
-    if (local_interval > 0) {
-        this->update(this->local_frame_count ++, local_interval, uptime);
+    elapse = local_timeline_elapse(interval, this->local_frame_delta, this->local_elapse, 0);
+    if (elapse > 0) {
+        this->update(this->local_frame_count ++, elapse, uptime);
     }
 }
 

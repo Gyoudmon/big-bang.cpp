@@ -101,6 +101,9 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
             if (frame_idx == 0) {
                 if (this->next_branch >= 0) {
                     this->next_branch = this->update_action_frames(this->frame_refs, this->next_branch);
+                    if (this->frame_refs.size() > 0) {
+                        this->notify_timeline_restart(1);
+                    }
                 } else {
                     if (this->animation_rest > 0) {
                         this->animation_rest -= 1;
@@ -138,6 +141,7 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
                     this->switch_to_costume(this->frame_refs[0].first);
                     duration = this->frame_refs[0].second;
                     this->animation_rest = ((times < 1) ? 1 : times);
+                    this->notify_timeline_restart(1);
                 }
             }
         }

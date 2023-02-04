@@ -69,7 +69,7 @@ namespace WarGrey::STEM {
         float xscale = 1.0F;
         float yscale = 1.0F;
 
-    private:
+    protected:
         std::vector<std::pair<int, int>> frame_refs;
         int animation_rest = 0;
         int next_branch = -1;
