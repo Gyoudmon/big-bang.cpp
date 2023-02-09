@@ -37,7 +37,7 @@ namespace WarGrey::STEM {
         size_t costume_count() override;
         int grid_cell_index(int x, int y, int* r = nullptr,  int* c = nullptr);
         int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
-
+        
     protected:
         void on_sheet_load(WarGrey::STEM::shared_costume_t sheet) override;
         void feed_costume_region(SDL_Rect* costume, size_t idx) override;

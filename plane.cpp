@@ -132,26 +132,6 @@ static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* m
     master->end_update_sequence();
 }
 
-static void matter_anchor_fraction(MatterAnchor& a, float* ofx, float* ofy) {
-    float fx = 0.0F;
-    float fy = 0.0F;
-
-    switch (a) {
-        case MatterAnchor::LT:                       break;
-        case MatterAnchor::LC:            fy = 0.5F; break;
-        case MatterAnchor::LB:            fy = 1.0F; break;
-        case MatterAnchor::CT: fx = 0.5F;            break;
-        case MatterAnchor::CC: fx = 0.5F; fy = 0.5F; break;
-        case MatterAnchor::CB: fx = 0.5F; fy = 1.0F; break;
-        case MatterAnchor::RT: fx = 1.0F;            break;
-        case MatterAnchor::RC: fx = 1.0F; fy = 0.5F; break;
-        case MatterAnchor::RB: fx = 1.0F; fy = 1.0F; break;
-    }
-
-    (*ofx) = fx;
-    (*ofy) = fy;
-}
-
 static bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x, float y, bool absolute) {
     bool moved = false;
     
@@ -1297,7 +1277,7 @@ void WarGrey::STEM::IPlane::create_grid(float cell_width, float cell_height, flo
     }
 }
 
-int WarGrey::STEM::IPlane::feed_grid_cell_index(float x, float y, int* r, int* c) {
+int WarGrey::STEM::IPlane::grid_cell_index(float x, float y, int* r, int* c) {
     int row = int(flfloor((y - this->grid_y) / this->cell_height));
     int col = int(flfloor((x - this->grid_x) / this->cell_width));
     
@@ -1306,12 +1286,12 @@ int WarGrey::STEM::IPlane::feed_grid_cell_index(float x, float y, int* r, int* c
     return row * this->column + col;
 }
 
-int WarGrey::STEM::IPlane::feed_grid_cell_index(IMatter* m, int* r, int* c, MatterAnchor a) {
+int WarGrey::STEM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, MatterAnchor a) {
     float x, y;
 
     this->feed_matter_location(m, &x, &y, a);
     
-    return this->feed_grid_cell_index(x, y, r, c);    
+    return this->grid_cell_index(x, y, r, c);    
 }
 
 void WarGrey::STEM::IPlane::feed_grid_cell_extent(float* width, float* height) {
@@ -1336,6 +1316,12 @@ void WarGrey::STEM::IPlane::feed_grid_cell_location(int idx, float* x, float* y,
 
 void WarGrey::STEM::IPlane::feed_grid_cell_location(int row, int col, float* x, float* y, MatterAnchor a) {
     float fx, fy;
+
+    /** NOTE
+     * Both `row` and `col` are just hints,
+     *   and they are therefore allowed to be outside the grid,
+     *   since the grid itself might be just a small port of the whole plane.
+     */
 
     if (row < 0) {
         row += this->row;

@@ -105,8 +105,8 @@ namespace WarGrey::STEM {
         void create_grid(int row, int col, float x = 0.0F, float y = 0.0F, float width = 0.0F, float height = 0.0F);
         void create_grid(float cell_width, float x = 0.0F, float y = 0.0F, int col = 0);
         void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0);
-        int feed_grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
-        int feed_grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, MatterAnchor a = MatterAnchor::CC);
+        int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
+        int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, MatterAnchor a = MatterAnchor::CC);
         void feed_grid_cell_extent(float* width, float* height);
         void feed_grid_cell_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
         void feed_grid_cell_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC);

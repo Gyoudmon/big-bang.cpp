@@ -199,3 +199,50 @@ void WarGrey::STEM::GridAtlas::create_map_grid(int row, int col, float tile_widt
 
     this->invalidate_map_size();
 }
+
+int WarGrey::STEM::GridAtlas::map_tile_index(int x, int y, int* r,  int* c) {
+    int cl = x / (this->map_tile_width  + this->map_tile_xgap);
+    int rw = y / (this->map_tile_height + this->map_tile_ygap);
+    
+    SET_VALUES(r, rw, c, cl);
+    
+    return rw * this->map_col + cl;
+}
+
+int WarGrey::STEM::GridAtlas::map_tile_index(float x, float y, int* r, int* c) {
+    return this->map_tile_index(fl2fxi(x), fl2fxi(y), r, c);
+}
+
+void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a) {
+    int total = this->map_col * this->map_row;
+    SDL_FRect region;
+    float fx, fy;
+    
+    if (idx > total) {
+        idx = idx % total;
+    } else if (idx < 0) {
+        idx = total - (-idx % total);
+    }
+
+    matter_anchor_fraction(a, &fx, &fy);
+    this->feed_map_tile_region(&region, idx);
+    
+    SET_BOX(x, region.x + region.w * fx);
+    SET_BOX(y, region.y + region.h * fy);
+}
+
+void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a) {
+    if (row > this->map_row) {
+        row = row % this->map_row;
+    } else if (row < 0) {
+        row = this->map_row - (-row % this->map_row);
+    }
+
+    if (col > this->map_col) {
+        col = col % this->map_col;
+    } else if (col < 0) {
+        col = this->map_col - (-col % this->map_col);
+    }
+
+    this->feed_map_tile_location(row * this->map_col + col, x, y, a);
+}

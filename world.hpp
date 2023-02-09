@@ -83,12 +83,12 @@ namespace WarGrey::STEM {
             this->plane->create_grid(cell_width, cell_height, x, y, row, col);
         }
 
-        int feed_grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr) {
-            return this->plane->feed_grid_cell_index(x, y, r, c);
+        int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr) {
+            return this->plane->grid_cell_index(x, y, r, c);
         }
         
-        int feed_grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, MatterAnchor a = MatterAnchor::CC) {
-            return this->plane->feed_grid_cell_index(m, r, c, a);
+        int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, MatterAnchor a = MatterAnchor::CC) {
+            return this->plane->grid_cell_index(m, r, c, a);
         }        
 
         void feed_grid_cell_extent(float* width, float* height) {
