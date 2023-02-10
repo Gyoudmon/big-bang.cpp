@@ -41,7 +41,7 @@ namespace WarGrey::STEM {
         size_t play(const std::string& action = "", int repetition = -1) { return this->play(action.c_str(), repetition); }
         size_t play(const char* action, int repetition = -1);
         size_t play(int idx0, size_t count, int repetition = -1);
-        size_t play_all(int repetition) { return this->play(0, this->costume_count(), repetition); }
+        size_t play_all(int repetition = -1) { return this->play(0, this->costume_count(), repetition); }
         bool in_playing() { return this->animation_rest != 0; }
         void stop(int rest = 0);
 
