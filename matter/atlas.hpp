@@ -77,8 +77,14 @@ namespace WarGrey::STEM {
     protected:
         int atlas_row;
         int atlas_col;
-        int map_row;
-        int map_col;
+        int map_row = 0;
+        int map_col = 0;
+
+    protected:
+        float map_tile_xgap = 0.0F;
+        float map_tile_ygap = 0.0F;
+        float map_tile_width = 0.0F;
+        float map_tile_height = 0.0F;
 
     private:
         bool atlas_inset; 
@@ -86,11 +92,5 @@ namespace WarGrey::STEM {
         int atlas_tile_ygap = 0;
         int atlas_tile_width = 0;
         int atlas_tile_height = 0;
-
-    private:
-        float map_tile_xgap = 0.0F;
-        float map_tile_ygap = 0.0F;
-        float map_tile_width = 0.0F;
-        float map_tile_height = 0.0F;
     };
 }
