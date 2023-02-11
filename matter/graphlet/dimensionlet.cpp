@@ -33,7 +33,7 @@ DimensionStyle WarGrey::STEM::make_plain_dimension_style(int lfontsize, int nfsi
 }
 
 DimensionStyle WarGrey::STEM::make_plain_dimension_style(int nfsize, unsigned int min_number, int precision) {
-	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize, nfsize * 0.90F, precision);
+	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize, fl2fxi(nfsize * 0.90F), precision);
 
     ds.minimize_number_width = font_width(ds.number_font, "0") * float(min_number);
 	ds.number_xfraction = 0.5F;
@@ -60,7 +60,7 @@ DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigne
 }
 
 DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_label, unsigned int min_number, int precision, uint32_t number_bgcolor, uint32_t label_bgcolor, uint32_t color) {
-	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize * 1.2F, nfsize, precision);
+	DimensionStyle ds = make_plain_dimension_style(nfsize, fl2fxi(nfsize * 1.2F), nfsize, precision);
 
     ds.minimize_label_width = ((min_label == 0) ? font_height(ds.label_font) : (font_width(ds.label_font, "0") * float(min_label)));
 	ds.label_xfraction = 0.5F;
@@ -146,7 +146,7 @@ void WarGrey::STEM::Dimensionlet::texture_collapse() {
 void WarGrey::STEM::Dimensionlet::feed_extent(float x, float y, float* w, float* h) {
     size_t n = sizeof(this->textures) / sizeof(SDL_Texture*);
     
-    this->feed_subextent(n, w, h);
+    this->feed_subextent(int(n), w, h);
 }
 
 void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor) {
@@ -198,7 +198,7 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 
 	FLCAS_SLOT(style.minimize_label_width, 0.0F);
 	FLCAS_SLOT(style.label_xfraction, 1.0F);
-	FLCAS_SLOT(style.number_leading_space, font_width(style.number_font, "0"));
+	FLCAS_SLOT(style.number_leading_space, float(font_width(style.number_font, "0")));
 
 	switch (status) {
 	case DimensionState::Default: case DimensionState::Highlight: {

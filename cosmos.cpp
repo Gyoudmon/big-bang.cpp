@@ -313,24 +313,16 @@ void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
 
 		if (delta_idx > 0) {
             delta_idx = delta_idx % this->chunk_count;
-            this->recent_plane_idx += delta_idx;
-            
-            if (this->recent_plane_idx >= this->chunk_count) {
-                this->recent_plane_idx -= this->chunk_count;
-            }
+            this->recent_plane_idx = (this->recent_plane_idx + delta_idx) % this->chunk_count;
 
 			for (int i = 0; i < delta_idx; i++) {
 				this->recent_plane = PLANE_INFO(this->recent_plane)->next;
 			}
 		} else {
-            delta_idx = -((-delta_idx) % this->chunk_count);
-            this->recent_plane_idx += delta_idx;
+            delta_idx = (-delta_idx) % this->chunk_count;
+            this->recent_plane_idx = (this->recent_plane_idx + int(this->chunk_count) - delta_idx) % this->chunk_count;
             
-            if (this->recent_plane_idx < 0) {
-                this->recent_plane_idx += this->chunk_count;
-            }
-
-			for (int i = 0; i > delta_idx; i--) {
+            for (int i = 0; i < delta_idx; i++) {
 				this->recent_plane = PLANE_INFO(this->recent_plane)->prev;
 			}
 		}

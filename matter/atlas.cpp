@@ -162,9 +162,9 @@ size_t WarGrey::STEM::GridAtlas::map_tile_count() {
     return (this->map_tile_width == 0) ? 0 : (this->map_row * this->map_col);
 }
 
-void WarGrey::STEM::GridAtlas::feed_atlas_tile_region(SDL_Rect* region, int idx) {
-    int r = idx / this->atlas_col;
-    int c = idx % this->atlas_col;
+void WarGrey::STEM::GridAtlas::feed_atlas_tile_region(SDL_Rect* region, size_t idx) {
+    int r = int(idx) / this->atlas_col;
+    int c = int(idx) % this->atlas_col;
     int xoff = 0;
     int yoff = 0;
 
@@ -179,9 +179,9 @@ void WarGrey::STEM::GridAtlas::feed_atlas_tile_region(SDL_Rect* region, int idx)
     region->h = this->atlas_tile_height;
 }
 
-void WarGrey::STEM::GridAtlas::feed_map_tile_region(SDL_FRect* region, int idx) {
-    int r = idx / this->map_col;
-    int c = idx % this->map_col;
+void WarGrey::STEM::GridAtlas::feed_map_tile_region(SDL_FRect* region, size_t idx) {
+    size_t r = idx / this->map_col;
+    size_t c = idx % this->map_col;
 
     region->x = float(c) * (this->map_tile_width + this->map_tile_xgap);
     region->y = float(r) * (this->map_tile_height + this->map_tile_ygap);
@@ -213,8 +213,8 @@ void WarGrey::STEM::GridAtlas::create_map_grid(int row, int col, float tile_widt
 }
 
 int WarGrey::STEM::GridAtlas::map_tile_index(int x, int y, int* r,  int* c) {
-    int cl = x / (this->map_tile_width  + this->map_tile_xgap);
-    int rw = y / (this->map_tile_height + this->map_tile_ygap);
+    int cl = x / int(this->map_tile_width  + this->map_tile_xgap);
+    int rw = y / int(this->map_tile_height + this->map_tile_ygap);
     
     SET_VALUES(r, rw, c, cl);
     

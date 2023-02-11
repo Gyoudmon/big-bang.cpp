@@ -60,7 +60,7 @@ void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
      *      and cause it always be true for `actual_idx >= maxsize`.
      **/
 
-    long maxsize = this->costume_count();
+    long maxsize = long(this->costume_count());
 
     if (maxsize > 0) {
         int actual_idx = idx;
@@ -133,14 +133,14 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
             this->stop();
         }
     } else if (frame_size == 0) {
-        int idle_interval = this->preferred_idle_duration();
+        int64_t idle_interval = this->preferred_idle_duration();
 
         if (idle_interval > 0) {
             if (this->idle_time0 <= 0) {
                 this->idle_time0 = uptime;
             }
 
-            if (idle_interval <= (uptime - this->idle_time0)) {
+            if (idle_interval <= (int64_t(uptime) - this->idle_time0)) {
                 int times = 1;
                 
                 this->next_branch = this->submit_idle_frames(this->frame_refs, times);

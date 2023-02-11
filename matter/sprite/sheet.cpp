@@ -85,8 +85,8 @@ int WarGrey::STEM::SpriteGridSheet::grid_cell_index(float x, float y, int* r, in
 }
 
 void WarGrey::STEM::SpriteGridSheet::feed_costume_region(SDL_Rect* region, size_t idx) {
-    int r = idx / this->col;
-    int c = idx % this->col;
+    int r = int(idx) / this->col;
+    int c = int(idx) % this->col;
     int xoff = 0;
     int yoff = 0;
 

@@ -1,5 +1,9 @@
 #pragma once
 
+#if defined(_MSC_VER)
+#pragma warning (disable: 4250)
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 

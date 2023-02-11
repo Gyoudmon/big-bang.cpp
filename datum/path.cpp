@@ -51,7 +51,7 @@ int WarGrey::STEM::path_next_slash_position(const std::string& path, int start, 
 
 std::string WarGrey::STEM::path_only(const std::string& path) {
 	std::string dirname;
-	size_t size = path.size();
+	int size = int(path.size());
 	const char* raw = path.c_str();
 	int last_slash_idx = last_slash_position(raw, size);
 
@@ -64,7 +64,7 @@ std::string WarGrey::STEM::path_only(const std::string& path) {
 
 std::string WarGrey::STEM::file_name_from_path(const std::string& path) {
 	std::string filename = path;
-	size_t size = path.size();
+	int size = int(path.size());
 	const char* raw = path.c_str();
 	int last_slash_idx = last_slash_position(raw, size);
 	
@@ -76,7 +76,7 @@ std::string WarGrey::STEM::file_name_from_path(const std::string& path) {
 }
 
 std::string WarGrey::STEM::file_basename_from_path(const std::string& path) {
-	size_t size = path.size();
+	int size = int(path.size());
 	const char* raw = path.c_str();
 	int last_dot_idx = last_dot_position(raw, size, size);
 	int last_slash_idx = last_slash_position(raw, last_dot_idx, -1);
@@ -86,7 +86,7 @@ std::string WarGrey::STEM::file_basename_from_path(const std::string& path) {
 
 std::string WarGrey::STEM::file_extension_from_path(const std::string& path) {
 	std::string ext;
-	size_t size = path.size();
+	int size = int(path.size());
 	const char* raw = path.c_str();
 	int last_dot_idx = last_dot_position(raw, size);
 	
