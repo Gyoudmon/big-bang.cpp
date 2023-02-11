@@ -461,6 +461,20 @@ const char* WarGrey::STEM::IUniverse::get_renderer_name() {
 }
 
 void WarGrey::STEM::IUniverse::set_window_size(int width, int height, bool centerize) {
+    if ((width <= 0) || (height <= 0)) {
+        int oldw, oldh;
+
+        SDL_GetWindowSize(this->window, &oldw, &oldh);
+
+        if (width <= 0) {
+            width = oldw;
+        }
+
+        if (height <= 0) {
+            height = oldh;
+        }
+    }
+
     SDL_SetWindowSize(this->window, width, height);
 
     if (centerize) {
