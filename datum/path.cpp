@@ -119,7 +119,7 @@ std::string WarGrey::STEM::directory_path(const std::string& path) {
 
 void WarGrey::STEM::enter_digimon_zone(const char* process_path) {
 	static std::string info_rkt = std::string(1, path::preferred_separator).append("info.rkt");
-	static path rootdir = current_path().root_directory();
+	static path rootdir = current_path().root_path();
 	path ppath = (process_path == nullptr) ? current_path().append(info_rkt) : canonical(current_path().append(process_path));
 	
 	zonedir.clear();

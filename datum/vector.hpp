@@ -21,11 +21,15 @@ namespace WarGrey::STEM {
         return total;
     }
 
-    template<typename T> int inline vector_replace_sorted_minimum(std::vector<T>& vs, const T val) {
+    template<typename T> int inline vector_replace_sorted_minimum(std::vector<T>& vs, const T val, T* replaced = nullptr) {
         int ret_idx = -1;
 
         for (int idx = 0; idx < vs.size(); idx ++) {
             if (vs[idx] > val) {
+                if (replaced != nullptr) {
+                    (*replaced) = vs[idx];
+                }
+
                 vs[idx] = val;
                 ret_idx = idx;
                 break;
@@ -35,11 +39,15 @@ namespace WarGrey::STEM {
         return ret_idx;
     }
 
-    template<typename T> int inline vector_replace_sorted_maximum(std::vector<T>& vs, const T val) {
+    template<typename T> int inline vector_replace_sorted_maximum(std::vector<T>& vs, const T val, T* replaced = nullptr) {
         int ret_idx = -1;
 
         for (int idx = 0; idx < vs.size(); idx ++) {
             if (vs[idx] < val) {
+                if (replaced != nullptr) {
+                    (*replaced) = vs[idx];
+                }
+
                 vs[idx] = val;
                 ret_idx = idx;
                 break;
