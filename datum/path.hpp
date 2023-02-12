@@ -11,5 +11,7 @@ namespace WarGrey::STEM {
 	std::string directory_path(const char* path);
 	std::string directory_path(const std::string& path);
 
+	void enter_digimon_zone(const char* process_path);
+	std::string digimon_zonedir();
 	std::string digimon_path(const char* file, const char* ext = "", const char* rootdir = "stone");
 }

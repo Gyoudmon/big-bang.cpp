@@ -25,6 +25,7 @@ namespace WarGrey::STEM {
 
     /*********************************************************************************************/
     void imgdb_setup(const char* rootdir);
+    void imgdb_setup(const std::string& rootdir);
     void imgdb_teardown();
 
     shared_costume_t imgdb_ref(const char* subpath, SDL_Renderer* rendener);

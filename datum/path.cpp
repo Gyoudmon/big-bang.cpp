@@ -7,6 +7,9 @@ using namespace WarGrey::STEM;
 using namespace std::filesystem;
 
 /*************************************************************************************************/
+static std::string zonedir;
+
+/*************************************************************************************************/
 static int last_slash_position(const char* raw, int size, int fallback = -1) {
 	int index = fallback;
 
@@ -114,11 +117,40 @@ std::string WarGrey::STEM::directory_path(const std::string& path) {
 	return npath;
 }
 
+void WarGrey::STEM::enter_digimon_zone(const char* process_path) {
+	static std::string info_rkt = std::string(1, path::preferred_separator).append("info.rkt");
+	static path rootdir = current_path().root_directory();
+	path ppath = (process_path == nullptr) ? current_path().append(info_rkt) : canonical(current_path().append(process_path));
+	
+	zonedir.clear();
+	while (zonedir.empty() && (ppath != rootdir)) {
+		ppath = ppath.parent_path();
+	
+		if (exists(path(ppath.string().append(info_rkt)))) {
+			zonedir = ppath.string();
+		}
+	}
+
+	if (zonedir.empty()) {
+		zonedir = current_path().string();
+	}
+	
+	zonedir.push_back(path::preferred_separator);
+}
+
+std::string WarGrey::STEM::digimon_zonedir() {
+	if (zonedir.empty()) {
+		enter_digimon_zone(nullptr);
+	}
+
+	return zonedir;
+}
+
 std::string WarGrey::STEM::digimon_path(const char* file, const char* ext, const char* rootdir) {
 	std::string file_raw(file);
 	std::string root_dir(rootdir);
 	std::string file_ext = (file_extension_from_path(file_raw) == "") ? (file_raw.append(ext)) : file_raw;
 	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(root_dir).append(file_ext)));
 
-    return std::string(__ZONE__).append(path_ext);
+    return zonedir.append(path_ext);
 }

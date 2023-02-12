@@ -31,6 +31,10 @@ void WarGrey::STEM::imgdb_setup(const char* rootdir) {
     }
 }
 
+void WarGrey::STEM::imgdb_setup(const std::string& rootdir) {
+    imgdb_setup(rootdir.c_str());
+}
+
 void WarGrey::STEM::imgdb_teardown() {
     costumes.clear();
 }
