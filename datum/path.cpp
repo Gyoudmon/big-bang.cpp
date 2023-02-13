@@ -152,5 +152,5 @@ std::string WarGrey::STEM::digimon_path(const char* file, const char* ext, const
 	std::string file_ext = (file_extension_from_path(file_raw) == "") ? (file_raw.append(ext)) : file_raw;
 	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(root_dir).append(file_ext)));
 
-    return zonedir.append(path_ext);
+    return std::string(zonedir).append(path_ext);
 }
