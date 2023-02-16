@@ -147,10 +147,14 @@ std::string WarGrey::STEM::digimon_zonedir() {
 }
 
 std::string WarGrey::STEM::digimon_path(const char* file, const char* ext, const char* rootdir) {
-	std::string file_raw(file);
 	std::string root_dir(rootdir);
+	std::string file_raw = path(file).make_preferred().string();
 	std::string file_ext = (file_extension_from_path(file_raw) == "") ? (file_raw.append(ext)) : file_raw;
-	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(root_dir).append(file_ext)));
+	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(path(rootdir).make_preferred().string()).append(file_ext)));
 
-    return std::string(zonedir).append(path_ext);
+    return directory_path(zonedir).append(path_ext);
+}
+
+std::string WarGrey::STEM::digimon_mascot_path(const char* file, const char* ext, const char* rootdir) {
+	return digimon_path(file, ext, rootdir);
 }

@@ -19,6 +19,8 @@
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
 
+#include "mascot/agent/linkmon.hpp"
+
 #include "virtualization/filesystem/imgdb.hpp"
 
 /**

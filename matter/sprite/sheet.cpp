@@ -47,8 +47,7 @@ WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const char* pathname, int row, i
     : SpriteGridSheet(std::string(pathname), row, col, xgap, ygap) {}
 
 WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const std::string& pathname, int row, int col, int xgap, int ygap, bool inset)
-    : ISpriteSheet(pathname)
-    , row(fxmax(row, 1)), col(fxmax(col, 1))
+    : ISpriteSheet(pathname), row(fxmax(row, 1)), col(fxmax(col, 1))
     , cell_inset(inset), cell_xgap(xgap), cell_ygap(ygap) {}
 
 void WarGrey::STEM::SpriteGridSheet::on_sheet_load(shared_costume_t sprite_sheet) {
@@ -72,6 +71,7 @@ size_t WarGrey::STEM::SpriteGridSheet::costume_count() {
 int WarGrey::STEM::SpriteGridSheet::grid_cell_index(int x, int y, int* r,  int* c) {
     int xoff = (this->cell_inset ? this->cell_xgap : 0);
     int yoff = (this->cell_inset ? this->cell_ygap : 0);
+
     int cl = (x - xoff) / (this->cell_width  + this->cell_xgap);
     int rw = (y - yoff) / (this->cell_height + this->cell_ygap);
     
