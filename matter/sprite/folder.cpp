@@ -23,7 +23,7 @@ WarGrey::STEM::Sprite::Sprite(const char* pathname_fmt, ...) {
     this->enable_resize(true);
 }
 
-void WarGrey::STEM::Sprite::pre_construct(SDL_Renderer* renderer) {
+void WarGrey::STEM::Sprite::construct(SDL_Renderer* renderer) {
     path target = imgdb_absolute_path(this->_pathname);
 
     if (exists(target)) {
@@ -44,6 +44,8 @@ void WarGrey::STEM::Sprite::pre_construct(SDL_Renderer* renderer) {
         } else {
             this->load_costume(renderer, this->_pathname);
         }
+
+        ISprite::construct(renderer);
     }
 }
 

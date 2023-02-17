@@ -336,9 +336,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
         info->next = this->head_matter;
 
         this->begin_update_sequence();
-        m->pre_construct(master_renderer);
         m->construct(master_renderer);
-        m->post_construct(master_renderer);
         unsafe_move_matter_via_info(this, m, info, x, y, fx, fy, dx, dy);
 
         if (m->ready()) {

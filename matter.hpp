@@ -23,9 +23,6 @@ namespace WarGrey::STEM {
         IMatter() {}
         virtual ~IMatter();
 
-        virtual void pre_construct(SDL_Renderer* renderer) {}     // pseudo constructor for special derived classes before constructing
-        virtual void post_construct(SDL_Renderer* renderer) {}    // pseudo constructor for special derived classes after constructing
-
     public:
         WarGrey::STEM::IPlane* master();
         SDL_Renderer* master_renderer();

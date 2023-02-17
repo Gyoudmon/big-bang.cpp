@@ -15,7 +15,7 @@ WarGrey::STEM::IAtlas::IAtlas(const std::string& pathname) : _pathname(pathname)
     this->camouflage(true);
 }
 
-void WarGrey::STEM::IAtlas::pre_construct(SDL_Renderer* renderer) {
+void WarGrey::STEM::IAtlas::construct(SDL_Renderer* renderer) {
     this->atlas = imgdb_ref(this->_pathname, renderer);
 
     if (this->atlas->okay()) {

@@ -137,7 +137,7 @@ namespace WarGrey::STEM {
 		}
 
 	public:
-		void post_construct(SDL_Renderer* renderer) override {
+		void construct(SDL_Renderer* renderer) override {
 			this->update_state(renderer);
 		}
 

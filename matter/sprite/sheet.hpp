@@ -10,7 +10,7 @@ namespace WarGrey::STEM {
         ISpriteSheet(const char* pathname);
         virtual ~ISpriteSheet() {}
 
-        void pre_construct(SDL_Renderer* renderer) override;
+        void construct(SDL_Renderer* renderer) override;
 
     protected:
         virtual void on_sheet_load(WarGrey::STEM::shared_costume_t sheet) = 0;

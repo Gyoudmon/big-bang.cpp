@@ -15,11 +15,12 @@ WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname) : ISprite
 
 WarGrey::STEM::ISpriteSheet::ISpriteSheet(const char* pathname) : ISpriteSheet(std::string(pathname)) {}
 
-void WarGrey::STEM::ISpriteSheet::pre_construct(SDL_Renderer* renderer) {
+void WarGrey::STEM::ISpriteSheet::construct(SDL_Renderer* renderer) {
     this->sprite_sheet = imgdb_ref(this->_pathname, renderer);
 
     if (this->sprite_sheet->okay()) {
         this->on_sheet_load(this->sprite_sheet);
+        ISprite::construct(renderer);
     }
 }
 

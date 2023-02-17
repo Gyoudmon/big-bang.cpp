@@ -10,7 +10,7 @@ namespace WarGrey::STEM {
         IAtlas(const char* pathname) : IAtlas(std::string(pathname)) {}
         virtual ~IAtlas() {}
 
-        void pre_construct(SDL_Renderer* renderer) override;
+        void construct(SDL_Renderer* renderer) override;
 
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;

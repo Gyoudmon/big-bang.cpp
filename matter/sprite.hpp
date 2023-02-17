@@ -14,7 +14,7 @@ namespace WarGrey::STEM {
         ISprite();
         virtual ~ISprite() {}
 
-        void post_construct(SDL_Renderer* renderer) override;
+        void construct(SDL_Renderer* renderer) override;
 
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;

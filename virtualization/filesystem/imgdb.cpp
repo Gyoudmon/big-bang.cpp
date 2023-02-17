@@ -8,16 +8,18 @@
 
 #include <map>
 #include <unordered_map>
+#include <filesystem>
 
 using namespace WarGrey::STEM;
+using namespace std::filesystem;
 
 /*************************************************************************************************/
 static shared_costume_t empty_costume = std::make_shared<Costume>(nullptr);
 static std::map<std::string, std::unordered_map<SDL_Renderer*, shared_costume_t>> costumes;
 static std::string imgdb_rootdir;
 
-static inline std::string path_normalize(const std::string& path) {
-    return string_prefix(path, imgdb_rootdir.c_str()) ? path : imgdb_rootdir + path;
+static inline std::string path_normalize(const std::string& str_path) {
+    return path(str_path).is_absolute() ? str_path : imgdb_rootdir + str_path;
 }
 
 static inline shared_costume_t imgdb_load(SDL_Renderer* renderer, const std::string& abspath) {

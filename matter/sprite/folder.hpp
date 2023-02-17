@@ -13,7 +13,7 @@ namespace WarGrey::STEM {
         Sprite(const char* pathname_fmt, ...);
         virtual ~Sprite() {}
 
-        void pre_construct(SDL_Renderer* renderer) override;
+        void construct(SDL_Renderer* renderer) override;
     
     public:
         void wear(const char* name) { this->wear(std::string(name)); }

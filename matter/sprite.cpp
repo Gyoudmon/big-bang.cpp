@@ -15,7 +15,7 @@ WarGrey::STEM::ISprite::ISprite() {
     this->_sprite = this;
 }
 
-void WarGrey::STEM::ISprite::post_construct(SDL_Renderer* renderer) {
+void WarGrey::STEM::ISprite::construct(SDL_Renderer* renderer) {
     this->switch_to_costume(this->get_initial_costume_index());
 }
 
