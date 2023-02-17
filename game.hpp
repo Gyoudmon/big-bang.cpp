@@ -20,6 +20,8 @@
 #include "matter/graphlet/dimensionlet.hpp"
 
 #include "mascot/agent/linkmon.hpp"
+#include "mascot/tuxmon.hpp"
+#include "mascot/coinlet.hpp"
 
 #include "virtualization/filesystem/imgdb.hpp"
 

@@ -16,7 +16,13 @@ WarGrey::STEM::ISprite::ISprite() {
 }
 
 void WarGrey::STEM::ISprite::construct(SDL_Renderer* renderer) {
-    this->switch_to_costume(this->get_initial_costume_index());
+    int idx = this->get_initial_costume_index();
+
+    if (idx >= 0) {
+        this->switch_to_costume(idx);
+    } else {
+        this->play_all();
+    }
 }
 
 void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* height) {
