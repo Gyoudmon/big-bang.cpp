@@ -59,7 +59,7 @@ namespace WarGrey::STEM {
 
     /************************************************************************************************/
     bool string_popback_utf8_char(std::string& src);
-    std::string WarGrey::STEM::string_add_between(const char* s, char ch = '\n');
+    std::string string_add_between(const char* s, char ch = '\n');
 
     /************************************************************************************************/
     bool string_prefix(const std::string& src, const char* sub);
