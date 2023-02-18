@@ -361,6 +361,44 @@ bool WarGrey::STEM::string_popback_utf8_char(std::string& src) {
     return okay;
 }
 
+std::string WarGrey::STEM::string_add_between(const char* s, char ch) {
+    std::string vstr;
+    int idx = 0;
+
+    while (s[idx] != '\0') {
+        unsigned char c = static_cast<unsigned char>(s[idx]);
+
+        if (idx > 0) {
+            vstr.push_back(ch);
+        }
+
+        /**
+         * UTF-8 encodes characters in 1 to 4 bytes, and their binary forms are:
+         *   0xxx xxxx
+         *   110x xxxx  10xx xxxx
+         *   1110 xxxx  10xx xxxx  10xx xxxx
+         *   1111 xxxx  10xx xxxx  10xx xxxx  10xx xxxx
+         */
+        
+        if (c >= 0b11110000U) {
+            vstr.append(s, idx, 4);
+            idx += 4;
+        } else if (c >= 0b11100000U) {
+            vstr.append(s, idx, 3);
+            idx += 3;
+        } else if (c >= 0b11000000U) {
+            vstr.append(s, idx, 2);
+            idx += 2;
+        } else {
+            vstr.push_back(s[idx]);
+            idx ++;
+        }
+    }
+
+    return vstr;
+}
+
+/************************************************************************************************/
 bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
     bool yes = true;
     size_t max = src.size();

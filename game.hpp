@@ -23,6 +23,7 @@
 #include "mascot/tuxmon.hpp"
 #include "mascot/coinlet.hpp"
 
+#include "datum/flonum.hpp"
 #include "virtualization/filesystem/imgdb.hpp"
 
 /**
