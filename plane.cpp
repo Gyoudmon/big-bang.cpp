@@ -4,6 +4,7 @@
 #include "graphics/image.hpp"
 #include "graphics/geometry.hpp"
 #include "graphics/colorspace.hpp"
+#include "graphics/named_colors.hpp"
 
 #include "physics/mathematics.hpp"
 
@@ -992,6 +993,15 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
                     
         SDL_RenderSetClipRect(renderer, nullptr);
     }
+
+#ifndef NDEBUG
+    if ((this->column > 0) && (this->row > 0) && (this->cell_width > 0.0F) && (this->cell_height > 0.0F)) {
+        RGB_SetRenderDrawColor(renderer, GRAY, 1.0F);
+        game_draw_grid(renderer, this->row, this->column,
+                        this->cell_width, this->cell_height,
+                        this->grid_x, this->grid_y);
+    }
+#endif
 }
 
 void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
@@ -1217,6 +1227,19 @@ void WarGrey::STEM::IPlane::create_grid(int row, int col, float x, float y, floa
 
     if (this->row > 0) {
         this->cell_height = height / float(this->row);
+    }
+}
+
+void WarGrey::STEM::IPlane::create_grid(int row, int col, IMatter* m) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        float x = info->x;
+        float y = info->y;
+        float width, height;
+
+        m->feed_extent(x, y, &width, &height);
+        this->create_grid(row, col, x, y, width, height);
     }
 }
 

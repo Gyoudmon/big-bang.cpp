@@ -103,6 +103,7 @@ namespace WarGrey::STEM {
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
         void create_grid(int row, int col, float x = 0.0F, float y = 0.0F, float width = 0.0F, float height = 0.0F);
+        void create_grid(int row, int col, IMatter* m);
         void create_grid(float cell_width, float x = 0.0F, float y = 0.0F, int col = 0);
         void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0);
         int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
