@@ -4,7 +4,6 @@
 #include "graphics/image.hpp"
 #include "graphics/geometry.hpp"
 #include "graphics/colorspace.hpp"
-#include "graphics/named_colors.hpp"
 
 #include "physics/mathematics.hpp"
 
@@ -975,8 +974,8 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
                 if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
                     clip.x = fl2fxi(flfloor(mx));
                     clip.y = fl2fxi(flfloor(my));
-                    clip.w = fl2fxi(flceiling(mwidth));
-                    clip.h = fl2fxi(flceiling(mheight));
+                    clip.w = fl2fxi(flfloor(mwidth + 1.0F));
+                    clip.h = fl2fxi(flfloor(mheight + 1.0F));
 
                     SDL_RenderSetClipRect(renderer, &clip);
                     child->draw(renderer, mx, my, mwidth, mheight);
@@ -993,15 +992,6 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
                     
         SDL_RenderSetClipRect(renderer, nullptr);
     }
-
-#ifndef NDEBUG
-    if ((this->column > 0) && (this->row > 0) && (this->cell_width > 0.0F) && (this->cell_height > 0.0F)) {
-        RGB_SetRenderDrawColor(renderer, GRAY, 1.0F);
-        game_draw_grid(renderer, this->row, this->column,
-                        this->cell_width, this->cell_height,
-                        this->grid_x, this->grid_y);
-    }
-#endif
 }
 
 void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {

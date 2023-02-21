@@ -15,7 +15,6 @@ namespace WarGrey::STEM {
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        //int update(uint32_t count, uint32_t interval, uint32_t uptime) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:
@@ -24,6 +23,15 @@ namespace WarGrey::STEM {
 
     public:
         int preferred_local_fps() override { return 4; }
+
+    public:
+        void create_logic_grid(int row, int col);
+        size_t logic_tile_count();
+        int logic_tile_index(int x, int y, int* r = nullptr,  int* c = nullptr);
+        int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr);
+        void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
+        void feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
+        void set_logic_grid_color(uint32_t color, float a = 1.0F) { this->logic_grid_color = color; this->logic_grid_alpha = a; }
 
     protected:
         virtual void feed_map_extent(float* width, float* height);
@@ -34,9 +42,10 @@ namespace WarGrey::STEM {
 
     protected:
         void on_resize(float width, float height, float old_width, float old_height) override;
-
+        
     protected:
         void invalidate_map_size() { this->map_width = -1.0F; }
+        void on_map_resize(float map_width, float map_height);
         SDL_RendererFlip current_flip_status();
         
     private:
@@ -47,6 +56,14 @@ namespace WarGrey::STEM {
         float map_height = 0.0F;
         float xscale = 1.0F;
         float yscale = 1.0F;
+
+    private:
+        int logic_row = 0;
+        int logic_col = 0;
+        float logic_tile_width = 0.0F;
+        float logic_tile_height = 0.0F;
+        uint32_t logic_grid_color = 0U;
+        float logic_grid_alpha = 0.0F;
 
     private:
         std::string _pathname;
@@ -67,7 +84,7 @@ namespace WarGrey::STEM {
         int map_tile_index(float x, float y, int* r = nullptr, int* c = nullptr);
         void feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
         void feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
-
+        
     protected:
         void on_tilemap_load(WarGrey::STEM::shared_costume_t atlas) override;
         void feed_map_extent(float* width, float* height) override;

@@ -6,6 +6,7 @@
 #include "../datum/fixnum.hpp"
 
 #include "../graphics/geometry.hpp"
+#include "../graphics/colorspace.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -34,6 +35,7 @@ void WarGrey::STEM::IAtlas::feed_extent(float x, float y, float* width, float* h
 void WarGrey::STEM::IAtlas::feed_original_extent(float x, float y, float* width, float* height) {
     if (this->map_width < 0.0F) {
         this->feed_map_extent(&this->map_width, &this->map_height);
+        this->on_map_resize(this->map_width, this->map_height);
     }
 
     SET_BOX(width, this->map_width);
@@ -53,6 +55,10 @@ void WarGrey::STEM::IAtlas::feed_map_extent(float* width, float* height) {
 
     SET_BOX(width, map_width);
     SET_BOX(height, map_height);
+}
+
+size_t WarGrey::STEM::IAtlas::logic_tile_count() {
+    return this->logic_row * this->logic_col;
 }
 
 SDL_RendererFlip WarGrey::STEM::IAtlas::current_flip_status() {
@@ -109,6 +115,83 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
             game_render_texture(renderer, tilemap, &src, &dest, flip);
         }
     }
+
+    if ((this->logic_grid_alpha > 0.0F) && (this->logic_col > 0) && (this->logic_row > 0)) {
+        RGB_SetRenderDrawColor(renderer, this->logic_grid_color, this->logic_grid_alpha);
+        game_draw_grid(renderer, this->logic_row, this->logic_col, this->logic_tile_width, this->logic_tile_height, x, y);
+    }
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::IAtlas::create_logic_grid(int row, int col) {
+    float map_width, map_height;
+
+    this->feed_map_extent(&map_width, &map_height);
+    
+    this->logic_row = row;
+    this->logic_col = col;
+    this->on_map_resize(map_width, map_height);
+}
+
+int WarGrey::STEM::IAtlas::logic_tile_index(int x, int y, int* r,  int* c) {
+    int cl = x / int(this->logic_tile_width);
+    int rw = y / int(this->logic_tile_height);
+    
+    SET_VALUES(r, rw, c, cl);
+    
+    return rw * this->logic_col + cl;
+}
+
+int WarGrey::STEM::IAtlas::logic_tile_index(float x, float y, int* r, int* c) {
+    return this->logic_tile_index(fl2fxi(x), fl2fxi(y), r, c);
+}
+
+void WarGrey::STEM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a) {
+    int total = this->logic_col * this->logic_row;
+    
+    if (total > 0) {
+        if (idx > total) {
+            idx = idx % total;
+        } else if (idx < 0) {
+            idx = total - (-idx % total);
+        }
+
+        this->feed_logic_tile_location(idx / this->logic_col, idx / this->logic_row, x, y, a);
+    }
+}
+
+void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a) {
+    float fx, fy;
+
+    if (this->logic_row > 0) {
+        if (row > this->logic_row) {
+            row = row % this->logic_row;
+        } else if (row < 0) {
+            row = this->logic_row - (-row % this->logic_row);
+        }
+    }
+
+    if (this->logic_col > 0) {
+        if (col > this->logic_col) {
+            col = col % this->logic_col;
+        } else if (col < 0) {
+            col = this->logic_col - (-col % this->logic_col);
+        }
+    }
+    
+    matter_anchor_fraction(a, &fx, &fy);
+    SET_BOX(x, this->logic_tile_width  * (float(col) + fx));
+    SET_BOX(y, this->logic_tile_height * (float(row) + fy));
+}
+
+void WarGrey::STEM::IAtlas::on_map_resize(float map_width, float map_height) {
+    if ((this->logic_row > 0) && (this->logic_col > 0)) {
+        this->logic_tile_width  = map_width  / float(this->logic_col);
+        this->logic_tile_height = map_height / float(this->logic_row);
+    } else {
+        this->logic_row = 0;
+        this->logic_col = 0;
+    }
 }
 
 /*************************************************************************************************/
@@ -147,6 +230,8 @@ void WarGrey::STEM::GridAtlas::on_tilemap_load(shared_costume_t atlas) {
     if (this->map_tile_height <= 0.0F) {
         this->map_tile_height = float(this->atlas_tile_height);
     }
+
+    this->create_logic_grid(this->map_row, this->map_col);
 }
 
 void WarGrey::STEM::GridAtlas::feed_map_extent(float* width, float* height) {
@@ -155,11 +240,11 @@ void WarGrey::STEM::GridAtlas::feed_map_extent(float* width, float* height) {
 }
 
 size_t WarGrey::STEM::GridAtlas::atlas_tile_count() {
-    return (this->atlas_tile_width == 0) ? 0 : (this->atlas_row * this->atlas_col);
+    return (this->atlas_tile_width <= 0) ? 0 : (this->atlas_row * this->atlas_col);
 }
 
 size_t WarGrey::STEM::GridAtlas::map_tile_count() {
-    return (this->map_tile_width == 0) ? 0 : (this->map_row * this->map_col);
+    return (this->map_tile_width <= 0.0F) ? 0 : (this->map_row * this->map_col);
 }
 
 void WarGrey::STEM::GridAtlas::feed_atlas_tile_region(SDL_Rect* region, size_t idx) {
@@ -189,6 +274,7 @@ void WarGrey::STEM::GridAtlas::feed_map_tile_region(SDL_FRect* region, size_t id
     region->h = this->map_tile_height;
 }
 
+/*************************************************************************************************/
 void WarGrey::STEM::GridAtlas::create_map_grid(int row, int col, float tile_width, float tile_height, float xgap, float ygap) {
     if (row > 0) {
         this->map_row = row;
