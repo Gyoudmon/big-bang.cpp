@@ -12,7 +12,7 @@ namespace WarGrey::STEM {
         virtual ~Tuxmon() {}
 
     public:
-        int preferred_local_fps() override { return 10; }
+        int preferred_local_fps() override { return 15; }
 
     protected:
         int get_initial_costume_index() override;

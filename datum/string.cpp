@@ -399,9 +399,9 @@ std::string WarGrey::STEM::string_add_between(const char* s, char ch) {
 }
 
 /************************************************************************************************/
-bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
+bool WarGrey::STEM::string_prefix(const char* src, const char* sub, int max0) {
     bool yes = true;
-    size_t max = src.size();
+    size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t n = strnlen(sub, max + 1);
 
     if (max >= n) {
@@ -418,13 +418,17 @@ bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
     return yes;
 }
 
-bool WarGrey::STEM::string_prefix(const std::string& src, const std::string& sub) {
-    return string_prefix(src, sub.c_str());
+bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
+    return string_prefix(src.c_str(), sub, src.size());
 }
 
-bool WarGrey::STEM::string_suffix(const std::string& src, const char* sub) {
+bool WarGrey::STEM::string_prefix(const std::string& src, const std::string& sub) {
+    return string_prefix(src.c_str(), sub.c_str(), src.size());
+}
+
+bool WarGrey::STEM::string_suffix(const char* src, const char* sub, int max0) {
     bool yes = true;
-    size_t max = src.size();
+    size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t n = strnlen(sub, max + 1);
 
     if (max >= n) {
@@ -441,6 +445,10 @@ bool WarGrey::STEM::string_suffix(const std::string& src, const char* sub) {
     return yes;
 }
 
+bool WarGrey::STEM::string_suffix(const std::string& src, const char* sub) {
+    return string_suffix(src.c_str(), sub, src.size());
+}
+
 bool WarGrey::STEM::string_suffix(const std::string& src, const std::string& sub) {
-    return string_suffix(src, sub.c_str());
+    return string_suffix(src.c_str(), sub.c_str(), src.size());
 }

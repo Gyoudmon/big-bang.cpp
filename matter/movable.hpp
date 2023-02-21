@@ -12,6 +12,7 @@ namespace WarGrey::STEM {
 
     public:
         void set_speed(float spd, float dir, bool is_rad = false);
+        void set_speed_xy(float xspd, float yspd);
         float x_speed() { return this->xspeed; }
         float y_speed() { return this->yspeed; }
 

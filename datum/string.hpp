@@ -62,8 +62,10 @@ namespace WarGrey::STEM {
     std::string string_add_between(const char* s, char ch = '\n');
 
     /************************************************************************************************/
+    bool string_prefix(const char* src, const char* sub, int max = -1);
     bool string_prefix(const std::string& src, const char* sub);
     bool string_prefix(const std::string& src, const std::string& sub);
+    bool string_suffix(const char* src, const char* sub, int max = -1);
     bool string_suffix(const std::string& src, const char* sub);
     bool string_suffix(const std::string& src, const std::string& sub);
 }

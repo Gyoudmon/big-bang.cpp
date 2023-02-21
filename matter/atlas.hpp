@@ -27,10 +27,10 @@ namespace WarGrey::STEM {
     public:
         void create_logic_grid(int row, int col);
         size_t logic_tile_count();
-        int logic_tile_index(int x, int y, int* r = nullptr,  int* c = nullptr);
-        int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr);
-        void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
-        void feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
+        int logic_tile_index(int x, int y, int* r = nullptr,  int* c = nullptr, bool local = true);
+        int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
+        void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
+        void feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void set_logic_grid_color(uint32_t color, float a = 1.0F) { this->logic_grid_color = color; this->logic_grid_alpha = a; }
 
     protected:
@@ -80,10 +80,10 @@ namespace WarGrey::STEM {
 
     protected:
         void create_map_grid(int row, int col, float tile_width = 0.0F, float tile_height = 0.0F, float xgap = 0.0F, float ygap = 0.0F);
-        int map_tile_index(int x, int y, int* r = nullptr,  int* c = nullptr);
-        int map_tile_index(float x, float y, int* r = nullptr, int* c = nullptr);
-        void feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
-        void feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC);
+        int map_tile_index(int x, int y, int* r = nullptr,  int* c = nullptr, bool local = true);
+        int map_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
+        void feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
+        void feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         
     protected:
         void on_tilemap_load(WarGrey::STEM::shared_costume_t atlas) override;

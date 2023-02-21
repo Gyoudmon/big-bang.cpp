@@ -16,8 +16,12 @@ void WarGrey::STEM::IMovable::set_speed(float spd, float dir, bool is_radian) {
         rad = degrees_to_radians(dir);
     }
 
-    this->xspeed = spd * flcos(rad);
-    this->yspeed = spd * flsin(rad);
+    this->set_speed_xy(spd * flcos(rad), spd * flsin(rad));
+}
+
+void WarGrey::STEM::IMovable::set_speed_xy(float xspd, float yspd) {
+    this->xspeed = xspd;
+    this->yspeed = yspd;
 }
 
 void WarGrey::STEM::IMovable::on_border(float hoffset, float voffset) {

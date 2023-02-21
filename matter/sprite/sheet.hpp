@@ -42,7 +42,6 @@ namespace WarGrey::STEM {
         void on_sheet_load(WarGrey::STEM::shared_costume_t sheet) override;
         void feed_costume_region(SDL_Rect* costume, size_t idx) override;
         const char* costume_index_to_name(size_t idx) override;
-        int costume_name_to_index(const char* name) override;
     
     protected:
         int row;

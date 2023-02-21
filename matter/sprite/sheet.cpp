@@ -107,16 +107,3 @@ const char* WarGrey::STEM::SpriteGridSheet::costume_index_to_name(size_t idx) {
     
     return this->__virtual_name.c_str();
 }
-
-int WarGrey::STEM::SpriteGridSheet::costume_name_to_index(const char* name) {
-    int idx = -1;
-
-    for (int i = 0; i < this->row * this->col; i++) {
-        if (strcmp(this->costume_index_to_name(i), name) == 0) {
-            idx = i;
-            break;
-        }
-    }
-
-    return idx;
-}

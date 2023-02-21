@@ -73,19 +73,6 @@ size_t WarGrey::STEM::Sprite::costume_count() {
     return this->costumes.size();
 }
 
-int WarGrey::STEM::Sprite::costume_name_to_index(const char* name) {
-    int cidx = -1;
-
-    for (int idx = 0; idx < this->costumes.size(); idx ++) {
-        if (this->costumes[idx].first.compare(name) == 0) {
-            cidx = idx;
-            break;
-        }
-    }
-
-    return cidx;
-}
-
 const char* WarGrey::STEM::Sprite::costume_index_to_name(size_t idx) {
     return this->costumes[idx].first.c_str();
 }

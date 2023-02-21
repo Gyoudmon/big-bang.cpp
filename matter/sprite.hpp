@@ -49,7 +49,7 @@ namespace WarGrey::STEM {
         virtual int preferred_idle_duration();
         virtual void feed_costume_extent(size_t idx, float* width, float* height) = 0;
         virtual const char* costume_index_to_name(size_t idx) = 0;
-        virtual int costume_name_to_index(const char* name) = 0;
+        virtual int costume_name_to_index(const char* name);
         virtual void draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) = 0;
 
     protected:

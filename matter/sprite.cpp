@@ -96,6 +96,29 @@ void WarGrey::STEM::ISprite::switch_to_random_costume(int idx0, int idxn) {
     this->switch_to_costume(random_uniform(idx0, idxn));
 }
 
+
+int WarGrey::STEM::ISprite::costume_name_to_index(const char* name) {
+    int cidx = -1;
+    
+    for (size_t idx = 0; idx < this->costume_count(); idx ++) {
+        if (strcmp(this->costume_index_to_name(idx), name) == 0) {
+            cidx = idx;
+            break;
+        }
+    }
+
+    if (cidx < 0) {
+        for (int idx = 0; idx < this->costume_count(); idx ++) {
+            if (string_prefix(this->costume_index_to_name(idx), name)) {
+                cidx = idx;
+                break;
+            }
+        }
+    }
+
+    return cidx;
+}
+
 int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t uptime) {
     size_t frame_size = this->frame_refs.size();
     int duration = 0;

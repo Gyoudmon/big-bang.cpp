@@ -5,6 +5,7 @@
 #include "../datum/flonum.hpp"
 #include "../datum/fixnum.hpp"
 
+#include "../plane.hpp"
 #include "../graphics/geometry.hpp"
 #include "../graphics/colorspace.hpp"
 
@@ -133,7 +134,19 @@ void WarGrey::STEM::IAtlas::create_logic_grid(int row, int col) {
     this->on_map_resize(map_width, map_height);
 }
 
-int WarGrey::STEM::IAtlas::logic_tile_index(int x, int y, int* r,  int* c) {
+int WarGrey::STEM::IAtlas::logic_tile_index(int x, int y, int* r,  int* c, bool local) {
+    if (!local) {
+        auto master = this->master();
+
+        if (master != nullptr) {
+            float dx, dy;
+
+            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
+            x -= fl2fxi(dx);
+            y -= fl2fxi(dy);
+        }
+    }
+    
     int cl = x / int(this->logic_tile_width);
     int rw = y / int(this->logic_tile_height);
     
@@ -142,11 +155,11 @@ int WarGrey::STEM::IAtlas::logic_tile_index(int x, int y, int* r,  int* c) {
     return rw * this->logic_col + cl;
 }
 
-int WarGrey::STEM::IAtlas::logic_tile_index(float x, float y, int* r, int* c) {
-    return this->logic_tile_index(fl2fxi(x), fl2fxi(y), r, c);
+int WarGrey::STEM::IAtlas::logic_tile_index(float x, float y, int* r, int* c, bool local) {
+    return this->logic_tile_index(fl2fxi(x), fl2fxi(y), r, c, local);
 }
 
-void WarGrey::STEM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a) {
+void WarGrey::STEM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a, bool local) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
@@ -156,13 +169,15 @@ void WarGrey::STEM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y
             idx = total - (-idx % total);
         }
 
-        this->feed_logic_tile_location(idx / this->logic_col, idx / this->logic_row, x, y, a);
+        this->feed_logic_tile_location(idx / this->logic_col, idx / this->logic_row, x, y, a, local);
     }
 }
 
-void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a) {
+void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a, bool local) {
+    float dx = 0.0F;
+    float dy = 0.0F;
     float fx, fy;
-
+    
     if (this->logic_row > 0) {
         if (row > this->logic_row) {
             row = row % this->logic_row;
@@ -179,9 +194,17 @@ void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x,
         }
     }
     
+    if (!local) {
+        auto master = this->master();
+
+        if (master != nullptr) {
+            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
+        }
+    }
+    
     matter_anchor_fraction(a, &fx, &fy);
-    SET_BOX(x, this->logic_tile_width  * (float(col) + fx));
-    SET_BOX(y, this->logic_tile_height * (float(row) + fy));
+    SET_BOX(x, this->logic_tile_width  * (float(col) + fx) + dx);
+    SET_BOX(y, this->logic_tile_height * (float(row) + fy) + dy);
 }
 
 void WarGrey::STEM::IAtlas::on_map_resize(float map_width, float map_height) {
@@ -298,7 +321,19 @@ void WarGrey::STEM::GridAtlas::create_map_grid(int row, int col, float tile_widt
     this->invalidate_map_size();
 }
 
-int WarGrey::STEM::GridAtlas::map_tile_index(int x, int y, int* r,  int* c) {
+int WarGrey::STEM::GridAtlas::map_tile_index(int x, int y, int* r,  int* c, bool local) {
+    if (!local) {
+        auto master = this->master();
+
+        if (master != nullptr) {
+            float dx, dy;
+
+            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
+            x -= fl2fxi(dx);
+            y -= fl2fxi(dy);
+        }
+    }
+    
     int cl = x / int(this->map_tile_width  + this->map_tile_xgap);
     int rw = y / int(this->map_tile_height + this->map_tile_ygap);
     
@@ -307,14 +342,16 @@ int WarGrey::STEM::GridAtlas::map_tile_index(int x, int y, int* r,  int* c) {
     return rw * this->map_col + cl;
 }
 
-int WarGrey::STEM::GridAtlas::map_tile_index(float x, float y, int* r, int* c) {
-    return this->map_tile_index(fl2fxi(x), fl2fxi(y), r, c);
+int WarGrey::STEM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, bool local) {
+    return this->map_tile_index(fl2fxi(x), fl2fxi(y), r, c, local);
 }
 
-void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a) {
+void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a, bool local) {
     int total = this->map_col * this->map_row;
     SDL_FRect region;
     float fx, fy;
+    float dx = 0.0F;
+    float dy = 0.0F;
     
     if (idx > total) {
         idx = idx % total;
@@ -322,14 +359,22 @@ void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* 
         idx = total - (-idx % total);
     }
 
+    if (!local) {
+        auto master = this->master();
+
+        if (master != nullptr) {
+            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
+        }
+    }
+
     matter_anchor_fraction(a, &fx, &fy);
     this->feed_map_tile_region(&region, idx);
     
-    SET_BOX(x, region.x + region.w * fx);
-    SET_BOX(y, region.y + region.h * fy);
+    SET_BOX(x, region.x + region.w * fx + dx);
+    SET_BOX(y, region.y + region.h * fy + dy);
 }
 
-void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a) {
+void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a, bool local) {
     if (row > this->map_row) {
         row = row % this->map_row;
     } else if (row < 0) {
@@ -342,5 +387,5 @@ void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x
         col = this->map_col - (-col % this->map_col);
     }
 
-    this->feed_map_tile_location(row * this->map_col + col, x, y, a);
+    this->feed_map_tile_location(row * this->map_col + col, x, y, a, local);
 }
