@@ -119,7 +119,10 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
 
     if ((this->logic_grid_alpha > 0.0F) && (this->logic_col > 0) && (this->logic_row > 0)) {
         RGB_SetRenderDrawColor(renderer, this->logic_grid_color, this->logic_grid_alpha);
-        game_draw_grid(renderer, this->logic_row, this->logic_col, this->logic_tile_width, this->logic_tile_height, x, y);
+        game_draw_grid(renderer, this->logic_row, this->logic_col,
+            this->logic_tile_width * flabs(this->xscale),
+            this->logic_tile_height * flabs(this->yscale),
+            x, y);
     }
 }
 
@@ -147,8 +150,8 @@ int WarGrey::STEM::IAtlas::logic_tile_index(int x, int y, int* r,  int* c, bool 
         }
     }
     
-    int cl = x / int(this->logic_tile_width);
-    int rw = y / int(this->logic_tile_height);
+    int cl = x / int(this->logic_tile_width  * flabs(this->xscale));
+    int rw = y / int(this->logic_tile_height * flabs(this->yscale));
     
     SET_VALUES(r, rw, c, cl);
     
@@ -203,8 +206,8 @@ void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x,
     }
     
     matter_anchor_fraction(a, &fx, &fy);
-    SET_BOX(x, this->logic_tile_width  * (float(col) + fx) + dx);
-    SET_BOX(y, this->logic_tile_height * (float(row) + fy) + dy);
+    SET_BOX(x, this->logic_tile_width  * flabs(this->xscale) * (float(col) + fx) + dx);
+    SET_BOX(y, this->logic_tile_height * flabs(this->yscale) * (float(row) + fy) + dy);
 }
 
 void WarGrey::STEM::IAtlas::on_map_resize(float map_width, float map_height) {
@@ -334,8 +337,8 @@ int WarGrey::STEM::GridAtlas::map_tile_index(int x, int y, int* r,  int* c, bool
         }
     }
     
-    int cl = x / int(this->map_tile_width  + this->map_tile_xgap);
-    int rw = y / int(this->map_tile_height + this->map_tile_ygap);
+    int cl = x / fl2fxi((this->map_tile_width  + this->map_tile_xgap) * flabs(this->xscale));
+    int rw = y / fl2fxi((this->map_tile_height + this->map_tile_ygap) * flabs(this->yscale));
     
     SET_VALUES(r, rw, c, cl);
     
@@ -370,8 +373,8 @@ void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* 
     matter_anchor_fraction(a, &fx, &fy);
     this->feed_map_tile_region(&region, idx);
     
-    SET_BOX(x, region.x + region.w * fx + dx);
-    SET_BOX(y, region.y + region.h * fy + dy);
+    SET_BOX(x, (region.x + region.w * fx + dx) * flabs(this->xscale));
+    SET_BOX(y, (region.y + region.h * fy + dy) * flabs(this->yscale));
 }
 
 void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a, bool local) {

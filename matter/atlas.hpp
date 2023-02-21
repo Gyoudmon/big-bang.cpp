@@ -48,14 +48,16 @@ namespace WarGrey::STEM {
         void on_map_resize(float map_width, float map_height);
         SDL_RendererFlip current_flip_status();
         
+    protected:
+        float xscale = 1.0F;
+        float yscale = 1.0F;
+
     private:
         WarGrey::STEM::shared_costume_t atlas;
 
     private:
         float map_width = -1.0F;
         float map_height = 0.0F;
-        float xscale = 1.0F;
-        float yscale = 1.0F;
 
     private:
         int logic_row = 0;
