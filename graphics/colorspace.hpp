@@ -6,6 +6,9 @@ namespace WarGrey::STEM {
     void RGB_FillColor(SDL_Color* c, unsigned int hex, float alpha);
     void RGB_FillColor(SDL_Color* c, unsigned int hex, unsigned char alpha = 255U);
 
+    unsigned int Hexadecimal_FromColor(SDL_Color* c, float* alpha = nullptr);
+    unsigned int Hexadecimal_FromColor(SDL_Color* c, unsigned char* alpha);
+
     void RGB_FromHexadecimal(unsigned int hex, unsigned char* red, unsigned char* green, unsigned char* blue);
     void RGB_FromHexadecimal(unsigned int hex, unsigned char* red, unsigned char* green, unsigned char* blue, float* alpha);
     void RGB_FromHexadecimal(unsigned int hex, unsigned char* red, unsigned char* green, unsigned char* blue, unsigned char* alpha);

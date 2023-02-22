@@ -25,6 +25,8 @@ namespace WarGrey::STEM {
     public:
         void set_font(TTF_Font* font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         void set_text_color(uint32_t color_hex = SILVER, float alpha = 1.0F);
+        void set_background_color(uint32_t bg_hex, float alpha = 1.0F);
+        void set_border_color(uint32_t border_hex, float alpha = 1.0F);
 
     public:
         void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
@@ -40,6 +42,10 @@ namespace WarGrey::STEM {
         SDL_Color text_color;
         TTF_Font* text_font = nullptr;
         SDL_Texture* texture = nullptr;
+        uint32_t bg_color;
+        float bg_alpha = 0.0F;
+        u_int32_t border_color;
+        float border_alpha = 0.0F;
 
     private:
         std::string raw;

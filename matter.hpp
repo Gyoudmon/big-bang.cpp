@@ -64,7 +64,6 @@ namespace WarGrey::STEM {
         void resize(float width, float height, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
 
     public:
-        void enable_events(bool yes_no, bool low_level = false) { this->deal_with_events = yes_no; this->deal_with_low_level_events = low_level; }
         bool events_allowed() { return this->deal_with_events; }
         bool low_level_events_allowed() { return (this->events_allowed() && this->deal_with_low_level_events); }
     
@@ -96,6 +95,7 @@ namespace WarGrey::STEM {
         IMatterInfo* info = nullptr;
 
     protected:
+        void enable_events(bool yes_no, bool low_level = false) { this->deal_with_events = yes_no; this->deal_with_low_level_events = low_level; }
         void enable_resize(bool yes_no = true) { this->can_resize = yes_no; }
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
 

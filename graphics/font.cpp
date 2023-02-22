@@ -58,7 +58,9 @@ void WarGrey::STEM::game_fonts_initialize(int fontsize) {
     game_font::serif = game_create_font("Times.ttc", fontsize);
     game_font::monospace = game_create_font("Courier.ttc", fontsize);
     game_font::math = game_create_font("Bodoni 72.ttc", fontsize);
-    game_font::unicode = game_create_font("Arial Unicode.ttf", fontsize);
+
+    /* This is the only font that is elegant, although some characters are missing */
+    game_font::unicode = game_create_font("PingFang.ttc", fontsize);
 #elif defined(__windows__) /* HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts */
     game_font::sans_serif = game_create_font("msyh.ttc", fontsize); // Microsoft YaHei
     game_font::serif = game_create_font("times.ttf", fontsize); // Times New Roman

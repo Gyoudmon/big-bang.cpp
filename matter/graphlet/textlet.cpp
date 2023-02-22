@@ -26,9 +26,30 @@ void WarGrey::STEM::ITextlet::construct(SDL_Renderer* renderer) {
 }
 
 void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, float alpha) {
-    RGB_FillColor(&this->text_color, color_hex, alpha);
-    this->update_texture();
-    this->notify_updated();
+    float self_alpha = 0.0F;
+    uint32_t hex = Hexadecimal_FromColor(&this->text_color, &self_alpha);
+
+    if ((hex != color_hex) || (self_alpha != alpha)) {
+        RGB_FillColor(&this->text_color, color_hex, alpha);
+        this->update_texture();
+        this->notify_updated();
+    }
+}
+
+void WarGrey::STEM::ITextlet::set_background_color(uint32_t bg_hex, float alpha) {
+    if ((this->bg_color != bg_hex) || (this->bg_alpha != alpha)) {
+        this->bg_color = bg_hex;
+        this->bg_alpha = alpha;
+        this->notify_updated();
+    }
+}
+
+void WarGrey::STEM::ITextlet::set_border_color(uint32_t border_hex, float alpha) {
+    if ((this->border_color != border_hex) || (this->border_alpha != alpha)) {
+        this->border_color = border_hex;
+        this->border_alpha = alpha;
+        this->notify_updated();
+    }
 }
 
 void WarGrey::STEM::ITextlet::set_font(TTF_Font* font, MatterAnchor anchor) {
@@ -80,6 +101,14 @@ void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) 
 
 void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if (this->texture != nullptr) {
+        if (this->bg_alpha > 0.0F) {
+            game_fill_rect(renderer, x, y, Width, Height, this->bg_color, this->bg_alpha);
+        }
+
+        if (this->border_alpha > 0.0F) {
+            game_draw_rect(renderer, x, y, Width, Height, this->border_color, this->border_alpha);
+        }
+
         game_render_texture(renderer, this->texture, x, y);
     }
 }
