@@ -2,14 +2,12 @@
 
 #include "universe.hpp"
 #include "plane.hpp"
-#include "navigator.hpp"
 #include "virtualization/screen.hpp"
 
 namespace WarGrey::STEM {
-    class Cosmos : public WarGrey::STEM::IUniverse, public WarGrey::STEM::INavigatorListener {
+    class Cosmos : public WarGrey::STEM::IUniverse {
     public:
-        Cosmos(WarGrey::STEM::INavigator* navigator, int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
-        Cosmos(int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU) : Cosmos(nullptr, fps, fgc, bgc) {}
+        Cosmos(int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
         virtual ~Cosmos();
 
     public:
@@ -26,7 +24,6 @@ namespace WarGrey::STEM {
         void transfer_to_plane(int idx);
         void transfer_to_next_plane() { this->transfer(1); }
         void transfer_to_prev_plane() { this->transfer(-1); }
-        void on_navigate(int from_index, int to_index) override;
 
     public:
         size_t plane_count() { return this->chunk_count; }
@@ -56,6 +53,7 @@ namespace WarGrey::STEM {
     private:
         void collapse();
         void notify_transfer(WarGrey::STEM::IPlane* from, WarGrey::STEM::IPlane* to);
+        void on_navigate(int from_idx, int to_idx);
 
     private:
         WarGrey::STEM::IScreen* screen = nullptr;
@@ -65,7 +63,6 @@ namespace WarGrey::STEM {
         int recent_plane_idx = 0;
 
     private:
-        WarGrey::STEM::INavigator* navigator = nullptr;
         WarGrey::STEM::IPlane* from_plane = nullptr;
     };
 }

@@ -2,7 +2,6 @@
 #include "matter.hpp"
 
 #include "virtualization/screen/onionskin.hpp"
-#include "navigator/null.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -44,23 +43,11 @@ static inline void draw_plane(SDL_Renderer* renderer, IPlane* plane, float x, fl
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Cosmos::Cosmos(INavigator* navigator, int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
+WarGrey::STEM::Cosmos::Cosmos(int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
     this->screen = new OnionSkin(this);
-    this->navigator = ((navigator == nullptr) ? new NullNavigator() : navigator);
-    this->navigator->push_navigation_listener(this);
 }
 
 WarGrey::STEM::Cosmos::~Cosmos() {
-    if (this->navigator != nullptr) {
-        if (dynamic_cast<IPlane*>(this->navigator) != nullptr) {
-            // leave it to `Cosmos::collapse`
-        } else if (dynamic_cast<IMatter*>(this->navigator) != nullptr) {
-            // leave it to the `IPlane` instance managing it
-        } else {
-            delete this->navigator;
-        }
-    }
-
     this->collapse();
     delete this->screen;
 }
@@ -78,8 +65,6 @@ void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
 
             this->recent_plane_idx = 0;
             this->chunk_count = 1;
-            this->navigator->insert(plane);
-            this->navigator->select(plane);
         } else { 
             LinkedPlaneInfo* head_info = PLANE_INFO(this->head_plane);
             LinkedPlaneInfo* prev_info = PLANE_INFO(head_info->prev);
@@ -89,7 +74,6 @@ void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
             head_info->prev = plane;
 
             this->chunk_count ++;
-            this->navigator->insert(plane);
         }
 
         info->next = this->head_plane;
@@ -327,7 +311,6 @@ void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
 			}
 		}
 
-		this->navigator->select(this->recent_plane);
         this->notify_transfer(this->from_plane, this->recent_plane);
 
 		this->from_plane = nullptr;
