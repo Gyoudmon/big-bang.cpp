@@ -12,6 +12,7 @@ using namespace std::filesystem;
 #define Game_Close_Font(id) if (id != nullptr) TTF_CloseFont(id); id = nullptr;
 
 TTF_Font* WarGrey::STEM::game_font::DEFAULT = nullptr;
+TTF_Font* WarGrey::STEM::game_font::title = nullptr;
 TTF_Font* WarGrey::STEM::game_font::sans_serif = nullptr;
 TTF_Font* WarGrey::STEM::game_font::serif = nullptr;
 TTF_Font* WarGrey::STEM::game_font::monospace = nullptr;
@@ -52,26 +53,29 @@ void WarGrey::STEM::game_fonts_initialize(int fontsize) {
     }
 
 #if defined(__macosx__)
+    game_font::title = game_create_font("Hiragino Sans GB.ttc", fontsize);
     game_font::sans_serif = game_create_font("LucidaGrande.ttc", fontsize);
     game_font::serif = game_create_font("Times.ttc", fontsize);
     game_font::monospace = game_create_font("Courier.ttc", fontsize);
     game_font::math = game_create_font("Bodoni 72.ttc", fontsize);
-    game_font::unicode = game_create_font("PingFang.ttc", fontsize);
+    game_font::unicode = game_create_font("Arial Unicode.ttf", fontsize);
 #elif defined(__windows__) /* HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts */
     game_font::sans_serif = game_create_font("msyh.ttc", fontsize); // Microsoft YaHei
     game_font::serif = game_create_font("times.ttf", fontsize); // Times New Roman
     game_font::monospace = game_create_font("cour.ttf", fontsize); // Courier New
     game_font::math = game_create_font("BOD_R.TTF", fontsize); // Bodoni MT
     game_font::unicode = game_create_font("msyh.ttc", fontsize);
+    game_font::title = game_create_font("msyh.ttc", fontsize);
 #else /* the following fonts have not been tested */
     game_font::sans_serif = game_create_font("Nimbus Sans.ttc", fontsize);
     game_font::serif = game_create_font("DejaVu Serif.ttc", fontsize);
     game_font::monospace = game_create_font("Monospace.ttf", fontsize);
     game_font::math = game_create_font("URW Bookman.ttf", fontsize);
     game_font::unicode = game_create_font("Arial Unicode.ttf", fontsize);
+    game_font::title = game_create_font("Arial Unicode.ttf", fontsize);
 #endif
 
-    game_font::DEFAULT = game_font::sans_serif;
+    game_font::DEFAULT = game_font::unicode;
 }
 
 void WarGrey::STEM::game_fonts_destroy() {

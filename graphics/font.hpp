@@ -8,6 +8,7 @@ namespace WarGrey::STEM {
     class game_font {
         public:
             static TTF_Font* DEFAULT;
+            static TTF_Font* title;
             static TTF_Font* sans_serif;
             static TTF_Font* serif;
             static TTF_Font* monospace;
