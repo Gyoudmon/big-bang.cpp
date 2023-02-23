@@ -312,6 +312,7 @@ void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
 		}
 
         this->notify_transfer(this->from_plane, this->recent_plane);
+        this->set_window_title("%s", this->recent_plane->name());
 
 		this->from_plane = nullptr;
 		this->notify_updated();

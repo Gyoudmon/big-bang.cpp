@@ -88,7 +88,7 @@ static void game_initialize(uint32_t flags, int fontsize = 32) {
                 exit(1);
             }
         }
-    
+        
         // SDL_SetHint("SDL_IME_SHOW_UI", "1");
 
         game_fonts_initialize(fontsize);
