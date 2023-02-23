@@ -2,13 +2,13 @@
 
 #include <SDL2/SDL.h>
 
+#include "cosmos.hpp"
+
 #include "graphics/colorspace.hpp"
 #include "graphics/named_colors.hpp"
 #include "graphics/geometry.hpp"
 #include "graphics/font.hpp"
 #include "graphics/text.hpp"
-
-#include "world.hpp"
 
 #include "matter/atlas.hpp"
 #include "matter/sprite.hpp"
