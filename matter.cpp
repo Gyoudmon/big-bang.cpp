@@ -149,6 +149,13 @@ bool WarGrey::STEM::IMatter::has_caret() {
     return careted;
 }
 
+void WarGrey::STEM::IMatter::show(bool yes_no) {
+    if (this->invisible == yes_no) {
+        this->invisible = !yes_no;
+        this->notify_updated();
+    }
+}
+
 void WarGrey::STEM::IMatter::feed_location(float* x, float* y, WarGrey::STEM::MatterAnchor a) {
     if (this->info != nullptr) {
         this->info->master->feed_matter_location(this, x, y, a);

@@ -208,6 +208,7 @@ namespace WarGrey::STEM {
     public:
         bool has_mission_completed() override;
         void set_sentry_sprite(WarGrey::STEM::ISprite* sentry, const char* greeting, const char* goodbye);
+        void set_tooltip_matter(WarGrey::STEM::IMatter* m, float dx = 0.0F, float dy = 0.0F);
 
     public:
         void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) override;
@@ -251,6 +252,7 @@ namespace WarGrey::STEM {
 
     protected:
         void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
+        virtual bool update_tooltip(IMatter* m, float local_x, float local_y) { return false; }
         
     protected:
         bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) override;
@@ -262,12 +264,13 @@ namespace WarGrey::STEM {
         void on_text(const char* text, size_t size, bool entire) override;
         void on_editing_text(const char* text, int pos, int span) override;
         void on_tap(WarGrey::STEM::IMatter* m, float x, float y) override;
-        void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
 
     protected:
         void on_enter(WarGrey::STEM::IPlane* from) override;
         void mission_complete() override;
 
+    protected:
+        void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
         void on_matter_ready(IMatter* m) override {}
 
     private:
@@ -296,9 +299,14 @@ namespace WarGrey::STEM {
         float scale_y = 1.0F;
     
     private:
-        bool mission_done = false;
         WarGrey::STEM::ISprite* sentry = nullptr;
+        bool mission_done = false;
         std::string greeting;
         std::string goodbye;
+
+    private:
+        WarGrey::STEM::IMatter* tooltip = nullptr;
+        float tooltip_dx = 0.0F;
+        float tooltip_dy = 0.0F;
     };
 }

@@ -789,6 +789,10 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
 
         if (unmasked_matter != this->hovering_matter) {
             this->say_goodbye_to_hover_matter(state, x, y, dx, dy);
+
+            if ((this->tooltip != nullptr) && (unmasked_matter != this->tooltip) && this->tooltip->visible()) {
+                this->tooltip->show(false);
+            }
         }
 
         if (unmasked_matter != nullptr) {
@@ -807,6 +811,18 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
             }
 
             this->on_hover(this->hovering_matter, local_x, local_y);
+
+            if (this->tooltip != nullptr) {
+                if (this->update_tooltip(this->hovering_matter, local_x, local_y)) {
+                    if (!this->tooltip->visible()) {
+                        this->tooltip->show(true);
+                    }
+
+                    this->move_to(this->tooltip, this->hovering_matter,
+                        MatterAnchor::LB, MatterAnchor::LT,
+                        this->tooltip_dx, this->tooltip_dy);
+                }
+            }
 
             handled = true;
         }
@@ -918,6 +934,21 @@ void WarGrey::STEM::Plane::set_sentry_sprite(ISprite* sentry, const char* greeti
     this->sentry = sentry;
     this->greeting = greeting;
     this->goodbye = goodbye;
+}
+
+void WarGrey::STEM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
+    this->begin_update_sequence();
+
+    if ((this->tooltip != nullptr) && !this->tooltip->visible()) {
+        this->tooltip->show(true);
+    }
+
+    this->tooltip = m;
+    this->tooltip->show(false);
+    this->tooltip_dx = dx;
+    this->tooltip_dy = dy;
+
+    this->end_update_sequence();
 }
 
 /************************************************************************************************/
@@ -1197,6 +1228,7 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMa
     this->move_to(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
 
+/*************************************************************************************************/
 void WarGrey::STEM::IPlane::create_grid(int col, float x, float y, float width) {
     IScreen* master = this->master();
     float height;
