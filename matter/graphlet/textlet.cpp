@@ -11,6 +11,16 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
+Labellet* WarGrey::STEM::make_label_as_tooltip(TTF_Font* font, uint32_t fg_color, uint32_t bg_color, uint32_t border_color) {
+    Labellet* tooltip = new Labellet(font, fg_color, "");
+
+    tooltip->set_background_color(bg_color);
+    tooltip->set_border_color(border_color);
+
+    return tooltip;
+}
+
+/*************************************************************************************************/
 WarGrey::STEM::ITextlet::ITextlet() {
     this->set_text_color();
 }
@@ -141,7 +151,7 @@ WarGrey::STEM::Labellet::Labellet(TTF_Font* font, const char* fmt, ...) {
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(TTF_Font* font, unsigned int color_hex, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(TTF_Font* font, uint32_t color_hex, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_font(font);
@@ -149,7 +159,7 @@ WarGrey::STEM::Labellet::Labellet(TTF_Font* font, unsigned int color_hex, const 
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(TTF_Font* font, unsigned int color_hex, float alpha, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(TTF_Font* font, uint32_t color_hex, float alpha, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_font(font);
@@ -157,14 +167,14 @@ WarGrey::STEM::Labellet::Labellet(TTF_Font* font, unsigned int color_hex, float 
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(unsigned int color_hex, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(uint32_t color_hex, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_text_color(color_hex, 1.0F);
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(unsigned int color_hex, float alpha, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(uint32_t color_hex, float alpha, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_text_color(color_hex, alpha);

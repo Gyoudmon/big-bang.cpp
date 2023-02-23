@@ -55,9 +55,15 @@ namespace WarGrey::STEM {
     public:
         Labellet(const char* fmt, ...);
         Labellet(TTF_Font* font, const char* fmt, ...);
-        Labellet(unsigned int color_hex, const char* fmt, ...);
-        Labellet(unsigned int color_hex, float alpha, const char* fmt, ...);
-        Labellet(TTF_Font* font, unsigned int color_hex, const char* fmt, ...);
-        Labellet(TTF_Font* font, unsigned int color_hex, float alpha, const char* fmt, ...);
+        Labellet(uint32_t color_hex, const char* fmt, ...);
+        Labellet(uint32_t color_hex, float alpha, const char* fmt, ...);
+        Labellet(TTF_Font* font, uint32_t color_hex, const char* fmt, ...);
+        Labellet(TTF_Font* font, uint32_t color_hex, float alpha, const char* fmt, ...);
     };
+
+    /*********************************************************************************************/
+    Labellet* make_label_as_tooltip(TTF_Font* font,
+        uint32_t fg_color = BLACK,
+        uint32_t bg_color = SNOW,
+        uint32_t border_color = GOLD);
 }
