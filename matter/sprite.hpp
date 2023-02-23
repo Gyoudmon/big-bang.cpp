@@ -45,6 +45,10 @@ namespace WarGrey::STEM {
         bool in_playing() { return this->animation_rest != 0; }
         void stop(int rest = 0);
 
+    public:
+        virtual void greetings(int repeat = 1) {} 
+        virtual void goodbye(int repeat = 1) {}
+
     protected:
         virtual int preferred_idle_duration();
         virtual void feed_costume_extent(size_t idx, float* width, float* height) = 0;

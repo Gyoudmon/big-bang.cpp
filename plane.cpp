@@ -905,16 +905,17 @@ bool WarGrey::STEM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, 
 void WarGrey::STEM::Plane::on_enter(IPlane* from) {
     this->mission_done = false;
 
-    if ((this->sentry != nullptr) && (this->greeting.size() > 0)) {
-        this->sentry->play(this->greeting.c_str(), 1);
+    if (this->sentry != nullptr) {
+        this->sentry->greetings(1);
     }
 
     this->on_mission_start();
 }
 
 void WarGrey::STEM::Plane::mission_complete() {
-    if ((this->sentry != nullptr) && (this->goodbye.size() > 0)) {
-        this->sentry->play(this->goodbye.c_str(), 1);
+    if (this->sentry != nullptr) {
+        this->sentry->goodbye(1);
+        this->sentry->stop(1);
     }
 
     this->on_mission_complete();
@@ -928,12 +929,6 @@ bool WarGrey::STEM::Plane::has_mission_completed() {
 
 bool WarGrey::STEM::Plane::can_select(IMatter* m) {
     return this->sentry == m;
-}
-
-void WarGrey::STEM::Plane::set_sentry_sprite(ISprite* sentry, const char* greeting, const char* goodbye) {
-    this->sentry = sentry;
-    this->greeting = greeting;
-    this->goodbye = goodbye;
 }
 
 void WarGrey::STEM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {

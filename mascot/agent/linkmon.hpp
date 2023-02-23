@@ -7,6 +7,10 @@ namespace WarGrey::STEM {
     public:
         Linkmon();
 
+    public:
+        void greetings(int repeat = 1) override { this->play("Greeting", repeat); } 
+        void goodbye(int repeat = 1) override { this->play("GoodBye", repeat); }
+
     protected:
         int submit_idle_frames(std::vector<std::pair<int, int>>& frame_refs, int& times) override;
         int submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) override;

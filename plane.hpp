@@ -207,7 +207,7 @@ namespace WarGrey::STEM {
 
     public:
         bool has_mission_completed() override;
-        void set_sentry_sprite(WarGrey::STEM::ISprite* sentry, const char* greeting, const char* goodbye);
+        void set_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->sentry = sentry; }
         void set_tooltip_matter(WarGrey::STEM::IMatter* m, float dx = 0.0F, float dy = 0.0F);
 
     public:
@@ -301,8 +301,6 @@ namespace WarGrey::STEM {
     private:
         WarGrey::STEM::ISprite* sentry = nullptr;
         bool mission_done = false;
-        std::string greeting;
-        std::string goodbye;
 
     private:
         WarGrey::STEM::IMatter* tooltip = nullptr;
