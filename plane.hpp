@@ -33,12 +33,14 @@ namespace WarGrey::STEM {
         SDL_Renderer* master_renderer();
 
     public:
+        virtual bool has_mission_completed() { return false; }
+ 
+    public:
         virtual void construct(float Width, float Height) {}
         virtual void load(float Width, float Height) {}
         virtual void reflow(float width, float height) {}
         virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
         virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
-        virtual bool has_mission_completed() { return false; }
     
     public:
         virtual WarGrey::STEM::IMatter* find_matter(float x, float y) = 0;
@@ -64,7 +66,6 @@ namespace WarGrey::STEM {
 
     public:
         virtual IMatter* find_next_selected_matter(IMatter* start) = 0;
-        virtual IMatter* thumbnail_matter() = 0;
         virtual void add_selected(IMatter* m) = 0;
         virtual void set_selected(IMatter* m) = 0;
         virtual void no_selected() = 0;
@@ -135,9 +136,13 @@ namespace WarGrey::STEM {
         virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         
     protected:
-        virtual void on_enter(WarGrey::STEM::IPlane* from) {}
-        virtual void on_leave(WarGrey::STEM::IPlane* to) {}
-
+        virtual void on_enter(WarGrey::STEM::IPlane* from) { this->on_mission_start(); }
+        virtual void on_leave(WarGrey::STEM::IPlane* to) { /* the completion of mission doesn't imply leaving */ }
+        virtual void mission_complete() { this->on_mission_complete(); }
+        virtual void on_mission_start() {}
+        virtual void on_mission_complete() {}
+  
+        
     protected:
         virtual void on_matter_ready(IMatter* m) = 0;
         virtual void on_save() {}
@@ -201,6 +206,10 @@ namespace WarGrey::STEM {
         bool matter_unmasked(WarGrey::STEM::IMatter* m);
 
     public:
+        bool has_mission_completed() override;
+        void set_sentry_sprite(WarGrey::STEM::ISprite* sentry, const char* greeting, const char* goodbye);
+
+    public:
         void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) override;
 
     public: // learn C++ "Name Hiding"
@@ -223,12 +232,12 @@ namespace WarGrey::STEM {
 
     public:
         IMatter* find_next_selected_matter(IMatter* start = nullptr) override;
-        IMatter* thumbnail_matter() override { return nullptr; }
         void add_selected(IMatter* m) override;
         void set_selected(IMatter* m) override;
         void no_selected() override;
         unsigned int count_selected() override;
         bool is_selected(IMatter* m) override;
+        bool can_select(IMatter* m) override;
 
     public:
         WarGrey::STEM::IMatter* get_focused_matter() override;
@@ -254,6 +263,10 @@ namespace WarGrey::STEM {
         void on_editing_text(const char* text, int pos, int span) override;
         void on_tap(WarGrey::STEM::IMatter* m, float x, float y) override;
         void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
+
+    protected:
+        void on_enter(WarGrey::STEM::IPlane* from) override;
+        void mission_complete() override;
 
         void on_matter_ready(IMatter* m) override {}
 
@@ -281,5 +294,11 @@ namespace WarGrey::STEM {
         float translate_y = 0.0F;
         float scale_x = 1.0F;
         float scale_y = 1.0F;
+    
+    private:
+        bool mission_done = false;
+        WarGrey::STEM::ISprite* sentry = nullptr;
+        std::string greeting;
+        std::string goodbye;
     };
 }

@@ -3,6 +3,7 @@
 namespace WarGrey::STEM {
     class IPlane;
     class IMatter;
+    class ISprite;
     class Cosmos;
 
     enum class MatterAnchor { LT, CT, RT, LC, CC, RC, LB, CB, RB };

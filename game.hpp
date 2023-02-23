@@ -23,6 +23,9 @@
 #include "mascot/tuxmon.hpp"
 #include "mascot/coinlet.hpp"
 
+#include "physics/random.hpp"
+#include "physics/mathematics.hpp"
+
 #include "datum/flonum.hpp"
 #include "virtualization/filesystem/imgdb.hpp"
 

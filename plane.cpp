@@ -5,6 +5,7 @@
 #include "graphics/geometry.hpp"
 #include "graphics/colorspace.hpp"
 
+#include "matter/sprite.hpp"
 #include "physics/mathematics.hpp"
 
 #include "datum/string.hpp"
@@ -752,23 +753,27 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
 bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) {
     bool handled = false;
 
-    switch (clicks) {
-        case 1: {
-            switch (button) {
-                case SDL_BUTTON_LEFT: {
-                    IMatter* unmasked_matter = this->find_matter(x, y);
+    switch (button) {
+        case SDL_BUTTON_LEFT: {
+            IMatter* unmasked_matter = this->find_matter(x, y);
 
+            if (unmasked_matter != nullptr) {
+                MatterInfo* info = MATTER_INFO(unmasked_matter);
+
+                if (!info->selected) {
                     this->set_caret_owner(unmasked_matter);
                     this->no_selected();
-                    
-                    if ((unmasked_matter != nullptr) && (unmasked_matter->low_level_events_allowed())) {
-                        MatterInfo* info = MATTER_INFO(unmasked_matter);
-                        float local_x = x - info->x;
-                        float local_y = y - info->y;
+                }
+                
+                if (unmasked_matter->low_level_events_allowed()) {
+                    float local_x = x - info->x;
+                    float local_y = y - info->y;
 
-                        handled = unmasked_matter->on_pointer_pressed(button, local_x, local_y, clicks);
-                    }
-                }; break;
+                    handled = unmasked_matter->on_pointer_pressed(button, local_x, local_y, clicks);
+                }
+            } else {
+                this->set_caret_owner(nullptr);
+                this->no_selected();
             }
         }; break;
     }
@@ -813,34 +818,38 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
 bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) {
     bool handled = false;
 
-    switch (clicks) {
-        case 1: {
-            switch (button) {
-                case SDL_BUTTON_LEFT: {
-                    IMatter* unmasked_matter = this->find_matter(x, y);
-        
-                    if (unmasked_matter != nullptr) {
-                        MatterInfo* info = MATTER_INFO(unmasked_matter);
-                        float local_x = x - info->x;
-                        float local_y = y - info->y;
+    switch (button) {
+        case SDL_BUTTON_LEFT: {
+            IMatter* unmasked_matter = this->find_matter(x, y);
 
-                        if (unmasked_matter->events_allowed()) {
-                            unmasked_matter->on_tap(local_x, local_y);
+            if (unmasked_matter != nullptr) {
+                MatterInfo* info = MATTER_INFO(unmasked_matter);
+                float local_x = x - info->x;
+                float local_y = y - info->y;
 
-                            if (unmasked_matter->low_level_events_allowed()) {
-                                unmasked_matter->on_pointer_released(button, local_x, local_y, clicks);
-                            }
-                        }
-
-                        this->on_tap(unmasked_matter, local_x, local_y);
-
-                        if (info->selected) {
-                            this->on_tap_selected(unmasked_matter, local_x, local_y);
-                        }
-
-                        handled = info->selected;
+                if (unmasked_matter->events_allowed()) {
+                    if (clicks == 1) {
+                        unmasked_matter->on_tap(local_x, local_y);
                     }
-                }; break;
+
+                    if (unmasked_matter->low_level_events_allowed()) {
+                        unmasked_matter->on_pointer_released(button, local_x, local_y, clicks);
+                    }
+                }
+
+                if (clicks == 1) {
+                    if (info->selected) {
+                        this->on_tap_selected(unmasked_matter, local_x, local_y);
+                    } else {
+                        this->on_tap(unmasked_matter, local_x, local_y);
+                    }
+
+                    handled = info->selected;
+                } else {
+                    if ((unmasked_matter == this->sentry) && (this->can_select(unmasked_matter))) {
+                        this->mission_complete();
+                    }
+                }
             }
         }; break;
     }
@@ -875,6 +884,40 @@ bool WarGrey::STEM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, 
     }
 
     return done;
+}
+
+void WarGrey::STEM::Plane::on_enter(IPlane* from) {
+    this->mission_done = false;
+
+    if ((this->sentry != nullptr) && (this->greeting.size() > 0)) {
+        this->sentry->play(this->greeting.c_str(), 1);
+    }
+
+    this->on_mission_start();
+}
+
+void WarGrey::STEM::Plane::mission_complete() {
+    if ((this->sentry != nullptr) && (this->goodbye.size() > 0)) {
+        this->sentry->play(this->goodbye.c_str(), 1);
+    }
+
+    this->on_mission_complete();
+    this->mission_done = true;
+}
+
+bool WarGrey::STEM::Plane::has_mission_completed() {
+    return this->mission_done &&
+            ((this->sentry == nullptr) || !this->sentry->in_playing());
+}
+
+bool WarGrey::STEM::Plane::can_select(IMatter* m) {
+    return this->sentry == m;
+}
+
+void WarGrey::STEM::Plane::set_sentry_sprite(ISprite* sentry, const char* greeting, const char* goodbye) {
+    this->sentry = sentry;
+    this->greeting = greeting;
+    this->goodbye = goodbye;
 }
 
 /************************************************************************************************/

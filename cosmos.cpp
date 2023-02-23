@@ -314,7 +314,7 @@ void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
         this->notify_transfer(this->from_plane, this->recent_plane);
 
 		this->from_plane = nullptr;
-		this->refresh();
+		this->notify_updated();
 	}
 }
 
