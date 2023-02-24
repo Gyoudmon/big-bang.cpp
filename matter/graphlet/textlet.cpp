@@ -91,6 +91,12 @@ void WarGrey::STEM::ITextlet::set_text(const char* fmt, ...) {
     this->set_text(content);
 }
 
+void WarGrey::STEM::ITextlet::set_text(uint32_t color, const char* fmt, ...) {
+    VSNPRINT(content, fmt);
+    this->set_text(content);
+    this->set_text_color(color);
+}
+
 void WarGrey::STEM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...) {
     VSNPRINT(content, fmt);
     this->set_text(content, anchor);

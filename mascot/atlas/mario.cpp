@@ -38,7 +38,7 @@ static const row_col_t mario_rt_pipe_positions[] = {
 
 /*************************************************************************************************/
 WarGrey::STEM::MarioGroundAtlas::MarioGroundAtlas(size_t slot, int row, int col, float tile_size)
-        : GridAtlas(MARIO_WORLD_MAP, 46, 68) {
+        : GridAtlas(MARIO_WORLD_MAP, 46, 68), slot(slot) {
     this->map_row = row;
     this->map_col = col;
     this->map_tile_width = tile_size;
