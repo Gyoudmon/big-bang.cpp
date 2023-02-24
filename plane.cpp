@@ -212,9 +212,9 @@ static void do_resize(Plane* master, IMatter* m, MatterInfo* info, float fx, flo
     }
 }
 
-static void do_move(IMovable* sprite, IMatter* child, MatterInfo* info, float dwidth, float dheight) {
-    float xspd = sprite->x_speed();
-    float yspd = sprite->y_speed();
+static void do_move(IMatter* child, MatterInfo* info, float dwidth, float dheight) {
+    float xspd = child->x_speed();
+    float yspd = child->y_speed();
     float hdist = 0.0F;
     float vdist = 0.0F;
     float cwidth, cheight;
@@ -238,9 +238,9 @@ static void do_move(IMovable* sprite, IMatter* child, MatterInfo* info, float dw
         }
 
         if ((hdist != 0.0F) || (vdist != 0.0F)) {
-            sprite->on_border(hdist, vdist);
-            xspd = sprite->x_speed();
-            yspd = sprite->y_speed();
+            child->on_border(hdist, vdist);
+            xspd = child->x_speed();
+            yspd = child->y_speed();
                         
             if ((xspd == 0.0F) || (yspd == 0.0F)) {
                 if (info->x < 0.0F) {
@@ -749,6 +749,10 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
                 if (m->events_allowed()) {
                     this->set_caret_owner(m);
                 }
+
+                if ((this->tooltip != nullptr) && (this->tooltip->visible())) {
+                    this->update_tooltip(m, local_x, local_y);
+                }
             } else {
                 this->no_selected();
             }
@@ -998,11 +1002,7 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
                 }
 
                 /* seems to be more smoothly if move is not controlled by local timeline */ {
-                    IMovable* sprite = child->as_sprite();
-
-                    if (sprite != nullptr) {
-                        do_move(sprite, child, info, dwidth, dheight);
-                    }
+                    do_move(child, info, dwidth, dheight);
                 }
             }
             

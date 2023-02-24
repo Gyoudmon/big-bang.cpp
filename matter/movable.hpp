@@ -6,6 +6,7 @@ namespace WarGrey::STEM {
     class IMovable {
     public:
         IMovable();
+        virtual ~IMovable() {}
 
     public: // gameplay events
         virtual void on_border(float hoffset, float voffset);

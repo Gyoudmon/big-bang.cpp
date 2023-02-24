@@ -18,7 +18,6 @@ using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
 WarGrey::STEM::IShapelet::IShapelet(int32_t color, int32_t bcolor) : color(color), border_color(bcolor) {
-    this->_sprite = this;
     this->enable_resize(true);
     this->last_x = flnan_f;
     this->last_y = flnan_f;

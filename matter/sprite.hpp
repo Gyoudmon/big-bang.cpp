@@ -9,9 +9,9 @@
 #include <string>
 
 namespace WarGrey::STEM {
-    class ISprite : public WarGrey::STEM::IMatter, public virtual WarGrey::STEM::IMovable {
+    class ISprite : public WarGrey::STEM::IMatter {
     public:
-        ISprite();
+        ISprite() {}
         virtual ~ISprite() {}
 
         void construct(SDL_Renderer* renderer) override;

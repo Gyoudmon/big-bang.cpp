@@ -18,7 +18,7 @@ namespace WarGrey::STEM {
         IPlane* master;
     };
 
-    class IMatter {
+    class IMatter : public WarGrey::STEM::IMovable {
     public:
         IMatter() {}
         virtual ~IMatter();
@@ -89,18 +89,12 @@ namespace WarGrey::STEM {
         void log_message(const char* fmt, ...);
 
     public:
-        WarGrey::STEM::IMovable* as_sprite() { return this->_sprite; }
-
-    public:
         IMatterInfo* info = nullptr;
 
     protected:
         void enable_events(bool yes_no, bool low_level = false) { this->deal_with_events = yes_no; this->deal_with_low_level_events = low_level; }
         void enable_resize(bool yes_no = true) { this->can_resize = yes_no; }
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
-
-    protected:
-        WarGrey::STEM::IMovable* _sprite = nullptr;
 
     private:
         bool findable = true;

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../graphlet.hpp"
-#include "../movable.hpp"
 
 namespace WarGrey::STEM {
-    class IShapelet : public WarGrey::STEM::IGraphlet, public WarGrey::STEM::IMovable {
+    class IShapelet : public WarGrey::STEM::IGraphlet {
     public:
         IShapelet(int32_t color = -1, int32_t border_color = -1);
         virtual ~IShapelet() { /* do nothing */ };
