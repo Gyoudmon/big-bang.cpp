@@ -1175,6 +1175,19 @@ void WarGrey::STEM::IPlane::notify_updated(IMatter* m) {
     }
 }
 
+bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target) {
+    float slx, sty, sw, sh, srx, sby, tlx, tty, tw, th, trx, tby;
+    bool sokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
+    bool tokay = this->feed_matter_boundary(target, &tlx, &tty, &tw, &th);
+
+    srx = slx + sw;
+    sby = sty + sh;
+    trx = tlx + tw;
+    tby = tty + th;
+
+    return sokay && tokay && rectangle_overlay(slx, sty, srx, sby, tlx, tty, trx, tby);
+}
+
 bool WarGrey::STEM::IPlane::feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a) {
     float fx, fy;
 

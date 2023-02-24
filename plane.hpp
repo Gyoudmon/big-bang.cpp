@@ -93,6 +93,7 @@ namespace WarGrey::STEM {
         void notify_updated(IMatter* m = nullptr);
 
     public:
+        bool is_colliding(IMatter* m, IMatter* target);
         bool feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a);
         void insert_at(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move_to(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
