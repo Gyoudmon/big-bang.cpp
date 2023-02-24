@@ -11,7 +11,7 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-Labellet* WarGrey::STEM::make_label_as_tooltip(TTF_Font* font, uint32_t fg_color, uint32_t bg_color, uint32_t border_color) {
+Labellet* WarGrey::STEM::make_label_for_tooltip(TTF_Font* font, uint32_t fg_color, uint32_t bg_color, uint32_t border_color) {
     Labellet* tooltip = new Labellet(font, fg_color, "");
 
     tooltip->set_background_color(bg_color);

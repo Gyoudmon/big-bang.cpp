@@ -276,6 +276,7 @@ namespace WarGrey::STEM {
     private:
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
+        WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y);
 
     private:
         float matters_left;

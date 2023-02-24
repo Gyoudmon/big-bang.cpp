@@ -474,7 +474,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
     }
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter(float x, float y) {
+IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, float y) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
@@ -485,7 +485,7 @@ IMatter* WarGrey::STEM::Plane::find_matter(float x, float y) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (unsafe_matter_unmasked(info, this->mode)) {
-                if (!child->concealled() && child->visible()) {
+                if (child->visible()) {
                     float sx, sy, sw, sh;
 
                     unsafe_feed_matter_bound(child, info, &sx, &sy, &sw, &sh);
@@ -507,6 +507,12 @@ IMatter* WarGrey::STEM::Plane::find_matter(float x, float y) {
     }
 
     return found;
+}
+
+IMatter* WarGrey::STEM::Plane::find_matter(float x, float y) {
+    IMatter* found = this->find_matter_including_camouflaged_ones(x, y);
+
+    return ((found == nullptr) || found->concealled()) ? nullptr : found;
 }
 
 IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
@@ -785,12 +791,14 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
     bool handled = false;
 
     if (state == 0) {
-        IMatter* unmasked_matter = this->find_matter(x, y);
+        IMatter* unmasked_matter = this->find_matter_including_camouflaged_ones(x, y);
 
-        if (unmasked_matter != this->hovering_matter) {
-            this->say_goodbye_to_hover_matter(state, x, y, dx, dy);
+        if ((unmasked_matter == nullptr) || (unmasked_matter != this->hovering_matter)) {
+            if ((unmasked_matter != nullptr) && !unmasked_matter->concealled()) {
+                this->say_goodbye_to_hover_matter(state, x, y, dx, dy);
+            }
 
-            if ((this->tooltip != nullptr) && (unmasked_matter != this->tooltip) && this->tooltip->visible()) {
+            if ((this->tooltip != nullptr) && (this->tooltip != unmasked_matter) && this->tooltip->visible()) {
                 this->tooltip->show(false);
             }
         }
@@ -800,31 +808,32 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
             float local_x = x - info->x;
             float local_y = y - info->y;
 
-            this->hovering_matter = unmasked_matter;
+            if (!unmasked_matter->concealled()) {
+                this->hovering_matter = unmasked_matter;
 
-            if (unmasked_matter->events_allowed()) {
-                unmasked_matter->on_hover(local_x, local_y);
+                if (unmasked_matter->events_allowed()) {
+                    unmasked_matter->on_hover(local_x, local_y);
 
-                if (unmasked_matter->low_level_events_allowed()) {
-                    unmasked_matter->on_pointer_move(state, local_x, local_y, dx, dy, false);
+                    if (unmasked_matter->low_level_events_allowed()) {
+                        unmasked_matter->on_pointer_move(state, local_x, local_y, dx, dy, false);
+                    }
                 }
+
+                this->on_hover(this->hovering_matter, local_x, local_y);
+                handled = true;
             }
 
-            this->on_hover(this->hovering_matter, local_x, local_y);
-
             if (this->tooltip != nullptr) {
-                if (this->update_tooltip(this->hovering_matter, local_x, local_y)) {
+                if (this->update_tooltip(unmasked_matter, local_x, local_y)) {
                     if (!this->tooltip->visible()) {
                         this->tooltip->show(true);
                     }
 
-                    this->move_to(this->tooltip, this->hovering_matter,
+                    this->move_to(this->tooltip, unmasked_matter,
                         MatterAnchor::LB, MatterAnchor::LT,
                         this->tooltip_dx, this->tooltip_dy);
                 }
             }
-
-            handled = true;
         }
     }
 

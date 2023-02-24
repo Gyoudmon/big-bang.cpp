@@ -87,7 +87,9 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
     SDL_FRect dest;
     
     for (size_t idx = 0U; idx < this->map_tile_count(); idx ++) {
-        int primitive_tile_idx = this->get_atlas_tile_index(idx);
+        int xoff = 0;
+        int yoff = 0;
+        int primitive_tile_idx = this->get_atlas_tile_index(idx, xoff, yoff);
 
         if (primitive_tile_idx >= 0) {
             /** NOTE
@@ -97,6 +99,14 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
 
             this->feed_atlas_tile_region(&src, primitive_tile_idx % idxmax);
             this->feed_map_tile_region(&dest, idx);
+
+            if (xoff != 0) {
+                src.x += xoff;
+            }
+
+            if (yoff != 0) {
+                src.y += yoff;
+            }
 
             dest.w *= sx;
             dest.h *= sy;

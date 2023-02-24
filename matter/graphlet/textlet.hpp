@@ -62,7 +62,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    Labellet* make_label_as_tooltip(TTF_Font* font,
+    Labellet* make_label_for_tooltip(TTF_Font* font,
         uint32_t fg_color = BLACK,
         uint32_t bg_color = SNOW,
         uint32_t border_color = GOLD);
