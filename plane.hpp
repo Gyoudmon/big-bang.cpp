@@ -141,8 +141,7 @@ namespace WarGrey::STEM {
         virtual void mission_complete() { this->on_mission_complete(); }
         virtual void on_mission_start() {}
         virtual void on_mission_complete() {}
-  
-        
+
     protected:
         virtual void on_matter_ready(IMatter* m) = 0;
         virtual void on_save() {}

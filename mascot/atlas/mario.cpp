@@ -71,14 +71,33 @@ void WarGrey::STEM::MarioGroundAtlas::feed_ground_tile_index(size_t map_idx, int
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::MarioVPipe::MarioVPipe(int length, MarioVPipeDirection dir, MarioPipeColor color, float tile_size)
-        : GridAtlas(MARIO_WORLD_MAP, 46, 34), direction(dir), color_idx(static_cast<int>(color)) {
-    this->map_row = length;
+WarGrey::STEM::MarioPipe::MarioPipe(int row, int col, MarioPipeColor color, float tile_size)
+        : GridAtlas(MARIO_WORLD_MAP, row, col), color_idx(static_cast<int>(color)) {
+    this->map_row = 1;
     this->map_col = 1;
 
-    this->map_tile_width = tile_size * 2.0F;
+    this->map_tile_width = tile_size;
     this->map_tile_height = tile_size;
     this->camouflage(false);
+}
+
+void WarGrey::STEM::MarioPipe::set_color(MarioPipeColor color) {
+    int idx = static_cast<int>(color);
+
+    if (idx != this->color_idx) {
+        this->color_idx = idx;
+        this->notify_updated();
+    }
+}
+
+MarioPipeColor WarGrey::STEM::MarioPipe::get_color() {
+    return static_cast<MarioPipeColor>(this->color_idx);
+}
+
+WarGrey::STEM::MarioVPipe::MarioVPipe(int length, MarioVPipeDirection dir, MarioPipeColor color, float tile_size)
+        : MarioPipe(46, 34, color, tile_size), direction(dir) {
+    this->map_row = length;
+    this->map_tile_width *= 2.0F;
 }
 
 int WarGrey::STEM::MarioVPipe::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {
@@ -98,28 +117,20 @@ int WarGrey::STEM::MarioVPipe::get_atlas_tile_index(size_t map_idx, int& xoff, i
         }
         pos.first += 1;
     } else {
-        pos = mario_dw_pipe_positions[this->color_idx];
-    }
-
-    if (color_idx > 2) {
-        if (color_idx != 5) {
-            yoff = 1;
-        } else if (map_idx < this->map_row - 1) {
-            yoff = 1;
-        }
+        /** NOTE
+         * using `mario_dw_pipe_positions` here requires annoying adjustment of `yoff`
+         **/
+        pos = mario_up_pipe_positions[this->color_idx];
+        pos.first += 1;
     }
 
     return pos.first * this->atlas_col + pos.second;
 }
 
 WarGrey::STEM::MarioHPipe::MarioHPipe(int length, MarioHPipeDirection dir, MarioPipeColor color, float tile_size)
-        : GridAtlas(MARIO_WORLD_MAP, 23, 68), direction(dir), color_idx(static_cast<int>(color)) {
-    this->map_row = 1;
+        : MarioPipe(23, 68, color, tile_size), direction(dir) {
     this->map_col = length;
-
-    this->map_tile_width = tile_size;
-    this->map_tile_height = tile_size * 2.0F;
-    this->camouflage(false);
+    this->map_tile_height *= 2.0F;
 }
 
 int WarGrey::STEM::MarioHPipe::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {

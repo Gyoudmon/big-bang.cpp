@@ -34,7 +34,21 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    class MarioVPipe : public WarGrey::STEM::GridAtlas {
+    class MarioPipe : public WarGrey::STEM::GridAtlas {
+    public:
+        MarioPipe(int row, int col,
+            WarGrey::STEM::MarioPipeColor color = MarioPipeColor::Green,
+            float tile_size = 0.0F);
+
+    public:
+        void set_color(WarGrey::STEM::MarioPipeColor color);
+        WarGrey::STEM::MarioPipeColor get_color();
+
+    protected:
+        int color_idx;
+    };
+
+    class MarioVPipe : public WarGrey::STEM::MarioPipe {
     public:
         MarioVPipe(int length,
             WarGrey::STEM::MarioVPipeDirection dir = MarioVPipeDirection::Up,
@@ -46,10 +60,9 @@ namespace WarGrey::STEM {
         
     private:
         WarGrey::STEM::MarioVPipeDirection direction;
-        int color_idx;
     };
 
-    class MarioHPipe : public WarGrey::STEM::GridAtlas {
+    class MarioHPipe : public WarGrey::STEM::MarioPipe {
     public:
         MarioHPipe(int length,
             WarGrey::STEM::MarioHPipeDirection dir = MarioHPipeDirection::Both,
@@ -61,6 +74,5 @@ namespace WarGrey::STEM {
         
     private:
         WarGrey::STEM::MarioHPipeDirection direction;
-        int color_idx;
     };
 }
