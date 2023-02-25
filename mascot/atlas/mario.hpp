@@ -21,7 +21,7 @@ namespace WarGrey::STEM {
     /*********************************************************************************************/
     class MarioGroundAtlas : public WarGrey::STEM::GridAtlas {
     public:
-        MarioGroundAtlas(size_t slot, int row, int col, float tile_size);
+        MarioGroundAtlas(size_t slot, int row, int col, float tile_size = 0.0F);
 
     protected:
         int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) override;

@@ -752,6 +752,7 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
 
                 if ((this->tooltip != nullptr) && (this->tooltip->visible())) {
                     this->update_tooltip(m, local_x, local_y);
+                    this->place_tooltip(m);
                 }
             } else {
                 this->no_selected();
@@ -814,6 +815,8 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
 
             if (!unmasked_matter->concealled()) {
                 this->hovering_matter = unmasked_matter;
+                this->hovering_matter_x = local_x;
+                this->hovering_matter_y = local_y;
 
                 if (unmasked_matter->events_allowed()) {
                     unmasked_matter->on_hover(local_x, local_y);
@@ -833,9 +836,7 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
                         this->tooltip->show(true);
                     }
 
-                    this->move_to(this->tooltip, unmasked_matter,
-                        MatterAnchor::LB, MatterAnchor::LT,
-                        this->tooltip_dx, this->tooltip_dy);
+                    this->place_tooltip(unmasked_matter);
                 }
             }
         }
@@ -959,6 +960,34 @@ void WarGrey::STEM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
     this->end_update_sequence();
 }
 
+void WarGrey::STEM::Plane::place_tooltip(WarGrey::STEM::IMatter* target) {
+    float ttx, tty, width, height;
+
+    this->master()->feed_client_extent(&width, &height);
+
+    this->move_to(this->tooltip, target,
+        MatterAnchor::LB, MatterAnchor::LT,
+        this->tooltip_dx, this->tooltip_dy);
+
+    this->feed_matter_location(this->tooltip, &ttx, &tty, MatterAnchor::LB);
+
+    if (tty > height) {
+        this->move_to(this->tooltip, target,
+            MatterAnchor::LT, MatterAnchor::LB,
+            this->tooltip_dx, this->tooltip_dy);
+    }
+
+    if (ttx < 0.0F) {
+        this->move(this->tooltip, -ttx, 0.0F);
+    } else {
+        this->feed_matter_location(this->tooltip, &ttx, &tty, MatterAnchor::RB);
+
+        if (ttx > width) {
+            this->move(this->tooltip, width - ttx, 0.0F);
+        }
+    }
+}
+
 /************************************************************************************************/
 void WarGrey::STEM::Plane::set_matter_fps(IMatter* m, int fps, bool restart) {
     MatterInfo* info = plane_matter_info(this, m);
@@ -1001,9 +1030,8 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
                     info->duration = child->update(info->local_frame_count ++, elapse, uptime);
                 }
 
-                /* seems to be more smoothly if move is not controlled by local timeline */ {
-                    do_move(child, info, dwidth, dheight);
-                }
+                /* seems to be more smoothly if move is not controlled by local timeline */
+                do_move(child, info, dwidth, dheight);
             }
             
             child = info->next;
@@ -1013,6 +1041,13 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
     elapse = local_timeline_elapse(interval, this->local_frame_delta, this->local_elapse, 0);
     if (elapse > 0) {
         this->update(this->local_frame_count ++, elapse, uptime);
+
+        if ((this->tooltip != nullptr) && this->tooltip->visible()) {
+            if (this->hovering_matter != nullptr) {
+                this->update_tooltip(this->hovering_matter, this->hovering_matter_x, this->hovering_matter_y);
+                this->place_tooltip(this->hovering_matter);
+            }
+        }
     }
 }
 

@@ -277,6 +277,7 @@ namespace WarGrey::STEM {
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
         WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y);
+        void place_tooltip(WarGrey::STEM::IMatter* target);
 
     private:
         float matters_left;
@@ -292,6 +293,8 @@ namespace WarGrey::STEM {
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 1U;
         uint32_t local_elapse = 0U;
+        float hovering_matter_x = 0.0F;
+        float hovering_matter_y = 0.0F;
 
     private:
         float translate_x = 0.0F;

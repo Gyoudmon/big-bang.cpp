@@ -33,6 +33,10 @@ namespace WarGrey::STEM {
         void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
         void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
 
+    public:
+        size_t content_size() { return this->raw.size(); }
+        const char* c_str() { return this->raw.c_str(); }
+
     protected:
         virtual void on_font_changed() {}
 
