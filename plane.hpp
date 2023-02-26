@@ -137,10 +137,10 @@ namespace WarGrey::STEM {
         virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         
     protected:
-        virtual void on_enter(WarGrey::STEM::IPlane* from) { this->on_mission_start(); }
+        virtual void on_enter(WarGrey::STEM::IPlane* from);
         virtual void on_leave(WarGrey::STEM::IPlane* to) { /* the completion of mission doesn't imply leaving */ }
         virtual void mission_complete() { this->on_mission_complete(); }
-        virtual void on_mission_start() {}
+        virtual void on_mission_start(float width, float height) {}
         virtual void on_mission_complete() {}
 
     protected:

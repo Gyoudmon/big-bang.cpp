@@ -923,7 +923,7 @@ void WarGrey::STEM::Plane::on_enter(IPlane* from) {
         this->sentry->greetings(1);
     }
 
-    this->on_mission_start();
+    IPlane::on_enter(from);
 }
 
 void WarGrey::STEM::Plane::mission_complete() {
@@ -1145,6 +1145,14 @@ SDL_Renderer* WarGrey::STEM::IPlane::master_renderer() {
     }
 
     return renderer;
+}
+
+void WarGrey::STEM::IPlane::on_enter(IPlane* from) {
+    /* It's good to tell the mission the size of the stage */
+    float width, height;
+
+    this->master()->feed_client_extent(&width, &height);
+    this->on_mission_start(width, height);
 }
 
 void WarGrey::STEM::IPlane::feed_background(SDL_Color* c) {
