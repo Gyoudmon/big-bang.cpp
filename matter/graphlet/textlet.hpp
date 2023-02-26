@@ -49,7 +49,7 @@ namespace WarGrey::STEM {
         SDL_Texture* texture = nullptr;
         uint32_t bg_color;
         float bg_alpha = 0.0F;
-        u_int32_t border_color;
+        uint32_t border_color;
         float border_alpha = 0.0F;
 
     private:

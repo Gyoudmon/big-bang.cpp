@@ -3,6 +3,7 @@
 #include "../matter/sprite/sheet.hpp"
 #include "../datum/path.hpp"
 
+#include <optional>
 #include <vector>
 #include <map>
 
