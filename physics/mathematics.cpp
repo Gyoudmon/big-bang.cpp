@@ -5,19 +5,47 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-inline static float quick_degrees_to_radians(float degrees) {
-    return (degrees * pi_f) / 180.0f;
-}
-
-/*************************************************************************************************/
 float WarGrey::STEM::radians_to_degrees(float radians) {
     return (radians / pi_f) * 180.0f;
 }
 
 float WarGrey::STEM::degrees_to_radians(float degrees) {
-    return quick_degrees_to_radians(degrees);
+    return (degrees * pi_f) / 180.0f;
 }
 
+void WarGrey::STEM::orthogonal_decomposition(float magnitude, float direction, float* x, float* y, bool is_radian) {
+    float rad = direction;
+
+    if (!is_radian) {
+        rad = degrees_to_radians(rad);
+    }
+
+    SET_BOX(x, magnitude * flcos(rad));
+    SET_BOX(y, magnitude * flsin(rad));
+}
+
+float WarGrey::STEM::vector_magnitude(float x, float y) {
+    return flsqrt(x * x + y * y);
+}
+
+float WarGrey::STEM::vector_direction(float x, float y, bool need_radian) {
+    float rad = flatan(y, x);
+
+    return need_radian ? rad : radians_to_degrees(rad);
+}
+
+void WarGrey::STEM::vector_rotate(float x, float y, float theta, float* rx, float* ry, float ox, float oy, bool is_radian) {
+    float radians = is_radian ? theta : degrees_to_radians(theta);
+	float cosr = flcos(radians);
+	float sinr = flsin(radians);
+	float dx = x - ox;
+	float dy = y - oy;
+
+	SET_BOX(rx, dx * cosr - dy * sinr + ox);
+	SET_BOX(ry, dx * sinr + dy * cosr + oy);
+}
+
+/*************************************************************************************************/
 bool WarGrey::STEM::point_inside(float px, float py, float x1, float y1, float x2, float y2) {
     return (x1 <= x2 ? flin(x1, px, x2) : flin(x2, px, x1))
         && (y1 <= y2 ? flin(y1, py, y2) : flin(y2, py, y2));
@@ -60,14 +88,13 @@ bool WarGrey::STEM::lines_intersection(float x11, float y11, float x12, float y1
     bool intersected = (denominator != 0.0);
 
     if (intersected) {
-	float T1 = +((x11 - x21) * (y21 - y22) - (y11 - y21) * (x21 - x22)) / denominator;
-	float T2 = -((x11 - x12) * (y11 - y21) - (y11 - y12) * (x11 - x21)) / denominator;
+	    float T1 = +((x11 - x21) * (y21 - y22) - (y11 - y21) * (x21 - x22)) / denominator;
+	    float T2 = -((x11 - x12) * (y11 - y21) - (y11 - y12) * (x11 - x21)) / denominator;
 
-	SET_VALUES(t1, T1, t2, T2);
-	SET_BOX(px, x21 + T2 * (x22 - x21));
-	SET_BOX(py, y21 + T2 * (y22 - y21));
+	    SET_VALUES(t1, T1, t2, T2);
+	    SET_BOX(px, x21 + T2 * (x22 - x21));
+	    SET_BOX(py, y21 + T2 * (y22 - y21));
     }
 
     return intersected;
 }
-

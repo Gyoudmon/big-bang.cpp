@@ -5,6 +5,12 @@
 namespace WarGrey::STEM {
     float radians_to_degrees(float degrees);
     float degrees_to_radians(float degrees);
+
+    void orthogonal_decomposition(float magnitude, float direction, float* x, float* y, bool is_radian = true);
+
+    float vector_magnitude(float x, float y);
+    float vector_direction(float x, float y, bool need_radian = true);
+    void vector_rotate(float x, float y, float theta, float* rx, float* ry, float ox = 0.0F, float oy = 0.0F, bool is_radian = true);
 	
     bool point_inside(float px, float py, float x1, float y1, float x2, float y2);
     bool rectangle_inside(float tlx1, float tly1, float brx1, float bry1, float tlx2, float tly2, float brx2, float bry2);
@@ -14,4 +20,3 @@ namespace WarGrey::STEM {
     bool lines_intersection(float x11, float y11, float x12, float y12, float x21, float y21, float x22, float y22,
         float* px, float* py, float* t1 = nullptr, float* t2 = nullptr);
 }
-

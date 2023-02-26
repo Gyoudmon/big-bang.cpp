@@ -220,9 +220,7 @@ static void do_move(IMatter* child, MatterInfo* info, float dwidth, float dheigh
     float cwidth, cheight;
 
     if ((xspd != 0.0F) || (yspd != 0.0F)) {
-        info->x += xspd;
-        info->y += yspd;
-
+        child->step(&info->x, &info->y);
         child->feed_extent(info->x, info->y, &cwidth, &cheight);
 
         if (info->x < 0) {
@@ -242,13 +240,15 @@ static void do_move(IMatter* child, MatterInfo* info, float dwidth, float dheigh
             xspd = child->x_speed();
             yspd = child->y_speed();
                         
-            if ((xspd == 0.0F) || (yspd == 0.0F)) {
+            if (xspd == 0.0F) {
                 if (info->x < 0.0F) {
                     info->x = 0.0F;
                 } else if (info->x + cwidth > dwidth) {
                     info->x = dwidth - cwidth;
                 }
+            }
 
+            if (yspd == 0.0F) {
                 if (info->y < 0.0F) {
                     info->y = 0.0F;
                 } else if (info->y + cheight > dheight) {

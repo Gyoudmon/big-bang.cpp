@@ -12,10 +12,32 @@ namespace WarGrey::STEM {
         virtual void on_border(float hoffset, float voffset);
 
     public:
-        void set_speed(float spd, float dir, bool is_rad = false);
-        void set_speed_xy(float xspd, float yspd);
-        float x_speed() { return this->xspeed; }
-        float y_speed() { return this->yspeed; }
+        void set_acceleration(float acc, float direction, bool is_radian = false);
+        void add_acceleration(float acc, float direction, bool is_radian = false);
+        float get_acceleration(float* direction = nullptr, float* vx = nullptr, float* vy = nullptr);
+        float get_acceleration_direction(bool need_radian = true);
+
+        void set_delta_speed(float xacc, float yacc) { this->ax = xacc; this->ay = yacc; }
+        void add_delta_speed(float xacc, float yacc) { this->ax += xacc; this->ay += yacc; }
+        float x_delta_speed() { return this->ax; }
+        float y_delta_speed() { return this->ay; }
+
+    public:
+        void set_velocity(float spd, float direction, bool is_radian = false);
+        void add_velocity(float spd, float direction, bool is_radian = false);
+        float get_velocity(float* direction = nullptr, float* vx = nullptr, float* vy = nullptr);
+        float get_velocity_direction(bool need_radian = true);
+        
+        void set_speed(float xspd, float yspd) { this->vx = xspd; this->vy = yspd; }
+        void add_speed(float xspd, float yspd) { this->vx += xspd; this->vy += yspd; }
+        float x_speed() { return this->vx; }
+        float y_speed() { return this->vy; }
+
+    public:
+        void set_terminal_velocity(float max_spd, float direction, bool is_radian = false);
+        void set_terminal_speed(float mxspd, float myspd) { this->mvx = mxspd; this->mvy = myspd; }
+        float get_heading(bool need_radian = true) { return this->get_velocity_direction(); }
+        void heading_rotate(float theta, bool is_radian = false);
 
     public:
         void set_border_strategy(WarGrey::STEM::BorderStrategy s);
@@ -23,12 +45,17 @@ namespace WarGrey::STEM {
         void set_border_strategy(BorderStrategy ts, BorderStrategy rs, BorderStrategy bs, BorderStrategy ls);
 
     public:
-        void motion_stop(bool horizon, bool vertical);
+        void step(float* x, float* y);
+        void motion_stop(bool horizon = true, bool vertical = true);
         void motion_bounce(bool horizon, bool vertical);
 
     private:
         WarGrey::STEM::BorderStrategy border_strategies[4];
-        float xspeed = 0.0F;
-        float yspeed = 0.0F;
+        float ax = 0.0F;
+        float ay = 0.0F;
+        float vx = 0.0F;
+        float vy = 0.0F;
+        float mvx = 0.0F;
+        float mvy = 0.0F;
     };
 }
