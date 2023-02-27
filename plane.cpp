@@ -12,6 +12,9 @@
 #include "datum/flonum.hpp"
 #include "datum/fixnum.hpp"
 #include "datum/box.hpp"
+#include "datum/time.hpp"
+
+#include <deque>
 
 using namespace WarGrey::STEM;
 
@@ -24,12 +27,20 @@ using namespace WarGrey::STEM;
 
 namespace {
     struct AsyncInfo {
+        float second;
         float x0;
         float y0;
         float fx0;
         float fy0;
         float dx0;
         float dy0;
+    };
+
+    struct GlidingMotion {
+        float target_x;
+        float target_y;
+        float second;
+        float sec_delta;
     };
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
@@ -44,6 +55,12 @@ namespace {
         uint32_t local_frame_count = 0;
         uint32_t local_elapse = 0;
         int duration = 0;
+
+        // for queued motions
+        bool gliding = false;
+        float gliding_tx = 0.0F;
+        float gliding_ty = 0.0F;
+        std::deque<GlidingMotion> queues;
 
         // for asynchronously loaded matters
         AsyncInfo* async = nullptr;
@@ -133,14 +150,9 @@ static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* m
     master->end_update_sequence();
 }
 
-static bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x, float y, bool absolute) {
+static inline bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x, float y) {
     bool moved = false;
     
-    if (!absolute) {
-        x += info->x;
-        y += info->y;
-    }
-
     if ((info->x != x) || (info->y != y)) {
         info->x = x;
         info->y = y;
@@ -152,7 +164,78 @@ static bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x
     return moved;
 }
 
-static bool unsafe_move_matter_via_info(Plane* master, IMatter* m, MatterInfo* info
+static bool unsafe_glide_matter_via_info(Plane* master, IMatter* m, MatterInfo* info, float x, float y, float sec, float sec_delta) {
+    bool moved = false;
+
+    if ((info->x != x) || (info->y != y)) {
+        float n = flceiling(sec / sec_delta);
+        float dx = x - info->x;
+        float dy = y - info->y;
+                
+        m->set_delta_speed(0.0F, 0.0F);
+        m->set_speed(dx / n, dy / n);
+        m->step(&info->x, &info->y);
+                
+        info->gliding = true;
+        info->gliding_tx = x;
+        info->gliding_ty = y;
+
+        master->size_cache_invalid();
+        moved = true;
+    }
+
+    return moved;
+}
+
+static bool unsafe_move_matter_via_info(Plane* master, MatterInfo* info, float x, float y, bool absolute) {
+    bool moved = false;
+    
+    if (!absolute) {
+        x += info->x;
+        y += info->y;
+    }
+
+    if (!info->gliding) {
+        moved = unsafe_move_matter_via_info(master, info, x, y);
+    } else {
+        info->queues.push_back( { x, y, 0.0F, 0.0F } );
+    }
+
+    return moved;
+}
+
+static bool unsafe_glide_matter_via_info(Plane* master, IMatter* m, MatterInfo* info, float sec, float x, float y, bool absolute) {
+    bool moved = false;
+    
+    if (!absolute) {
+        x += info->x;
+        y += info->y;
+    }
+
+    if (sec <= 0.0F) {
+        moved = unsafe_move_matter_via_info(master, info, x, y, true);
+    } else {
+        IScreen* screen = master->master();
+        float sec_delta = (screen != nullptr) ? (1.0F / float(screen->frame_rate())) : 0.0F;
+            
+        if ((sec <= sec_delta) || (sec_delta == 0.0F)) {
+            moved = unsafe_move_matter_via_info(master, info, x, y, true);
+        } else {
+            if (m->motion_stopped()) {
+                info->queues.clear();
+                moved = unsafe_glide_matter_via_info(master, m, info, x, y, sec, sec_delta);
+            } else if (!info->gliding) {
+                moved = unsafe_glide_matter_via_info(master, m, info, x, y, sec, sec_delta);
+            } else {
+                info->queues.push_back({ x, y, sec, sec_delta });
+            }
+        }
+    }
+
+    return moved;
+}
+
+static bool unsafe_glide_matter_via_info(Plane* master, IMatter* m, MatterInfo* info, float sec
     , float x, float y, float fx, float fy, float dx, float dy) {
     float ax = 0.0F;
     float ay = 0.0F;
@@ -166,6 +249,7 @@ static bool unsafe_move_matter_via_info(Plane* master, IMatter* m, MatterInfo* i
     } else {
         info->async = new AsyncInfo();
 
+        info->async->second = sec;
         info->async->x0 = x;
         info->async->y0 = y;
         info->async->fx0 = fx;
@@ -174,7 +258,12 @@ static bool unsafe_move_matter_via_info(Plane* master, IMatter* m, MatterInfo* i
         info->async->dy0 = dy;
     }
     
-    return unsafe_move_matter_via_info(master, info, x - ax + dx, y - ay + dy, true);
+    return unsafe_glide_matter_via_info(master, m, info, sec, x - ax + dx, y - ay + dy, true);
+}
+
+static bool unsafe_move_matter_via_info(Plane* master, IMatter* m, MatterInfo* info
+    , float x, float y, float fx, float fy, float dx, float dy) {
+    return unsafe_glide_matter_via_info(master, m, info, 0.0F, x, y, fx, fy, dx, dy);
 }
 
 static IMatter* do_search_selected_matter(IMatter* start, unsigned int mode, IMatter* terminator) {
@@ -212,16 +301,28 @@ static void do_resize(Plane* master, IMatter* m, MatterInfo* info, float fx, flo
     }
 }
 
-static void do_move(IMatter* child, MatterInfo* info, float dwidth, float dheight) {
-    float xspd = child->x_speed();
-    float yspd = child->y_speed();
-    float hdist = 0.0F;
-    float vdist = 0.0F;
-    float cwidth, cheight;
+static void do_motion_move(Plane* master, IMatter* m, MatterInfo* info, float dwidth, float dheight) {
+    if (!m->motion_stopped()) {
+        float hdist = 0.0F;
+        float vdist = 0.0F;
+        float cwidth, cheight;
 
-    if ((xspd != 0.0F) || (yspd != 0.0F)) {
-        child->step(&info->x, &info->y);
-        child->feed_extent(info->x, info->y, &cwidth, &cheight);
+        if (info->gliding) {
+            m->step(&info->x, &info->y);
+
+            if (flsign(info->gliding_tx - info->x) != flsign(m->x_speed())
+                    || flsign(info->gliding_ty - info->y) != flsign(m->y_speed())) {
+                m->motion_stop();
+                info->gliding = false;
+                info->x = info->gliding_tx;
+                info->y = info->gliding_ty;
+            }
+        } else {
+            m->step(&info->x, &info->y);
+        }
+
+        master->size_cache_invalid();
+        m->feed_extent(info->x, info->y, &cwidth, &cheight);
 
         if (info->x < 0) {
             hdist = info->x;
@@ -236,11 +337,9 @@ static void do_move(IMatter* child, MatterInfo* info, float dwidth, float dheigh
         }
 
         if ((hdist != 0.0F) || (vdist != 0.0F)) {
-            child->on_border(hdist, vdist);
-            xspd = child->x_speed();
-            yspd = child->y_speed();
+            m->on_border(hdist, vdist);
                         
-            if (xspd == 0.0F) {
+            if (m->x_stopped()) {
                 if (info->x < 0.0F) {
                     info->x = 0.0F;
                 } else if (info->x + cwidth > dwidth) {
@@ -248,7 +347,7 @@ static void do_move(IMatter* child, MatterInfo* info, float dwidth, float dheigh
                 }
             }
 
-            if (yspd == 0.0F) {
+            if (m->y_stopped()) {
                 if (info->y < 0.0F) {
                     info->y = 0.0F;
                 } else if (info->y + cheight > dheight) {
@@ -256,8 +355,28 @@ static void do_move(IMatter* child, MatterInfo* info, float dwidth, float dheigh
                 }
             }
         }
-                        
-        info->master->notify_updated();
+
+        // TODO: dealing with bounce and glide
+        if (info->gliding && m->motion_stopped()) {
+            info->gliding = false;
+        }
+
+        master->notify_updated();
+    } else {
+        while (!info->queues.empty()) {
+            GlidingMotion motion = info->queues.front();
+
+            info->queues.pop_front();
+
+            if (motion.second > 0.0F) {
+                if (unsafe_glide_matter_via_info(master, m, info, motion.target_x, motion.target_y, motion.second, motion.sec_delta)) {
+                    master->notify_updated();
+                    break;
+                }
+            } else if (unsafe_move_matter_via_info(master, info, motion.target_x, motion.target_y)) {
+                master->notify_updated();
+            }
+        }
     }
 }
 
@@ -299,7 +418,8 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
             this->size_cache_invalid();
             this->begin_update_sequence();
 
-            unsafe_move_matter_via_info(this, m, info,
+            unsafe_glide_matter_via_info(this, m, info,
+                info->async->second,
                 info->async->x0, info->async->y0,
                 info->async->fx0, info->async->fy0,
                 info->async->dx0, info->async->dy0);
@@ -403,6 +523,32 @@ void WarGrey::STEM::Plane::erase() {
     }
 }
 
+void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        if (unsafe_matter_unmasked(info, this->mode)) {
+            if (unsafe_move_matter_via_info(this, info, x, y, false)) {
+                this->notify_updated();
+            }
+        }
+    } else if (this->head_matter != nullptr) {
+        IMatter* child = this->head_matter;
+
+        do {
+            info = MATTER_INFO(child);
+
+            if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
+                unsafe_move_matter_via_info(this, info, x, y, false);
+            }
+
+            child = info->next;
+        } while (child != this->head_matter);
+
+        this->notify_updated();
+    }
+}
+
 void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
     MatterInfo* info = plane_matter_info(this, m);
     
@@ -448,14 +594,12 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMat
     this->move_to(m, x, y, fx, fy, dx, dy);
 }
 
-void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
+void WarGrey::STEM::Plane::glide(float sec, IMatter* m, float x, float y) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
         if (unsafe_matter_unmasked(info, this->mode)) {
-            if (unsafe_move_matter_via_info(this, info, x, y, false)) {
-                this->notify_updated();
-            }
+            unsafe_glide_matter_via_info(this, m, info, sec, x, y, false);
         }
     } else if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
@@ -464,14 +608,55 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
             info = MATTER_INFO(child);
 
             if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
-                unsafe_move_matter_via_info(this, info, x, y, false);
+                unsafe_glide_matter_via_info(this, m, info, sec, x, y, false);
             }
 
             child = info->next;
         } while (child != this->head_matter);
-
-        this->notify_updated();
     }
+}
+
+void WarGrey::STEM::Plane::glide_to(float sec, IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
+    MatterInfo* info = plane_matter_info(this, m);
+    
+    if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+        unsafe_glide_matter_via_info(this, m, info, sec, x, y, fx, fy, dx, dy);
+    }
+}
+
+void WarGrey::STEM::Plane::glide_to(float sec, IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+    MatterInfo* tinfo = plane_matter_info(this, target);
+    float x = 0.0F;
+    float y = 0.0F;
+
+    if ((tinfo != nullptr) && unsafe_matter_unmasked(tinfo, this->mode)) {
+        float tsx, tsy, tsw, tsh;
+
+        unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
+        x = tsx + tsw * tfx;
+        y = tsy + tsh * tfy;
+    }
+        
+    this->glide_to(sec, m, x, y, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::Plane::glide_to(float sec, IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+    MatterInfo* xinfo = plane_matter_info(this, xtarget);
+    MatterInfo* yinfo = plane_matter_info(this, ytarget);
+    float x = 0.0F;
+    float y = 0.0F;
+
+    if ((xinfo != nullptr) && unsafe_matter_unmasked(xinfo, this->mode)
+        && (yinfo != nullptr) && unsafe_matter_unmasked(yinfo, this->mode)) {
+        float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
+
+        unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
+        unsafe_feed_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
+        x = xsx + xsw * xfx;
+        y = ysy + ysh * yfy;
+    }
+
+    this->glide_to(sec, m, x, y, fx, fy, dx, dy);
 }
 
 IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, float y) {
@@ -1030,8 +1215,8 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
                     info->duration = child->update(info->local_frame_count ++, elapse, uptime);
                 }
 
-                /* seems to be more smoothly if move is not controlled by local timeline */
-                do_move(child, info, dwidth, dheight);
+                /* controlling motion via global timeline makes it more smooth */
+                do_motion_move(this, child, info, dwidth, dheight);
             }
             
             child = info->next;
@@ -1091,7 +1276,12 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
                     clip.h = fl2fxi(flfloor(mheight + 1.0F));
 
                     SDL_RenderSetClipRect(renderer, &clip);
-                    child->draw(renderer, mx, my, mwidth, mheight);
+
+                    if (child->ready()) {
+                        child->draw(renderer, mx, my, mwidth, mheight);
+                    } else {
+                        child->draw_in_progress(renderer, mx, my, mwidth, mheight);
+                    }
 
                     if (info->selected) {
                         SDL_RenderSetClipRect(renderer, nullptr);
@@ -1243,7 +1433,6 @@ void WarGrey::STEM::IPlane::insert_at(IMatter* m, float x, float y, MatterAnchor
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
-
     this->insert_at(m, x, y, fx, fy, dx, dy);
 }
 
@@ -1251,7 +1440,6 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, float x, float y, MatterAnchor a
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
-
     this->move_to(m, x, y, fx, fy, dx, dy);
 }
 
@@ -1260,7 +1448,6 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, MatterAnchor ta
 
     matter_anchor_fraction(ta, &tfx, &tfy);
     matter_anchor_fraction(a, &fx, &fy);
-
     this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
@@ -1268,7 +1455,6 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, float tfx, floa
     float fx, fy;
 
     matter_anchor_fraction(a, &fx, &fy);
-
     this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
@@ -1276,7 +1462,6 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, MatterAnchor ta
     float tfx, tfy;
 
     matter_anchor_fraction(ta, &tfx, &tfy);
-
     this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
 }
 
@@ -1284,8 +1469,43 @@ void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMa
     float fx, fy;
     
     matter_anchor_fraction(a, &fx, &fy);
-
     this->move_to(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::glide_to(float sec, IMatter* m, float x, float y, MatterAnchor a, float dx, float dy) {
+    float fx, fy;
+
+    matter_anchor_fraction(a, &fx, &fy);
+    this->glide_to(sec, m, x, y, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::glide_to(float sec, IMatter* m, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+    float tfx, tfy, fx, fy;
+
+    matter_anchor_fraction(ta, &tfx, &tfy);
+    matter_anchor_fraction(a, &fx, &fy);
+    this->glide_to(sec, m, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::glide_to(float sec, IMatter* m, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
+    float fx, fy;
+
+    matter_anchor_fraction(a, &fx, &fy);
+    this->glide_to(sec, m, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::glide_to(float sec, IMatter* m, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
+    float tfx, tfy;
+
+    matter_anchor_fraction(ta, &tfx, &tfy);
+    this->glide_to(sec, m, target, tfx, tfy, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::glide_to(float sec, IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
+    float fx, fy;
+    
+    matter_anchor_fraction(a, &fx, &fy);
+    this->glide_to(sec, m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
 
 /*************************************************************************************************/
@@ -1509,4 +1729,18 @@ void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int row, int col, MatterAnc
 
     this->feed_grid_cell_location(row, col, &x, &y, a);
     this->move_to(m, x, y, a, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::glide_to_grid(float sec, IMatter* m, int idx, MatterAnchor a, float dx, float dy) {
+    float x, y;
+
+    this->feed_grid_cell_location(idx, &x, &y, a);
+    this->glide_to(sec, m, x, y, a, dx, dy);
+}
+
+void WarGrey::STEM::IPlane::glide_to_grid(float sec, IMatter* m, int row, int col, MatterAnchor a, float dx, float dy) {
+    float x, y;
+
+    this->feed_grid_cell_location(row, col, &x, &y, a);
+    this->glide_to(sec, m, x, y, a, dx, dy);
 }

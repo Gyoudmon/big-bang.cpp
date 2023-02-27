@@ -48,6 +48,11 @@ namespace WarGrey::STEM {
         void step(float* x, float* y);
         void motion_stop(bool horizon = true, bool vertical = true);
         void motion_bounce(bool horizon, bool vertical);
+    
+    public:
+        bool x_stopped() { return (this->ax == 0.0F) && (this->vx == 0.0F); }
+        bool y_stopped() { return (this->ay == 0.0F) && (this->vy == 0.0F); }
+        bool motion_stopped() { return this->x_stopped() && this->y_stopped(); }
 
     private:
         WarGrey::STEM::BorderStrategy border_strategies[4];

@@ -51,7 +51,7 @@ namespace WarGrey::STEM {
         void feed_window_size(int* width, int* height, bool logical = true);
         void set_window_fullscreen(bool yes);
         const char* get_renderer_name();
-        int get_frame_per_second() { return this->_fps; }
+        int frame_rate() override { return this->_fps; }
         uint32_t get_background_color() { return this->_bgc; }
         uint32_t get_foreground_color() { return this->_fgc; }
 

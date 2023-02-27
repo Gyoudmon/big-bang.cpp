@@ -34,6 +34,7 @@ namespace WarGrey::STEM {
         virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
         virtual int update(uint32_t count, uint32_t interval, uint32_t uptime) { return 0; }
         virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
+        virtual void draw_in_progress(SDL_Renderer* renderer, float x, float y, float Width, float Height) {}
         virtual bool ready() { return true; }
 
     public:

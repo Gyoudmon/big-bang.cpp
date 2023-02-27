@@ -14,6 +14,7 @@ namespace WarGrey::STEM {
         void refresh() override { this->_display->refresh(); }
         void feed_extent(float* width, float* height) override { this->_display->feed_extent(width, height); }
         void feed_client_extent(float* width, float* height) override { this->_display->feed_client_extent(width, height); }
+        int frame_rate() override { return this->_display->frame_rate(); }
     
     public:
         void begin_update_sequence() override { this->_display->begin_update_sequence(); }
