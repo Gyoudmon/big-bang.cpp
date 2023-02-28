@@ -16,6 +16,14 @@ namespace WarGrey::STEM {
     static const double pi        = 3.141592653589793;
     static const long double pi_t = 3.1415926535897932385L;
 
+    static const float h_pi_f       = pi_f / 2.0F;
+    static const double h_pi        = pi / 2.0;
+    static const long double h_pi_t = pi_t / 2.0L;
+
+    static const float q_pi_f       = pi_f / 4.0F;
+    static const double q_pi        = pi / 4.0;
+    static const long double q_pi_t = pi_t / 4.0L;
+
     static const float infinity_f        = std::numeric_limits<float>::infinity();
     static const double infinity         = std::numeric_limits<double>::infinity();
     static const long double infinity_t  = std::numeric_limits<long double>::infinity();

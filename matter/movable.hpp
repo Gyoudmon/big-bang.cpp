@@ -17,8 +17,8 @@ namespace WarGrey::STEM {
         float get_acceleration(float* direction = nullptr, float* vx = nullptr, float* vy = nullptr);
         float get_acceleration_direction(bool need_radian = true);
 
-        void set_delta_speed(float xacc, float yacc) { this->ax = xacc; this->ay = yacc; }
-        void add_delta_speed(float xacc, float yacc) { this->ax += xacc; this->ay += yacc; }
+        void set_delta_speed(float xacc, float yacc);
+        void add_delta_speed(float xacc, float yacc);
         float x_delta_speed() { return this->ax; }
         float y_delta_speed() { return this->ay; }
 
@@ -28,8 +28,8 @@ namespace WarGrey::STEM {
         float get_velocity(float* direction = nullptr, float* vx = nullptr, float* vy = nullptr);
         float get_velocity_direction(bool need_radian = true);
         
-        void set_speed(float xspd, float yspd) { this->vx = xspd; this->vy = yspd; }
-        void add_speed(float xspd, float yspd) { this->vx += xspd; this->vy += yspd; }
+        void set_speed(float xspd, float yspd);
+        void add_speed(float xspd, float yspd);
         float x_speed() { return this->vx; }
         float y_speed() { return this->vy; }
 
@@ -45,19 +45,32 @@ namespace WarGrey::STEM {
         void set_border_strategy(BorderStrategy ts, BorderStrategy rs, BorderStrategy bs, BorderStrategy ls);
 
     public:
-        void step(float* x, float* y);
+        void step(float* sx, float* sy);
         void motion_stop(bool horizon = true, bool vertical = true);
         void motion_bounce(bool horizon, bool vertical);
+        void disable_acceleration_bounce(bool yes = true) { this->bounce_acc = !yes; }
     
     public:
         bool x_stopped() { return (this->ax == 0.0F) && (this->vx == 0.0F); }
         bool y_stopped() { return (this->ay == 0.0F) && (this->vy == 0.0F); }
         bool motion_stopped() { return this->x_stopped() && this->y_stopped(); }
 
+    protected:
+        virtual void on_heading_changed(float theta_rad, float vx, float vy) {}
+        virtual void on_motion_stopped() {}
+
+    private:
+        void on_acceleration_changed();
+        void check_velocity_changing();
+        void on_velocity_changed();
+
     private:
         WarGrey::STEM::BorderStrategy border_strategies[4];
+        float bounce_acc = false;
+        float ar = 0.0F;
         float ax = 0.0F;
         float ay = 0.0F;
+        float vr = 0.0F;
         float vx = 0.0F;
         float vy = 0.0F;
         float mvx = 0.0F;

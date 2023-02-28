@@ -14,6 +14,8 @@ namespace WarGrey::STEM {
         IScreen* master;
     };
 
+    struct MatterInfo;
+
     /** Note
      * The destruction of `IPlane` is always performed by its `display`
      *  since its instance cannot belong to multiple `display`s.
@@ -110,7 +112,8 @@ namespace WarGrey::STEM {
         void glide_to(float sec, IMatter* m, IMatter* tm, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
         void glide_to(float sec, IMatter* m, IMatter* tm, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void glide_to(float sec, IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-
+        void glide_to_random_location(float sec, IMatter* m);
+        
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
         void create_grid(int row, int col, float x = 0.0F, float y = 0.0F, float width = 0.0F, float height = 0.0F);
@@ -146,6 +149,10 @@ namespace WarGrey::STEM {
         virtual void on_goodbye(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         virtual void on_tap(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
+
+    protected:
+        virtual void on_glide_start(WarGrey::STEM::IMatter* m, float sec, float x, float y, float xspd, float yspd) {}
+        virtual void on_glide_complete(WarGrey::STEM::IMatter* m, float sec, float x, float y, float xspd, float yspd) {}
         
     protected:
         virtual void on_enter(WarGrey::STEM::IPlane* from);
@@ -290,6 +297,16 @@ namespace WarGrey::STEM {
         void on_matter_ready(IMatter* m) override {}
 
     private:
+        bool move_matter_via_info(MatterInfo* info, float x, float y, bool absolute);
+        bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, bool absolute);
+        bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, float fx, float fy, float dx, float dy);
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
+        bool do_move_via_info(MatterInfo* info, float x, float y, bool absolute);
+        bool do_glide_via_info(IMatter* m, MatterInfo* info, float x, float y, float sec, float sec_delta, bool absolute);
+        void do_motion_move(IMatter* m, MatterInfo* info, float dwidth, float dheight);
+        
+    private:
+        void do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F);
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
         WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y);
