@@ -75,7 +75,7 @@ namespace WarGrey::STEM {
         virtual void add_selected(IMatter* m) = 0;
         virtual void set_selected(IMatter* m) = 0;
         virtual void no_selected() = 0;
-        virtual unsigned int count_selected() = 0;
+        virtual size_t count_selected() = 0;
         virtual bool is_selected(IMatter* m) = 0;
 
     public:
@@ -152,7 +152,7 @@ namespace WarGrey::STEM {
 
     protected:
         virtual void on_glide_start(WarGrey::STEM::IMatter* m, float sec, float x, float y, float xspd, float yspd) {}
-        virtual void on_glide_complete(WarGrey::STEM::IMatter* m, float sec, float x, float y, float xspd, float yspd) {}
+        virtual void on_glide_complete(WarGrey::STEM::IMatter* m, float x, float y) {}
         
     protected:
         virtual void on_enter(WarGrey::STEM::IPlane* from);
@@ -259,7 +259,7 @@ namespace WarGrey::STEM {
         void add_selected(IMatter* m) override;
         void set_selected(IMatter* m) override;
         void no_selected() override;
-        unsigned int count_selected() override;
+        size_t count_selected() override;
         bool is_selected(IMatter* m) override;
         bool can_select(IMatter* m) override;
 

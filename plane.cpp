@@ -644,8 +644,8 @@ bool WarGrey::STEM::Plane::is_selected(IMatter* m) {
     return selected;
 }
 
-unsigned int WarGrey::STEM::Plane::count_selected() {
-    unsigned int n = 0U;
+size_t WarGrey::STEM::Plane::count_selected() {
+    size_t n = 0U;
 
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
@@ -1253,6 +1253,7 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
                 info->gliding = false;
                 info->x = info->gliding_tx;
                 info->y = info->gliding_ty;
+                this->on_glide_complete(m, info->x, info->y);
             }
         } else {
             m->step(&info->x, &info->y);
