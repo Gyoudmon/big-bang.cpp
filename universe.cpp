@@ -70,7 +70,7 @@ static unsigned int trigger_timer_event(unsigned int interval, void* datum) {
 }
 
 /*************************************************************************************************/
-static void game_initialize(uint32_t flags, int fontsize = 32) {
+static void game_initialize(uint32_t flags, int fontsize = 16 /* Don't change the default value of `fontsize` */) {
     if (game_font::DEFAULT == nullptr) {
         Call_With_Safe_Exit(SDL_Init(flags), "SDL 初始化失败: ", SDL_Quit, SDL_GetError);
         Call_With_Safe_Exit(TTF_Init(), "TTF 初始化失败: ", TTF_Quit, TTF_GetError);
