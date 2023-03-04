@@ -25,6 +25,7 @@ namespace WarGrey::STEM {
         static TTF_Font* normal;
         static TTF_Font* small;
         static TTF_Font* tiny;
+        static TTF_Font* math;
         static TTF_Font* mono;
     };
 
