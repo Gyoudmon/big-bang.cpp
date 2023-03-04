@@ -76,4 +76,26 @@ namespace WarGrey::STEM {
         float mvx = 0.0F;
         float mvy = 0.0F;
     };
+
+    class I4WayMotion {
+    public:
+        virtual void dispatch_heading_event(float theta_rad, float vx, float vy);
+
+    protected:
+        virtual void on_nward(float theta_rad, float vx, float vy) = 0;
+        virtual void on_eward(float theta_rad, float vx, float vy) = 0;
+        virtual void on_sward(float theta_rad, float vx, float vy) = 0;
+        virtual void on_wward(float theta_rad, float vx, float vy) = 0;
+    };
+
+    class I8WayMotion : public WarGrey::STEM::I4WayMotion {
+    public:
+        virtual void dispatch_heading_event(float theta_rad, float vx, float vy);
+
+    protected:
+        virtual void on_neward(float theta_rad, float vx, float vy) = 0;
+        virtual void on_nwward(float theta_rad, float vx, float vy) = 0;
+        virtual void on_esward(float theta_rad, float vx, float vy) = 0;
+        virtual void on_wsward(float theta_rad, float vx, float vy) = 0;
+    };
 }
