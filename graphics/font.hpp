@@ -16,6 +16,7 @@ namespace WarGrey::STEM {
             static TTF_Font* unicode;
     };
 
+    /*********************************************************************************************/
     void game_fonts_initialize(int fontsize);
     void game_fonts_destroy();
 

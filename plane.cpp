@@ -852,7 +852,7 @@ bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y,
                     handled = info->selected;
                 } else {
                     if ((unmasked_matter == this->sentry) && (this->can_select(unmasked_matter))) {
-                        this->mission_complete();
+                        this->on_double_tap_sentry_sprite(this->sentry);
                     }
                 }
             }

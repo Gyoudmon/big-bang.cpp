@@ -276,6 +276,7 @@ namespace WarGrey::STEM {
     protected:
         void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
         virtual bool update_tooltip(IMatter* m, float local_x, float local_y) { return false; }
+        virtual void on_double_tap_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->mission_complete(); }
         
     protected:
         bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) override;
