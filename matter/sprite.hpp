@@ -3,8 +3,6 @@
 #include "../matter.hpp"
 #include "../graphics/image.hpp"
 
-#include "movable.hpp"
-
 #include <vector>
 #include <string>
 

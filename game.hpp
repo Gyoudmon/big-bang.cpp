@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 
 #include "cosmos.hpp"
+#include "matter.hpp"
 
 #include "graphics/colorspace.hpp"
 #include "graphics/named_colors.hpp"
