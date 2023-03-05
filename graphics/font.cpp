@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "../datum/flonum.hpp"
+#include "../datum/string.hpp"
 
 using namespace WarGrey::STEM;
 using namespace std::filesystem;
@@ -17,7 +18,9 @@ TTF_Font* WarGrey::STEM::game_font::sans_serif = nullptr;
 TTF_Font* WarGrey::STEM::game_font::serif = nullptr;
 TTF_Font* WarGrey::STEM::game_font::monospace = nullptr;
 TTF_Font* WarGrey::STEM::game_font::math = nullptr;
-TTF_Font* WarGrey::STEM::game_font::unicode = nullptr;
+TTF_Font* WarGrey::STEM::game_font::cursive = nullptr;
+TTF_Font* WarGrey::STEM::game_font::fantasy = nullptr;
+TTF_Font* WarGrey::STEM::game_font::fangsong = nullptr;
 
 /*************************************************************************************************/
 static std::unordered_map<std::string, std::string> system_fonts;
@@ -58,26 +61,32 @@ void WarGrey::STEM::game_fonts_initialize(int fontsize) {
     game_font::serif = game_create_font("Times.ttc", fontsize);
     game_font::monospace = game_create_font("Courier.ttc", fontsize);
     game_font::math = game_create_font("Bodoni 72.ttc", fontsize);
+    game_font::cursive = game_create_font("Courier.ttc", fontsize);
+    game_font::fantasy = game_create_font("Bodoni 72.ttc", fontsize);
 
     /* This is the only font that is elegant, although some characters are missing */
-    game_font::unicode = game_create_font("PingFang.ttc", fontsize);
+    game_font::fangsong = game_create_font("PingFang.ttc", fontsize);
 #elif defined(__windows__) /* HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts */
+    game_font::title = game_create_font("msyh.ttc", fontsize);
     game_font::sans_serif = game_create_font("msyh.ttc", fontsize); // Microsoft YaHei
     game_font::serif = game_create_font("times.ttf", fontsize); // Times New Roman
     game_font::monospace = game_create_font("cour.ttf", fontsize); // Courier New
     game_font::math = game_create_font("BOD_R.TTF", fontsize); // Bodoni MT
-    game_font::unicode = game_create_font("msyh.ttc", fontsize);
-    game_font::title = game_create_font("msyh.ttc", fontsize);
+    game_font::cursive = game_create_font("Courier.ttc", fontsize);
+    game_font::fantasy = game_create_font("Bodoni 72.ttc", fontsize);
+    game_font::fangsong = game_create_font("msyh.ttc", fontsize);
 #else /* the following fonts have not been tested */
+    game_font::title = game_create_font("Arial Unicode.ttf", fontsize);
     game_font::sans_serif = game_create_font("Nimbus Sans.ttc", fontsize);
     game_font::serif = game_create_font("DejaVu Serif.ttc", fontsize);
     game_font::monospace = game_create_font("Monospace.ttf", fontsize);
     game_font::math = game_create_font("URW Bookman.ttf", fontsize);
-    game_font::unicode = game_create_font("Arial Unicode.ttf", fontsize);
-    game_font::title = game_create_font("Arial Unicode.ttf", fontsize);
+    game_font::fangsong = game_create_font("Arial Unicode.ttf", fontsize);
+    game_font::cursive = game_create_font("URW Bookman.ttf", fontsize);
+    game_font::fantasy = game_create_font("Arial Unicode.ttf", fontsize);
 #endif
 
-    game_font::DEFAULT = game_font::unicode;
+    game_font::DEFAULT = game_font::sans_serif;
 }
 
 void WarGrey::STEM::game_fonts_destroy() {
@@ -85,7 +94,7 @@ void WarGrey::STEM::game_fonts_destroy() {
     Game_Close_Font(game_font::serif);
     Game_Close_Font(game_font::monospace);
     Game_Close_Font(game_font::math);
-    Game_Close_Font(game_font::unicode);
+    Game_Close_Font(game_font::fangsong);
 }
 
 /*************************************************************************************************/
@@ -121,7 +130,9 @@ void WarGrey::STEM::game_font_destroy(TTF_Font* font, bool usr_only) {
         } else if (font == game_font::serif) {
         } else if (font == game_font::monospace) {
         } else if (font == game_font::math) {
-        } else if (font == game_font::unicode) {
+        } else if (font == game_font::cursive) {
+        } else if (font == game_font::fantasy) {
+        } else if (font == game_font::fangsong) {
         } else {
             TTF_CloseFont(font);
         }
@@ -149,7 +160,7 @@ const std::string* WarGrey::STEM::game_font_list(int* n, int fontsize) {
         (*n) = i;
     }
 
-    return (const std::string*)font_list;
+    return static_cast<const std::string*>(font_list);
 }
 
 const char* WarGrey::STEM::font_basename(const TTF_Font* font) {
@@ -172,6 +183,24 @@ void WarGrey::STEM::feed_text_extent(TTF_Font* font, const char* unicode, int* w
     } else {
         TTF_SizeUTF8(font, unicode, width, height);
     }
+}
+
+bool WarGrey::STEM::is_font_okay(TTF_Font* font, const std::string& text) {
+    size_t utf8_size = string_utf8_length(text.c_str(), text.size());
+    bool okay = true;
+    
+    if (font == nullptr) {
+        font = game_font::DEFAULT;
+    }
+
+    for (size_t idx = 0; idx < utf8_size; idx ++) {
+        if (!TTF_GlyphIsProvided32(font, string_utf8_ref(text, idx))) {
+            okay = false;
+            break;
+        }
+    }
+
+    return okay;
 }
 
 int WarGrey::STEM::font_width(TTF_Font* font, const char* unicode) {

@@ -30,7 +30,6 @@ namespace WarGrey::STEM {
     std::string flstring(double flonum, int precision);
     std::string fxstring(long long fixnum, int width);
     std::string sstring(unsigned long long bytes, int precision);
-    std::string gpstring(double position, char suffix, int precision = 3);
 
     long long string_to_fixnum(const std::string& string);
 
@@ -58,6 +57,14 @@ namespace WarGrey::STEM {
     }
 
     /************************************************************************************************/
+    size_t string_utf8_length(const char* src, int max = -1);
+    size_t string_utf8_length(const std::string& src);
+    int string_utf8_index(const char* src, int idx, int max = -1);
+    int string_utf8_index(const std::string& src, int idx);
+    uint32_t string_utf8_ref(const char* src, int char_idx, int max = -1);
+    uint32_t string_utf8_ref(const std::string& src, int char_idx);
+    size_t string_character_size(const char* src, int byte_idx);
+    size_t string_character_size(const std::string& src, int byte_idx);
     bool string_popback_utf8_char(std::string& src);
     std::string string_add_between(const char* s, char ch = '\n');
 

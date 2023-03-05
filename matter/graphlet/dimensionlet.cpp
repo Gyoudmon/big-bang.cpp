@@ -24,7 +24,7 @@ static uint8_t  unit_idx = 2U;
 DimensionStyle WarGrey::STEM::make_plain_dimension_style(int lfontsize, int nfsize, int ufsize, int precision) {
 	DimensionStyle ds;
 
-    ds.label_font = game_create_font(font_basename(game_font::unicode), lfontsize);
+    ds.label_font = game_create_font(font_basename(game_font::DEFAULT), lfontsize);
 	ds.number_font = game_create_font(font_basename(game_font::math), nfsize);
 	ds.unit_font = game_create_font(font_basename(game_font::monospace), ufsize);
 	ds.precision = precision;
@@ -190,7 +190,7 @@ void WarGrey::STEM::Dimensionlet::draw(SDL_Renderer* renderer, float x, float y,
 void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, DimensionStyle& style) {
     CAS_SLOT(style.number_font, game_font::math);
 	CAS_SLOT(style.unit_font, game_font::monospace);
-	CAS_SLOT(style.label_font, game_font::unicode);
+	CAS_SLOT(style.label_font, game_font::DEFAULT);
 
 	ICAS_SLOT(style.number_color, default_math_color);
 	ICAS_SLOT(style.unit_color, default_unit_color);

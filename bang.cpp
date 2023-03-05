@@ -26,12 +26,12 @@ const char* WarGrey::STEM::the_big_bang_name() {
 void WarGrey::STEM::bang_fonts_initialize() {
     if (bang_font::title == nullptr) {
         bang_font::title = game_create_font(font_basename(game_font::title), bang_fontsize::xx_large);
-        bang_font::tooltip = game_create_font(font_basename(game_font::unicode), bang_fontsize::x_small);
-        bang_font::huge = game_create_font(font_basename(game_font::unicode), bang_fontsize::x_large);
-        bang_font::large = game_create_font(font_basename(game_font::unicode), bang_fontsize::large);
-        bang_font::normal = game_create_font(font_basename(game_font::unicode), bang_fontsize::medium);
-        bang_font::small = game_create_font(font_basename(game_font::unicode), bang_fontsize::small);
-        bang_font::tiny = game_create_font(font_basename(game_font::unicode), bang_fontsize::xx_small);
+        bang_font::tooltip = game_create_font(font_basename(game_font::DEFAULT), bang_fontsize::x_small);
+        bang_font::huge = game_create_font(font_basename(game_font::DEFAULT), bang_fontsize::x_large);
+        bang_font::large = game_create_font(font_basename(game_font::DEFAULT), bang_fontsize::large);
+        bang_font::normal = game_create_font(font_basename(game_font::DEFAULT), bang_fontsize::medium);
+        bang_font::small = game_create_font(font_basename(game_font::DEFAULT), bang_fontsize::small);
+        bang_font::tiny = game_create_font(font_basename(game_font::DEFAULT), bang_fontsize::xx_small);
         bang_font::mono = game_create_font(font_basename(game_font::monospace), bang_fontsize::medium);
     }
 }

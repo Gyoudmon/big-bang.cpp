@@ -13,7 +13,9 @@ namespace WarGrey::STEM {
             static TTF_Font* serif;
             static TTF_Font* monospace;
             static TTF_Font* math;
-            static TTF_Font* unicode;
+            static TTF_Font* cursive;
+            static TTF_Font* fantasy;
+            static TTF_Font* fangsong;
     };
 
     /*********************************************************************************************/
@@ -29,6 +31,7 @@ namespace WarGrey::STEM {
 
     void feed_text_extent(TTF_Font* font, const char* unicode, int* width = nullptr, int* height = nullptr);
 
+    bool is_font_okay(TTF_Font* font, const std::string& text);
     int font_width(TTF_Font* font, const char* unicode);
     int font_height(TTF_Font* font);
     int font_ascent(TTF_Font* font);

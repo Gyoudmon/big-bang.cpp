@@ -332,20 +332,145 @@ size_t WarGrey::STEM::scan_skip_this_line(const char* src, size_t* pos, size_t e
 }
 
 /************************************************************************************************/
+/**
+ * UTF-8 encodes characters in 1 to 4 bytes, and their binary forms are:
+ *   0xxx xxxx
+ *   110x xxxx  10xx xxxx
+ *   1110 xxxx  10xx xxxx  10xx xxxx
+ *   1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
+ */
+
+size_t WarGrey::STEM::string_utf8_length(const char* src, int max0) {
+    size_t max = (max0 >= 0) ? max0 : strlen(src);
+    size_t idx = 0;
+    size_t n = 0;
+
+    while ((idx < max) && (src[idx] != '\0')) {
+        unsigned char c = static_cast<unsigned char>(src[idx]);
+
+        n++;
+
+        if (c < 0b10000000U) {
+            idx ++;
+        } else if (c >= 0b11110000U) {
+            idx += 4;
+        } else if (c >= 0b11100000U) {
+            idx += 3;
+        } else {
+            idx += 2;
+        }
+    }
+    
+    return n;
+}
+
+size_t WarGrey::STEM::string_utf8_length(const std::string& src) {
+    return string_utf8_length(src.c_str(), int(src.size()));
+}
+
+int WarGrey::STEM::string_utf8_index(const char* src, int idx, int max0) {
+    size_t max = (max0 >= 0) ? max0 : strlen(src);
+    size_t it = 0;
+    int cidx = -1;
+    int n = 0;
+
+    while ((it < max) && (src[it] != '\0')) {
+        if (n < idx) {
+            unsigned char c = static_cast<unsigned char>(src[it]);
+
+            if (c < 0b10000000U) {
+                it ++;
+            } else if (c >= 0b11110000U) {
+                it += 4;
+            } else if (c >= 0b11100000U) {
+                it += 3;
+            } else {
+                it += 2;
+            }
+
+            n++;
+        } else {
+            cidx = it;
+            break;
+        }
+    }
+    
+    return cidx;
+}
+
+int WarGrey::STEM::string_utf8_index(const std::string& src, int char_idx) {
+    return string_utf8_index(src.c_str(), char_idx, int(src.size()));
+}
+
+uint32_t WarGrey::STEM::string_utf8_ref(const char* src, int idx, int max0) {
+    size_t max = (max0 >= 0) ? max0 : strlen(src);
+    size_t codepoint = 0;
+    int code_idx = string_utf8_index(src, idx, max0);
+
+    if (code_idx >= 0) {
+        unsigned char c = static_cast<unsigned char>(src[code_idx]);
+
+        if (c < 0b10000000U) {
+            codepoint = c;
+        } else if (c >= 0b11110000U) {
+            if (code_idx + 3 < max) {
+                size_t b1 = c & 0b00000111U;
+                size_t b2 = static_cast<unsigned char>(src[code_idx + 1]) & 0b00111111U;
+                size_t b3 = static_cast<unsigned char>(src[code_idx + 2]) & 0b00111111U;
+                size_t b4 = static_cast<unsigned char>(src[code_idx + 4]) & 0b00111111U;
+
+                codepoint = (b1 << 18) | (b2 << 12) | (b3 << 6) | b4;
+            }
+        } else if (c >= 0b11100000U) {
+            if (code_idx + 2 < max) {
+                size_t b1 = c & 0b00001111U;
+                size_t b2 = static_cast<unsigned char>(src[code_idx + 1]) & 0b00111111U;
+                size_t b3 = static_cast<unsigned char>(src[code_idx + 2]) & 0b00111111U;
+ 
+                codepoint = (b1 << 12) | (b2 << 6) | b3;
+            }
+        } else {
+            if (code_idx + 1 < max) {
+                size_t b1 = c & 0b00011111U;
+                size_t b2 = static_cast<unsigned char>(src[code_idx + 1]) & 0b00111111U; 
+                
+                codepoint = (b1 << 5) | b2;
+            }
+        }
+    }
+
+    return codepoint;
+}
+
+uint32_t WarGrey::STEM::string_utf8_ref(const std::string& src, int idx) {
+    return string_utf8_ref(src.c_str(), idx, int(src.size()));
+}
+
+size_t WarGrey::STEM::string_character_size(const char* src, int idx) {
+    unsigned char c = static_cast<unsigned char>(src[idx]);
+    size_t size = 1;
+
+    if (c >= 0b11110000U) {
+        size = 4;
+    } else if (c >= 0b11100000U) {
+        size = 3;
+    } else if (c >= 0b11000000U) {
+        size = 2;
+    }
+
+    return size;
+}
+
+size_t WarGrey::STEM::string_character_size(const std::string& src, int idx) {
+    return string_character_size(src.c_str(), idx);
+}
+
 bool WarGrey::STEM::string_popback_utf8_char(std::string& src) {
     size_t size = src.size();
     bool okay = false;
 
     if (size > 0) {
         const unsigned char* text = reinterpret_cast<const unsigned char*>(src.c_str());
-        
-        /**
-         * UTF-8 encodes characters in 1 to 4 bytes, and their binary forms are:
-         *   0xxx xxxx
-         *   110x xxxx  10xx xxxx
-         *   1110 xxxx  10xx xxxx  10xx xxxx
-         *   1111 xxxx  10xx xxxx  10xx xxxx  10xx xxxx
-         */
         
         if (text[size - 1] < 0b10000000U) {
             src.pop_back();
@@ -372,14 +497,6 @@ std::string WarGrey::STEM::string_add_between(const char* s, char ch) {
             vstr.push_back(ch);
         }
 
-        /**
-         * UTF-8 encodes characters in 1 to 4 bytes, and their binary forms are:
-         *   0xxx xxxx
-         *   110x xxxx  10xx xxxx
-         *   1110 xxxx  10xx xxxx  10xx xxxx
-         *   1111 xxxx  10xx xxxx  10xx xxxx  10xx xxxx
-         */
-        
         if (c >= 0b11110000U) {
             vstr.append(s, idx, 4);
             idx += 4;
@@ -419,11 +536,11 @@ bool WarGrey::STEM::string_prefix(const char* src, const char* sub, int max0) {
 }
 
 bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
-    return string_prefix(src.c_str(), sub, src.size());
+    return string_prefix(src.c_str(), sub, int(src.size()));
 }
 
 bool WarGrey::STEM::string_prefix(const std::string& src, const std::string& sub) {
-    return string_prefix(src.c_str(), sub.c_str(), src.size());
+    return string_prefix(src.c_str(), sub.c_str(), int(src.size()));
 }
 
 bool WarGrey::STEM::string_suffix(const char* src, const char* sub, int max0) {
@@ -446,9 +563,9 @@ bool WarGrey::STEM::string_suffix(const char* src, const char* sub, int max0) {
 }
 
 bool WarGrey::STEM::string_suffix(const std::string& src, const char* sub) {
-    return string_suffix(src.c_str(), sub, src.size());
+    return string_suffix(src.c_str(), sub, int(src.size()));
 }
 
 bool WarGrey::STEM::string_suffix(const std::string& src, const std::string& sub) {
-    return string_suffix(src.c_str(), sub.c_str(), src.size());
+    return string_suffix(src.c_str(), sub.c_str(), int(src.size()));
 }

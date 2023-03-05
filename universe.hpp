@@ -61,7 +61,7 @@ namespace WarGrey::STEM {
         void feed_client_extent(float* width, float* height) override;
 
     public: // 用户 IME 输入输出
-        void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_font::unicode);
+        void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_font::monospace);
         int get_cmdwin_height() { return this->echo.h; }
         void start_input_text(const char* fmt, ...);
         void start_input_text(const std::string& prompt) override;
