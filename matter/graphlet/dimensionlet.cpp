@@ -24,9 +24,9 @@ static uint8_t  unit_idx = 2U;
 DimensionStyle WarGrey::STEM::make_plain_dimension_style(int lfontsize, int nfsize, int ufsize, int precision) {
 	DimensionStyle ds;
 
-    ds.label_font = game_create_font(font_basename(game_font::DEFAULT), lfontsize);
-	ds.number_font = game_create_font(font_basename(game_font::math), nfsize);
-	ds.unit_font = game_create_font(font_basename(game_font::monospace), ufsize);
+    ds.label_font = GameFont::Default(lfontsize);
+	ds.number_font = GameFont::math(nfsize);
+	ds.unit_font = GameFont::monospace(ufsize);
 	ds.precision = precision;
 
 	return ds;
@@ -35,7 +35,7 @@ DimensionStyle WarGrey::STEM::make_plain_dimension_style(int lfontsize, int nfsi
 DimensionStyle WarGrey::STEM::make_plain_dimension_style(int nfsize, unsigned int min_number, int precision) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize, fl2fxi(nfsize * 0.90F), precision);
 
-    ds.minimize_number_width = font_width(ds.number_font, "0") * float(min_number);
+    ds.minimize_number_width = ds.number_font->width("0") * float(min_number);
 	ds.number_xfraction = 0.5F;
 	ds.number_leading_space = 0.0F;
 	ds.unit_leading_space = 0.0F;
@@ -47,7 +47,7 @@ DimensionStyle WarGrey::STEM::make_plain_dimension_style(int nfsize, unsigned in
 DimensionStyle WarGrey::STEM::make_setting_dimension_style(int nfsize, unsigned int min_number, int precision, uint32_t color) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize, nfsize, precision);
 	
-    ds.minimize_number_width = font_width(ds.number_font, "0") * float(min_number);
+    ds.minimize_number_width = ds.number_font->width("0") * float(min_number);
 	ds.number_border_color = color;
 	ds.number_color = color;
 	ds.unit_color = color;
@@ -62,9 +62,9 @@ DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigne
 DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_label, unsigned int min_number, int precision, uint32_t number_bgcolor, uint32_t label_bgcolor, uint32_t color) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, fl2fxi(nfsize * 1.2F), nfsize, precision);
 
-    ds.minimize_label_width = ((min_label == 0) ? font_height(ds.label_font) : (font_width(ds.label_font, "0") * float(min_label)));
+    ds.minimize_label_width = ((min_label == 0) ? ds.label_font->height() : (ds.label_font->width("0") * float(min_label)));
 	ds.label_xfraction = 0.5F;
-	ds.minimize_number_width = font_width(ds.number_font, "0") * float(min_number);
+	ds.minimize_number_width = ds.number_font->width("0") * float(min_number);
 	ds.number_leading_space = 2.0F;
 	ds.number_background_color = number_bgcolor;
 	ds.number_color = color;
@@ -188,9 +188,9 @@ void WarGrey::STEM::Dimensionlet::draw(SDL_Renderer* renderer, float x, float y,
 }
 
 void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, DimensionStyle& style) {
-    CAS_SLOT(style.number_font, game_font::math);
-	CAS_SLOT(style.unit_font, game_font::monospace);
-	CAS_SLOT(style.label_font, game_font::DEFAULT);
+    CAS_SLOT(style.number_font, GameFont::math());
+	CAS_SLOT(style.unit_font, GameFont::monospace());
+	CAS_SLOT(style.label_font, GameFont::Default());
 
 	ICAS_SLOT(style.number_color, default_math_color);
 	ICAS_SLOT(style.unit_color, default_unit_color);
@@ -198,7 +198,7 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 
 	FLCAS_SLOT(style.minimize_label_width, 0.0F);
 	FLCAS_SLOT(style.label_xfraction, 1.0F);
-	FLCAS_SLOT(style.number_leading_space, float(font_width(style.number_font, "0")));
+	FLCAS_SLOT(style.number_leading_space, float(style.number_font->width("0")));
 
 	switch (status) {
 	case DimensionState::Default: case DimensionState::Highlight: {
@@ -249,7 +249,7 @@ void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, 
             TextRenderMode::Blender, color, color, 0);
 }
 
-void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, TTF_Font* font, float leading_space) {
+void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, shared_font_t font, float leading_space) {
     SDL_Texture* self = this->textures[idx];
     SDL_FRect* sbox = &this->boxes[idx];
     int width, height;
@@ -264,7 +264,7 @@ void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, T
         sbox->h = float(height);
     } else if (min_width > 0.0F) {
         sbox->w = flmax(min_width, 0.0F);
-        sbox->h = float(font_height(font));
+        sbox->h = float(font->height());
     } else {
         sbox->w = 0.0F;
         sbox->h = 0.0F;

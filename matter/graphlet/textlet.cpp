@@ -11,7 +11,7 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-Labellet* WarGrey::STEM::make_label_for_tooltip(TTF_Font* font, uint32_t fg_color, uint32_t bg_color, uint32_t border_color) {
+Labellet* WarGrey::STEM::make_label_for_tooltip(shared_font_t font, uint32_t fg_color, uint32_t bg_color, uint32_t border_color) {
     Labellet* tooltip = new Labellet(font, fg_color, "");
 
     tooltip->set_background_color(bg_color);
@@ -62,10 +62,10 @@ void WarGrey::STEM::ITextlet::set_border_color(uint32_t border_hex, float alpha)
     }
 }
 
-void WarGrey::STEM::ITextlet::set_font(TTF_Font* font, MatterAnchor anchor) {
+void WarGrey::STEM::ITextlet::set_font(shared_font_t font, MatterAnchor anchor) {
     this->moor(anchor);
 
-    this->text_font = ((font == nullptr) ? game_font::DEFAULT : font);
+    this->text_font = (font->okay() ? font : GameFont::Default());
     this->set_text(this->raw, anchor);
     this->on_font_changed();
 
@@ -77,8 +77,8 @@ void WarGrey::STEM::ITextlet::set_text(const std::string& content, MatterAnchor 
 
     this->moor(anchor);
 
-    if (this->text_font == nullptr) {
-        this->set_font(nullptr, anchor);
+    if (!this->text_font->okay()) {
+        this->set_font(null_font, anchor);
     } else {
         this->update_texture();
     }
@@ -151,13 +151,13 @@ WarGrey::STEM::Labellet::Labellet(const char *fmt, ...) {
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(TTF_Font* font, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(shared_font_t font, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
     this->set_font(font);
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(TTF_Font* font, uint32_t color_hex, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(shared_font_t font, uint32_t color_hex, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_font(font);
@@ -165,7 +165,7 @@ WarGrey::STEM::Labellet::Labellet(TTF_Font* font, uint32_t color_hex, const char
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(TTF_Font* font, uint32_t color_hex, float alpha, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(shared_font_t font, uint32_t color_hex, float alpha, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_font(font);

@@ -61,7 +61,7 @@ namespace WarGrey::STEM {
         void feed_client_extent(float* width, float* height) override;
 
     public: // 用户 IME 输入输出
-        void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, TTF_Font* font = game_font::monospace);
+        void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, shared_font_t font = GameFont::monospace(FontSize::xx_small));
         int get_cmdwin_height() { return this->echo.h; }
         void start_input_text(const char* fmt, ...);
         void start_input_text(const std::string& prompt) override;
@@ -142,7 +142,7 @@ namespace WarGrey::STEM {
         SDL_Rect echo;                          // 输入回显区域
         uint32_t _ifgc;                         // 回显区前景色
         uint32_t _ibgc;                         // 回显区背景色
-        TTF_Font* echo_font = nullptr;          // 回显字体
+        shared_font_t echo_font;                // 回显字体
         std::string message;                    // 回显区消息
         uint32_t _mfgc;                         // 消息颜色
         bool needs_termio_if_no_echo;           // 消息是否需要输出

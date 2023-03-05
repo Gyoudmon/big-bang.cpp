@@ -70,32 +70,30 @@ static unsigned int trigger_timer_event(unsigned int interval, void* datum) {
 }
 
 /*************************************************************************************************/
-static void game_initialize(uint32_t flags, int fontsize = 16 /* Don't change the default value of `fontsize` */) {
-    if (game_font::DEFAULT == nullptr) {
-        Call_With_Safe_Exit(SDL_Init(flags), "SDL 初始化失败: ", SDL_Quit, SDL_GetError);
-        Call_With_Safe_Exit(TTF_Init(), "TTF 初始化失败: ", TTF_Quit, TTF_GetError);
+static void game_initialize(uint32_t flags) {
+    Call_With_Safe_Exit(SDL_Init(flags), "SDL 初始化失败: ", SDL_Quit, SDL_GetError);
+    Call_With_Safe_Exit(TTF_Init(), "TTF 初始化失败: ", TTF_Quit, TTF_GetError);
 
 #if defined(__macosx__)
-        IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 #else
-        IMG_Init(IMG_INIT_PNG);
+    IMG_Init(IMG_INIT_PNG);
 #endif
-        /* manually check errors */ {
-            std::string err = std::string(IMG_GetError());
+    /* manually check errors */ {
+        std::string err = std::string(IMG_GetError());
 
-            if (err.size() > 0) {
-                fprintf(stderr, "IMG 初始化失败: %s\n", err.c_str());
-                exit(1);
-            }
+        if (err.size() > 0) {
+            fprintf(stderr, "IMG 初始化失败: %s\n", err.c_str());
+            exit(1);
         }
-        
-        // SDL_SetHint("SDL_IME_SHOW_UI", "1");
-
-        game_fonts_initialize(fontsize);
-
-        atexit(IMG_Quit);
-        atexit(game_fonts_destroy);
     }
+        
+    // SDL_SetHint("SDL_IME_SHOW_UI", "1");
+
+    game_fonts_initialize();
+
+    atexit(IMG_Quit);
+    atexit(game_fonts_destroy);
 }
 
 static SDL_Texture* game_create_texture(SDL_Window* window, SDL_Renderer* renderer, float* backing_scale = nullptr) {
@@ -526,7 +524,7 @@ void WarGrey::STEM::IUniverse::feed_client_extent(float* width, float* height) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int bgc, TTF_Font* font) {
+void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int bgc, shared_font_t font) {
     int width, height;
 
     this->feed_window_size(&width, &height);

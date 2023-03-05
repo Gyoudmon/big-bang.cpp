@@ -5,11 +5,11 @@
 #endif
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 
 #include <cstdint>
 
 #include "../graphlet.hpp"
+#include "../../graphics/font.hpp"
 #include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
@@ -21,17 +21,17 @@ namespace WarGrey::STEM {
     /** TODO: how to safely release the fonts, meanwhile leave them with memory leaks **/
 
     struct DimensionStyle {
-		TTF_Font* label_font = nullptr;
+		shared_font_t label_font = nullptr;
 		long label_color = -1;
 		long label_border_color = -1;
 		long label_background_color = -1;
 
-		TTF_Font* number_font = nullptr;
+		shared_font_t number_font = nullptr;
 		long number_color = -1;
 		long number_border_color = -1;
 		long number_background_color = -1;
 
-		TTF_Font* unit_font = nullptr;
+		shared_font_t unit_font = nullptr;
 		long unit_color = -1;
 		long unit_border_color = -1;
 		long unit_background_color = -1;
@@ -88,7 +88,7 @@ namespace WarGrey::STEM {
     private:
         void texture_collapse();
         void feed_subextent(int n, float* w = nullptr, float* h = nullptr);
-        void update_drawing_box(int idx, float minimize_width, TTF_Font* font, float leading_space);
+        void update_drawing_box(int idx, float minimize_width, shared_font_t font, float leading_space);
         void update_number_texture(SDL_Renderer* ds, float value, WarGrey::STEM::DimensionStyle& style);
         void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor);
 

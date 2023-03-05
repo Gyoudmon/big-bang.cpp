@@ -1,12 +1,12 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 
 #include <cstdint>
 
 #include "../graphlet.hpp"
 
+#include "../../graphics/font.hpp"
 #include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
@@ -24,7 +24,7 @@ namespace WarGrey::STEM {
         void set_text(const std::string& content, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         
     public:
-        void set_font(TTF_Font* font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
+        void set_font(shared_font_t font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         void set_text_color(uint32_t color_hex = SILVER, float alpha = 1.0F);
         void set_background_color(uint32_t bg_hex, float alpha = 1.0F);
         void set_border_color(uint32_t border_hex, float alpha = 1.0F);
@@ -45,7 +45,7 @@ namespace WarGrey::STEM {
 
     protected:
         SDL_Color text_color;
-        TTF_Font* text_font = nullptr;
+        shared_font_t text_font = nullptr;
         SDL_Texture* texture = nullptr;
         uint32_t bg_color;
         float bg_alpha = 0.0F;
@@ -59,15 +59,15 @@ namespace WarGrey::STEM {
     class Labellet : public virtual WarGrey::STEM::ITextlet {
     public:
         Labellet(const char* fmt, ...);
-        Labellet(TTF_Font* font, const char* fmt, ...);
+        Labellet(shared_font_t font, const char* fmt, ...);
         Labellet(uint32_t color_hex, const char* fmt, ...);
         Labellet(uint32_t color_hex, float alpha, const char* fmt, ...);
-        Labellet(TTF_Font* font, uint32_t color_hex, const char* fmt, ...);
-        Labellet(TTF_Font* font, uint32_t color_hex, float alpha, const char* fmt, ...);
+        Labellet(shared_font_t font, uint32_t color_hex, const char* fmt, ...);
+        Labellet(shared_font_t font, uint32_t color_hex, float alpha, const char* fmt, ...);
     };
 
     /*********************************************************************************************/
-    Labellet* make_label_for_tooltip(TTF_Font* font,
+    Labellet* make_label_for_tooltip(shared_font_t font,
         uint32_t fg_color = BLACK,
         uint32_t bg_color = SNOW,
         uint32_t border_color = GOLD);
