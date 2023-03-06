@@ -1,11 +1,11 @@
 #include "font.hpp"
 
-#include <map>
 #include <unordered_map>
 #include <filesystem>
 
 #include "../datum/flonum.hpp"
 #include "../datum/string.hpp"
+#include "../datum/hash.hpp"
 
 using namespace WarGrey::STEM;
 using namespace std::filesystem;
@@ -13,12 +13,24 @@ using namespace std::filesystem;
 /*************************************************************************************************/
 typedef std::tuple<std::string, int> font_key_t;
 
-static std::map<font_key_t, shared_font_t> fontdb;
+namespace {
+    struct FontKeyHash { // It might not be neccessary
+    public:
+        std::size_t operator() (const font_key_t& fk) const {
+            size_t hash = 0;
+            
+            hash_combine(hash, std::get<0>(fk));
+            hash_combine(hash, std::get<1>(fk));
 
+            return hash;
+        }
+    };
+}
+
+static std::unordered_map<font_key_t, shared_font_t, FontKeyHash> fontdb;
 static int medium_fontsize = 16;
 
 // GameFont::Title "Hiragino Sans GB.ttc";
-// GameFont::DEFAULT = GameFont::sans_serif;
 
 /*************************************************************************************************/
 static std::unordered_map<std::string, std::string> system_fonts;
@@ -54,7 +66,14 @@ void WarGrey::STEM::game_fonts_initialize() {
     }
 }
 
-void WarGrey::STEM::game_fonts_destroy() { /* nothing has to be done */}
+void WarGrey::STEM::game_fonts_destroy() {
+    /**
+     * Please remeber to clear the fonts
+     *   Or it will fail at exit due to segfault
+     * TODO: find out why.
+     */
+    fontdb.clear();
+}
 
 int WarGrey::STEM::generic_font_size(FontSize size) {
     switch (size) {
@@ -102,7 +121,7 @@ const char* WarGrey::STEM::generic_font_family_name(FontFamily family) {
 }
 
 /*************************************************************************************************/
-shared_font_t WarGrey::STEM::game_create_font(const char* face, int fontsize) {
+shared_font_t WarGrey::STEM::game_create_shared_font(const char* face, int fontsize) {
     std::string face_key(face);
     font_key_t font_key;
     
@@ -117,18 +136,47 @@ shared_font_t WarGrey::STEM::game_create_font(const char* face, int fontsize) {
 
         if (font == nullptr) {
             fprintf(stderr, "无法加载字体 '%s': %s\n", face, TTF_GetError());
-            fontdb[font_key] = null_font;
+            fontdb[font_key] = invalid_font;
         } else {
             basenames[std::string(TTF_FontFaceFamilyName(font))] = std::string(face);
             fontdb[font_key] = std::make_shared<GameFont>(font);
         }
     }
 
-    return fontdb.find(font_key)->second;
+    return fontdb[font_key];
 }
 
-shared_font_t WarGrey::STEM::game_create_font(const char* face, float fontsize) {
+shared_font_t WarGrey::STEM::game_create_shared_font(const char* face, float fontsize) {
+    return game_create_shared_font(face, fl2fxi(fontsize));
+}
+
+TTF_Font* WarGrey::STEM::game_create_font(const char* face, int fontsize) {
+    std::string face_key(face);
+    TTF_Font* font = nullptr;
+    
+    if (system_fonts.find(face_key) == system_fonts.end()) {
+        font = TTF_OpenFont(face, fontsize);
+    } else {
+        font = TTF_OpenFont(system_fonts[face_key].c_str(), fontsize);
+    }
+
+    if (font == nullptr) {
+        fprintf(stderr, "无法加载字体 '%s': %s\n", face, TTF_GetError());
+    } else {
+        basenames[std::string(TTF_FontFaceFamilyName(font))] = std::string(face);
+    }
+
+    return font;
+}
+
+TTF_Font* WarGrey::STEM::game_create_font(const char* face, float fontsize) {
     return game_create_font(face, fl2fxi(fontsize));
+}
+
+void WarGrey::STEM::game_destory_font(TTF_Font* font) {
+    if (font != nullptr) {
+        TTF_CloseFont(font);
+    }
 }
 
 const std::string* WarGrey::STEM::game_fontname_list(int* n, int fontsize) {
@@ -195,31 +243,31 @@ std::shared_ptr<GameFont> WarGrey::STEM::GameFont::Default(FontSize absize) {
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::sans_serif(int ftsize) {
-    return game_create_font(generic_font_family_name(FontFamily::sans_serif), ftsize);
+    return game_create_shared_font(generic_font_family_name(FontFamily::sans_serif), ftsize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::serif(int ftsize) {
-    return game_create_font(generic_font_family_name(FontFamily::serif), ftsize);
+    return game_create_shared_font(generic_font_family_name(FontFamily::serif), ftsize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::cursive(int ftsize) {
-    return game_create_font(generic_font_family_name(FontFamily::cursive), ftsize);
+    return game_create_shared_font(generic_font_family_name(FontFamily::cursive), ftsize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::fantasy(int ftsize) {
-    return game_create_font(generic_font_family_name(FontFamily::fantasy), ftsize);
+    return game_create_shared_font(generic_font_family_name(FontFamily::fantasy), ftsize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::monospace(int ftsize) {
-    return game_create_font(generic_font_family_name(FontFamily::monospace), ftsize);
+    return game_create_shared_font(generic_font_family_name(FontFamily::monospace), ftsize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::math(int ftsize) {
-    return game_create_font(generic_font_family_name(FontFamily::math), ftsize);
+    return game_create_shared_font(generic_font_family_name(FontFamily::math), ftsize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::fangsong(int ftsize) {
-    return game_create_font(generic_font_family_name(FontFamily::fangsong), ftsize);
+    return game_create_shared_font(generic_font_family_name(FontFamily::fangsong), ftsize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::Default(int ftsize) {

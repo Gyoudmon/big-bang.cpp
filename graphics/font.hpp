@@ -58,7 +58,7 @@ namespace WarGrey::STEM {
     };
 
     typedef std::shared_ptr<GameFont> shared_font_t;
-    static shared_font_t null_font = std::make_shared<GameFont>(nullptr);
+    static shared_font_t invalid_font = std::make_shared<GameFont>(nullptr);
 
     /*********************************************************************************************/
     void game_fonts_initialize();
@@ -67,7 +67,10 @@ namespace WarGrey::STEM {
     int generic_font_size(FontSize size);
     const char* generic_font_family_name(FontFamily family);
 
-    shared_font_t game_create_font(const char* basename, int fontsize);
-    shared_font_t game_create_font(const char* basename, float fontsize);
+    shared_font_t game_create_shared_font(const char* basename, int fontsize);
+    shared_font_t game_create_shared_font(const char* basename, float fontsize);
+    TTF_Font* game_create_font(const char* basename, int fontsize);
+    TTF_Font* game_create_font(const char* basename, float fontsize);
+    void game_destory_font(TTF_Font* font);
     const std::string* game_fontname_list(int* n, int fontsize = 16);
 }

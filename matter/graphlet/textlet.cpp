@@ -78,7 +78,7 @@ void WarGrey::STEM::ITextlet::set_text(const std::string& content, MatterAnchor 
     this->moor(anchor);
 
     if (!this->text_font->okay()) {
-        this->set_font(null_font, anchor);
+        this->set_font(invalid_font, anchor);
     } else {
         this->update_texture();
     }
