@@ -8,7 +8,7 @@
 namespace WarGrey::STEM {
     // https://www.w3.org/TR/css-fonts-4
     enum class FontSize { xx_small, x_small, small, medium, large, x_large, xx_large };
-    enum class FontFamily { sans_serif, serif, cursive, fantasy, math, monospace, fangsong };
+    enum class FontFamily { sans_serif, serif, cursive, fantasy, math, monospace, fangsong, _ };
 
     class GameFont {
     public:
@@ -36,7 +36,7 @@ namespace WarGrey::STEM {
         static std::shared_ptr<GameFont> fangsong(int ftsize);
 
     public:
-        GameFont(TTF_Font* raw) : font(raw) {}
+        GameFont(TTF_Font* raw, int ftsize) : font(raw), size(ftsize) {}
         virtual ~GameFont() { if (this->okay()) TTF_CloseFont(this->font); }
 
     public:
@@ -52,20 +52,29 @@ namespace WarGrey::STEM {
         int height();
         int ascent();
         int descent();
+
+    public:
+        std::shared_ptr<GameFont> try_fallback_for_unicode();
+
+    private:
+        static std::shared_ptr<GameFont> create_font(FontFamily family, int ftsize);
         
     private:
         TTF_Font* font = nullptr;
+        FontFamily family = FontFamily::_;
+        int size;
     };
 
     typedef std::shared_ptr<GameFont> shared_font_t;
-    static shared_font_t invalid_font = std::make_shared<GameFont>(nullptr);
+    static shared_font_t invalid_font = std::make_shared<GameFont>(static_cast<TTF_Font*>(nullptr), 0);
 
     /*********************************************************************************************/
     void game_fonts_initialize();
     void game_fonts_destroy();
 
     int generic_font_size(FontSize size);
-    const char* generic_font_family_name(FontFamily family);
+    const char* generic_font_family_name_for_ascii(FontFamily family);
+    const char* generic_font_family_name_for_chinese(FontFamily family);
 
     shared_font_t game_create_shared_font(const char* basename, int fontsize);
     shared_font_t game_create_shared_font(const char* basename, float fontsize);

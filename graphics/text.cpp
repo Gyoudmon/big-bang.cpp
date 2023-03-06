@@ -68,10 +68,21 @@ static SDL_Surface* blended_text_surface(shared_font_t font, uint32_t rgb, const
     return game_text_surface(text, font, ::TextRenderMode::Blender, text_color, text_color, wrap);
 }
 
+static TTF_Font* select_font(shared_font_t sfont, const std::string& text) {
+    if (!sfont->is_suitable(text)) {
+        sfont = sfont->try_fallback_for_unicode();
+    }
+
+    if (!sfont->okay()) {
+        sfont = GameFont::Default();
+    }
+
+    return sfont->self();
+}
+
 /*************************************************************************************************/
 std::string WarGrey::STEM::game_create_string(const char* fmt, ...) {
     VSNPRINT(s, fmt);
-
     return s;
 }
 
@@ -107,11 +118,7 @@ void WarGrey::STEM::game_text_size(shared_font_t font, float* width, float* heig
 /*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, shared_font_t sfont, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
     SDL_Surface* surface = nullptr;
-    TTF_Font* font = sfont->self();
-
-    if (font == nullptr) {
-        font = GameFont::Default()->self();
-    }
+    TTF_Font* font = select_font(sfont, text);
 
 #ifndef __windows__
     if (wrap >= 0) { // will wrap by newline for 0
