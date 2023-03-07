@@ -56,7 +56,7 @@ namespace WarGrey::STEM {
         bool motion_stopped() { return this->x_stopped() && this->y_stopped(); }
 
     protected:
-        virtual void on_heading_changed(float theta_rad, float vx, float vy) {}
+        virtual void on_heading_changed(float theta_rad, float vx, float vy, float prev_vr) {}
         virtual void on_motion_stopped() {}
 
     private:
@@ -66,7 +66,7 @@ namespace WarGrey::STEM {
 
     private:
         WarGrey::STEM::BorderStrategy border_strategies[4];
-        float bounce_acc = false;
+        bool bounce_acc = false;
         float ar = 0.0F;
         float ax = 0.0F;
         float ay = 0.0F;
@@ -75,27 +75,5 @@ namespace WarGrey::STEM {
         float vy = 0.0F;
         float mvx = 0.0F;
         float mvy = 0.0F;
-    };
-
-    class I4WayMotion {
-    public:
-        virtual void dispatch_heading_event(float theta_rad, float vx, float vy);
-
-    protected:
-        virtual void on_nward(float theta_rad, float vx, float vy) = 0;
-        virtual void on_eward(float theta_rad, float vx, float vy) = 0;
-        virtual void on_sward(float theta_rad, float vx, float vy) = 0;
-        virtual void on_wward(float theta_rad, float vx, float vy) = 0;
-    };
-
-    class I8WayMotion : public WarGrey::STEM::I4WayMotion {
-    public:
-        virtual void dispatch_heading_event(float theta_rad, float vx, float vy);
-
-    protected:
-        virtual void on_neward(float theta_rad, float vx, float vy) = 0;
-        virtual void on_nwward(float theta_rad, float vx, float vy) = 0;
-        virtual void on_esward(float theta_rad, float vx, float vy) = 0;
-        virtual void on_wsward(float theta_rad, float vx, float vy) = 0;
     };
 }

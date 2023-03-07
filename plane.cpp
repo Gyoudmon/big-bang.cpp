@@ -72,6 +72,10 @@ namespace WarGrey::STEM {
     };
 }
 
+static inline bool over_stepped(float tx, float cx, float spd) {
+    return flsign(tx - cx) != flsign(spd);
+}
+
 static inline void reset_timeline(uint32_t& frame_count, uint32_t& elapse, uint32_t count0) {
     elapse = 0U;
     frame_count = count0;
@@ -318,7 +322,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
 
     if (info != nullptr) {
         if (unsafe_matter_unmasked(info, this->mode)) {
-            if (this->move_matter_via_info(info, x, y, false)) {
+            if (this->move_matter_via_info(m, info, x, y, false)) {
                 this->notify_updated();
             }
         }
@@ -329,7 +333,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
             info = MATTER_INFO(child);
 
             if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
-                this->move_matter_via_info(info, x, y, false);
+                this->move_matter_via_info(m, info, x, y, false);
             }
 
             child = info->next;
@@ -1104,12 +1108,12 @@ void WarGrey::STEM::Plane::do_resize(IMatter* m, MatterInfo* info, float fx, flo
         nx = sx + (sw - nw) * fx;
         ny = sy + (sh - nh) * fy;
 
-        this->do_move_via_info(info, nx, ny, true);
+        this->do_move_via_info(m, info, nx, ny, true);
     }
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::Plane::do_move_via_info(MatterInfo* info, float x, float y, bool absolute) {
+bool WarGrey::STEM::Plane::do_move_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute) {
     bool moved = false;
     
     if (!absolute) {
@@ -1121,6 +1125,7 @@ bool WarGrey::STEM::Plane::do_move_via_info(MatterInfo* info, float x, float y, 
         info->x = x;
         info->y = y;
 
+        // this->on_motion_complete(m, info->x, info->y, 0.0F, 0.0F);
         this->size_cache_invalid();
         moved = true;
     }
@@ -1150,8 +1155,9 @@ bool WarGrey::STEM::Plane::do_glide_via_info(IMatter* m, MatterInfo* info, float
         info->gliding_tx = x;
         info->gliding_ty = y;
 
-        this->on_glide_start(m, sec, info->x, info->y, xspd, yspd);
+        this->on_motion_start(m, sec, info->x, info->y, xspd, yspd);
         m->step(&info->x, &info->y);
+        this->on_motion_step(m, info->x, info->y, xspd, yspd);
         this->size_cache_invalid();
         moved = true;
     }
@@ -1159,11 +1165,11 @@ bool WarGrey::STEM::Plane::do_glide_via_info(IMatter* m, MatterInfo* info, float
     return moved;
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(MatterInfo* info, float x, float y, bool absolute) {
+bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute) {
     bool moved = false;
     
     if (!info->gliding) {
-        moved = this->do_move_via_info(info, x, y, absolute);
+        moved = this->do_move_via_info(m, info, x, y, absolute);
     } else {
         if (info->queues.empty()) {
             info->queues.push_back( { x, y, 0.0F, 0.0F, absolute } );
@@ -1187,13 +1193,13 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, f
     bool moved = false;
     
     if (sec <= 0.0F) {
-        moved = this->move_matter_via_info(info, x, y, absolute);
+        moved = this->move_matter_via_info(m, info, x, y, absolute);
     } else {
         IScreen* screen = this->master();
         float sec_delta = (screen != nullptr) ? (1.0F / float(screen->frame_rate())) : 0.0F;
             
         if ((sec <= sec_delta) || (sec_delta == 0.0F)) {
-            moved = this->move_matter_via_info(info, x, y, absolute);
+            moved = this->move_matter_via_info(m, info, x, y, absolute);
         } else {
             if (m->motion_stopped()) {
                 info->queues.clear();
@@ -1242,21 +1248,23 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
     if (!m->motion_stopped()) {
         float hdist = 0.0F;
         float vdist = 0.0F;
+        float xspd = m->x_speed();
+        float yspd = m->y_speed();
         float cwidth, cheight;
 
-        if (info->gliding) {
-            m->step(&info->x, &info->y);
-
-            if (flsign(info->gliding_tx - info->x) != flsign(m->x_speed())
-                    || flsign(info->gliding_ty - info->y) != flsign(m->y_speed())) {
-                m->motion_stop();
-                info->gliding = false;
-                info->x = info->gliding_tx;
-                info->y = info->gliding_ty;
-                this->on_glide_complete(m, info->x, info->y);
-            }
+        m->step(&info->x, &info->y);
+        
+        if (info->gliding &&
+                (over_stepped(info->gliding_tx, info->x, xspd)
+                    || over_stepped(info->gliding_ty, info->y, yspd))) {
+            info->x = info->gliding_tx;
+            info->y = info->gliding_ty;
+            this->on_motion_step(m, info->x, info->y, xspd, yspd);
+            m->motion_stop();
+            info->gliding = false;
+            this->on_motion_complete(m, info->x, info->y, xspd, yspd);
         } else {
-            m->step(&info->x, &info->y);
+            this->on_motion_step(m, info->x, info->y, xspd, yspd);
         }
 
         this->size_cache_invalid();
@@ -1311,7 +1319,7 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
                     this->notify_updated();
                     break;
                 }
-            } else if (this->do_move_via_info(info, gm.target_x, gm.target_y, gm.absolute)) {
+            } else if (this->do_move_via_info(m, info, gm.target_x, gm.target_y, gm.absolute)) {
                 this->notify_updated();
             }
         }

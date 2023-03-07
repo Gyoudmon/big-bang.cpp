@@ -5,6 +5,7 @@
 
 #include "../datum/flonum.hpp"
 #include "../datum/fixnum.hpp"
+#include "../datum/box.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -225,6 +226,15 @@ SDL_RendererFlip WarGrey::STEM::game_scales_to_flip(float x_scale, float y_scale
     }
 
     return flip;
+}
+
+void WarGrey::STEM::game_flip_to_signs(SDL_RendererFlip flip, float* hsgn, float* vsgn) {
+    switch (flip) {
+    case SDL_FLIP_HORIZONTAL: SET_VALUES(hsgn, -1.0F, vsgn, 1.0F); break;
+    case SDL_FLIP_VERTICAL: SET_VALUES(hsgn, 1.0F, vsgn, -1.0F); break;
+    case SDL_FLIP_NONE: SET_VALUES(hsgn, 1.0F, vsgn, 1.0F); break;
+    default: SET_VALUES(hsgn, -1.0F, vsgn, -1.0F); break;
+    }
 }
 
 /*************************************************************************************************/

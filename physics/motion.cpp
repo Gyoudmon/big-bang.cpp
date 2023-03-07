@@ -1,7 +1,8 @@
-#include "movable.hpp"
+#include "motion.hpp"
 
 #include "../datum/box.hpp"
 
+#include "../graphics/geometry.hpp"
 #include "../physics/mathematics.hpp"
 
 using namespace WarGrey::STEM;
@@ -242,8 +243,10 @@ void WarGrey::STEM::IMovable::on_velocity_changed() {
     float rad = flatan(this->vy, this->vx);
 
     if (this->vr != rad) {
+        float pvr = this->vr;
+
         this->vr = rad;
-        this->on_heading_changed(rad, this->vx, this->vy);
+        this->on_heading_changed(rad, this->vx, this->vy, pvr);
     }
 }
 
@@ -252,20 +255,5 @@ void WarGrey::STEM::IMovable::check_velocity_changing() {
         if (this->ar != this->vr) {
             this->on_velocity_changed();
         }
-    }
-}
-
-/*************************************************************************************************/
-void WarGrey::STEM::I4WayMotion::dispatch_heading_event(float theta_rad, float vx, float vy) {
-    float theta = flabs(theta_rad);
-
-    if (theta < q_pi_f) {
-        this->on_eward(theta_rad, vx, vy);
-    } else if (theta > q_pi_f * 3.0F) {
-        this->on_wward(theta_rad, vx, vy);
-    } else if (theta_rad >= 0.0F) {
-        this->on_sward(theta_rad, vx, vy);
-    } else {
-        this->on_nward(theta_rad, vx, vy);
     }
 }

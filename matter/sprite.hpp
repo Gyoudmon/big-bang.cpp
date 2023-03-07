@@ -44,6 +44,7 @@ namespace WarGrey::STEM {
         void stop(int rest = 0);
 
     public:
+        virtual void flip(bool horizontal = true, bool vertical = false);
         virtual void greetings(int repeat = 1) {} 
         virtual void goodbye(int repeat = 1) {}
 

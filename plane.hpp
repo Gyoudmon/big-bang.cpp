@@ -151,8 +151,9 @@ namespace WarGrey::STEM {
         virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
 
     protected:
-        virtual void on_glide_start(WarGrey::STEM::IMatter* m, float sec, float x, float y, float xspd, float yspd) {}
-        virtual void on_glide_complete(WarGrey::STEM::IMatter* m, float x, float y) {}
+        virtual void on_motion_start(WarGrey::STEM::IMatter* m, float sec, float x, float y, float xspd, float yspd) {}
+        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, float xspd, float yspd) {}
+        virtual void on_motion_complete(WarGrey::STEM::IMatter* m, float x, float y, float xspd, float yspd) {}
         
     protected:
         virtual void on_enter(WarGrey::STEM::IPlane* from);
@@ -218,7 +219,8 @@ namespace WarGrey::STEM {
         Plane(const char* caption, unsigned int initial_mode = 0);
 
     public:
-        void shift_to_mode(unsigned int mode); // NOTE: mode 0 is designed for UI graphlets which will be unmasked in all modes;
+        // NOTE: mode 0 is designed for UI elements which will be unmasked in all modes
+        void shift_to_mode(unsigned int mode);
         unsigned int current_mode();
 
         bool matter_unmasked(WarGrey::STEM::IMatter* m);
@@ -298,11 +300,11 @@ namespace WarGrey::STEM {
         void on_matter_ready(IMatter* m) override {}
 
     private:
-        bool move_matter_via_info(MatterInfo* info, float x, float y, bool absolute);
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, bool absolute);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, float fx, float fy, float dx, float dy);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
-        bool do_move_via_info(MatterInfo* info, float x, float y, bool absolute);
+        bool do_move_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
         bool do_glide_via_info(IMatter* m, MatterInfo* info, float x, float y, float sec, float sec_delta, bool absolute);
         void do_motion_move(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         

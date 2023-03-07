@@ -7,6 +7,7 @@
 
 namespace WarGrey::STEM {
     SDL_RendererFlip game_scales_to_flip(float x_scale, float y_scale);
+    void game_flip_to_signs(SDL_RendererFlip flip, float* hsgn = nullptr, float* vsgn = nullptr);
 
     void game_draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height);
     void game_draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, int xoff = 0, int yoff = 0);

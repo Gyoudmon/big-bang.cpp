@@ -297,8 +297,8 @@ std::shared_ptr<GameFont> WarGrey::STEM::GameFont::Title() {
     return GameFont::sans_serif(FontSize::xx_large);
 }
 
-std::shared_ptr<GameFont> WarGrey::STEM::GameFont::Tooltip() {
-    return GameFont::serif(FontSize::small);
+std::shared_ptr<GameFont> WarGrey::STEM::GameFont::Tooltip(FontSize absize) {
+    return GameFont::serif(absize);
 }
 
 std::shared_ptr<GameFont> WarGrey::STEM::GameFont::create_font(FontFamily family, int ftsize) {

@@ -245,6 +245,20 @@ int WarGrey::STEM::ISprite::preferred_idle_duration() {
     return random_uniform(2000, 4000);
 }
 
+void WarGrey::STEM::ISprite::flip(bool horizontal, bool vertical) {
+    if (horizontal || vertical) {
+        if (horizontal) {
+            this->xscale *= -1.0F;
+        }
+
+        if (vertical) {
+            this->yscale *= -1.0F;
+        }
+
+        this->notify_updated();
+    }
+}
+
 SDL_RendererFlip WarGrey::STEM::ISprite::current_flip_status() {
     return game_scales_to_flip(this->xscale, this->yscale);
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "forward.hpp"
-#include "physics/movable.hpp"
+#include "physics/motion.hpp"
 
 #include <SDL2/SDL.h>
 

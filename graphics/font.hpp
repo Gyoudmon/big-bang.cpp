@@ -15,7 +15,7 @@ namespace WarGrey::STEM {
         static void fontsize(int fontsize = 16);
 
         static std::shared_ptr<GameFont> Title();
-        static std::shared_ptr<GameFont> Tooltip();
+        static std::shared_ptr<GameFont> Tooltip(FontSize absize = FontSize::small);
 
         static std::shared_ptr<GameFont> Default(FontSize absize = FontSize::medium);
         static std::shared_ptr<GameFont> sans_serif(FontSize absize = FontSize::medium);

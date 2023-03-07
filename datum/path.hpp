@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace WarGrey::STEM {
 	int path_next_slash_position(const std::string& path, int start = 0, int fallback = -1);
 
