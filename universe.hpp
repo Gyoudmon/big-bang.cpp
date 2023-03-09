@@ -43,7 +43,6 @@ namespace WarGrey::STEM {
         SDL_Renderer* master_renderer() override;
         
     public: // 窗体 setter 和 getter
-        void set_blend_mode(SDL_BlendMode bmode);
         void set_window_title(std::string& title);
         void set_window_title(const char* fmt, ...);
         void set_window_size(int width, int height, bool centerize = true);

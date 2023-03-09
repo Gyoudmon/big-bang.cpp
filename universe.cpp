@@ -172,8 +172,6 @@ WarGrey::STEM::IUniverse::IUniverse(int fps, uint32_t fgc, uint32_t bgc) : _fgc(
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     game_create_world(1, 0, &this->window, &this->renderer);
     
-    this->set_blend_mode(SDL_BLENDMODE_NONE);
-
     this->echo.x = 0;
     this->echo.h = 0;
 }
@@ -447,10 +445,6 @@ int WarGrey::STEM::IUniverse::cmdline_message_yposition() {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IUniverse::set_blend_mode(SDL_BlendMode bmode) {
-    SDL_SetRenderDrawBlendMode(this->renderer, bmode);
-}
-
 void WarGrey::STEM::IUniverse::set_window_title(std::string& title) {
     SDL_SetWindowTitle(this->window, title.c_str());
 }

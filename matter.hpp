@@ -43,6 +43,7 @@ namespace WarGrey::STEM {
         
     public:
         virtual bool is_colliding_with_mouse(float local_x, float local_y) { return true; }
+        virtual void on_location_changed(float x, float y, float old_x, float old_y) {}
         virtual bool on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) { return false; }
         virtual bool on_text(const char* text, size_t size, bool entire) { return false; }
         virtual bool on_editing_text(const char* text, int pos, int span) { return false; }

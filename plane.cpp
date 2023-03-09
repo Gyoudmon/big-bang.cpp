@@ -1122,10 +1122,13 @@ bool WarGrey::STEM::Plane::do_move_via_info(IMatter* m, MatterInfo* info, float 
     }    
     
     if ((info->x != x) || (info->y != y)) {
+        float ox = info->x;
+        float oy = info->y;
+
         info->x = x;
         info->y = y;
 
-        // this->on_motion_complete(m, info->x, info->y, 0.0F, 0.0F);
+        m->on_location_changed(info->x, info->y, ox, oy);
         this->size_cache_invalid();
         moved = true;
     }
@@ -1162,6 +1165,7 @@ bool WarGrey::STEM::Plane::do_glide_via_info(IMatter* m, MatterInfo* info, float
         this->on_motion_start(m, sec, info->x, info->y, xspd, yspd);
         m->step(&info->x, &info->y);
         this->on_motion_step(m, info->x, info->y, xspd, yspd);
+        m->on_location_changed(info->x, info->y, x - dx, y - dy);
         this->size_cache_invalid();
         moved = true;
     }
@@ -1254,6 +1258,8 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
         float vdist = 0.0F;
         float xspd = m->x_speed();
         float yspd = m->y_speed();
+        float ox = info->x;
+        float oy = info->y;
         float cwidth, cheight;
 
         m->step(&info->x, &info->y);
@@ -1271,7 +1277,6 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
             this->on_motion_step(m, info->x, info->y, xspd, yspd);
         }
 
-        this->size_cache_invalid();
         m->feed_extent(info->x, info->y, &cwidth, &cheight);
 
         if (info->x < 0) {
@@ -1311,7 +1316,11 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
             info->gliding = false;
         }
 
-        this->notify_updated();
+        if ((info->x != ox) || (info->y != oy)) {
+            m->on_location_changed(info->x, info->y, ox, oy);
+            this->size_cache_invalid();
+            this->notify_updated();
+        }
     } else {
         while (!info->motion_queues.empty()) {
             GlidingMotion gm = info->motion_queues.front();
@@ -1376,6 +1385,13 @@ void WarGrey::STEM::IPlane::on_enter(IPlane* from) {
 
 void WarGrey::STEM::IPlane::feed_background(SDL_Color* c) {
     RGB_FillColor(c, this->background, this->bg_alpha);
+}
+
+void WarGrey::STEM::IPlane::feed_mouse_location(float* mx, float* my) {
+    int fxmx, fxmy;
+
+    SDL_GetMouseState(&fxmx, &fxmy);
+    SET_VALUES(mx, float(fxmx), my, float(fxmy));
 }
 
 void WarGrey::STEM::IPlane::start_input_text(const char* fmt, ...) {
@@ -1553,6 +1569,13 @@ void WarGrey::STEM::IPlane::glide_to_random_location(float sec, IMatter* m) {
             float(random_uniform(int(vinset), int(height - vinset))),
             MatterAnchor::CC);
     }
+}
+
+void WarGrey::STEM::IPlane::glide_to_mouse(float sec, IMatter* m, MatterAnchor a, float dx, float dy) {
+    float mx, my;
+
+    this->feed_mouse_location(&mx, &my);
+    this->glide_to(sec, m, mx, my, a, dx, dy);
 }
 
 /*************************************************************************************************/

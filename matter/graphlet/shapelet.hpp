@@ -1,17 +1,23 @@
 #pragma once
 
 #include "../graphlet.hpp"
+#include "../../graphics/colorspace.hpp"
 
 namespace WarGrey::STEM {
     class IShapelet : public WarGrey::STEM::IGraphlet {
     public:
         IShapelet(int32_t color = -1, int32_t border_color = -1);
-        virtual ~IShapelet() { /* do nothing */ };
+        virtual ~IShapelet() { this->invalidate_geometry(); }
 
     public:
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:
+        void set_color_mixture(WarGrey::STEM::ColorMixture mixture);
+        void set_alpha(unsigned char alpha);
+        void set_alpha(float alpha);
+        unsigned char get_alpha() { return this->alpha; }
+
         void set_color(int32_t color);
         int32_t get_color() { return this->color; }
 
@@ -20,19 +26,20 @@ namespace WarGrey::STEM {
  
     protected:
         virtual void on_moved(float new_x, float new_y) {}
-        virtual void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
-        virtual void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
+        virtual void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
+        virtual void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
 
     protected:
-        void dirty_cached_position();
+        void invalidate_geometry();
 
     private:
+        ColorMixture mixture = ColorMixture::Alpha;
         int32_t color = -1;
         int32_t border_color = -1;
+        unsigned char alpha = 0xFFU;
 
     private:
-        float last_x;
-        float last_y;
+        SDL_Texture* geometry;
     };
 
     /**********************************************************************************************/
@@ -45,8 +52,8 @@ namespace WarGrey::STEM {
         
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override {}
-        void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override {}
+        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
     private:
         float epx;
@@ -74,8 +81,8 @@ namespace WarGrey::STEM {
 	    
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	private:
 	    float width;
@@ -98,8 +105,8 @@ namespace WarGrey::STEM {
 	    
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	private:
 	    float width;
@@ -110,7 +117,7 @@ namespace WarGrey::STEM {
     class RoundedSquarelet : public WarGrey::STEM::RoundedRectanglet {
     public:
         RoundedSquarelet(float edge_size, float radius, int32_t color, int32_t border_color = -1)
-        : RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
+            : RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
     };
 
     class Ellipselet : public WarGrey::STEM::IShapelet {
@@ -123,8 +130,8 @@ namespace WarGrey::STEM {
 	    
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	private:
 	    float aradius;
@@ -146,8 +153,8 @@ namespace WarGrey::STEM {
 	    
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
     private:
         float x2;
@@ -166,10 +173,9 @@ namespace WarGrey::STEM {
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
 	    
     protected:
-        void on_moved(float new_x, float new_y) override;
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int x, int y, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
     private:
         void initialize_vertice();
@@ -180,8 +186,8 @@ namespace WarGrey::STEM {
         float bradius;
         float rotation;
         float* xs = nullptr;
-        short* txs = nullptr;
         float* ys = nullptr;
+        short* txs = nullptr;
         short* tys = nullptr;
 
     private:

@@ -3,6 +3,17 @@
 #include <SDL2/SDL.h>
 
 namespace WarGrey::STEM {
+    enum class ColorMixture {
+        None = 0,
+        Add = 1,
+        Subtract = 2, Multiply = 2, // Yes, they're identical
+        Modulate = 3,
+        Alpha = 4
+    };
+
+    SDL_BlendMode color_mixture_to_blend_mode(WarGrey::STEM::ColorMixture mixture);
+    ColorMixture blend_mode_to_color_mixture(SDL_BlendMode mode);
+
     void RGB_FillColor(SDL_Color* c, unsigned int hex, float alpha);
     void RGB_FillColor(SDL_Color* c, unsigned int hex, unsigned char alpha = 255U);
 

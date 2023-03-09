@@ -64,6 +64,7 @@ namespace WarGrey::STEM {
     public:
         void set_background(uint32_t color, float a = 1.0F) { this->background = color; this->bg_alpha = a; }
         void feed_background(SDL_Color* color);
+        void feed_mouse_location(float* x, float* y);
         void start_input_text(const std::string& prompt);
         void start_input_text(const char* prompt, ...);
         void log_message(int fgc, const char* fmt, ...);
@@ -113,6 +114,7 @@ namespace WarGrey::STEM {
         void glide_to(float sec, IMatter* m, IMatter* tm, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void glide_to(float sec, IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void glide_to_random_location(float sec, IMatter* m);
+        void glide_to_mouse(float sec, IMatter* m, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
         
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);

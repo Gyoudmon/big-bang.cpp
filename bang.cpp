@@ -21,6 +21,7 @@ void WarGrey::STEM::TheBigBang::load(float width, float height) {
     this->agent = this->insert(new Linkmon());
     this->agent->scale(-1.0F, 1.0F);
 
+    this->title->camouflage(true);
     this->set_sentry_sprite(this->agent);
     this->move_to(this->title, this->agent, MatterAnchor::RB, MatterAnchor::LB);
 }
