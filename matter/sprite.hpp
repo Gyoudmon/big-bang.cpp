@@ -7,6 +7,12 @@
 #include <string>
 
 namespace WarGrey::STEM {
+    struct SpriteRenderArguments {
+        SDL_FRect dst;
+        SDL_RendererFlip flip;
+    };
+
+    /*********************************************************************************************/
     class ISprite : public WarGrey::STEM::IMatter {
     public:
         ISprite() {}
@@ -24,6 +30,7 @@ namespace WarGrey::STEM {
         virtual size_t costume_count() = 0;
         
     public:
+        void set_virtual_canvas(float width, float height);
         void switch_to_costume(int idx);
         void switch_to_costume(const char* name);
         void switch_to_costume(const std::string& name) { this->switch_to_costume(name.c_str()); }
@@ -33,6 +40,9 @@ namespace WarGrey::STEM {
         void switch_to_random_costume(int idx0 = 0) { this->switch_to_random_costume(idx0, int(this->costume_count()) - 1); }
         size_t current_costume_index() { return this->current_costume_idx; }
         const char* current_costume_name() { return this->costume_index_to_name(this->current_costume_index()); };
+        void auto_virtual_canvas(const char* action_name = nullptr);
+        void auto_virtual_canvas(const std::string& action_name) { this->auto_virtual_canvas(action_name.c_str()); }
+        
 
     public:
         int preferred_local_fps() override { return 10; }
@@ -53,7 +63,7 @@ namespace WarGrey::STEM {
         virtual void feed_costume_extent(size_t idx, float* width, float* height) = 0;
         virtual const char* costume_index_to_name(size_t idx) = 0;
         virtual int costume_name_to_index(const char* name);
-        virtual void draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) = 0;
+        virtual void draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) = 0;
 
     protected:
         virtual int get_initial_costume_index() { return 0; }
@@ -67,16 +77,18 @@ namespace WarGrey::STEM {
     protected:
         SDL_RendererFlip current_flip_status();
 
-    private:
-        size_t current_costume_idx = 0;
-        float xscale = 1.0F;
-        float yscale = 1.0F;
-
     protected:
         std::string current_action_name;
         std::vector<std::pair<int, int>> frame_refs;
         int animation_rest = 0;
         int next_branch = -1;
         int idle_time0 = 0;
+
+    private:
+        size_t current_costume_idx = 0;
+        float canvas_width = 0.0F;
+        float canvas_height = 0.0F;
+        float xscale = 1.0F;
+        float yscale = 1.0F;
     };
 }

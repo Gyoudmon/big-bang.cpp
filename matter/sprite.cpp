@@ -32,8 +32,18 @@ void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* 
 void WarGrey::STEM::ISprite::feed_original_extent(float x, float y, float* width, float* height) {
     if (this->current_costume_idx >= this->costume_count()) {
         SET_BOXES(width, height, 0.0F);
+    } else if ((this->canvas_width > 0.0F) && (this->canvas_height > 0.0F)) {
+        SET_VALUES(width, this->canvas_width, height, this->canvas_height);
     } else {
         this->feed_costume_extent(this->current_costume_idx, width, height);
+        
+        if (this->canvas_width > 0.0F) {
+            SET_BOX(width, this->canvas_width);
+        }
+
+        if (this->canvas_height > 0.0F) {
+            SET_BOX(height, this->canvas_height);
+        }
     }
 }
 
@@ -52,8 +62,92 @@ void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_widt
 
 void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if (this->current_costume_idx < this->costume_count()) {
-        this->draw_costume(renderer, this->current_costume_idx, x, y, Width, Height);
+        SpriteRenderArguments argv;
+        
+        argv.dst = { x, y, Width, Height };
+        argv.flip = this->current_flip_status();
+
+        if ((this->canvas_width <= 0.0F) && (this->canvas_height <= 0.0F)) {
+            this->draw_costume(renderer, this->current_costume_idx, nullptr, &argv);
+        } else {
+            float width, height, xoff, yoff;
+            float sx = flabs(this->xscale);
+            float sy = flabs(this->yscale);
+            float cwidth = this->canvas_width;
+            float cheight = this->canvas_height;
+
+            this->feed_costume_extent(this->current_costume_idx, &width, &height);
+
+            if (cwidth <= 0.0F) {
+                cwidth = width;
+            }
+
+            if (cheight <= 0.0F) {
+                cheight = height;
+            }
+        
+            xoff = (cwidth - width) * 0.5F * sx;
+            yoff = (cheight - height) * 0.5F * sy;
+
+            if (xoff > 0.0F) {
+                argv.dst.x += xoff;
+                argv.dst.w -= xoff * 2.0F;
+            }
+
+            if (yoff > 0.0F) {
+                argv.dst.y += yoff;
+                argv.dst.h -= yoff * 2.0F;
+            }
+
+            if ((xoff >= 0.0F) && (yoff >= 0.0F)) {
+                this->draw_costume(renderer, this->current_costume_idx, nullptr, &argv);
+            } else {
+                SDL_Rect src = { 0, 0, fl2fxi(width), fl2fxi(height) };
+            
+                if (xoff < 0.0F) {
+                    src.x = fl2fxi(-xoff) / sx;
+                    src.w -= src.x * 2.0F;
+                }
+
+                if (yoff < 0.0F) {
+                    src.y = fl2fxi(-yoff) / sy;
+                    src.h -= src.y * 2.0F;
+                }
+
+                this->draw_costume(renderer, this->current_costume_idx, &src, &argv);
+            }
+        }
     }
+}
+
+void WarGrey::STEM::ISprite::set_virtual_canvas(float width, float height) {
+    if ((this->canvas_width != width) || (this->canvas_height != height)) {
+        this->canvas_width = width;
+        this->canvas_height = height;
+        this->notify_updated();
+    }
+}
+
+void WarGrey::STEM::ISprite::auto_virtual_canvas(const char* action_name) {
+    float cwidth = 0.0F;
+    float cheight = 0.0F;
+    float cw, ch;
+
+    for (size_t idx = 0; idx < this->costume_count(); idx ++) {
+        if ((action_name == nullptr) || string_prefix(this->costume_index_to_name(idx), action_name)) {
+            this->feed_costume_extent(idx, &cw, &ch);
+
+            if (cw > cwidth) {
+                cwidth = cw;
+            }
+
+            if (ch > cheight) {
+                cheight = ch;
+            }
+        }
+    }
+
+    this->set_virtual_canvas(cw, ch);
 }
 
 void WarGrey::STEM::ISprite::switch_to_costume(int idx) {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 
 #include <cstdint>
 
@@ -61,7 +60,7 @@ namespace WarGrey::STEM {
         void feed_client_extent(float* width, float* height) override;
 
     public: // 用户 IME 输入输出
-        void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, shared_font_t font = GameFont::monospace(FontSize::xx_small));
+        void set_cmdwin_height(int height, int fgc = -1, int bgc = -1, shared_font_t font = GameFont::monospace(16));
         int get_cmdwin_height() { return this->echo.h; }
         void start_input_text(const char* fmt, ...);
         void start_input_text(const std::string& prompt) override;
@@ -118,6 +117,7 @@ namespace WarGrey::STEM {
         void do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height);
         bool display_usr_input_and_caret(SDL_Renderer* renderer, bool yes);
         bool display_usr_message(SDL_Renderer* renderer);
+        int cmdline_message_yposition();
         void enter_input_text();
         void popback_input_text();
 

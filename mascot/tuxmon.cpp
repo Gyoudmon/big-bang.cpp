@@ -1,6 +1,5 @@
 #include "tuxmon.hpp"
 
-#include "../datum/flonum.hpp"
 #include "../graphics/geometry.hpp"
 
 using namespace WarGrey::STEM;

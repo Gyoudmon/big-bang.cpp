@@ -9,11 +9,11 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname) : ISprite(), _pathname(pathname) {
+WarGrey::STEM::ISpriteSheet::ISpriteSheet(const char* pathname) : ISpriteSheet(std::string(pathname)) {}
+
+WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname) : _pathname(pathname) {
     this->enable_resize(true);
 }
-
-WarGrey::STEM::ISpriteSheet::ISpriteSheet(const char* pathname) : ISpriteSheet(std::string(pathname)) {}
 
 void WarGrey::STEM::ISpriteSheet::construct(SDL_Renderer* renderer) {
     this->sprite_sheet = imgdb_ref(this->_pathname, renderer);
@@ -31,16 +31,17 @@ void WarGrey::STEM::ISpriteSheet::feed_costume_extent(size_t idx, float* width, 
     SET_BOX(height, float(this->costume_region.h));
 }
 
-void WarGrey::STEM::ISpriteSheet::draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) {
-    SDL_FRect dest;
-
-    dest.x = x;
-    dest.y = y;
-    dest.w = Width;
-    dest.h = Height;
-
+void WarGrey::STEM::ISpriteSheet::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
     this->feed_costume_region(&this->costume_region, idx);
-    game_render_texture(renderer, this->sprite_sheet->texture(), &this->costume_region, &dest, this->current_flip_status());
+    
+    if (src == nullptr) {
+        src = &this->costume_region;
+    } else {
+        src->x += this->costume_region.x;
+        src->y += this->costume_region.y;
+    }
+
+    game_render_texture(renderer, this->sprite_sheet->texture(), src, &argv->dst, argv->flip);
 }
 
 /*************************************************************************************************/

@@ -62,7 +62,7 @@ namespace WarGrey::STEM {
         bool gliding = false;
         float gliding_tx = 0.0F;
         float gliding_ty = 0.0F;
-        std::deque<GlidingMotion> queues;
+        std::deque<GlidingMotion> motion_queues;
 
         // for asynchronously loaded matters
         AsyncInfo* async = nullptr;
@@ -318,10 +318,10 @@ void WarGrey::STEM::Plane::erase() {
 }
 
 void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
-    MatterInfo* info = plane_matter_info(this, m);
+    if (m != nullptr) {
+        MatterInfo* info = plane_matter_info(this, m);
 
-    if (info != nullptr) {
-        if (unsafe_matter_unmasked(info, this->mode)) {
+        if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
             if (this->move_matter_via_info(m, info, x, y, false)) {
                 this->notify_updated();
             }
@@ -330,7 +330,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
         IMatter* child = this->head_matter;
 
         do {
-            info = MATTER_INFO(child);
+            MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
                 this->move_matter_via_info(m, info, x, y, false);
@@ -389,17 +389,17 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMat
 }
 
 void WarGrey::STEM::Plane::glide(float sec, IMatter* m, float x, float y) {
-    MatterInfo* info = plane_matter_info(this, m);
+    if (m != nullptr) {
+        MatterInfo* info = plane_matter_info(this, m);
 
-    if (info != nullptr) {
-        if (unsafe_matter_unmasked(info, this->mode)) {
+        if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
             this->glide_matter_via_info(m, info, sec, x, y, false);
         }
     } else if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
 
         do {
-            info = MATTER_INFO(child);
+            MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
                 this->glide_matter_via_info(m, info, sec, x, y, false);
@@ -1142,7 +1142,11 @@ bool WarGrey::STEM::Plane::do_glide_via_info(IMatter* m, MatterInfo* info, float
     }    
 
     if ((info->x != x) || (info->y != y)) {
-        float n = flceiling(sec / sec_delta);
+        /** WARNING
+         * Meanwhile the gliding time is not accurate
+         * `flfloor` makes it more accurate than `flceiling`
+         **/
+        float n = flfloor(sec / sec_delta);
         float dx = x - info->x;
         float dy = y - info->y;
         float xspd = dx / n;
@@ -1167,21 +1171,21 @@ bool WarGrey::STEM::Plane::do_glide_via_info(IMatter* m, MatterInfo* info, float
 
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute) {
     bool moved = false;
-    
+
     if (!info->gliding) {
         moved = this->do_move_via_info(m, info, x, y, absolute);
     } else {
-        if (info->queues.empty()) {
-            info->queues.push_back( { x, y, 0.0F, 0.0F, absolute } );
+        if (info->motion_queues.empty()) {
+            info->motion_queues.push_back( { x, y, 0.0F, 0.0F, absolute } );
         } else {
-            auto back = info->queues.back();
+            auto back = info->motion_queues.back();
 
             if (back.second == 0.0F) {
                 back.target_x = x;
                 back.target_y = y;
                 back.absolute = absolute;
             } else {
-                info->queues.push_back( { x, y, 0.0F, 0.0F, absolute } );
+                info->motion_queues.push_back( { x, y, 0.0F, 0.0F, absolute } );
             }
         }
     }
@@ -1197,17 +1201,17 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, f
     } else {
         IScreen* screen = this->master();
         float sec_delta = (screen != nullptr) ? (1.0F / float(screen->frame_rate())) : 0.0F;
-            
+
         if ((sec <= sec_delta) || (sec_delta == 0.0F)) {
             moved = this->move_matter_via_info(m, info, x, y, absolute);
         } else {
             if (m->motion_stopped()) {
-                info->queues.clear();
+                info->motion_queues.clear();
                 moved = this->do_glide_via_info(m, info, x, y, sec, sec_delta, absolute);
             } else if (!info->gliding) {
                 moved = this->do_glide_via_info(m, info, x, y, sec, sec_delta, absolute);
             } else {
-                info->queues.push_back({ x, y, sec, sec_delta, absolute });
+                info->motion_queues.push_back({ x, y, sec, sec_delta, absolute });
             }
         }
     }
@@ -1309,10 +1313,10 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
 
         this->notify_updated();
     } else {
-        while (!info->queues.empty()) {
-            GlidingMotion gm = info->queues.front();
+        while (!info->motion_queues.empty()) {
+            GlidingMotion gm = info->motion_queues.front();
 
-            info->queues.pop_front();
+            info->motion_queues.pop_front();
 
             if (gm.second > 0.0F) {
                 if (this->do_glide_via_info(m, info, gm.target_x, gm.target_y, gm.second, gm.sec_delta, gm.absolute)) {

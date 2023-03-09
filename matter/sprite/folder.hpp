@@ -28,8 +28,8 @@ namespace WarGrey::STEM {
     protected:
         void feed_costume_extent(size_t idx, float* width, float* height) override;
         const char* costume_index_to_name(size_t idx) override;
-        void draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) override;
-
+        void draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) override;
+    
     private:
         void load_costume(SDL_Renderer* renderer, const std::string& png);
         void load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png);

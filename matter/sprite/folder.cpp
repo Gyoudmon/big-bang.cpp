@@ -3,6 +3,7 @@
 #include "../../datum/box.hpp"
 #include "../../datum/path.hpp"
 #include "../../datum/string.hpp"
+#include "../../datum/flonum.hpp"
 
 #include "../../graphics/geometry.hpp"
 
@@ -12,14 +13,14 @@ using namespace WarGrey::STEM;
 using namespace std::filesystem;
 
 /*************************************************************************************************/
-WarGrey::STEM::Sprite::Sprite(const std::string& pathname) : _pathname(pathname) {
-    this->enable_resize(true);
-}
-
 WarGrey::STEM::Sprite::Sprite(const char* pathname_fmt, ...) {
     VSNPRINT(pathname, pathname_fmt);
 
     this->_pathname = pathname;
+    this->enable_resize(true);
+}
+
+WarGrey::STEM::Sprite::Sprite(const std::string& pathname) : _pathname(pathname) {
     this->enable_resize(true);
 }
 
@@ -53,18 +54,15 @@ void WarGrey::STEM::Sprite::feed_costume_extent(size_t idx, float* width, float*
     this->costumes[idx].second->feed_extent(width, height);
 }
 
-void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) {
-    SDL_RendererFlip flip = this->current_flip_status();
-    SDL_FRect region = { x, y, Width, Height };
-
-    game_render_texture(renderer, this->costumes[idx].second->texture(), &region, flip);
+void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
+    game_render_texture(renderer, this->costumes[idx].second->texture(), src, &argv->dst, argv->flip);
 
     if (this->current_decorate.size() > 0) {
         std::string c_name = this->costumes[idx].first;
         auto decorate = this->decorates[this->current_decorate];
 
         if (decorate.find(c_name) != decorate.end()) {
-            game_render_texture(renderer, decorate[c_name]->texture(), &region, flip);
+            game_render_texture(renderer, decorate[c_name]->texture(), src, &argv->dst, argv->flip);
         }
     }
 }

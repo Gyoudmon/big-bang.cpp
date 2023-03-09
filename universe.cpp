@@ -396,7 +396,7 @@ bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
 
         if (!this->message.empty()) {
             game_draw_blended_text(this->echo_font, renderer, this->_mfgc,
-                    this->echo.x, this->echo.y, this->message, this->echo.w);
+                    this->echo.x, this->cmdline_message_yposition(), this->message, this->echo.w);
         }
     } else {
         if (!this->message.empty()) {
@@ -419,10 +419,10 @@ bool WarGrey::STEM::IUniverse::display_usr_input_and_caret(SDL_Renderer* rendere
         if (yes) {
             if (this->prompt.empty()) {
                 game_draw_blended_text(this->echo_font, renderer, this->_ifgc,
-                        this->echo.x, this->echo.y, this->usrin + "_", this->echo.w);
+                        this->echo.x, this->cmdline_message_yposition(), this->usrin + "_", this->echo.w);
             } else {
                 game_draw_blended_text(this->echo_font, renderer, this->_ifgc,
-                        this->echo.x, this->echo.y, this->prompt + this->usrin + "_", this->echo.w);
+                        this->echo.x, this->cmdline_message_yposition(), this->prompt + this->usrin + "_", this->echo.w);
             }
         }
 
@@ -430,6 +430,20 @@ bool WarGrey::STEM::IUniverse::display_usr_input_and_caret(SDL_Renderer* rendere
     }
 
     return updated;
+}
+
+int WarGrey::STEM::IUniverse::cmdline_message_yposition() {
+    int yoff = 0;
+
+    if (this->echo_font->okay()) {
+        yoff = (this->echo.h - this->echo_font->height()) / 2;
+    }
+
+    if (yoff < 0) {
+        yoff = 0;
+    }
+
+    return this->echo.y + yoff;
 }
 
 /*************************************************************************************************/

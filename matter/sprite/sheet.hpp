@@ -18,7 +18,7 @@ namespace WarGrey::STEM {
 
     protected:
         void feed_costume_extent(size_t idx, float* width, float* height) override;
-        void draw_costume(SDL_Renderer* renderer, size_t idx, float x, float y, float Width, float Height) override;
+        void draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) override;
         
     private:
         WarGrey::STEM::shared_costume_t sprite_sheet;
