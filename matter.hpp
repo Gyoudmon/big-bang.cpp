@@ -77,9 +77,9 @@ namespace WarGrey::STEM {
                               use this method to do it manually. */
 
     public:
-        void camouflage(bool yes_no) { this->findable = !yes_no; }
+        void camouflage(bool yes = true) { this->findable = !yes; }
         bool concealled() { return !this->findable; }
-        void show(bool yes_no);
+        void show(bool yes = true);
         bool visible() { return !this->invisible; }
 
     public:
@@ -94,8 +94,8 @@ namespace WarGrey::STEM {
         IMatterInfo* info = nullptr;
 
     protected:
-        void enable_events(bool yes_no, bool low_level = false) { this->deal_with_events = yes_no; this->deal_with_low_level_events = low_level; }
-        void enable_resize(bool yes_no = true) { this->can_resize = yes_no; }
+        void enable_events(bool yes = true, bool low_level = false) { this->deal_with_events = yes; this->deal_with_low_level_events = low_level; }
+        void enable_resize(bool yes = true) { this->can_resize = yes; }
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
 
     private:
