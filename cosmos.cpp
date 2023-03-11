@@ -52,7 +52,7 @@ WarGrey::STEM::Cosmos::~Cosmos() {
     delete this->screen;
 }
 
-void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
+IPlane* WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
     // NOTE: this method is designed to be invoked in `Cosmos::construct()`
 
     if (plane->info == nullptr) {
@@ -78,6 +78,8 @@ void WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
 
         info->next = this->head_plane;
     }
+
+    return plane;
 }
 
 void WarGrey::STEM::Cosmos::collapse() {

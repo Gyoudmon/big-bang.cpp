@@ -14,11 +14,7 @@ float WarGrey::STEM::degrees_to_radians(float degrees) {
 }
 
 void WarGrey::STEM::orthogonal_decomposition(float magnitude, float direction, float* x, float* y, bool is_radian) {
-    float rad = direction;
-
-    if (!is_radian) {
-        rad = degrees_to_radians(rad);
-    }
+    float rad = is_radian ? direction : degrees_to_radians(direction);
 
     SET_BOX(x, magnitude * flcos(rad));
     SET_BOX(y, magnitude * flsin(rad));
@@ -61,6 +57,21 @@ bool WarGrey::STEM::rectangle_overlay(float tlx1, float tly1, float brx1, float 
 
 bool WarGrey::STEM::rectangle_contain(float tlx, float tly, float brx, float bry, float x, float y) {
     return flin(tlx, x, brx) && flin(tly, y, bry);
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::circle_point(float radius, float angle, float* x, float* y, bool is_radian) {
+    float rad = is_radian ? angle : degrees_to_radians(angle);
+
+	SET_BOX(x, radius * flcos(rad));
+	SET_BOX(y, radius * flsin(rad));
+}
+
+void WarGrey::STEM::ellipse_point(float radiusX, float radiusY, float angle, float* x, float* y, bool is_radian) {
+    float rad = is_radian ? angle : degrees_to_radians(angle);
+
+	SET_BOX(x, radiusX * flcos(rad));
+	SET_BOX(y, radiusY * flsin(rad));
 }
 
 /*************************************************************************************************/

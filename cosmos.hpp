@@ -48,7 +48,7 @@ namespace WarGrey::STEM {
         void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
 
     protected:
-        void push_plane(WarGrey::STEM::IPlane* plane);
+        WarGrey::STEM::IPlane* push_plane(WarGrey::STEM::IPlane* plane);
 
     private:
         void collapse();

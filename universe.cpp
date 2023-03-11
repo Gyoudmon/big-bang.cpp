@@ -146,11 +146,11 @@ static void game_create_world(int width, int height, SDL_Window** window, SDL_Re
 static inline void game_world_reset(SDL_Renderer* renderer, uint32_t fgc, uint32_t bgc) {
     unsigned char r, g, b;
 
-    RGB_FromHexadecimal(bgc, &r, &g, &b);
+    RGB_From_Hexadecimal(bgc, &r, &g, &b);
     SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
     SDL_RenderClear(renderer);
 
-    RGB_FromHexadecimal(fgc, &r, &g, &b);
+    RGB_From_Hexadecimal(fgc, &r, &g, &b);
     SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
 }
 

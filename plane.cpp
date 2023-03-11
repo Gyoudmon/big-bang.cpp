@@ -1383,6 +1383,10 @@ void WarGrey::STEM::IPlane::on_enter(IPlane* from) {
     this->on_mission_start(width, height);
 }
 
+void WarGrey::STEM::IPlane::set_background(float hue, float saturation, float brightness, float alpha) {
+    this->set_background(Hexadecimal_From_HSV(hue, saturation, brightness), alpha);
+}
+
 void WarGrey::STEM::IPlane::feed_background(SDL_Color* c) {
     RGB_FillColor(c, this->background, this->bg_alpha);
 }

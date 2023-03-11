@@ -8,6 +8,9 @@ namespace WarGrey::STEM {
 
     void orthogonal_decomposition(float magnitude, float direction, float* x, float* y, bool is_radian = true);
 
+	void circle_point(float radius, float angle, float* x, float* y, bool is_radian = false);
+	void ellipse_point(float radiusX, float radiusY, float angle, float* x, float* y, bool is_radian = false);
+
     float vector_magnitude(float x, float y);
     float vector_direction(float x, float y, bool need_radian = true);
     void vector_rotate(float x, float y, float theta, float* rx, float* ry, float ox = 0.0F, float oy = 0.0F, bool is_radian = true);

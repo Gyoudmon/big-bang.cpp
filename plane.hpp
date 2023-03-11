@@ -63,6 +63,7 @@ namespace WarGrey::STEM {
 
     public:
         void set_background(uint32_t color, float a = 1.0F) { this->background = color; this->bg_alpha = a; }
+        void set_background(float hue, float saturation = 1.0F, float brightness = 1.0F, float a = 1.0F);
         void feed_background(SDL_Color* color);
         void feed_mouse_location(float* x, float* y);
         void start_input_text(const std::string& prompt);

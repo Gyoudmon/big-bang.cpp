@@ -37,7 +37,7 @@ void WarGrey::STEM::ITextlet::construct(SDL_Renderer* renderer) {
 
 void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, float alpha) {
     float self_alpha = 0.0F;
-    uint32_t hex = Hexadecimal_FromColor(&this->text_color, &self_alpha);
+    uint32_t hex = Hexadecimal_From_Color(&this->text_color, &self_alpha);
 
     if ((hex != color_hex) || (self_alpha != alpha)) {
         RGB_FillColor(&this->text_color, color_hex, alpha);

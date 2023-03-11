@@ -20,7 +20,7 @@ static inline void unsafe_utf8_size(shared_font_t font, int* width, int* height,
 }
 
 static inline void setup_for_text(const std::string& text, unsigned int rgb, SDL_Color& c) {
-    RGB_FromHexadecimal(rgb, &c.r, &c.g, &c.b);
+    RGB_From_Hexadecimal(rgb, &c.r, &c.g, &c.b);
     c.a = 0xFFU;
 }
 

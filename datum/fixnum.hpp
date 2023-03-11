@@ -12,6 +12,8 @@ namespace WarGrey::STEM {
 
     template<typename I> I inline fxmax(I fx1, I fx2) { return ((fx1 < fx2) ? fx2 : fx1); }
     template<typename I> I inline fxmin(I fx1, I fx2) { return ((fx1 < fx2) ? fx1 : fx2); }
+    template<typename I> I inline fxmax(I fx1, I fx2, I fx3) { return fxmax(fx1, fxmax(fx2, fx3)); }
+    template<typename I> I inline fxmin(I fx1, I fx2, I fx3) { return fxmin(fx1, fxmin(fx2, fx3)); }
 
     long long inline fxround(long long fx, float precision) { return (long long)(std::roundf(float(fx) * precision)); }
     long long inline fxround(long long fx, double precision) { return (long long)(std::round(double(fx) * precision)); }
@@ -24,4 +26,3 @@ namespace WarGrey::STEM {
 
     static inline size_t integer_length(unsigned long long n) { size_t s = 0;  while (n) { n >>= 1; s++; } return s; }
 }
-

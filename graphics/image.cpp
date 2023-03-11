@@ -35,7 +35,7 @@ SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height, uint32_t alp
     SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
     uint8_t r, g, b;
 
-    RGB_FromHexadecimal(alpha_color_key, &r, &g, &b);
+    RGB_From_Hexadecimal(alpha_color_key, &r, &g, &b);
     SDL_SetColorKey(surface, 1, SDL_MapRGB(surface->format, r, g, b));
 
     return surface;

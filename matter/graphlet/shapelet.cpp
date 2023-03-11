@@ -55,12 +55,56 @@ void WarGrey::STEM::IShapelet::set_border_color(int32_t color) {
     }
 }
 
+void WarGrey::STEM::IShapelet::set_border_color_hsv(float hue, float saturation, float value) {
+    this->set_border_color(Hexadecimal_From_HSV(hue, saturation, value));
+}
+
+void WarGrey::STEM::IShapelet::set_border_color_hsl(float hue, float saturation, float lightness) {
+    this->set_border_color(Hexadecimal_From_HSL(hue, saturation, lightness));
+}
+
+void WarGrey::STEM::IShapelet::set_border_color_hsi(float hue, float saturation, float intensity) {
+    this->set_border_color(Hexadecimal_From_HSI(hue, saturation, intensity));
+}
+
+float WarGrey::STEM::IShapelet::get_border_hsb_hue() {
+    float hue = flnan_f;
+
+    if (this->border_color >= 0) {
+        hue = HSB_Hue_From_Hexadecimal(static_cast<uint32_t>(this->border_color));
+    }
+
+    return hue;
+}
+
 void WarGrey::STEM::IShapelet::set_color(int32_t color) {
     if (this->color != color) {
         this->color = color;
         this->invalidate_geometry();
         this->notify_updated();
     }
+}
+
+void WarGrey::STEM::IShapelet::set_color_hsv(float hue, float saturation, float value) {
+    this->set_color(Hexadecimal_From_HSV(hue, saturation, value));
+}
+
+void WarGrey::STEM::IShapelet::set_color_hsl(float hue, float saturation, float lightness) {
+    this->set_color(Hexadecimal_From_HSL(hue, saturation, lightness));
+}
+
+void WarGrey::STEM::IShapelet::set_color_hsi(float hue, float saturation, float intensity) {
+    this->set_color(Hexadecimal_From_HSI(hue, saturation, intensity));
+}
+
+float WarGrey::STEM::IShapelet::get_body_hsb_hue() {
+    float hue = flnan_f;
+
+    if (this->color >= 0) {
+        hue = HSB_Hue_From_Hexadecimal(static_cast<uint32_t>(this->color));
+    }
+
+    return hue;
 }
 
 void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
@@ -87,12 +131,12 @@ void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float flx, float fly
             SDL_RenderClear(renderer);
 
             if (this->color >= 0) {
-                RGB_FromHexadecimal(this->color, &r, &g, &b);
+                RGB_From_Hexadecimal(this->color, &r, &g, &b);
                 this->fill_shape(renderer, width, height, r, g, b, this->alpha);
             }
 
             if (this->border_color >= 0) {
-                RGB_FromHexadecimal(this->border_color, &r, &g, &b);
+                RGB_From_Hexadecimal(this->border_color, &r, &g, &b);
                 this->draw_shape(renderer, width, height, r, g, b, this->alpha);
             }
 
@@ -117,6 +161,10 @@ void WarGrey::STEM::IShapelet::invalidate_geometry() {
 
 /*************************************************************************************************/
 WarGrey::STEM::Linelet::Linelet(float ex, float ey, int32_t color) : IShapelet(color, -1), epx(ex), epy(ey) {}
+WarGrey::STEM::Linelet::Linelet(float ex, float ey, uint32_t color) : Linelet(ex, ey, static_cast<int32_t>(color)) {}
+
+WarGrey::STEM::Linelet::Linelet(float ex, float ey, float hue, float saturation, float brightness)
+    : Linelet(ex, ey, Hexadecimal_From_HSV(hue, saturation, brightness)) {}
 
 void WarGrey::STEM::Linelet::on_resize(float w, float h, float width, float height) {
     this->epx *= w / width;
@@ -149,8 +197,20 @@ void WarGrey::STEM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int h
 WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, int32_t color, int32_t border_color)
 	: Rectanglet(edge_size, edge_size, color, border_color) {}
 
+WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, uint32_t color, int32_t border_color)
+	: Rectanglet(edge_size, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, float hue, float saturation, float brightness, int32_t border_color)
+    : Rectanglet(edge_size, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+
 WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), width(width), height(height) {}
+
+WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, uint32_t color, int32_t border_color)
+	: Rectanglet(width, height, static_cast<int>(color), border_color) {}
+
+WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, float hue, float saturation, float brightness, int32_t border_color)
+    : Rectanglet(width, height, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
 
 void WarGrey::STEM::Rectanglet::on_resize(float w, float h, float width, float height) {
     this->width = w;
@@ -174,8 +234,20 @@ void WarGrey::STEM::Rectanglet::fill_shape(SDL_Renderer* renderer, int width, in
 WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float edge_size, float radius, int32_t color, int32_t border_color)
 	: RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
 
+WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float edge_size, float radius, uint32_t color, int32_t border_color)
+	: RoundedRectanglet(edge_size, radius, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float edge_size, float radius, float hue, float saturation, float brightness, int32_t border_color)
+    : RoundedRectanglet(edge_size, radius, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+
 WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, float radius, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), width(width), height(height), radius(radius) {}
+
+WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, float radius, uint32_t color, int32_t border_color)
+	: RoundedRectanglet(width, height, radius, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, float radius, float hue, float saturation, float brightness, int32_t border_color)
+    : RoundedRectanglet(width, height, radius, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
 
 void WarGrey::STEM::RoundedRectanglet::on_resize(float w, float h, float width, float height) {
     this->width = w;
@@ -211,8 +283,20 @@ void WarGrey::STEM::RoundedRectanglet::fill_shape(SDL_Renderer* renderer, int wi
 WarGrey::STEM::Ellipselet::Ellipselet(float radius, int32_t color, int32_t border_color)
 	: Ellipselet(radius, radius, color, border_color) {}
 
+WarGrey::STEM::Ellipselet::Ellipselet(float radius, uint32_t color, int32_t border_color)
+	: Ellipselet(radius, radius, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::Ellipselet::Ellipselet(float radius, float hue, float saturation, float brightness, int32_t border_color)
+    : Ellipselet(radius, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+
 WarGrey::STEM::Ellipselet::Ellipselet(float a, float b, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), aradius(a), bradius(b) {}
+
+WarGrey::STEM::Ellipselet::Ellipselet(float a, float b, uint32_t color, int32_t border_color)
+	: Ellipselet(a, b, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::Ellipselet::Ellipselet(float aradius, float bradius, float hue, float saturation, float brightness, int32_t border_color)
+    : Ellipselet(aradius, bradius, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
 
 void WarGrey::STEM::Ellipselet::on_resize(float w, float h, float width, float height) {
     this->aradius = w * 0.5F;
@@ -256,6 +340,12 @@ void WarGrey::STEM::Ellipselet::fill_shape(SDL_Renderer* renderer, int width, in
 WarGrey::STEM::Trianglet::Trianglet(float x2, float y2, float x3, float y3, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), x2(x2), y2(y2), x3(x3), y3(y3) {}
 
+WarGrey::STEM::Trianglet::Trianglet(float x2, float y2, float x3, float y3, uint32_t color, int32_t border_color)
+	: Trianglet(x2, y2, x3, y3, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::Trianglet::Trianglet(float x2, float y2, float x3, float y3, float hue, float saturation, float brightness, int32_t border_color)
+    : Trianglet(x2, y2, x3, y3, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+
 void WarGrey::STEM::Trianglet::on_resize(float w, float h, float width, float height) {
     float xratio = w / width;
     float yratio = h / height;
@@ -296,10 +386,22 @@ void WarGrey::STEM::Trianglet::fill_shape(SDL_Renderer* renderer, int width, int
 WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, int32_t color, int32_t border_color)
 	: RegularPolygonlet(n, radius, 0.0F, color, border_color) {}
 
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, uint32_t color, int32_t border_color)
+	: RegularPolygonlet(n, radius, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float hue, float saturation, float brightness, int32_t border_color)
+    : RegularPolygonlet(n, radius, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+
 WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float rotation, int32_t color, int32_t border_color)
 	: IShapelet(color, border_color), n(n), aradius(radius), bradius(radius), rotation(rotation) {
     this->initialize_vertice();
 }
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float rotation, uint32_t color, int32_t border_color)
+	: RegularPolygonlet(n, radius, rotation, static_cast<int32_t>(color), border_color) {}
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float rotation, float hue, float saturation, float brightness, int32_t border_color)
+    : RegularPolygonlet(n, radius, rotation, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
 
 WarGrey::STEM::RegularPolygonlet::~RegularPolygonlet() {
     if (this->xs != nullptr) {
