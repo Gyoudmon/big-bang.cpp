@@ -390,7 +390,7 @@ int WarGrey::STEM::string_utf8_index(const char* src, int idx, int max0) {
 
             n++;
         } else {
-            cidx = it;
+            cidx = int(it);
             break;
         }
     }
@@ -439,7 +439,7 @@ uint32_t WarGrey::STEM::string_utf8_ref(const char* src, int idx, int max0) {
         }
     }
 
-    return codepoint;
+    return static_cast<uint32_t>(codepoint);
 }
 
 uint32_t WarGrey::STEM::string_utf8_ref(const std::string& src, int idx) {

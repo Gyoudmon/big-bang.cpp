@@ -126,13 +126,12 @@ const char* WarGrey::STEM::generic_font_family_name_for_chinese(FontFamily famil
     case FontFamily::monospace: return "STHeiti Medium.ttc"; break;
     case FontFamily::fangsong: return "Arial Unicode.ttf"; break;
 #elif defined(__windows__) /* HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts */
-    case FontFamily::sans_serif: return "msyh.ttc"; break; // Microsoft YaHei
-    case FontFamily::serif: return "times.ttf"; break; // Times New Roman
-    case FontFamily::monospace: return "cour.ttf"; break; // Courier New
-    case FontFamily::math: return "BOD_R.TTF"; break; // Bodoni MT
-    case FontFamily::cursive: return "Courier.ttc"; break;
-    case FontFamily::fantasy: return "Bodoni 72.ttc"; break;
-    case FontFamily::fangsong: return "msyh.ttc"; break;
+    case FontFamily::sans_serif: return "msyh.ttc"; break; // 雅黑
+    case FontFamily::serif: return "simkai.ttf"; break; // 楷体
+    case FontFamily::monospace: return "simhei.ttf"; break;
+    case FontFamily::cursive: return "FZSTK.TTF"; break;
+    case FontFamily::fantasy: return "STHUPO.TTF"; break;
+    case FontFamily::fangsong: return "SIMFANG.TTF"; break;
 #else /* the following fonts have not been tested */
 #endif
     default: return generic_font_family_name_for_ascii(family);
@@ -342,13 +341,29 @@ bool WarGrey::STEM::GameFont::is_suitable(const std::string& text) {
     bool okay = true;
     
     if (this->okay()) {
-        size_t utf8_size = string_utf8_length(text.c_str(), text.size());
+        size_t utf8_size = string_utf8_length(text.c_str(), int(text.size()));
 
         for (size_t idx = 0; idx < utf8_size; idx ++) {
+#ifndef __windows__
             if (!TTF_GlyphIsProvided32(this->font, string_utf8_ref(text, idx))) {
                 okay = false;
                 break;
             }
+#else
+            uint32_t utf8_ch = string_utf8_ref(text, int(idx));
+
+            /** TODO
+             * Upgrade the windows version of TTF_Font
+             */
+
+            if (utf8_ch > 0xFFU) {
+                okay = false;
+                break;
+            } else if (!TTF_GlyphIsProvided(this->font, utf8_ch)) {
+                okay = false;
+                break;
+            }
+#endif
         }
     } else {
         okay = false;

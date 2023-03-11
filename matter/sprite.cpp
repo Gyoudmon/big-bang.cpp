@@ -105,13 +105,13 @@ void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, floa
                 SDL_Rect src = { 0, 0, fl2fxi(width), fl2fxi(height) };
             
                 if (xoff < 0.0F) {
-                    src.x = fl2fxi(-xoff) / sx;
-                    src.w -= src.x * 2.0F;
+                    src.x = fl2fxi(-xoff / sx);
+                    src.w -= src.x * 2;
                 }
 
                 if (yoff < 0.0F) {
-                    src.y = fl2fxi(-yoff) / sy;
-                    src.h -= src.y * 2.0F;
+                    src.y = fl2fxi(-yoff / sy);
+                    src.h -= src.y * 2;
                 }
 
                 this->draw_costume(renderer, this->current_costume_idx, &src, &argv);
@@ -192,7 +192,7 @@ int WarGrey::STEM::ISprite::costume_name_to_index(const char* name) {
     
     for (size_t idx = 0; idx < this->costume_count(); idx ++) {
         if (strcmp(this->costume_index_to_name(idx), name) == 0) {
-            cidx = idx;
+            cidx = int(idx);
             break;
         }
     }

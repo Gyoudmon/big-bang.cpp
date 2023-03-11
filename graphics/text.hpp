@@ -10,6 +10,10 @@
 namespace WarGrey::STEM {
     enum TextRenderMode { Solid, Shaded, Blender, LCD };
 
+    /*********************************************************************************************/
+    void game_disable_font_selection(bool yes);
+
+    /*********************************************************************************************/
     std::string game_create_string(const char* fmt, ...);
     SDL_Surface* game_text_surface(const std::string& text, shared_font_t font, WarGrey::STEM::TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap);
     SDL_Texture* game_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t font, WarGrey::STEM::TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap);

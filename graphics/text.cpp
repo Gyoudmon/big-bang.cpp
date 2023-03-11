@@ -13,6 +13,9 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
+static bool disable_font_selection = false;
+
+/*************************************************************************************************/
 static inline void unsafe_utf8_size(shared_font_t font, int* width, int* height, const std::string& text) {
     if (TTF_SizeUTF8(font->self(), text.c_str(), width, height)) {
         fprintf(stderr, "无法计算文本尺寸: %s\n", TTF_GetError());
@@ -86,6 +89,10 @@ std::string WarGrey::STEM::game_create_string(const char* fmt, ...) {
     return s;
 }
 
+void WarGrey::STEM::game_disable_font_selection(bool yes) {
+    disable_font_selection = yes;
+}
+
 /*************************************************************************************************/
 void WarGrey::STEM::game_text_size(shared_font_t font, int* width, int* height, const char* fmt, ...) {
     VSNPRINT(text, fmt);
@@ -118,7 +125,7 @@ void WarGrey::STEM::game_text_size(shared_font_t font, float* width, float* heig
 /*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, shared_font_t sfont, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
     SDL_Surface* surface = nullptr;
-    TTF_Font* font = select_font(sfont, text);
+    TTF_Font* font = (disable_font_selection) ? sfont->self() : select_font(sfont, text);
 
 #ifndef __windows__
     if (wrap >= 0) { // will wrap by newline for 0
