@@ -175,7 +175,7 @@ static void fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float 
             SDL_FPoint spt = pts[i];
             SDL_FPoint ept = pts[i + 1];
 
-            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, px + pcount, &py, &t)) {
+            if (lines_intersect(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, px + pcount, &py, &t)) {
                 if (flin(0.0, t, 1.0)) pcount += 1;
             } else if (pcount == 0) {
                 px[0] = spt.x;
@@ -188,7 +188,7 @@ static void fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float 
             spt = pts[n - i];
             ept = pts[n - i - 1];
 
-            if (lines_intersection(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, px + pcount, &py, &t)) {
+            if (lines_intersect(spt.x, spt.y, ept.x, ept.y, xmin, y, xmax, y, px + pcount, &py, &t)) {
                 if (flin(0.0, t, 1.0)) pcount += 1;
             } else if (pcount == 0) {
                 px[0] = spt.x;

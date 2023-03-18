@@ -87,8 +87,8 @@ namespace WarGrey::STEM {
 
     /*********************************************************************************************/
     template<typename Fl>
-    bool lines_intersection(Fl x11, Fl y11, Fl x12, Fl y12, Fl x21, Fl y21, Fl x22, Fl y22,
-            Fl* px, Fl* py, Fl* t1 = nullptr, Fl* t2 = nullptr) {
+    bool lines_intersect(Fl x11, Fl y11, Fl x12, Fl y12, Fl x21, Fl y21, Fl x22, Fl y22,
+            Fl* px = nullptr, Fl* py = nullptr, Fl* t1 = nullptr, Fl* t2 = nullptr) {
         // find the intersection point P(px, py) of L1((x11, y11), (x12, y12)) and L2((x21, y21), (x22, y22))
 
         /** Theorem

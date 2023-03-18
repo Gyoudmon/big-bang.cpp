@@ -299,8 +299,8 @@ void WarGrey::STEM::Ellipselet::feed_extent(float x, float y, float* w, float* h
 void WarGrey::STEM::Ellipselet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     short rx = fl2fx<short>(this->aradius) - 1;
     short ry = fl2fx<short>(this->bradius) - 1;
-    short cx = short(rx);
-    short cy = short(ry);
+    short cx = short(rx) + 1;
+    short cy = short(ry) + 1;
 
     if (rx == ry) {
         aacircleRGBA(renderer, cx, cy, rx, r, g, b, a);
@@ -312,8 +312,8 @@ void WarGrey::STEM::Ellipselet::draw_shape(SDL_Renderer* renderer, int width, in
 void WarGrey::STEM::Ellipselet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     short rx = fl2fx<short>(this->aradius) - 1;
     short ry = fl2fx<short>(this->bradius) - 1;
-    short cx = short(rx);
-    short cy = short(ry);
+    short cx = short(rx) + 1;
+    short cy = short(ry) + 1;
 
     if (rx == ry) {
         filledCircleRGBA(renderer, cx, cy, rx, r, g, b, a);

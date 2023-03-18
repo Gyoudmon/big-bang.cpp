@@ -8,6 +8,9 @@ namespace WarGrey::STEM {
 #define flin(open, v, close) ((open <= v) && (v <= close))
 #define flout(open, v, close) ((v < open) || (v > close))
 
+#define flnull static_cast<double*>(nullptr)
+#define flnull_f static_cast<float*>(nullptr)
+
     static const float flnan_f = std::nanf("");
     static const double flnan = std::nanf("");
     static const long double flnan_t = std::nanf("");

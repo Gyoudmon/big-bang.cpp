@@ -5,6 +5,9 @@
 
 #include "../../graphics/image.hpp"
 #include "../../graphics/geometry.hpp"
+#include "../../graphics/named_colors.hpp"
+
+#include "../../physics/mathematics.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -225,6 +228,10 @@ WarGrey::STEM::Chromalet::Chromalet(float width, float height, CIE_Standard std,
         this->height = flabs(this->width);
     }
 
+    this->primaries[0] = 0xFF0000U;
+    this->primaries[1] = 0x00FF00U;
+    this->primaries[2] = 0x0000FFU;
+
     this->enable_resize(true);
 }
 
@@ -235,7 +242,7 @@ void WarGrey::STEM::Chromalet::feed_extent(float x, float y, float* w, float* h)
 void WarGrey::STEM::Chromalet::on_resize(float w, float h, float width, float height) {
     this->width = w;
     this->height = h;
-    this->invalidate_diagram();
+    this->invalidate_geometry();
 }
 
 void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
@@ -249,9 +256,9 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
             SDL_Texture* origin = SDL_GetRenderTarget(renderer);
 
             SDL_SetRenderTarget(renderer, this->diagram);
-            
+
             //this->draw_color_map(renderer, width, height);
-            //this->draw_spectural_locus(renderer, width, height);
+            this->draw_spectral_locus(renderer, width, height);
             this->draw_chromaticity(renderer, width, height);
 
             SDL_SetRenderTarget(renderer, origin);
@@ -260,15 +267,217 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
         }
     }
 
+    RGB_SetRenderDrawColor(renderer, DIMGREY);
+    game_draw_grid(renderer, 10, 10, flwidth / 10.0F, flheight / 10.0F, flx, fly);    
+
     if (this->diagram != nullptr) {
         game_render_texture(renderer, this->diagram, flx, fly, flwidth, flheight);
+    } else {
+        this->draw_chromaticity(renderer, width, height, flx, fly);
     }
+
+    this->draw_color_triangle(renderer, width, height, flx, fly);
+}
+
+uint32_t WarGrey::STEM::Chromalet::get_color(float mx, float my) {
+    double x = double(mx / flabs(this->width));
+    double y = double(1.0 - my / flabs(this->height));
+    double X, Y, Z, R, G, B;
+    uint32_t hex = 0;
+
+    if (x + y <= 1.0) {
+        CIE_xyY_to_XYZ(x, y, &X, &Y, &Z, this->luminance);
+        CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
+
+        hex = Hexadecimal_From_RGB(color_component_clamp_to_byte(R),
+                                    color_component_clamp_to_byte(G),
+                                    color_component_clamp_to_byte(B));
+    }
+
+    return hex;
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::Chromalet::draw_color_triangle(SDL_Renderer* renderer, int width, int height, double dx, double dy) {
+    static const size_t vcount = sizeof(this->primaries) / sizeof(uint32_t) + 1U;
+    double flwidth = double(width);
+    double flheight = double(height);
+    SDL_FPoint pts[vcount];
+    double X, Y, Z, x, y;
+
+    for (int idx = 0; idx < sizeof(this->primaries) / sizeof(uint32_t); idx ++) {
+        CIE_RGB_to_XYZ(this->standard, this->primaries[idx], &X, &Y, &Z);
+        CIE_XYZ_to_xyY(X, Y, Z, &x, &y);
+        this->fix_render_location(&x, &y);
+
+        pts[idx].x = float(x * flwidth + dx);
+        pts[idx].y = float(y * flheight + dy);
+    }
+
+    pts[vcount - 1] = pts[0];
+    RGB_SetRenderDrawColor(renderer, BLACK);
+    SDL_RenderDrawLinesF(renderer, pts, vcount);
+}
+
+void WarGrey::STEM::Chromalet::draw_color_map(SDL_Renderer* renderer, int width, int height, double dx, double dy) {
+    double flwidth = double(width);
+    double flheight = double(height);
+    double X, Y, Z, R, G, B, x, y;
+
+    for (int px = 0; px < width; px ++) {
+        for (int py = 0; py < height; py ++) {
+            x = double(px) / flwidth;
+            y = double(py) / flheight;
+                    
+            if (x + y <= 1.0) {
+                CIE_xyY_to_XYZ(x, y, &X, &Y, &Z, this->luminance);
+                CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
+
+                if ((R >= 0.0) && (G >= 0.0) && (B >= 0.0)) {
+                    this->render_dot(renderer, x, y, flwidth, flheight, R, G, B, dx, dy);
+                }
+            }
+        }
+    }
+}
+
+void WarGrey::STEM::Chromalet::draw_spectral_locus(SDL_Renderer* renderer, int width, int height, double dx, double dy) {
+    double flwidth = double(width);
+    double flheight = double(height);
+    double R, G, B, xbar, ybar, zbar, x, y;
+
+    for (int idx = 0; idx < sizeof(wavelength_xbars) / sizeof(double); idx ++) {
+        xbar = wavelength_xbars[idx];
+        ybar = wavelength_ybars[idx];
+        zbar = wavelength_zbars[idx];
+
+        CIE_XYZ_to_xyY(xbar, ybar, zbar, &x, &y);
+        CIE_XYZ_to_RGB(this->standard, xbar, ybar, zbar, &R, &G, &B, false);
+        this->render_dot(renderer, x, y, flwidth, flheight, R, G, B, dx, dy);
+    }
+}
+
+void WarGrey::STEM::Chromalet::draw_chromaticity(SDL_Renderer* renderer, int width, int height, double dx, double dy) {
+    double flwidth = double(width);
+    double flheight = double(height);
+    int slt_idx = this->scanline_idx0;
+    int slb_idx = this->scanline_idx0;
+    double X, Y, Z, R, G, B, fx, fy;
+    double x, ty, by, tt, bt;
+    
+    if (this->locus_xs == nullptr) {
+        this->make_locus_polygon(flwidth, flheight);
+    }
+
+    x = flround(this->scanline_start);
+
+    do {
+        while (true) {
+            lines_intersect(this->locus_xs[slt_idx], this->locus_ys[slt_idx],
+                        this->locus_xs[slt_idx + 1], this->locus_ys[slt_idx + 1],
+                        x, 0.0, x, flheight, flnull, &ty, &tt);
+
+            if (tt <= 1.0) break;
+            slt_idx ++;
+        }
+
+        while (true) {
+            lines_intersect(this->locus_xs[slb_idx], this->locus_ys[slb_idx],
+                        this->locus_xs[slb_idx - 1], this->locus_ys[slb_idx - 1],
+                        x, 0.0, x, flheight, flnull, &by, &bt);
+
+            if (bt <= 1.0) break;
+            slb_idx --;
+        }
+
+        fx = x / flwidth;
+        x += 1.0;
+
+        for (double y = flfloor(ty); y < flceiling(by) + 1.0; y += 1.0) {
+            fy = 1.0 - y / flheight;
+                    
+            CIE_xyY_to_XYZ(fx, fy, &X, &Y, &Z, this->luminance);
+            CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
+            this->render_dot(renderer, fx, fy, flwidth, flheight, R, G, B, dx, dy);
+        }
+    } while (x < this->scanline_end);
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::Chromalet::render_dot(SDL_Renderer* renderer, double x, double y, double width, double height, double R, double G, double B, double dx, double dy, double A) {
+    SDL_SetRenderDrawColor(renderer,
+        color_component_clamp_to_byte(R),
+        color_component_clamp_to_byte(G),
+        color_component_clamp_to_byte(B),
+        color_component_clamp_to_byte(A));
+
+    this->fix_render_location(&x, &y);
+    SDL_RenderDrawPointF(renderer, float(x * width + dx), float(y * height + dy));
+}
+
+void WarGrey::STEM::Chromalet::fix_render_location(double* x, double* y) {
+    if (this->width < 0.0F) { (*x) = 1.0 - (*x); }
+    if (this->height > 0.0F) { (*y) = 1.0 - (*y); }
+}
+
+void WarGrey::STEM::Chromalet::make_locus_polygon(float flwidth, float flheight) {
+    double xbar, ybar, zbar, x, y;
+
+    this->locus_count = sizeof(wavelength_xbars) / sizeof(double) + 2;
+    this->scanline_start = infinity;
+    this->scanline_end = -infinity;
+
+    this->locus_xs = new double[this->locus_count];
+    this->locus_ys = new double[this->locus_count];
+
+    for (int idx = 1; idx < this->locus_count - 1; idx ++) {
+        xbar = wavelength_xbars[idx - 1];
+        ybar = wavelength_ybars[idx - 1];
+        zbar = wavelength_zbars[idx - 1];
+
+        CIE_XYZ_to_xyY(xbar, ybar, zbar, &x, &y);
+
+        this->fix_render_location(&x, &y);
+        this->locus_xs[idx] = x * flwidth;
+        this->locus_ys[idx] = y * flheight;
+
+        if (this->locus_xs[idx] < this->scanline_start) {
+            this->scanline_start = this->locus_xs[idx];
+            this->scanline_idx0 = idx;
+        }
+
+        if (this->locus_xs[idx] > this->scanline_end) {
+            this->scanline_end = this->locus_xs[idx];
+        }
+    }
+
+    // make the polyline a polygon
+    this->locus_xs[0] = this->locus_xs[this->locus_count - 2];
+    this->locus_ys[0] = this->locus_ys[this->locus_count - 2];
+    this->locus_xs[this->locus_count - 1] = this->locus_xs[1];
+    this->locus_ys[this->locus_count - 1] = this->locus_ys[1];
+}
+
+/*************************************************************************************************/
+void WarGrey::STEM::Chromalet::invalidate_geometry() {
+    this->invalidate_diagram();
+    this->invalidate_locus();
 }
 
 void WarGrey::STEM::Chromalet::invalidate_diagram() {
     if (this->diagram != nullptr) {
         SDL_DestroyTexture(this->diagram);
         this->diagram = nullptr;
+    }
+}
+
+void WarGrey::STEM::Chromalet::invalidate_locus() {
+    if (this->locus_xs != nullptr) {
+        delete [] this->locus_xs;
+        delete [] this->locus_ys;
+
+        this->locus_xs = nullptr;
+        this->locus_ys = nullptr;
     }
 }
 
@@ -288,72 +497,11 @@ void WarGrey::STEM::Chromalet::set_standard(CIE_Standard std) {
     }    
 }
 
-/*************************************************************************************************/
-void WarGrey::STEM::Chromalet::draw_point(SDL_Renderer* renderer, double x, double y, int dx, int dy) {
-    if (this->width < 0.0) {
-        x = 1.0 - x;
-    }
+void WarGrey::STEM::Chromalet::set_primary_color(uint32_t hex, size_t idx) {
+    idx %= sizeof(this->primaries) / sizeof(uint32_t);
 
-    if (this->height > 0.0) {
-        y = 1.0 - y;
-    }
-
-    SDL_RenderDrawPointF(renderer,
-        float(x * flabs(this->width)) + dx,
-        float(y * flabs(this->height)) + dy);
-}
-
-void WarGrey::STEM::Chromalet::draw_color_map(SDL_Renderer* renderer, int width, int height, int dx, int dy) {
-    double flwidth = double(width);
-    double flheight = double(height);
-    double X, Y, Z, R, G, B, x, y;
-
-    for (int px = 0; px < width; px ++) {
-        for (int py = 0; py < height; py ++) {
-            x = double(px) / flwidth;
-            y = double(py) / flheight;
-                    
-            if (x + y <= 1.0) {
-                CIE_xyY_to_XYZ(x, y, &X, &Y, &Z, this->luminance);
-                CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
-
-                if ((R >= 0.0) && (G >= 0.0) && (B >= 0.0)) {
-                    SDL_SetRenderDrawColor(renderer,
-                        color_component_to_byte(R),
-                        color_component_to_byte(G),
-                        color_component_to_byte(B),
-                        0xFFU);
-                    this->draw_point(renderer, x, y, dx, dy);
-                }
-            }
-        }
-    }
-}
-
-void WarGrey::STEM::Chromalet::draw_spectral_locus(SDL_Renderer* renderer, int width, int height, int dx, int dy) {
-    double R, G, B, x, y;
-    double xbar, ybar, zbar;
-
-    for (int idx = 0; idx < sizeof(wavelength_xbars) / sizeof(double); idx ++) {
-        xbar = wavelength_xbars[idx];
-        ybar = wavelength_ybars[idx];
-        zbar = wavelength_zbars[idx];
-
-        CIE_XYZ_to_xyY(xbar, ybar, zbar, &x, &y);
-                    
-        if (x + y <= 1.0) {
-            CIE_XYZ_to_RGB(this->standard, xbar, ybar, zbar, &R, &G, &B, false);
-
-            SDL_SetRenderDrawColor(renderer,
-                color_component_clamp_to_byte(R),
-                color_component_clamp_to_byte(G),
-                color_component_clamp_to_byte(B),
-                0xFFU);
-            this->draw_point(renderer, x, y, dx, dy);
-        }
-    }
-}
-
-void WarGrey::STEM::Chromalet::draw_chromaticity(SDL_Renderer* renderer, int width, int height, int dx, int dy) {
-
+    if (this->primaries[idx] != hex) {
+        this->primaries[idx] = hex;
+        this->notify_updated();
+    }    
 }
