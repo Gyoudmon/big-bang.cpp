@@ -257,7 +257,7 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
 
             SDL_SetRenderTarget(renderer, this->diagram);
 
-            //this->draw_color_map(renderer, width, height);
+            this->draw_color_map(renderer, width, height);
             this->draw_spectral_locus(renderer, width, height);
             this->draw_chromaticity(renderer, width, height);
 
@@ -400,7 +400,7 @@ void WarGrey::STEM::Chromalet::draw_chromaticity(SDL_Renderer* renderer, int wid
             CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
             this->render_dot(renderer, fx, fy, flwidth, flheight, R, G, B, dx, dy);
         }
-    } while (x < this->scanline_end);
+    } while (x <= this->scanline_end);
 }
 
 /*************************************************************************************************/
@@ -420,7 +420,7 @@ void WarGrey::STEM::Chromalet::fix_render_location(double* x, double* y) {
     if (this->height > 0.0F) { (*y) = 1.0 - (*y); }
 }
 
-void WarGrey::STEM::Chromalet::make_locus_polygon(float flwidth, float flheight) {
+void WarGrey::STEM::Chromalet::make_locus_polygon(double flwidth, double flheight) {
     double xbar, ybar, zbar, x, y;
 
     this->locus_count = sizeof(wavelength_xbars) / sizeof(double) + 2;

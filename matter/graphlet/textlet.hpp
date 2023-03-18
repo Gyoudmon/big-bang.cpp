@@ -48,9 +48,9 @@ namespace WarGrey::STEM {
         shared_font_t text_font = nullptr;
         SDL_Texture* texture = nullptr;
         uint32_t bg_color;
-        float bg_alpha = 0.0F;
+        double bg_alpha = 0.0;
         uint32_t border_color;
-        float border_alpha = 0.0F;
+        double border_alpha = 0.0;
 
     private:
         std::string raw;

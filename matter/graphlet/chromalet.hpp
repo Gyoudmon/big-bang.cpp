@@ -32,7 +32,7 @@ namespace WarGrey::STEM {
 
     private:
         void fix_render_location(double* x, double* y);
-        void make_locus_polygon(float width, float height);
+        void make_locus_polygon(double width, double height);
         void render_dot(SDL_Renderer* renderer, double x, double y, double width, double height,
                             double R, double G, double B, double dx, double dy, double A = 1.0);
 
