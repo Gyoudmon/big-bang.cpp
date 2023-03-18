@@ -1,25 +1,126 @@
 #pragma once
 
+#include "../datum/box.hpp"
 #include "../datum/flonum.hpp"
 
 namespace WarGrey::STEM {
-    float radians_to_degrees(float degrees);
-    float degrees_to_radians(float degrees);
+    template<typename Fl>
+    Fl radians_to_degrees(Fl radians) {
+        return (radians / Fl(pi)) * Fl(180.0);
+    }
 
-    void orthogonal_decomposition(float magnitude, float direction, float* x, float* y, bool is_radian = true);
+    template<typename Fl>
+    Fl degrees_to_radians(Fl degrees) {
+        return (degrees * Fl(pi)) / Fl(180.0);
+    }
 
-	void circle_point(float radius, float angle, float* x, float* y, bool is_radian = false);
-	void ellipse_point(float radiusX, float radiusY, float angle, float* x, float* y, bool is_radian = false);
+    template<typename Fl>
+    void orthogonal_decomposition(Fl magnitude, Fl direction, Fl* x, Fl* y, bool is_radian = true) {
+        Fl rad = is_radian ? direction : degrees_to_radians(direction);
 
-    float vector_magnitude(float x, float y);
-    float vector_direction(float x, float y, bool need_radian = true);
-    void vector_rotate(float x, float y, float theta, float* rx, float* ry, float ox = 0.0F, float oy = 0.0F, bool is_radian = true);
-	
-    bool point_inside(float px, float py, float x1, float y1, float x2, float y2);
-    bool rectangle_inside(float tlx1, float tly1, float brx1, float bry1, float tlx2, float tly2, float brx2, float bry2);
-    bool rectangle_overlay(float tlx1, float tly1, float brx1, float bry1, float tlx2, float tly2, float brx2, float bry2);
-    bool rectangle_contain(float tlx, float tly, float brx, float bry, float x, float y);
+        SET_BOX(x, magnitude * flcos(rad));
+        SET_BOX(y, magnitude * flsin(rad));
+    }
 
-    bool lines_intersection(float x11, float y11, float x12, float y12, float x21, float y21, float x22, float y22,
-        float* px, float* py, float* t1 = nullptr, float* t2 = nullptr);
+    template<typename Fl>
+    Fl vector_magnitude(Fl x, Fl y) {
+        return flsqrt(x * x + y * y);
+    }
+
+    template<typename Fl>
+    Fl vector_direction(Fl x, Fl y, bool need_radian) {
+        Fl rad = flatan(y, x);
+
+        return need_radian ? rad : radians_to_degrees(rad);
+    }
+
+    template<typename Fl>
+    void vector_rotate(Fl x, Fl y, Fl theta, Fl* rx, Fl* ry, Fl ox, Fl oy, bool is_radian = true) {
+        Fl radians = is_radian ? theta : degrees_to_radians(theta);
+	    Fl cosr = flcos(radians);
+	    Fl sinr = flsin(radians);
+	    Fl dx = x - ox;
+	    Fl dy = y - oy;
+
+	    SET_BOX(rx, dx * cosr - dy * sinr + ox);
+	    SET_BOX(ry, dx * sinr + dy * cosr + oy);
+    }
+
+    /*********************************************************************************************/
+    template<typename Fl>
+    bool point_inside(Fl px, Fl py, Fl x1, Fl y1, Fl x2, Fl y2) {
+        return (x1 <= x2 ? flin(x1, px, x2) : flin(x2, px, x1))
+            && (y1 <= y2 ? flin(y1, py, y2) : flin(y2, py, y2));
+    }
+
+    template<typename Fl>
+    bool rectangle_inside(Fl tlx1, Fl tly1, Fl brx1, Fl bry1, Fl tlx2, Fl tly2, Fl brx2, Fl bry2) {
+        return flin(tlx2, tlx1, brx2) && flin(tlx2, brx1, brx2) && (flin(tly2, tly1, bry2) && flin(tly2, bry1, bry2));
+    }
+
+    template<typename Fl>
+    bool rectangle_overlay(Fl tlx1, Fl tly1, Fl brx1, Fl bry1, Fl tlx2, Fl tly2, Fl brx2, Fl bry2) {
+        return !((brx1 < tlx2) || (tlx1 > brx2) || (bry1 < tly2) || (tly1 > bry2));
+    }
+
+    template<typename Fl>
+    bool rectangle_contain(Fl tlx, Fl tly, Fl brx, Fl bry, Fl x, Fl y) {
+        return flin(tlx, x, brx) && flin(tly, y, bry);
+    }
+
+    /*********************************************************************************************/
+    template<typename Fl>
+    void circle_point(Fl radius, Fl angle, Fl* x, Fl* y, bool is_radian = false) {
+        Fl rad = is_radian ? angle : degrees_to_radians(angle);
+
+	    SET_BOX(x, radius * flcos(rad));
+	    SET_BOX(y, radius * flsin(rad));
+    }
+
+    template<typename Fl>
+    void ellipse_point(Fl radiusX, Fl radiusY, Fl angle, Fl* x, Fl* y, bool is_radian = false) {
+        Fl rad = is_radian ? angle : degrees_to_radians(angle);
+
+	    SET_BOX(x, radiusX * flcos(rad));
+	    SET_BOX(y, radiusY * flsin(rad));
+    }
+
+    /*********************************************************************************************/
+    template<typename Fl>
+    bool lines_intersection(Fl x11, Fl y11, Fl x12, Fl y12, Fl x21, Fl y21, Fl x22, Fl y22,
+            Fl* px, Fl* py, Fl* t1 = nullptr, Fl* t2 = nullptr) {
+        // find the intersection point P(px, py) of L1((x11, y11), (x12, y12)) and L2((x21, y21), (x22, y22))
+
+        /** Theorem
+         * In Euclidean Vector Space, A line can be represented in vector form as L = v0 + tv,
+         * the parameter `t` can be used to detect the interval of line. More precisely, for `t`:
+         *   -inf < t < +inf, L is an infinitely long line.
+         *   0 <= t <= 1, L is a line segment.
+         *   0 <= t < +inf, L is a ray.
+         *
+         * a). L1 = (x11, y11) + t1(x12 - x11, y12 - y11)
+         * b). L2 = (x21, y21) + t2(x22 - x21, y22 - x21)
+         *  ==> t1 = + [(x11 - x21)(y21 - y22) - (y11 - y21)(x21 - x22)] / [(x11 - x12)(y21 - y22) - (y11 - y12)(x21 - x22)]
+         *      t2 = - [(x11 - x12)(y11 - y21) - (y11 - y12)(x11 - x21)] / [(x11 - x12)(y21 - y22) - (y11 - y12)(x21 - x22)]
+         *  ==> P(x11 + t1(x12 - x11), y11 + t1(y12 - y11)) or
+         *      P(x21 + t2(x22 - x21), y21 + t2(y22 - y21))
+         */
+
+        Fl denominator = ((x11 - x12) * (y21 - y22) - (y11 - y12) * (x21 - x22));
+        // WARNING: client applications should check the float relevant errors when two lines are almost parallel
+        bool intersected = (denominator != Fl(0.0));
+
+        if (intersected) {
+	        Fl T1 = +((x11 - x21) * (y21 - y22) - (y11 - y21) * (x21 - x22)) / denominator;
+	        Fl T2 = -((x11 - x12) * (y11 - y21) - (y11 - y12) * (x11 - x21)) / denominator;
+
+	        SET_VALUES(t1, T1, t2, T2);
+	        SET_BOX(px, x21 + T2 * (x22 - x21));
+	        SET_BOX(py, y21 + T2 * (y22 - y21));
+        } else {
+            SET_VALUES(t1, Fl(flnan), t2, Fl(flnan));
+        }
+
+        return intersected;
+    }
 }
