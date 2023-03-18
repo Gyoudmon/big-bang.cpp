@@ -126,12 +126,14 @@ const char* WarGrey::STEM::generic_font_family_name_for_chinese(FontFamily famil
     case FontFamily::monospace: return "STHeiti Medium.ttc"; break;
     case FontFamily::fangsong: return "Arial Unicode.ttf"; break;
 #elif defined(__windows__) /* HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Fonts */
+    // Some fonts might fail due to referenced by BIG-CAPTION names.
+    // Say, The 'SIMFANG.TTF', for instance.
     case FontFamily::sans_serif: return "msyh.ttc"; break; // 雅黑
     case FontFamily::serif: return "simkai.ttf"; break; // 楷体
     case FontFamily::monospace: return "simhei.ttf"; break;
     case FontFamily::cursive: return "FZSTK.TTF"; break;
     case FontFamily::fantasy: return "STHUPO.TTF"; break;
-    case FontFamily::fangsong: return "SIMFANG.TTF"; break;
+    case FontFamily::fangsong: return "simfang.ttf"; break;
 #else /* the following fonts have not been tested */
 #endif
     default: return generic_font_family_name_for_ascii(family);
