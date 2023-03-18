@@ -15,25 +15,24 @@ namespace WarGrey::STEM {
     public:
         void set_color_mixture(WarGrey::STEM::ColorMixture mixture);
         void set_alpha(unsigned char alpha);
-        void set_alpha(float alpha);
+        void set_alpha(double alpha);
         unsigned char get_alpha() { return this->alpha; }
 
         void set_color(int32_t color);
-        void set_color_hsv(float hue, float saturation, float value);
-        void set_color_hsl(float hue, float saturation, float lightness);
-        void set_color_hsi(float hue, float saturation, float intensity);
+        void set_color_hsv(double hue, double saturation, double value);
+        void set_color_hsl(double hue, double saturation, double lightness);
+        void set_color_hsi(double hue, double saturation, double intensity);
         int32_t get_color() { return this->color; }
-        float get_body_hsb_hue();
+        double get_body_hsb_hue();
 
         void set_border_color(int32_t color);
-        void set_border_color_hsv(float hue, float saturation, float value);
-        void set_border_color_hsl(float hue, float saturation, float lightness);
-        void set_border_color_hsi(float hue, float saturation, float intensity);
+        void set_border_color_hsv(double hue, double saturation, double value);
+        void set_border_color_hsl(double hue, double saturation, double lightness);
+        void set_border_color_hsi(double hue, double saturation, double intensity);
         int32_t get_border_color() { return this->border_color; }
-        float get_border_hsb_hue();
+        double get_border_hsb_hue();
  
     protected:
-        virtual void on_moved(float new_x, float new_y) {}
         virtual void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
         virtual void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
 
@@ -55,7 +54,7 @@ namespace WarGrey::STEM {
     public:
 	    Linelet(float ex, float ey, int32_t color);
 	    Linelet(float ex, float ey, uint32_t color);
-	    Linelet(float ex, float ey, float hue, float saturation = 1.0F, float brightness = 1.0F);
+	    Linelet(float ex, float ey, double hue, double saturation = 1.0, double brightness = 1.0);
 
 	public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -74,14 +73,14 @@ namespace WarGrey::STEM {
     public:
         HLinelet(float width, int32_t color) : Linelet(width, 0.0F, color) {}
         HLinelet(float width, uint32_t color) : Linelet(width, 0.0F, color) {}
-	    HLinelet(float width, float hue, float saturation = 1.0F, float brightness = 1.0F) : Linelet(width, 0.0F, hue, saturation, brightness) {}
+	    HLinelet(float width, double hue, double saturation = 1.0, double brightness = 1.0) : Linelet(width, 0.0F, hue, saturation, brightness) {}
     };
 
     class VLinelet : public WarGrey::STEM::Linelet {
     public:
         VLinelet(float height, int32_t color) : Linelet(0.0F, height, color) {}
         VLinelet(float height, uint32_t color) : Linelet(0.0F, height, color) {}
-	    VLinelet(float height, float hue, float saturation = 1.0F, float brightness = 1.0F) : Linelet(0.0F, height, hue, saturation, brightness) {}
+	    VLinelet(float height, double hue, double saturation = 1.0, double brightness = 1.0) : Linelet(0.0F, height, hue, saturation, brightness) {}
     };
 
     /**********************************************************************************************/
@@ -89,10 +88,10 @@ namespace WarGrey::STEM {
     public:
 	    Rectanglet(float edge_size, int32_t color, int32_t border_color = -1);
 	    Rectanglet(float edge_size, uint32_t color, int32_t border_color = -1);
-	    Rectanglet(float edge_size, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    Rectanglet(float edge_size, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
 	    Rectanglet(float width, float height, int32_t color, int32_t border_color = -1);
 	    Rectanglet(float width, float height, uint32_t color, int32_t border_color = -1);
-	    Rectanglet(float width, float height, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    Rectanglet(float width, float height, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
 
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -115,7 +114,7 @@ namespace WarGrey::STEM {
         Squarelet(float edge_size, uint32_t color, int32_t border_color = -1)
             : Rectanglet(edge_size, color, border_color) {}
 
-        Squarelet(float edge_size, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1)
+        Squarelet(float edge_size, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1)
             : Rectanglet(edge_size, hue, saturation, brightness, border_color) {}
     };
 
@@ -123,10 +122,10 @@ namespace WarGrey::STEM {
     public:
 	    RoundedRectanglet(float edge_size, float radius, int32_t color, int32_t border_color = -1);
 	    RoundedRectanglet(float edge_size, float radius, uint32_t color, int32_t border_color = -1);
-	    RoundedRectanglet(float edge_size, float radius, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    RoundedRectanglet(float edge_size, float radius, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
 	    RoundedRectanglet(float width, float height, float radius, int32_t color, int32_t border_color = -1);
 	    RoundedRectanglet(float width, float height, float radius, uint32_t color, int32_t border_color = -1);
-	    RoundedRectanglet(float width, float height, float radius, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    RoundedRectanglet(float width, float height, float radius, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
 
 	public:
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -150,7 +149,7 @@ namespace WarGrey::STEM {
         RoundedSquarelet(float edge_size, float radius, uint32_t color, int32_t border_color = -1)
             : RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
 
-        RoundedSquarelet(float edge_size, float radius, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1)
+        RoundedSquarelet(float edge_size, float radius, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1)
             : RoundedRectanglet(edge_size, edge_size, radius, hue, saturation, brightness, border_color) {}
     };
 
@@ -158,10 +157,10 @@ namespace WarGrey::STEM {
     public:
 	    Ellipselet(float radius, int32_t color, int32_t border_color = -1);
 	    Ellipselet(float radius, uint32_t color, int32_t border_color = -1);
-	    Ellipselet(float radius, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    Ellipselet(float radius, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
         Ellipselet(float aradius, float bradius, int32_t color, int32_t border_color = -1);
 	    Ellipselet(float aradius, float bradius, uint32_t color, int32_t border_color = -1);
-	    Ellipselet(float aradius, float bradius, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    Ellipselet(float aradius, float bradius, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
 
 	public:
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -184,7 +183,7 @@ namespace WarGrey::STEM {
         Circlet(float radius, uint32_t color, int32_t border_color = -1)
             : Ellipselet(radius, radius, color, border_color) {}
 
-	    Circlet(float radius, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1)
+	    Circlet(float radius, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1)
             : Ellipselet(radius, radius, hue, saturation, brightness, border_color) {}
     };
     
@@ -192,7 +191,7 @@ namespace WarGrey::STEM {
     public:
 	    Trianglet(float x2, float y2, float x3, float y3, int32_t color, int32_t border_color = -1);
 	    Trianglet(float x2, float y2, float x3, float y3, uint32_t color, int32_t border_color = -1);
-	    Trianglet(float x2, float y2, float x3, float y3, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    Trianglet(float x2, float y2, float x3, float y3, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
 
 	public:
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -213,10 +212,10 @@ namespace WarGrey::STEM {
     public:
 	    RegularPolygonlet(int n, float radius, int32_t color, int32_t border_color = -1);
 	    RegularPolygonlet(int n, float radius, uint32_t color, int32_t border_color = -1);
-	    RegularPolygonlet(int n, float radius, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    RegularPolygonlet(int n, float radius, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
         RegularPolygonlet(int n, float radius, float rotation, int32_t color, int32_t border_color = -1);
 	    RegularPolygonlet(int n, float radius, float rotation, uint32_t color, int32_t border_color = -1);
-	    RegularPolygonlet(int n, float radius, float rotation, float hue, float saturation = 1.0F, float brightness = 1.0F, int32_t border_color = -1);
+	    RegularPolygonlet(int n, float radius, float rotation, double hue, double saturation = 1.0, double brightness = 1.0, int32_t border_color = -1);
         virtual ~RegularPolygonlet();
 
 	public:

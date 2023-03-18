@@ -25,9 +25,9 @@ namespace WarGrey::STEM {
         
     public:
         void set_font(shared_font_t font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
-        void set_text_color(uint32_t color_hex = SILVER, float alpha = 1.0F);
-        void set_background_color(uint32_t bg_hex, float alpha = 1.0F);
-        void set_border_color(uint32_t border_hex, float alpha = 1.0F);
+        void set_text_color(uint32_t color_hex = SILVER, double alpha = 1.0);
+        void set_background_color(uint32_t bg_hex, double alpha = 1.0);
+        void set_border_color(uint32_t border_hex, double alpha = 1.0);
 
     public:
         void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
@@ -61,9 +61,9 @@ namespace WarGrey::STEM {
         Labellet(const char* fmt, ...);
         Labellet(shared_font_t font, const char* fmt, ...);
         Labellet(uint32_t color_hex, const char* fmt, ...);
-        Labellet(uint32_t color_hex, float alpha, const char* fmt, ...);
+        Labellet(uint32_t color_hex, double alpha, const char* fmt, ...);
         Labellet(shared_font_t font, uint32_t color_hex, const char* fmt, ...);
-        Labellet(shared_font_t font, uint32_t color_hex, float alpha, const char* fmt, ...);
+        Labellet(shared_font_t font, uint32_t color_hex, double alpha, const char* fmt, ...);
     };
 
     /*********************************************************************************************/

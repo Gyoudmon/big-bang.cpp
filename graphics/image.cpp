@@ -11,24 +11,28 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-SDL_Surface* WarGrey::STEM::game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key) {
-    return game_lambda_image(float(width), float(height), make_image, datum, alpha_color_key);
+SDL_Texture* WarGrey::STEM::game_blank_image(SDL_Renderer* renderer, int width, int height) {
+    SDL_Texture* image = SDL_CreateTexture(renderer,
+                            SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+                            width, height);
+
+    if (image != nullptr) {
+        SDL_Texture* origin = SDL_GetRenderTarget(renderer);
+
+        // Enable the alpha channel
+        SDL_SetTextureBlendMode(image, SDL_BLENDMODE_BLEND);
+
+        SDL_SetRenderTarget(renderer, image);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
+        SDL_SetRenderTarget(renderer, origin);
+    }
+    
+    return image;
 }
 
-SDL_Surface* WarGrey::STEM::game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key) {
-    SDL_Surface* surface = game_blank_image(width, height, alpha_color_key);
-
-    if (surface != nullptr) {
-        SDL_Renderer* renderer = SDL_CreateSoftwareRenderer(surface);
-        
-        if (renderer != nullptr) {
-            make_image(renderer, width, height, datum);
-            SDL_RenderPresent(renderer);
-            SDL_DestroyRenderer(renderer);
-        }
-    }
-
-    return surface;
+SDL_Texture* WarGrey::STEM::game_blank_image(SDL_Renderer* renderer, float width, float height) {
+    return game_blank_image(renderer, fl2fxi(width), fl2fxi(height));
 }
 
 SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height, uint32_t alpha_color_key) {
@@ -61,11 +65,11 @@ SDL_Surface* WarGrey::STEM::game_load_image(const char* file) {
     return IMG_Load(file);
 }
 
-SDL_Texture* WarGrey::STEM::game_load_image_as_texture(SDL_Renderer* renderer, const std::string& file) {
-    return game_load_image_as_texture(renderer, file.c_str());
+SDL_Texture* WarGrey::STEM::game_load_image(SDL_Renderer* renderer, const std::string& file) {
+    return game_load_image(renderer, file.c_str());
 }
 
-SDL_Texture* WarGrey::STEM::game_load_image_as_texture(SDL_Renderer* renderer, const char* file) {
+SDL_Texture* WarGrey::STEM::game_load_image(SDL_Renderer* renderer, const char* file) {
     return IMG_LoadTexture(renderer, file);
 }
 
@@ -86,7 +90,7 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& f
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image_as_texture(renderer, file);
+    SDL_Texture* image = game_load_image(renderer, file);
 
     if (image != nullptr) {
         game_render_texture(renderer, image, x, y, flip, angle);
@@ -107,7 +111,7 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& f
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image_as_texture(renderer, file);
+    SDL_Texture* image = game_load_image(renderer, file);
 
     if (image != nullptr) {
         game_render_texture(renderer, image, x, y, width, height, flip, angle);
@@ -128,7 +132,7 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& f
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image_as_texture(renderer, file);
+    SDL_Texture* image = game_load_image(renderer, file);
 
     if (image != nullptr) {
         game_render_texture(renderer, image, x, y, flip, angle);
@@ -149,7 +153,7 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& f
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image_as_texture(renderer, file);
+    SDL_Texture* image = game_load_image(renderer, file);
 
     if (image != nullptr) {
         game_render_texture(renderer, image, x, y, width, height, flip, angle);

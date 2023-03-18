@@ -6,14 +6,12 @@
 #include <string>
 
 namespace WarGrey::STEM {
-    typedef void (*game_lambda_image_f)(SDL_Renderer*, float, float, void*);
+    SDL_Texture* game_blank_image(SDL_Renderer* renderer, int width, int height);
+    SDL_Texture* game_blank_image(SDL_Renderer* renderer, float width, float height);
 
-    SDL_Surface* game_lambda_image(int width, int height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key = 0xFFFFFFU);
-    SDL_Surface* game_lambda_image(float width, float height, game_lambda_image_f make_image, void* datum, uint32_t alpha_color_key = 0xFFFFFFU);
-    
     SDL_Surface* game_blank_image(int width, int height, uint32_t alpha_color_key = 0xFFFFFFU);
     SDL_Surface* game_blank_image(float width, float height, uint32_t alpha_color_key = 0xFFFFFFU);
-
+    
     SDL_Surface* game_formatted_image(int width, int height, uint32_t format);
     SDL_Surface* game_formatted_image(float width, float height, uint32_t format);
     
@@ -21,8 +19,8 @@ namespace WarGrey::STEM {
     SDL_Surface* game_load_image(const std::string& file);
     void game_unload_image(SDL_Surface* image);
 
-    SDL_Texture* game_load_image_as_texture(SDL_Renderer* renderer, const char* file);
-    SDL_Texture* game_load_image_as_texture(SDL_Renderer* renderer, const std::string& file);
+    SDL_Texture* game_load_image(SDL_Renderer* renderer, const char* file);
+    SDL_Texture* game_load_image(SDL_Renderer* renderer, const std::string& file);
     void game_unload_image(SDL_Texture* image);
 
     void game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);

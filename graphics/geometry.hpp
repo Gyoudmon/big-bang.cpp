@@ -23,39 +23,39 @@ namespace WarGrey::STEM {
     int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dst, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
 
-    void game_draw_point(SDL_Renderer* renderer, int x, int y, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_point(SDL_Renderer* renderer, int x, int y, float hue, float saturation = 1.0f , float value = 1.0f, float alpha = 1.0F);
-    void game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_point(SDL_Renderer* renderer, int x, int y, uint32_t rgb, double alpha = 1.0);
+    void game_draw_point(SDL_Renderer* renderer, int x, int y, double hue, double saturation = 1.0 , double value = 1.0, double alpha = 1.0);
+    void game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, uint32_t rgb, double alpha = 1.0);
+    void game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
     
-    void game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, double alpha = 1.0);
+    void game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, double alpha = 1.0);
+    void game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha = 1.0);
+    void game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha = 1.0);
+    void game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha = 1.0);
+    void game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha = 1.0);
+    void game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, uint32_t rgb, double alpha = 1.0);
+    void game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, uint32_t rgb, double alpha = 1.0);
+    void game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int aradius, int bradius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, double alpha = 1.0);
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, double alpha = 1.0);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
     /**********************************************************************************************/
     void game_draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height);
@@ -72,37 +72,37 @@ namespace WarGrey::STEM {
     int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_FRect* region, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     int game_render_texture(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_FRect* dst, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
     
-    void game_draw_point(SDL_Renderer* renderer, float x, float y, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_point(SDL_Renderer* renderer, float x, float y, float hue, float saturation = 1.0f , float value = 1.0f, float alpha = 1.0F);
-    void game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_point(SDL_Renderer* renderer, float x, float y, uint32_t rgb, double alpha = 1.0);
+    void game_draw_point(SDL_Renderer* renderer, float x, float y, double hue, double saturation = 1.0 , double value = 1.0, double alpha = 1.0);
+    void game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, uint32_t rgb, double alpha = 1.0);
+    void game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
     
-    void game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha = 1.0);
+    void game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, double alpha = 1.0);
+    void game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, double alpha = 1.0);
+    void game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha = 1.0);
+    void game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha = 1.0);
+    void game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha = 1.0);
+    void game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha = 1.0);
+    void game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, uint32_t rgb, double alpha = 1.0);
+    void game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, uint32_t rgb, double alpha = 1.0);
+    void game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
-    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha = 1.0F);
-    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
-    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha = 1.0F);
-    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation = 1.0f, float value = 1.0f, float alpha = 1.0F);
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, double alpha = 1.0);
+    void game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, double alpha = 1.0);
+    void game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 }

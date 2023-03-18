@@ -35,8 +35,8 @@ void WarGrey::STEM::ITextlet::construct(SDL_Renderer* renderer) {
     this->update_texture();
 }
 
-void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, float alpha) {
-    float self_alpha = 0.0F;
+void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, double alpha) {
+    double self_alpha = 0.0;
     uint32_t hex = Hexadecimal_From_Color(&this->text_color, &self_alpha);
 
     if ((hex != color_hex) || (self_alpha != alpha)) {
@@ -46,7 +46,7 @@ void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, float alpha) {
     }
 }
 
-void WarGrey::STEM::ITextlet::set_background_color(uint32_t bg_hex, float alpha) {
+void WarGrey::STEM::ITextlet::set_background_color(uint32_t bg_hex, double alpha) {
     if ((this->bg_color != bg_hex) || (this->bg_alpha != alpha)) {
         this->bg_color = bg_hex;
         this->bg_alpha = alpha;
@@ -54,7 +54,7 @@ void WarGrey::STEM::ITextlet::set_background_color(uint32_t bg_hex, float alpha)
     }
 }
 
-void WarGrey::STEM::ITextlet::set_border_color(uint32_t border_hex, float alpha) {
+void WarGrey::STEM::ITextlet::set_border_color(uint32_t border_hex, double alpha) {
     if ((this->border_color != border_hex) || (this->border_alpha != alpha)) {
         this->border_color = border_hex;
         this->border_alpha = alpha;
@@ -165,7 +165,7 @@ WarGrey::STEM::Labellet::Labellet(shared_font_t font, uint32_t color_hex, const 
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(shared_font_t font, uint32_t color_hex, float alpha, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(shared_font_t font, uint32_t color_hex, double alpha, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_font(font);
@@ -180,7 +180,7 @@ WarGrey::STEM::Labellet::Labellet(uint32_t color_hex, const char* fmt, ...) {
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(uint32_t color_hex, float alpha, const char* fmt, ...) {
+WarGrey::STEM::Labellet::Labellet(uint32_t color_hex, double alpha, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_text_color(color_hex, alpha);

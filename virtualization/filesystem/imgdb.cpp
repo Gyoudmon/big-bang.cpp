@@ -23,7 +23,7 @@ static inline std::string path_normalize(const std::string& str_path) {
 }
 
 static inline shared_costume_t imgdb_load(SDL_Renderer* renderer, const std::string& abspath) {
-    return std::make_shared<Costume>(game_load_image_as_texture(renderer, abspath));
+    return std::make_shared<Costume>(game_load_image(renderer, abspath));
 }
 
 /*************************************************************************************************/

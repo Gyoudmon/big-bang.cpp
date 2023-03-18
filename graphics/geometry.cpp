@@ -332,143 +332,143 @@ int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* textur
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, int x, int y, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, int x, int y, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, int x, int y, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, int x, int y, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
-void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderDrawRect(renderer, box);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_Rect* box, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderDrawRect(renderer, box);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderFillRect(renderer, box);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_Rect* box, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderFillRect(renderer, box);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, double alpha) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
     game_draw_rect(renderer, &box, rgb, alpha);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, double hue, double saturation, double value, double alpha) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
     game_draw_rect(renderer, &box, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, double alpha) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
     game_fill_rect(renderer, &box, rgb, alpha);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, double hue, double saturation, double value, double alpha) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
     game_fill_rect(renderer, &box, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha) {
     game_draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rgb, alpha);
 }
 
-void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation, double value, double alpha) {
     game_draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha) {
     game_fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rgb, alpha);
 }
 
-void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation, double value, double alpha) {
     game_fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_filled_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_filled_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_filled_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_filled_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, double alpha) {
     game_draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, rgb, alpha);
 }
 
-void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, double hue, double saturation, double value, double alpha) {
     game_draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, double alpha) {
     game_fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, rgb, alpha);
 }
 
-void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, double hue, double saturation, double value, double alpha) {
     game_fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, hue, saturation, value, alpha);
 }
 
@@ -567,146 +567,146 @@ int WarGrey::STEM::game_render_texture(SDL_Renderer* target, SDL_Texture* textur
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, float x, float y, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, float x, float y, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderDrawPointF(renderer, x, y);
 }
 
-void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, float x, float y, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, float x, float y, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderDrawPointF(renderer, x, y);
 }
 
-void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderDrawLineF(renderer, x1, y1, x2, y2);
 }
 
-void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderDrawLineF(renderer, x1, y1, x2, y2);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderDrawRectF(renderer, box);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderDrawRectF(renderer, box);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     SDL_RenderFillRectF(renderer, box);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderFillRectF(renderer, box);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, double alpha) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
     game_draw_rect(renderer, &box, rgb, alpha);
 }
 
-void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, double hue, double saturation, double value, double alpha) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
     game_draw_rect(renderer, &box, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, double alpha) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
     game_fill_rect(renderer, &box, rgb, alpha);
 }
 
-void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, double hue, double saturation, double value, double alpha) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
     game_fill_rect(renderer, &box, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha) {
     game_draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rgb, alpha);
 }
 
-void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, double hue, double saturation, double value, double alpha) {
     game_draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha) {
     game_fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rgb, alpha);
 }
 
-void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, double hue, double saturation, double value, double alpha) {
     game_fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, hue, saturation, value, alpha);
 }
 
-void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
 }
 
-void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
 }
 
-void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_filled_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
 }
 
-void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_filled_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
 }
 
-void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
 }
 
-void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
 }
 
-void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_filled_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
 }
 
-void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_filled_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
 }
 
-void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     draw_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
 
-void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     draw_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
 
-void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, float alpha) {
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, double alpha) {
     RGB_SetRenderDrawColor(renderer, rgb, alpha);
     fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
 
-void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, float hue, float saturation, float value, float alpha) {
+void WarGrey::STEM::game_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
