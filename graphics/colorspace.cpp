@@ -7,10 +7,13 @@
 #include "../datum/fixnum.hpp"
 #include "../datum/box.hpp"
 
+#include "../physics/mathematics.hpp"
+
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
 #define UCHAR(v) static_cast<unsigned char>(flround(v * 255.0))
+#define GAMUT(v) (double(v) / 255.0)
 
 static void feed_rgb(double r, double g, double b, unsigned char* red, unsigned char* green, unsigned char* blue) {
     SET_BOX(red, UCHAR(r));
@@ -22,6 +25,8 @@ static void feed_rgb_from_hue(double hue, double chroma, double m, unsigned char
     double r = m;
     double g = m;
     double b = m;
+
+    hue = degrees_normalize(hue);
     
     if (!flisnan(hue)) {
         double hue_60 = hue / 60.0f;
@@ -60,6 +65,28 @@ static void feed_rgb_from_hsi_sector(double hue, double saturation, double inten
         case 'g': feed_rgb(midor, major, minor, r, g, b); break;
         default:  feed_rgb(minor, midor, major, r, g, b); break;
         }
+    }
+}
+
+static double rgb_to_hue(unsigned char red, unsigned char green, unsigned char blue, double* flM, double* flm, double* flchroma) {
+    unsigned char M = fxmax(red, green, blue);
+    unsigned char m = fxmin(red, green, blue);
+    double chroma = double(M) - double(m);
+    
+    SET_BOX(flchroma, chroma);
+    SET_BOX(flM, GAMUT(M));
+    SET_BOX(flm, GAMUT(m));
+    
+    if (chroma == 0.0F) {
+        return flnan_f;
+    } else if (M == green) {
+        return 60.0 * ((double(blue) - double(red)) / chroma + 2.0F);
+    } else if (M == blue) {
+        return 60.0 * ((double(red) - double(green)) / chroma + 4.0F);
+    } else if (green < blue) {
+        return 60.0 * ((double(green) - double(blue)) / chroma + 6.0F);
+    } else {
+        return 60.0 * ((double(green) - double(blue)) / chroma);
     }
 }
 
@@ -118,6 +145,50 @@ void WarGrey::STEM::RGB_FillColor(SDL_Color* c, unsigned int hex, unsigned char 
         RGB_From_Hexadecimal(hex, &c->r, &c->g, &c->b);
         c->a = alpha;
     }
+}
+
+/*************************************************************************************************/
+unsigned int WarGrey::STEM::RGB_Contrast(unsigned int hex) {
+    unsigned char r, g, b;
+    double h, s, v;
+    
+    RGB_From_Hexadecimal(hex, &r, &g, &b);
+    HSV_From_RGB(r, g, b, &h, &s, &v);
+
+    if (flisnan(h)) {
+        return RGB_Contrast_For_Background(hex);
+    } else {
+        return Hexadecimal_From_HSV(h + 180.0, s, v);
+    }
+}
+
+unsigned int WarGrey::STEM::RGB_Contrast_For_Background(unsigned int hex) {
+    unsigned char r, g, b;
+    double perceptive_luminance;
+
+    RGB_From_Hexadecimal(hex, &r, &g, &b);
+    
+    perceptive_luminance = 1.0 - (double(r) * 0.299 + double(g) * 0.587 + double(b) * 0.114) / 255.0;
+
+	if (perceptive_luminance < 0.5) {
+		return 0x000000U;
+	} else {
+		return 0xFFFFFFU;
+	}
+}
+
+unsigned int WarGrey::STEM::RGB_Add(unsigned int hex1, unsigned int hex2) {
+    unsigned char r1, g1, b1, r2, g2, b2;
+    int r, g, b;
+
+    RGB_From_Hexadecimal(hex1, &r1, &g1, &b1);
+    RGB_From_Hexadecimal(hex2, &r2, &g2, &b2);
+
+    r = fxmin(int(r1) + int(r2), 255);
+    g = fxmin(int(g1) + int(g2), 255);
+    b = fxmin(int(b1) + int(b2), 255);
+
+    return Hexadecimal_From_RGB(static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b));
 }
 
 /*************************************************************************************************/
@@ -197,6 +268,43 @@ void WarGrey::STEM::RGB_From_HSI(double hue, double saturation, double intensity
 }
 
 /*************************************************************************************************/
+double WarGrey::STEM::HSB_Hue_From_RGB(unsigned char red, unsigned char green, unsigned char blue) {
+    double hue;
+
+    HSV_From_RGB(red, green, blue, &hue, nullptr, nullptr);
+
+    return hue;
+}
+
+double WarGrey::STEM::HSB_Hue_From_Hexadecimal(unsigned int hex) {
+    unsigned char r, g, b;
+
+    RGB_From_Hexadecimal(hex, &r, &g, &b);
+    
+    return HSB_Hue_From_RGB(r, g, b);
+}
+
+void WarGrey::STEM::HSV_From_RGB(unsigned char red, unsigned char green, unsigned char blue, double* h, double* s, double* b) {
+    double M, m, chroma;
+    double hue = rgb_to_hue(red, green, blue, &M, &m, &chroma);
+
+    SET_BOX(h, hue);
+    SET_BOX(b, M);
+    SET_BOX(s, (M == 0.0) ? 0.0 : chroma / M);
+}
+
+void WarGrey::STEM::HSL_From_RGB(unsigned char red, unsigned char green, unsigned char blue, double* h, double* s, double* l) {
+    double M, m, chroma;
+    double hue = rgb_to_hue(red, green, blue, &M, &m, &chroma);
+    double lightness = (M + m) * 0.5;
+    double abs_2L_1 = flabs(2.0 * lightness - 1.0);
+
+    SET_BOX(h, hue);
+    SET_BOX(s, (abs_2L_1 == 1.0) ? 0.0 : chroma / (1.0 - abs_2L_1));
+    SET_BOX(l, lightness);
+}
+
+/*************************************************************************************************/
 void WarGrey::STEM::RGB_From_Hexadecimal(unsigned int hex, unsigned char* r, unsigned char* g, unsigned char* b) {
     SET_BOX(r, static_cast<unsigned char>((hex >> 16) & 0xFF));
     SET_BOX(g, static_cast<unsigned char>((hex >> 8) & 0xFF));
@@ -214,7 +322,7 @@ void WarGrey::STEM::RGB_From_Hexadecimal(unsigned int hex, unsigned char* r, uns
     unsigned char alpha;
 
     RGB_From_Hexadecimal(hex, r, g, b, &alpha);
-    SET_BOX(a, double(alpha) / 255.0F);
+    SET_BOX(a, GAMUT(alpha));
 }
 
 
@@ -234,7 +342,7 @@ unsigned int WarGrey::STEM::Hexadecimal_From_Color(SDL_Color* c, double* a) {
     unsigned char alpha;
     unsigned int hex = Hexadecimal_From_Color(c, &alpha);
 
-    SET_BOX(a, double(alpha) / 255.0F);
+    SET_BOX(a, GAMUT(alpha));
 
     return hex;
 }
@@ -274,33 +382,6 @@ unsigned int WarGrey::STEM::Hexadecimal_From_HSI(double hue, double saturation, 
 }
 
 /*************************************************************************************************/
-double WarGrey::STEM::HSB_Hue_From_RGB(unsigned char red, unsigned char green, unsigned char blue) {
-    unsigned char M = fxmax(red, green, blue);
-    unsigned char m = fxmin(red, green, blue);
-    double chroma = double(M) - double(m);
-    
-    if (chroma == 0.0F) {
-        return flnan_f;
-    } else if (M == green) {
-        return 60.0F * ((double(blue) - double(red)) / chroma + 2.0F);
-    } else if (M == blue) {
-        return 60.0F * ((double(red) - double(green)) / chroma + 4.0F);
-    } else if (green < blue) {
-        return 60.0F * ((double(green) - double(blue)) / chroma + 6.0F);
-    } else {
-        return 60.0F * ((double(green) - double(blue)) / chroma);
-    }
-}
-
-double WarGrey::STEM::HSB_Hue_From_Hexadecimal(unsigned int hex) {
-    unsigned char r, g, b;
-
-    RGB_From_Hexadecimal(hex, &r, &g, &b);
-    
-    return HSB_Hue_From_RGB(r, g, b);
-}
-
-/*************************************************************************************************/
 void WarGrey::STEM::CIE_RGB_normalize(double* R, double* G, double* B) {
     double L = flmax(*R, *G, *B);
 
@@ -317,7 +398,7 @@ void WarGrey::STEM::CIE_RGB_to_XYZ(CIE_Standard type, int hex, double* X, double
 }
 
 void WarGrey::STEM::CIE_RGB_to_XYZ(CIE_Standard type, unsigned char R, unsigned char G, unsigned char B, double* X, double* Y, double* Z, bool gamma) {
-    CIE_RGB_to_XYZ(type, double(R) / 255.0, double(G) / 255.0, double(B) / 255.0, X, Y, Z, gamma);
+    CIE_RGB_to_XYZ(type, GAMUT(R), GAMUT(G), GAMUT(B), X, Y, Z, gamma);
 }
 
 void WarGrey::STEM::CIE_RGB_to_XYZ(CIE_Standard type, double R, double G, double B, double* X, double* Y, double* Z, bool gamma) {

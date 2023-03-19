@@ -12,14 +12,22 @@ namespace WarGrey::STEM {
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+        bool is_colliding_with_mouse(float x, float y) override;
 
     public:
         void set_standard(WarGrey::STEM::CIE_Standard std = CIE_Standard::Primary);
         WarGrey::STEM::CIE_Standard get_standard() { return this->standard; }
         void set_luminance(double Y = 1.0);
 
+    public:
         void set_primary_color(uint32_t hex, size_t idx);
-        uint32_t get_color(float mx, float my);
+        void feed_primary_color_location(size_t idx, float* x, float* y);
+        void feed_primary_color_location(size_t idx, double* x, double* y);
+        void feed_color_location(uint32_t color, float* x, float* y);
+        void feed_color_location(uint32_t color, double* x, double* y);
+        uint32_t get_color_at(float mx, float my, bool after_primary = false) { return this->get_color_at(double(mx), double(my), after_primary); }
+        uint32_t get_color_at(double mx, double my, bool after_primary = false);
+        bool is_point_inside_the_spectrum(double x, double y);
 
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
@@ -33,6 +41,7 @@ namespace WarGrey::STEM {
     private:
         void fix_render_location(double* x, double* y);
         void make_locus_polygon(double width, double height);
+        void spectrum_intersection_vpoints(double x, double flheight, int& slt_idx, int& slb_idx, double* ty, double* by);
         void render_dot(SDL_Renderer* renderer, double x, double y, double width, double height,
                             double R, double G, double B, double dx, double dy, double A = 1.0);
 

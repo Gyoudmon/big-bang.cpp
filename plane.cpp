@@ -730,7 +730,7 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
                 }
 
                 if ((this->tooltip != nullptr) && (this->tooltip->visible())) {
-                    this->update_tooltip(m, local_x, local_y);
+                    this->update_tooltip(m, local_x, local_y, local_x + info->x, local_y + info->y);
                     this->place_tooltip(m);
                 }
             } else {
@@ -794,8 +794,10 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
 
             if (!unmasked_matter->concealled()) {
                 this->hovering_matter = unmasked_matter;
-                this->hovering_matter_x = local_x;
-                this->hovering_matter_y = local_y;
+                this->hovering_mgx = x;
+                this->hovering_mgy = y;
+                this->hovering_mlx = local_x;
+                this->hovering_mly = local_y;
 
                 if (unmasked_matter->events_allowed()) {
                     unmasked_matter->on_hover(local_x, local_y);
@@ -810,7 +812,7 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
             }
 
             if (this->tooltip != nullptr) {
-                if (this->update_tooltip(unmasked_matter, local_x, local_y)) {
+                if (this->update_tooltip(unmasked_matter, local_x, local_y, x, y)) {
                     if (!this->tooltip->visible()) {
                         this->tooltip->show(true);
                     }
@@ -1023,7 +1025,7 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
 
         if ((this->tooltip != nullptr) && this->tooltip->visible()) {
             if (this->hovering_matter != nullptr) {
-                this->update_tooltip(this->hovering_matter, this->hovering_matter_x, this->hovering_matter_y);
+                this->update_tooltip(this->hovering_matter, this->hovering_mlx, this->hovering_mly, this->hovering_mgx, this->hovering_mgy);
                 this->place_tooltip(this->hovering_matter);
             }
         }

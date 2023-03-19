@@ -15,6 +15,27 @@ namespace WarGrey::STEM {
     }
 
     template<typename Fl>
+    Fl degrees_normalize(Fl degrees, Fl degrees_start = Fl(0.0)) {
+	    Fl degrees_end = degrees_start + Fl(360.0);
+
+	    while (degrees < degrees_start) degrees += Fl(360.0);
+	    while (degrees >= degrees_end) degrees -= Fl(360.0);
+
+	    return degrees;
+    }
+
+    template<typename Fl>
+    Fl radians_normalize(Fl radians, Fl degrees_start = Fl(0.0)) {
+	    Fl radians_start = quick_degrees_to_radians(degrees_start);
+	    Fl radians_end = radians_start + Fl(d_pi);
+
+	    while (radians < radians_start) radians += Fl(d_pi);
+	    while (radians >= radians_end) radians -= Fl(d_pi);
+
+	    return radians;
+    }
+
+    template<typename Fl>
     void orthogonal_decomposition(Fl magnitude, Fl direction, Fl* x, Fl* y, bool is_radian = true) {
         Fl rad = is_radian ? direction : degrees_to_radians(direction);
 
@@ -85,6 +106,19 @@ namespace WarGrey::STEM {
 	    SET_BOX(y, radiusY * flsin(rad));
     }
 
+    template<typename Fl>
+    Fl point_distance(Fl x1, Fl y1, Fl x2, Fl y2) {
+        return flsqrt(flsqr(x2 - x1) + flsqr(y2 - y1));
+    }
+
+    template<typename Fl>
+    void line_point(Fl x0, Fl y0, Fl x1, Fl y1, double t, Fl* x, Fl* y) {
+	    Fl flt = Fl(t);
+
+	    SET_BOX(x, (x0 - x1) * flt + x1);
+	    SET_BOX(y, (y0 - y1) * flt + y1);
+    }
+
     /*********************************************************************************************/
     template<typename Fl>
     bool lines_intersect(Fl x11, Fl y11, Fl x12, Fl y12, Fl x21, Fl y21, Fl x22, Fl y22,
@@ -118,6 +152,7 @@ namespace WarGrey::STEM {
 	        SET_BOX(px, x21 + T2 * (x22 - x21));
 	        SET_BOX(py, y21 + T2 * (y22 - y21));
         } else {
+            SET_VALUES(px, Fl(flnan), py, Fl(flnan));
             SET_VALUES(t1, Fl(flnan), t2, Fl(flnan));
         }
 

@@ -19,6 +19,10 @@ namespace WarGrey::STEM {
     static const double pi        = 3.141592653589793;
     static const long double pi_t = 3.1415926535897932385L;
 
+    static const float d_pi_f       = pi_f * 2.0F;
+    static const double d_pi        = pi * 2.0;
+    static const long double d_pi_t = pi_t * 2.0L;
+
     static const float h_pi_f       = pi_f / 2.0F;
     static const double h_pi        = pi / 2.0;
     static const long double h_pi_t = pi_t / 2.0L;

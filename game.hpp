@@ -4,6 +4,7 @@
 
 #include "cosmos.hpp"
 #include "matter.hpp"
+#include "misc.hpp"
 
 #include "graphics/colorspace.hpp"
 #include "graphics/named_colors.hpp"

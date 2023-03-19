@@ -280,7 +280,7 @@ namespace WarGrey::STEM {
 
     protected:
         void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
-        virtual bool update_tooltip(IMatter* m, float local_x, float local_y) { return false; }
+        virtual bool update_tooltip(IMatter* m, float local_x, float local_y, float global_x, float global_y) { return false; }
         virtual void on_double_tap_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->mission_complete(); }
         
     protected:
@@ -332,8 +332,10 @@ namespace WarGrey::STEM {
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 1U;
         uint32_t local_elapse = 0U;
-        float hovering_matter_x = 0.0F;
-        float hovering_matter_y = 0.0F;
+        float hovering_mgx = 0.0F;
+        float hovering_mgy = 0.0F;
+        float hovering_mlx = 0.0F;
+        float hovering_mly = 0.0F;
 
     private:
         float translate_x = 0.0F;

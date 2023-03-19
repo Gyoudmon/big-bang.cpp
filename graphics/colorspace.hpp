@@ -19,6 +19,10 @@ namespace WarGrey::STEM {
 
     unsigned char color_component_to_byte(double com);
     unsigned char color_component_clamp_to_byte(double com);
+    
+    unsigned int RGB_Contrast(unsigned int hex);
+    unsigned int RGB_Contrast_For_Background(unsigned int hex);
+    unsigned int RGB_Add(unsigned int hex1, unsigned int hex2);
 
     void RGB_FillColor(SDL_Color* c, unsigned int hex, double alpha);
     void RGB_FillColor(SDL_Color* c, unsigned int hex, unsigned char alpha = 255U);
@@ -26,14 +30,17 @@ namespace WarGrey::STEM {
     unsigned int Hexadecimal_From_Color(SDL_Color* c, double* alpha = nullptr);
     unsigned int Hexadecimal_From_Color(SDL_Color* c, unsigned char* alpha);
 
-    double HSB_Hue_From_RGB(unsigned char r, unsigned char g, unsigned char b);
-    double HSB_Hue_From_Hexadecimal(unsigned int hex);
-
     unsigned int Hexadecimal_From_RGB(unsigned char red, unsigned char green, unsigned char blue);
     unsigned int Hexadecimal_From_HSV(double hue, double saturation, double brightness);
     unsigned int Hexadecimal_From_HSL(double hue, double saturation, double lightness);
     unsigned int Hexadecimal_From_HSI(double hue, double saturation, double intensity);
 
+    double HSB_Hue_From_Hexadecimal(unsigned int hex);
+    double HSB_Hue_From_RGB(unsigned char r, unsigned char g, unsigned char b);
+
+    void HSV_From_RGB(unsigned char red, unsigned char green, unsigned char blue, double* hue, double* saturation, double* brightness);
+    void HSL_From_RGB(unsigned char red, unsigned char green, unsigned char blue, double* hue, double* saturation, double* lightness);
+    
     void RGB_From_HSV(double hue, double saturation, double brightness, unsigned char* red, unsigned char* green, unsigned char* blue);
     void RGB_From_HSL(double hue, double saturation, double lightness, unsigned char* red, unsigned char* green, unsigned char* blue);
     void RGB_From_HSI(double hue, double saturation, double intensity, unsigned char* red, unsigned char* green, unsigned char* blue);

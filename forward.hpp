@@ -10,5 +10,5 @@ namespace WarGrey::STEM {
     enum class BorderEdge { TOP, RIGHT, BOTTOM, LEFT, NONE };
     enum class BorderStrategy { IGNORE, STOP, BOUNCE };
 
-    void matter_anchor_fraction(MatterAnchor& a, float* ofx, float* ofy);
+    void matter_anchor_fraction(MatterAnchor& a, float* ofx, float* ofy);    
 }

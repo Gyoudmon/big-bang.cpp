@@ -11,6 +11,10 @@
 
 using namespace WarGrey::STEM;
 
+/*************************************************************************************************/
+#define PrimaryColorCount sizeof(this->primaries) / sizeof(uint32_t)
+static const float triangle_vertice_radius = 3.0F;
+
 static const double wavelength_xbars [] = {
     0.001435025, 0.0015721889999999999, 0.0017223550000000044, 0.0018990695000000056, 0.0021158785, 0.0023856924999999998,
     0.002713994, 0.0030967160000000002, 0.0035270325, 0.003998118, 0.0045026944999999995, 0.005046218499999984,
@@ -257,13 +261,13 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
 
             SDL_SetRenderTarget(renderer, this->diagram);
 
-            this->draw_color_map(renderer, width, height);
+            // this->draw_color_map(renderer, width, height);
             this->draw_spectral_locus(renderer, width, height);
             this->draw_chromaticity(renderer, width, height);
 
             SDL_SetRenderTarget(renderer, origin);
         } else {
-            fprintf(stderr, "无法绘制几何图形：%s\n", SDL_GetError());
+            fprintf(stderr, "无法绘制色度图：%s\n", SDL_GetError());
         }
     }
 
@@ -279,44 +283,132 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
     this->draw_color_triangle(renderer, width, height, flx, fly);
 }
 
-uint32_t WarGrey::STEM::Chromalet::get_color(float mx, float my) {
-    double x = double(mx / flabs(this->width));
-    double y = double(1.0 - my / flabs(this->height));
-    double X, Y, Z, R, G, B;
-    uint32_t hex = 0;
+bool WarGrey::STEM::Chromalet::is_colliding_with_mouse(float x, float y) {
+    return this->is_point_inside_the_spectrum(double(x), double(y));
+}
 
-    if (x + y <= 1.0) {
-        CIE_xyY_to_XYZ(x, y, &X, &Y, &Z, this->luminance);
-        CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
+/*************************************************************************************************/
+uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after_primary) {
+    uint32_t hex = 0U;
 
-        hex = Hexadecimal_From_RGB(color_component_clamp_to_byte(R),
-                                    color_component_clamp_to_byte(G),
-                                    color_component_clamp_to_byte(B));
+    if (after_primary) {
+        double pcxs[PrimaryColorCount + 1];
+        double pcys[PrimaryColorCount + 1];
+
+        for (size_t idx = 0; idx < PrimaryColorCount; idx ++) {
+            this->feed_color_location(this->primaries[idx], &pcxs[idx], &pcys[idx]);
+
+            if (point_distance(pcxs[idx], pcys[idx], mx, my) <= triangle_vertice_radius) {
+                hex = this->get_color_at(pcxs[idx], pcys[idx]);
+                break;
+            }
+        }
+
+        if (hex == 0U) { // check midpoints
+            pcxs[PrimaryColorCount] = pcxs[0];
+            pcys[PrimaryColorCount] = pcys[0];
+
+            for (size_t idx = 0; idx < PrimaryColorCount; idx ++) {
+                double pcmx, pcmy;
+
+                line_point(pcxs[idx], pcys[idx], pcxs[idx + 1], pcys[idx + 1], 0.5, &pcmx, &pcmy);
+                if (point_distance(pcmx, pcmy, mx, my) <= triangle_vertice_radius) {
+                    hex = this->get_color_at(pcmx, pcmy, false);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (hex == 0U) {
+        double x = mx / flabs(double(this->width));
+        double y = 1.0 - my / flabs(double(this->height));
+        double X, Y, Z, R, G, B, r, g, b;
+        
+        if (x + y <= 1.0) {
+            CIE_xyY_to_XYZ(x, y, &X, &Y, &Z, this->luminance);
+            CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
+
+            if ((R >= 0.0) && (G >= 0.0) && (B >= 0.0)) {
+                r = color_component_to_byte(R);
+                g = color_component_to_byte(G);
+                b = color_component_to_byte(B);
+            } else if (this->is_point_inside_the_spectrum(mx, my)) {
+                r = color_component_clamp_to_byte(R);
+                g = color_component_clamp_to_byte(G);
+                b = color_component_clamp_to_byte(B);
+            } else {
+                r = g = b = 0.0;
+            }
+
+            hex = Hexadecimal_From_RGB(r, g, b);
+        }
     }
 
     return hex;
 }
 
+void WarGrey::STEM::Chromalet::feed_primary_color_location(size_t idx, float* x, float* y) {
+    idx %= PrimaryColorCount;
+    this->feed_color_location(this->primaries[idx], x, y);
+}
+
+void WarGrey::STEM::Chromalet::feed_primary_color_location(size_t idx, double* x, double* y) {
+    idx %= PrimaryColorCount;
+    this->feed_color_location(this->primaries[idx], x, y);
+}
+
+void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, float* x, float *y) {
+    double flx, fly;
+
+    this->feed_color_location(c, &flx, &fly);
+    SET_BOX(x, float(flx));
+    SET_BOX(y, float(fly));
+}
+
+void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, double* x, double *y) {
+    double X, Y, Z, flx, fly;
+    double width = flabs(double(this->width));
+    double height = flabs(double(this->height));
+
+    CIE_RGB_to_XYZ(this->standard, c, &X, &Y, &Z);
+    CIE_XYZ_to_xyY(X, Y, Z, &flx, &fly);
+    this->fix_render_location(&flx, &fly);
+
+    SET_BOX(x, flx * width);
+    SET_BOX(y, fly * height);
+}
+
 /*************************************************************************************************/
 void WarGrey::STEM::Chromalet::draw_color_triangle(SDL_Renderer* renderer, int width, int height, double dx, double dy) {
-    static const size_t vcount = sizeof(this->primaries) / sizeof(uint32_t) + 1U;
-    double flwidth = double(width);
-    double flheight = double(height);
+    static const size_t vcount = PrimaryColorCount + 1U;
     SDL_FPoint pts[vcount];
-    double X, Y, Z, x, y;
+    double x, y;
 
-    for (int idx = 0; idx < sizeof(this->primaries) / sizeof(uint32_t); idx ++) {
-        CIE_RGB_to_XYZ(this->standard, this->primaries[idx], &X, &Y, &Z);
-        CIE_XYZ_to_xyY(X, Y, Z, &x, &y);
-        this->fix_render_location(&x, &y);
+    for (int idx = 0; idx < PrimaryColorCount; idx ++) {
+        this->feed_color_location(this->primaries[idx], &x, &y);
 
-        pts[idx].x = float(x * flwidth + dx);
-        pts[idx].y = float(y * flheight + dy);
+        pts[idx].x = float(x + dx);
+        pts[idx].y = float(y + dy);
     }
 
     pts[vcount - 1] = pts[0];
     RGB_SetRenderDrawColor(renderer, BLACK);
     SDL_RenderDrawLinesF(renderer, pts, vcount);
+
+    for (int idx = 0; idx < PrimaryColorCount; idx ++) {
+        if ((pts[idx].x != pts[idx + 1].x) && (pts[idx].y != pts[idx + 1].y)) {
+            float mx, my;
+
+            line_point(pts[idx].x, pts[idx].y, pts[idx + 1].x, pts[idx + 1].y, 0.5, &mx, &my);
+            game_fill_circle(renderer, pts[idx].x, pts[idx].y, triangle_vertice_radius, this->get_color_at(pts[idx].x - dx, pts[idx].y - dy));
+            game_draw_circle(renderer, pts[idx].x, pts[idx].y, triangle_vertice_radius, GHOSTWHITE);
+            game_draw_circle(renderer, pts[idx].x, pts[idx].y, triangle_vertice_radius + 1.0F, GHOSTWHITE);
+            game_fill_circle(renderer, mx, my, triangle_vertice_radius, this->get_color_at(double(mx) - dx, double(my) - dy));
+            game_draw_circle(renderer, mx, my, triangle_vertice_radius, GHOSTWHITE);
+            game_draw_circle(renderer, mx, my, triangle_vertice_radius + 1.0F, GHOSTWHITE);
+        }
+    }
 }
 
 void WarGrey::STEM::Chromalet::draw_color_map(SDL_Renderer* renderer, int width, int height, double dx, double dy) {
@@ -362,45 +454,25 @@ void WarGrey::STEM::Chromalet::draw_chromaticity(SDL_Renderer* renderer, int wid
     double flheight = double(height);
     int slt_idx = this->scanline_idx0;
     int slb_idx = this->scanline_idx0;
-    double X, Y, Z, R, G, B, fx, fy;
-    double x, ty, by, tt, bt;
+    double X, Y, Z, R, G, B;
+    double fx, fy, ty, by;
     
     if (this->locus_xs == nullptr) {
         this->make_locus_polygon(flwidth, flheight);
+        slt_idx = slb_idx = this->scanline_idx0;
     }
 
-    x = flround(this->scanline_start);
-
-    do {
-        while (true) {
-            lines_intersect(this->locus_xs[slt_idx], this->locus_ys[slt_idx],
-                        this->locus_xs[slt_idx + 1], this->locus_ys[slt_idx + 1],
-                        x, 0.0, x, flheight, flnull, &ty, &tt);
-
-            if (tt <= 1.0) break;
-            slt_idx ++;
-        }
-
-        while (true) {
-            lines_intersect(this->locus_xs[slb_idx], this->locus_ys[slb_idx],
-                        this->locus_xs[slb_idx - 1], this->locus_ys[slb_idx - 1],
-                        x, 0.0, x, flheight, flnull, &by, &bt);
-
-            if (bt <= 1.0) break;
-            slb_idx --;
-        }
-
+    for (double x = flround(this->scanline_start); x <= this->scanline_end; x += 1.0) {
         fx = x / flwidth;
-        x += 1.0;
+        this->spectrum_intersection_vpoints(x, flheight, slt_idx, slb_idx, &ty, &by);
 
-        for (double y = flfloor(ty); y < flceiling(by) + 1.0; y += 1.0) {
-            fy = 1.0 - y / flheight;
-                    
+        for (double y = flfloor(ty); y <= flceiling(by); y += 1.0) {
+            fy = 1.0 - y / flheight;        
             CIE_xyY_to_XYZ(fx, fy, &X, &Y, &Z, this->luminance);
             CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
             this->render_dot(renderer, fx, fy, flwidth, flheight, R, G, B, dx, dy);
         }
-    } while (x <= this->scanline_end);
+    };
 }
 
 /*************************************************************************************************/
@@ -458,6 +530,47 @@ void WarGrey::STEM::Chromalet::make_locus_polygon(double flwidth, double flheigh
     this->locus_ys[this->locus_count - 1] = this->locus_ys[1];
 }
 
+bool WarGrey::STEM::Chromalet::is_point_inside_the_spectrum(double mx, double my) {
+    bool inside = false;
+
+    if (this->locus_xs == nullptr) {
+        this->make_locus_polygon(flabs(this->width), flabs(this->height));
+    }
+
+    if ((mx >= this->scanline_start) && (mx <= this->scanline_end)) {
+        int slt_idx = this->scanline_idx0;
+        int slb_idx = this->scanline_idx0;
+        double ty, by;
+
+        this->spectrum_intersection_vpoints(mx, flabs(this->height), slt_idx, slb_idx, &ty, &by);
+        inside = ((ty <= my) && (my <= by));
+    }
+
+    return inside;
+}
+
+void WarGrey::STEM::Chromalet::spectrum_intersection_vpoints(double mx, double flheight, int& slt_idx, int& slb_idx, double* ty, double* by) {
+    double t;
+
+    while (true) {
+        lines_intersect(this->locus_xs[slt_idx], this->locus_ys[slt_idx],
+                this->locus_xs[slt_idx + 1], this->locus_ys[slt_idx + 1],
+                mx, 0.0, mx, flheight, flnull, ty, &t);
+
+        if (t <= 1.0) break;
+        slt_idx ++;
+    }
+
+    while (true) {
+        lines_intersect(this->locus_xs[slb_idx], this->locus_ys[slb_idx],
+                this->locus_xs[slb_idx - 1], this->locus_ys[slb_idx - 1],
+                mx, 0.0, mx, flheight, flnull, by, &t);
+
+        if (t <= 1.0) break;
+        slb_idx --;
+    }
+}
+
 /*************************************************************************************************/
 void WarGrey::STEM::Chromalet::invalidate_geometry() {
     this->invalidate_diagram();
@@ -498,7 +611,7 @@ void WarGrey::STEM::Chromalet::set_standard(CIE_Standard std) {
 }
 
 void WarGrey::STEM::Chromalet::set_primary_color(uint32_t hex, size_t idx) {
-    idx %= sizeof(this->primaries) / sizeof(uint32_t);
+    idx %= PrimaryColorCount;
 
     if (this->primaries[idx] != hex) {
         this->primaries[idx] = hex;
