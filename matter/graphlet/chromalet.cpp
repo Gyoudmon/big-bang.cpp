@@ -288,10 +288,10 @@ bool WarGrey::STEM::Chromalet::is_colliding_with_mouse(float x, float y) {
 }
 
 /*************************************************************************************************/
-uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after_primary) {
+uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after_special) {
     uint32_t hex = 0U;
 
-    if (after_primary) {
+    if (after_special) {
         double pcxs[PrimaryColorCount + 1];
         double pcys[PrimaryColorCount + 1];
 
@@ -318,12 +318,22 @@ uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after
                 }
             }
         }
+
+        if (hex == 0U) { // check the white point
+            double wx, wy;
+
+            this->feed_color_location(0xFFFFFFU, &wx, &wy);
+            if (point_distance(wx, wy, mx, my) <= triangle_vertice_radius) {
+                hex = 0xFFFFFFU;
+            }
+        }
     }
 
     if (hex == 0U) {
         double x = mx / flabs(double(this->width));
         double y = 1.0 - my / flabs(double(this->height));
-        double X, Y, Z, R, G, B, r, g, b;
+        double X, Y, Z, R, G, B;
+        unsigned char r, g, b;
         
         if (x + y <= 1.0) {
             CIE_xyY_to_XYZ(x, y, &X, &Y, &Z, this->luminance);
@@ -338,7 +348,7 @@ uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after
                 g = color_component_clamp_to_byte(G);
                 b = color_component_clamp_to_byte(B);
             } else {
-                r = g = b = 0.0;
+                r = g = b = 0;
             }
 
             hex = Hexadecimal_From_RGB(r, g, b);
@@ -348,35 +358,36 @@ uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after
     return hex;
 }
 
-void WarGrey::STEM::Chromalet::feed_primary_color_location(size_t idx, float* x, float* y) {
+void WarGrey::STEM::Chromalet::feed_primary_color_location(size_t idx, float* x, float* y, float* fx, float* fy) {
     idx %= PrimaryColorCount;
-    this->feed_color_location(this->primaries[idx], x, y);
+    this->feed_color_location(this->primaries[idx], x, y, fx, fy);
 }
 
-void WarGrey::STEM::Chromalet::feed_primary_color_location(size_t idx, double* x, double* y) {
+void WarGrey::STEM::Chromalet::feed_primary_color_location(size_t idx, double* x, double* y, double* fx, double* fy) {
     idx %= PrimaryColorCount;
-    this->feed_color_location(this->primaries[idx], x, y);
+    this->feed_color_location(this->primaries[idx], x, y, fx, fy);
 }
 
-void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, float* x, float *y) {
-    double flx, fly;
+void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, float* x, float *y, float* fx, float* fy) {
+    double flx, fly, co_x, co_y;
 
-    this->feed_color_location(c, &flx, &fly);
-    SET_BOX(x, float(flx));
-    SET_BOX(y, float(fly));
+    this->feed_color_location(c, &flx, &fly, &co_x, &co_y);
+    SET_VALUES(x, float(flx), y, float(fly));
+    SET_VALUES(fx, float(co_x), fy, float(co_y));
 }
 
-void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, double* x, double *y) {
-    double X, Y, Z, flx, fly;
+void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, double* x, double *y, double* fx, double* fy) {
+    double X, Y, Z, co_x, co_y;
     double width = flabs(double(this->width));
     double height = flabs(double(this->height));
 
     CIE_RGB_to_XYZ(this->standard, c, &X, &Y, &Z);
-    CIE_XYZ_to_xyY(X, Y, Z, &flx, &fly);
-    this->fix_render_location(&flx, &fly);
+    CIE_XYZ_to_xyY(X, Y, Z, &co_x, &co_y);
+    
+    SET_VALUES(fx, co_x, fy, co_y);
 
-    SET_BOX(x, flx * width);
-    SET_BOX(y, fly * height);
+    this->fix_render_location(&co_x, &co_y);
+    SET_VALUES(x, co_x * width, y, co_y * height);
 }
 
 /*************************************************************************************************/
@@ -543,7 +554,7 @@ bool WarGrey::STEM::Chromalet::is_point_inside_the_spectrum(double mx, double my
         double ty, by;
 
         this->spectrum_intersection_vpoints(mx, flabs(this->height), slt_idx, slb_idx, &ty, &by);
-        inside = ((ty <= my) && (my <= by));
+        inside = ((ty - 1.0) <= my) && (my <= (by + 1.0));
     }
 
     return inside;

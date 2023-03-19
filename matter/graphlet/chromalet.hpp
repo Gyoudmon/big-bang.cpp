@@ -21,12 +21,12 @@ namespace WarGrey::STEM {
 
     public:
         void set_primary_color(uint32_t hex, size_t idx);
-        void feed_primary_color_location(size_t idx, float* x, float* y);
-        void feed_primary_color_location(size_t idx, double* x, double* y);
-        void feed_color_location(uint32_t color, float* x, float* y);
-        void feed_color_location(uint32_t color, double* x, double* y);
-        uint32_t get_color_at(float mx, float my, bool after_primary = false) { return this->get_color_at(double(mx), double(my), after_primary); }
-        uint32_t get_color_at(double mx, double my, bool after_primary = false);
+        void feed_primary_color_location(size_t idx, float* x, float* y, float* fx = nullptr, float* fy = nullptr);
+        void feed_primary_color_location(size_t idx, double* x, double* y, double* fx = nullptr, double* fy = nullptr);
+        void feed_color_location(uint32_t color, float* x, float* y, float* fx = nullptr, float* fy = nullptr);
+        void feed_color_location(uint32_t color, double* x, double* y, double* fx = nullptr, double* fy = nullptr);
+        uint32_t get_color_at(float mx, float my, bool after_special = false) { return this->get_color_at(double(mx), double(my), after_special); }
+        uint32_t get_color_at(double mx, double my, bool after_special = false);
         bool is_point_inside_the_spectrum(double x, double y);
 
     protected:
