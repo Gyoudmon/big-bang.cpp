@@ -1068,8 +1068,8 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
                 if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
                     clip.x = fl2fxi(flfloor(mx));
                     clip.y = fl2fxi(flfloor(my));
-                    clip.w = fl2fxi(flfloor(mwidth + 1.0F));
-                    clip.h = fl2fxi(flfloor(mheight + 1.0F));
+                    clip.w = fl2fxi(flfloor(mwidth));
+                    clip.h = fl2fxi(flfloor(mheight));
 
                     SDL_RenderSetClipRect(renderer, &clip);
 

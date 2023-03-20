@@ -30,6 +30,7 @@ namespace WarGrey::STEM {
     unsigned int Hexadecimal_From_Color(SDL_Color* c, double* alpha = nullptr);
     unsigned int Hexadecimal_From_Color(SDL_Color* c, unsigned char* alpha);
 
+    unsigned int Hexadecimal_From_RGB(double red, double green, double blue);
     unsigned int Hexadecimal_From_RGB(unsigned char red, unsigned char green, unsigned char blue);
     unsigned int Hexadecimal_From_HSV(double hue, double saturation, double brightness);
     unsigned int Hexadecimal_From_HSL(double hue, double saturation, double lightness);

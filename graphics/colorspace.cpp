@@ -91,7 +91,7 @@ static double rgb_to_hue(unsigned char red, unsigned char green, unsigned char b
 }
 
 static inline double color_gamma_encode(double c) {
-    return (c <= 0.0031308) ? c * 12.92 : flexpt(c, 1.0 /2.4 ) * 1.055 - 0.055;
+    return (c <= 0.0031308) ? c * 12.92 : flexpt(c, 1.0 / 2.4 ) * 1.055 - 0.055;
 }
 
 static inline double color_gamma_decode(double c) {
@@ -351,6 +351,14 @@ unsigned int WarGrey::STEM::Hexadecimal_From_Color(SDL_Color* c, unsigned char* 
     SET_BOX(alpha, c->a);
 
     return Hexadecimal_From_RGB(c->r, c->g, c->b);
+}
+
+unsigned int WarGrey::STEM::Hexadecimal_From_RGB(double red, double green, double blue) {
+    unsigned char r = color_component_clamp_to_byte(red);
+    unsigned char g = color_component_clamp_to_byte(green);
+    unsigned char b = color_component_clamp_to_byte(blue);
+     
+    return Hexadecimal_From_RGB(r, g, b);
 }
 
 unsigned int WarGrey::STEM::Hexadecimal_From_RGB(unsigned char red, unsigned char green, unsigned char blue) {

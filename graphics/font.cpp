@@ -89,8 +89,8 @@ const char* WarGrey::STEM::generic_font_family_name_for_ascii(FontFamily family)
     switch (family) {
 #if defined(__macosx__)
     case FontFamily::sans_serif: return "LucidaGrande.ttc"; break;
-    case FontFamily::serif: return "Times.ttc"; break;
-    case FontFamily::monospace: return "Courier.ttc"; break;
+    case FontFamily::serif: return "Times New Roman.ttf"; break;
+    case FontFamily::monospace: return "Courier New Bold.ttf"; break;
     case FontFamily::math: return "Bodoni 72.ttc"; break;
     case FontFamily::cursive: return "Courier.ttc"; break;
     case FontFamily::fantasy: return "Bodoni 72.ttc"; break;
