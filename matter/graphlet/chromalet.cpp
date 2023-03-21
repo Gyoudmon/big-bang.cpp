@@ -264,10 +264,8 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
     fix_imaginary_size(flwidth, flheight, &imaginary_width, &imaginary_height);
 
     if (this->diagram == nullptr) {
-        int width = fl2fxi(flwidth);
-        int height = fl2fxi(flheight);
-        
-        this->diagram = game_blank_image(renderer, width + 1, height + 1);
+        // doubling the size does make it more smooth, and causes other problems
+        this->diagram = game_blank_image(renderer, fl2fxi(imaginary_width) + 1, fl2fxi(imaginary_height) + 1);
 
         if (this->diagram != nullptr) {
             SDL_Texture* origin = SDL_GetRenderTarget(renderer);
