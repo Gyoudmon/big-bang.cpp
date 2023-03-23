@@ -611,7 +611,7 @@ void WarGrey::STEM::IUniverse::popback_input_text() {
 /*************************************************************************************************/
 SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
     uint32_t format = SDL_PIXELFORMAT_RGBA8888;
-    SDL_Surface* photograph = game_formatted_image(this->window_width, this->window_height, format);
+    SDL_Surface* photograph = game_formatted_surface(this->window_width, this->window_height, format);
 
     if (photograph != nullptr) {
         if (SDL_RenderReadPixels(this->renderer, NULL, format, photograph->pixels, photograph->pitch) < 0) {

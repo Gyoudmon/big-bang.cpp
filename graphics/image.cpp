@@ -35,12 +35,12 @@ SDL_Texture* WarGrey::STEM::game_blank_image(SDL_Renderer* renderer, float width
     return game_blank_image(renderer, fl2fxi(width), fl2fxi(height));
 }
 
-SDL_Surface* WarGrey::STEM::game_formatted_image(int width, int height, uint32_t format) {
+SDL_Surface* WarGrey::STEM::game_formatted_surface(int width, int height, uint32_t format) {
     return SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, format);
 }
 
-SDL_Surface* WarGrey::STEM::game_formatted_image(float width, float height, uint32_t format) {
-    return game_formatted_image(fl2fxi(width), fl2fxi(height), format);
+SDL_Surface* WarGrey::STEM::game_formatted_surface(float width, float height, uint32_t format) {
+    return game_formatted_surface(fl2fxi(width), fl2fxi(height), format);
 }
 
 SDL_Texture* WarGrey::STEM::game_load_image(SDL_Renderer* renderer, const std::string& file) {
