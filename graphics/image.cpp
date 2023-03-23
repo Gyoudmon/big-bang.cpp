@@ -43,14 +43,6 @@ SDL_Surface* WarGrey::STEM::game_formatted_image(float width, float height, uint
     return game_formatted_image(fl2fxi(width), fl2fxi(height), format);
 }
 
-SDL_Surface* WarGrey::STEM::game_load_image(const std::string& file) {
-    return game_load_image(file.c_str());
-}
-
-SDL_Surface* WarGrey::STEM::game_load_image(const char* file) {
-    return IMG_Load(file);
-}
-
 SDL_Texture* WarGrey::STEM::game_load_image(SDL_Renderer* renderer, const std::string& file) {
     return game_load_image(renderer, file.c_str());
 }
@@ -59,16 +51,8 @@ SDL_Texture* WarGrey::STEM::game_load_image(SDL_Renderer* renderer, const char* 
     return IMG_LoadTexture(renderer, file);
 }
 
-void WarGrey::STEM::game_unload_image(SDL_Surface* image) {
-    SDL_FreeSurface(image);
-}
-
 void WarGrey::STEM::game_unload_image(SDL_Texture* image) {
     SDL_DestroyTexture(image);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, SDL_RendererFlip flip, double angle) {
-    game_render_surface(renderer, image, x, y, flip, angle);
 }
     
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, SDL_RendererFlip flip, double angle) {
@@ -82,10 +66,6 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, in
         game_render_texture(renderer, image, x, y, flip, angle);
         game_unload_image(image);
     }
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
-    game_render_surface(renderer, image, x, y, width, height, flip, angle);
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
@@ -105,10 +85,6 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, in
     }
 }
 
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, SDL_RendererFlip flip, double angle) {
-    game_render_surface(renderer, image, x, y, flip, angle);
-}
-
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, float x, float y, SDL_RendererFlip flip, double angle) {
     game_render_texture(renderer, image, x, y, flip, angle);
 }
@@ -124,10 +100,6 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, fl
         game_render_texture(renderer, image, x, y, flip, angle);
         game_unload_image(image);
     }
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Surface* image, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
-    game_render_surface(renderer, image, x, y, width, height, flip, angle);
 }
 
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
