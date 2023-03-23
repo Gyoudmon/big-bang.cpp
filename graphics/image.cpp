@@ -35,20 +35,6 @@ SDL_Texture* WarGrey::STEM::game_blank_image(SDL_Renderer* renderer, float width
     return game_blank_image(renderer, fl2fxi(width), fl2fxi(height));
 }
 
-SDL_Surface* WarGrey::STEM::game_blank_image(int width, int height, uint32_t alpha_color_key) {
-    SDL_Surface* surface = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-    uint8_t r, g, b;
-
-    RGB_From_Hexadecimal(alpha_color_key, &r, &g, &b);
-    SDL_SetColorKey(surface, 1, SDL_MapRGB(surface->format, r, g, b));
-
-    return surface;
-}
-
-SDL_Surface* WarGrey::STEM::game_blank_image(float width, float height, uint32_t alpha_color_key) {
-    return game_blank_image(fl2fxi(width), fl2fxi(height), alpha_color_key);
-}
-
 SDL_Surface* WarGrey::STEM::game_formatted_image(int width, int height, uint32_t format) {
     return SDL_CreateRGBSurfaceWithFormat(0, width, height, 32, format);
 }

@@ -9,9 +9,6 @@ namespace WarGrey::STEM {
     SDL_Texture* game_blank_image(SDL_Renderer* renderer, int width, int height);
     SDL_Texture* game_blank_image(SDL_Renderer* renderer, float width, float height);
 
-    SDL_Surface* game_blank_image(int width, int height, uint32_t alpha_color_key = 0xFFFFFFU);
-    SDL_Surface* game_blank_image(float width, float height, uint32_t alpha_color_key = 0xFFFFFFU);
-    
     SDL_Surface* game_formatted_image(int width, int height, uint32_t format);
     SDL_Surface* game_formatted_image(float width, float height, uint32_t format);
     
