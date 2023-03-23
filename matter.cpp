@@ -6,6 +6,8 @@
 
 #include "graphics/image.hpp"
 
+#include <typeinfo>
+
 using namespace WarGrey::STEM;
 
 /**************************************************************************************************/
@@ -180,4 +182,8 @@ void WarGrey::STEM::IMatter::log_message(int fgc, const std::string& msg) {
     if (this->info != nullptr) {
         this->info->master->log_message(fgc, msg);
     }
+}
+
+const char* WarGrey::STEM::IMatter::name() {
+    return typeid(this).name();
 }

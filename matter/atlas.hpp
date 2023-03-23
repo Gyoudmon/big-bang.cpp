@@ -11,6 +11,7 @@ namespace WarGrey::STEM {
         virtual ~IAtlas() {}
 
         void construct(SDL_Renderer* renderer) override;
+        const char* name() override;
 
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;

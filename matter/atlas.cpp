@@ -1,6 +1,7 @@
 #include "atlas.hpp"
 
 #include "../datum/box.hpp"
+#include "../datum/path.hpp"
 #include "../datum/string.hpp"
 #include "../datum/flonum.hpp"
 #include "../datum/fixnum.hpp"
@@ -15,6 +16,10 @@ using namespace WarGrey::STEM;
 WarGrey::STEM::IAtlas::IAtlas(const std::string& pathname) : _pathname(pathname) {
     this->enable_resize(true);
     this->camouflage(true);
+}
+
+const char* WarGrey::STEM::IAtlas::name() {
+    return file_basename_from_path(this->_pathname.c_str()).c_str();
 }
 
 void WarGrey::STEM::IAtlas::construct(SDL_Renderer* renderer) {

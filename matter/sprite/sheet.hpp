@@ -11,6 +11,7 @@ namespace WarGrey::STEM {
         virtual ~ISpriteSheet() {}
 
         void construct(SDL_Renderer* renderer) override;
+        const char* name() override;
 
     protected:
         virtual void on_sheet_load(WarGrey::STEM::shared_costume_t sheet) = 0;

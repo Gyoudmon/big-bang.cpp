@@ -122,7 +122,7 @@ void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, flo
         }
 
         if (this->border_alpha > 0.0F) {
-            game_draw_rect(renderer, x, y, Width, Height, this->border_color, this->border_alpha);
+            game_draw_rect(renderer, x + 0.5F, y + 0.5F, Width - 1.0F, Height - 1.0F, this->border_color, this->border_alpha);
         }
 
         game_render_texture(renderer, this->texture, x, y);

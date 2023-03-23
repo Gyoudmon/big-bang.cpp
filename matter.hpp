@@ -40,6 +40,7 @@ namespace WarGrey::STEM {
     public:
         virtual void own_caret(bool is_own) {}
         virtual int preferred_local_fps() { return 0; }
+        virtual const char* name();
         
     public:
         virtual bool is_colliding_with_mouse(float local_x, float local_y) { return true; }

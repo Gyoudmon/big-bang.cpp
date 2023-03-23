@@ -24,9 +24,13 @@ WarGrey::STEM::Sprite::Sprite(const std::string& pathname) : _pathname(pathname)
     this->enable_resize(true);
 }
 
+const char* WarGrey::STEM::Sprite::name() {
+    return file_name_from_path(this->_pathname.c_str()).c_str();
+}
+
 void WarGrey::STEM::Sprite::construct(SDL_Renderer* renderer) {
     path target = imgdb_absolute_path(this->_pathname);
-
+    
     if (exists(target)) {
         if (is_directory(target)) {
             for (auto entry : directory_iterator(target)) {

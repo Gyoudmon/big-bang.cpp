@@ -1,6 +1,7 @@
 #include "sheet.hpp"
 
 #include "../../datum/box.hpp"
+#include "../../datum/path.hpp"
 #include "../../datum/fixnum.hpp"
 #include "../../datum/flonum.hpp"
 
@@ -13,6 +14,10 @@ WarGrey::STEM::ISpriteSheet::ISpriteSheet(const char* pathname) : ISpriteSheet(s
 
 WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname) : _pathname(pathname) {
     this->enable_resize(true);
+}
+
+const char* WarGrey::STEM::ISpriteSheet::name() {
+    return file_basename_from_path(this->_pathname.c_str()).c_str();
 }
 
 void WarGrey::STEM::ISpriteSheet::construct(SDL_Renderer* renderer) {

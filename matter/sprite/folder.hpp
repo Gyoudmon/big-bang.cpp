@@ -14,6 +14,7 @@ namespace WarGrey::STEM {
         virtual ~Sprite() {}
 
         void construct(SDL_Renderer* renderer) override;
+        const char* name() override;
     
     public:
         void wear(const char* name) { this->wear(std::string(name)); }

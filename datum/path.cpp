@@ -143,7 +143,11 @@ std::string WarGrey::STEM::digimon_zonedir() {
 		enter_digimon_zone(nullptr);
 	}
 
-	return zonedir;
+	return directory_path(zonedir);
+}
+
+std::string WarGrey::STEM::digimon_subdir(const char* dirpath) {
+	return digimon_zonedir().append(dirpath);
 }
 
 std::string WarGrey::STEM::digimon_path(const char* file, const char* ext, const char* rootdir) {
