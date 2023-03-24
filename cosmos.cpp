@@ -150,7 +150,7 @@ void WarGrey::STEM::Cosmos::on_game_start() {
 	}
 }
 
-void WarGrey::STEM::Cosmos::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
+void WarGrey::STEM::Cosmos::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
     this->begin_update_sequence();
 
     /**

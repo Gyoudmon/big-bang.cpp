@@ -36,9 +36,9 @@ using namespace std::filesystem;
 typedef struct timer_parcel {
     IUniverse* universe;
     uint32_t interval;
-    uint32_t count = 0;
-    uint32_t uptime = 0;
-    uint32_t last_timestamp = 0;
+    uint64_t count = 0;
+    uint64_t uptime = 0;
+    uint64_t last_timestamp = 0;
 } timer_parcel_t;
 
 /**
@@ -57,7 +57,7 @@ static unsigned int trigger_timer_event(unsigned int interval, void* datum) {
 
     user_event.data1 = datum;
 
-    parcel->count += 1;
+    parcel->count += 1U;
     parcel->interval = interval;
     parcel->uptime = SDL_GetTicks();
 
@@ -650,7 +650,7 @@ WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint
     this->set_window_title("%s", title);
 }
 
-void WarGrey::STEM::Universe::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
+void WarGrey::STEM::Universe::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
     this->update(count, interval, uptime);
     this->notify_updated();
 }

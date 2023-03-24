@@ -53,9 +53,9 @@ namespace WarGrey::STEM {
         bool selected = false;
         unsigned int mode = 0U;
 
-        uint32_t local_frame_delta = 0;
-        uint32_t local_frame_count = 0;
-        uint32_t local_elapse = 0;
+        uint32_t local_frame_delta = 0U;
+        uint64_t local_frame_count = 0U;
+        uint64_t local_elapse = 0U;
         int duration = 0;
 
         // for queued motions
@@ -76,12 +76,12 @@ static inline bool over_stepped(float tx, float cx, float spd) {
     return flsign(tx - cx) != flsign(spd);
 }
 
-static inline void reset_timeline(uint32_t& frame_count, uint32_t& elapse, uint32_t count0) {
+static inline void reset_timeline(uint64_t& frame_count, uint64_t& elapse, uint64_t count0) {
     elapse = 0U;
     frame_count = count0;
 }
 
-static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_delta, uint32_t& frame_count, uint32_t& elapse) {
+static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_delta, uint64_t& frame_count, uint64_t& elapse) {
     frame_delta = (fps > 0) ? (1000U / fps) : 0U;
 
     if (restart) {
@@ -93,7 +93,7 @@ static inline void unsafe_set_matter_fps(MatterInfo* info, int fps, bool restart
     unsafe_set_local_fps(fps, restart, info->local_frame_delta, info->local_frame_count, info->local_elapse);
 }
 
-static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_frame_delta, uint32_t& local_elapse, int duration) {
+static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_frame_delta, uint64_t& local_elapse, int duration) {
     uint32_t interval = 0;
 
     if ((local_frame_delta > 0) || (duration > 0)) {
@@ -983,7 +983,7 @@ void WarGrey::STEM::Plane::set_local_fps(int fps, bool restart) {
 }
 
 
-void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration) {
+void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint64_t count0, int duration) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -992,7 +992,7 @@ void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t c
     }
 }
 
-void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {
+void WarGrey::STEM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
     uint32_t elapse = 0U;
 
     if (this->head_matter != nullptr) {
@@ -1020,7 +1020,7 @@ void WarGrey::STEM::Plane::on_elapse(uint32_t count, uint32_t interval, uint32_t
     }
 
     elapse = local_timeline_elapse(interval, this->local_frame_delta, this->local_elapse, 0);
-    if (elapse > 0) {
+    if (elapse > 0U) {
         this->update(this->local_frame_count ++, elapse, uptime);
 
         if ((this->tooltip != nullptr) && this->tooltip->visible()) {
@@ -1068,8 +1068,8 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
                 if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
                     clip.x = fl2fxi(flfloor(mx));
                     clip.y = fl2fxi(flfloor(my));
-                    clip.w = fl2fxi(flfloor(mwidth));
-                    clip.h = fl2fxi(flfloor(mheight));
+                    clip.w = fl2fxi(flceiling(mwidth));
+                    clip.h = fl2fxi(flceiling(mheight));
 
                     SDL_RenderSetClipRect(renderer, &clip);
 

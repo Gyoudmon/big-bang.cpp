@@ -41,7 +41,7 @@ namespace WarGrey::STEM {
         virtual void construct(float Width, float Height) {}
         virtual void load(float Width, float Height) {}
         virtual void reflow(float width, float height) {}
-        virtual void update(uint32_t count, uint32_t interval, uint32_t uptime) {}
+        virtual void update(uint64_t count, uint32_t interval, uint64_t uptime) {}
         virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
     
     public:
@@ -91,7 +91,7 @@ namespace WarGrey::STEM {
         virtual WarGrey::STEM::IMatter* get_focused_matter() = 0;
         virtual void set_caret_owner(IMatter* m) = 0;
         virtual void notify_matter_ready(IMatter* m) = 0;
-        virtual void notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration = 0) = 0;
+        virtual void notify_matter_timeline_restart(IMatter* m, uint64_t count0, int duration = 0) = 0;
         
     public:
         void begin_update_sequence();
@@ -147,7 +147,7 @@ namespace WarGrey::STEM {
         virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
         virtual void on_text(const char* text, size_t size, bool entire) {}
         virtual void on_editing_text(const char* text, int pos, int span) {}
-        virtual void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) {}
+        virtual void on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {}
         virtual void on_hover(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         virtual void on_goodbye(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
         virtual void on_tap(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
@@ -272,7 +272,7 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* get_focused_matter() override;
         void set_caret_owner(IMatter* m) override;
         void notify_matter_ready(IMatter* m) override;
-        void notify_matter_timeline_restart(IMatter* m, uint32_t count0 = 1, int duration = 0) override;
+        void notify_matter_timeline_restart(IMatter* m, uint64_t count0 = 1, int duration = 0) override;
 
     public:
         void set_matter_fps(IMatter* m, int fps, bool restart = false);
@@ -299,7 +299,7 @@ namespace WarGrey::STEM {
         void mission_complete() override;
 
     protected:
-        void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
+        void on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) override;
         void on_matter_ready(IMatter* m) override {}
 
     private:
@@ -330,8 +330,8 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* hovering_matter = nullptr;
         unsigned int mode = 0U;
         uint32_t local_frame_delta = 0U;
-        uint32_t local_frame_count = 1U;
-        uint32_t local_elapse = 0U;
+        uint64_t local_frame_count = 1U;
+        uint64_t local_elapse = 0U;
         float hovering_mgx = 0.0F;
         float hovering_mgy = 0.0F;
         float hovering_mlx = 0.0F;

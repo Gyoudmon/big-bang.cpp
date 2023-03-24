@@ -12,7 +12,7 @@ namespace WarGrey::STEM {
 
     public:
         void reflow(float window, float height) override;
-        void update(uint32_t count, uint32_t interval, uint32_t uptime) override {};
+        void update(uint64_t count, uint32_t interval, uint64_t uptime) override {};
         void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override;
         bool has_current_mission_completed();
         bool can_exit() override;
@@ -45,7 +45,7 @@ namespace WarGrey::STEM {
     protected:
         void on_big_bang(int width, int height) override;
         void on_game_start() override;
-        void on_elapse(uint32_t count, uint32_t interval, uint32_t uptime) override;
+        void on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) override;
 
     protected:
         WarGrey::STEM::IPlane* push_plane(WarGrey::STEM::IPlane* plane);
