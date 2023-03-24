@@ -6,16 +6,20 @@ namespace WarGrey::STEM {
     /** NOTE: the HSB and HSV are identical **/
 
     enum class ColorMixture {
-        None = 0,
-        Add = 1,
-        Subtract = 2, Multiply = 2, // Yes, they're identical
-        Modulate = 3,
-        Alpha = 4
+        None = SDL_BLENDMODE_NONE,
+        Add = SDL_BLENDMODE_ADD,
+
+        // The following two are identical
+        Subtract = SDL_BLENDMODE_MUL,
+        Multiply = SDL_BLENDMODE_MUL,
+        
+        Modulate = SDL_BLENDMODE_MOD,
+        Alpha = SDL_BLENDMODE_BLEND
     };
 
     /*********************************************************************************************/
-    SDL_BlendMode color_mixture_to_blend_mode(WarGrey::STEM::ColorMixture mixture);
-    ColorMixture blend_mode_to_color_mixture(SDL_BlendMode mode);
+    inline SDL_BlendMode color_mixture_to_blend_mode(WarGrey::STEM::ColorMixture mixture) { return static_cast<SDL_BlendMode>(mixture); }
+    inline ColorMixture blend_mode_to_color_mixture(SDL_BlendMode mode) { return static_cast<ColorMixture>(mode); }
 
     unsigned char color_component_to_byte(double com);
     unsigned char color_component_clamp_to_byte(double com);

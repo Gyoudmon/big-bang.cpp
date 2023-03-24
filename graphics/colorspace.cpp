@@ -107,34 +107,6 @@ unsigned char WarGrey::STEM::color_component_clamp_to_byte(double com) {
     return UCHAR(flmin(flmax(com, 0.0), 1.0));
 }
 
-SDL_BlendMode WarGrey::STEM::color_mixture_to_blend_mode(ColorMixture mixture) {
-    SDL_BlendMode mode = SDL_BLENDMODE_NONE;
-
-    switch (mixture) {
-        case ColorMixture::Add: mode = SDL_BLENDMODE_ADD; break;
-        case ColorMixture::Subtract: /* case ColorMixture::Multiply: */ mode = SDL_BLENDMODE_MUL; break;
-        case ColorMixture::Alpha: mode = SDL_BLENDMODE_BLEND; break;
-        case ColorMixture::Modulate: mode = SDL_BLENDMODE_MOD; break;
-        default: mode = SDL_BLENDMODE_NONE;
-    }
-
-    return mode;
-}
-
-ColorMixture WarGrey::STEM::blend_mode_to_color_mixture(SDL_BlendMode mode) {
-    ColorMixture mixture = ColorMixture::None;
-
-    switch (mode) {
-        case SDL_BLENDMODE_ADD: mixture = ColorMixture::Add; break;
-        case SDL_BLENDMODE_MUL: mixture = ColorMixture::Subtract; break;
-        case SDL_BLENDMODE_BLEND: mixture = ColorMixture::Alpha; break;
-        case SDL_BLENDMODE_MOD: mixture = ColorMixture::Modulate; break;
-        default: mixture = ColorMixture::None;
-    }
-
-    return mixture;
-}
-
 /*************************************************************************************************/
 void WarGrey::STEM::RGB_FillColor(SDL_Color* c, unsigned int hex, double alpha) {
     RGB_FillColor(c, hex, UCHAR(alpha));
