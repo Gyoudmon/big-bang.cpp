@@ -11,6 +11,9 @@ using namespace WarGrey::STEM;
 WarGrey::STEM::IMovable::IMovable() {
     this->set_border_strategy(BorderStrategy::IGNORE);
     this->motion_stop(true, true);
+
+    this->tvx = infinity;
+    this->tvy = infinity;
 }
 
 void WarGrey::STEM::IMovable::set_acceleration(double acc, double dir, bool is_radian) {
@@ -21,15 +24,27 @@ void WarGrey::STEM::IMovable::set_acceleration(double acc, double dir, bool is_r
 }
 
 void WarGrey::STEM::IMovable::set_delta_speed(double xacc, double yacc) {
-    this->ax = xacc;
-    this->ay = yacc;
-    this->on_acceleration_changed();
+    bool xchanged = (this->ax != xacc);
+    bool ychanged = (this->ay != yacc);
+
+    if (xchanged) this->ax = xacc;
+    if (ychanged) this->ay = yacc;
+
+    if (xchanged || ychanged) {
+        this->on_acceleration_changed();
+    }
 }
 
 void WarGrey::STEM::IMovable::add_delta_speed(double xacc, double yacc) {
-    this->ax += xacc;
-    this->ay += yacc;
-    this->on_acceleration_changed();
+    bool xchanged = (xacc != 0.0);
+    bool ychanged = (yacc != 0.0);
+
+    if (xchanged) this->ax += xacc;
+    if (ychanged) this->ay += yacc;
+
+    if (xchanged || ychanged) {
+        this->on_acceleration_changed();
+    }
 }
 
 void WarGrey::STEM::IMovable::add_acceleration(double acc, double dir, bool is_radian) {
@@ -59,35 +74,36 @@ double WarGrey::STEM::IMovable::get_acceleration_direction(bool need_radian) {
 }
 
 void WarGrey::STEM::IMovable::set_velocity(double spd, double dir, bool is_radian) {
-    double rad = dir;
-    
-    if (!is_radian) {
-        rad = degrees_to_radians(dir);
-    }
+    double vx, vy;
 
-    this->set_speed(spd * flcos(rad), spd * flsin(rad));
+    orthogonal_decomposition(spd, dir, &vx, &vy, is_radian);
+    this->set_speed(vx, vy);
 }
 
 void WarGrey::STEM::IMovable::add_velocity(double spd, double dir, bool is_radian) {
-    double rad = dir;
-    
-    if (!is_radian) {
-        rad = degrees_to_radians(dir);
-    }
+    double vx, vy;
 
-    this->add_speed(spd * flcos(rad), spd * flsin(rad));
+    orthogonal_decomposition(spd, dir, &vx, &vy, is_radian);
+    this->add_speed(vx, vy);
 }
 
 void WarGrey::STEM::IMovable::set_speed(double xspd, double yspd) {
-    this->vx = xspd;
-    this->vy = yspd;
-    this->on_velocity_changed();
+    xspd = vector_clamp(xspd, this->tvx);
+    yspd = vector_clamp(yspd, this->tvy);
+
+    bool xchanged = (this->vx != xspd);
+    bool ychanged = (this->vy != yspd);
+
+    if (xchanged) this->vx = xspd;
+    if (ychanged) this->vy = yspd;
+    
+    if (xchanged || ychanged) {
+        this->on_velocity_changed();
+    }
 }
 
 void WarGrey::STEM::IMovable::add_speed(double xspd, double yspd) {
-    this->vx += xspd;
-    this->vy += yspd;
-    this->on_velocity_changed();
+    this->set_speed(this->vx + xspd, this->vy + yspd);
 }
 
 double WarGrey::STEM::IMovable::get_velocity(double* direction, double* x, double* y) {
@@ -110,35 +126,32 @@ double WarGrey::STEM::IMovable::get_velocity_direction(bool need_radian) {
 }
 
 void WarGrey::STEM::IMovable::set_terminal_velocity(double spd, double dir, bool is_radian) {
-    double rad = dir;
+    double vx, vy;
     
-    if (!is_radian) {
-        rad = degrees_to_radians(dir);
-    }
-
-    this->set_terminal_speed(spd * flcos(rad), spd * flsin(rad));
+    orthogonal_decomposition(spd, dir, &vx, &vy, is_radian);
+    this->set_terminal_speed(vx, vy);
 }
 
 void WarGrey::STEM::IMovable::set_terminal_speed(double mxspd, double myspd) {
     bool changed = false;
+    
+    this->tvx = flabs(mxspd);
+    this->tvy = flabs(myspd);
 
-    this->tvx = mxspd;
-    this->tvy = myspd;
-
-    if ((this->tvx > 0.0F) && (this->vx > this->tvx)) {
-        this->vx = this->tvx;
+    if flout(-this->tvx, this->vx, this->tvx) {
+        this->vx = vector_clamp(this->vx, this->tvx);
         changed = true;
     }
 
-    if ((this->tvy > 0.0F) && (this->vy > this->tvy)) {
-        this->vy = this->tvy;
+    if flout(-this->tvy, this->vy, this->tvy) {
+        this->vy = vector_clamp(this->vy, this->tvy);
         changed = true;
     }
 
     if (changed) {
         this->on_velocity_changed();
     }
-}       
+}
 
 void WarGrey::STEM::IMovable::heading_rotate(double theta, bool is_radian) {
     vector_rotate(this->vx, this->vy, theta, &this->vx, &this->vy, 0.0, 0.0, is_radian);
@@ -192,29 +205,12 @@ void WarGrey::STEM::IMovable::step(float* sx, float* sy) {
 }
 
 void WarGrey::STEM::IMovable::step(double* sx, double* sy) {
-    this->vx += this->ax;
-    this->vy += this->ay;
-
-    if (this->tvx > 0.0) {
-        if (this->vx > this->tvx) {
-            this->vx = this->tvx;
-        } else if (this->vx < -this->tvx) {
-            this->vx = -this->tvx;
-        }
-    }
-
-    if (this->tvy > 0.0) {
-        if (this->vy > this->tvy) {
-            this->vy = this->tvy;
-        } else if (this->vy < -this->tvy) {
-            this->vy = -this->tvy;
-        }
-    }
-
+    if (this->ax != 0.0) this->vx = vector_clamp(this->vx + this->ax, this->tvx);
+    if (this->ay != 0.0) this->vy = vector_clamp(this->vy + this->ay, this->tvy);
     this->check_velocity_changing();
 
-    (*sx) += this->vx;
-    (*sy) += this->vy;
+    if (this->vx != 0.0) (*sx) += this->vx;
+    if (this->vy != 0.0) (*sy) += this->vy;
 }
 
 void WarGrey::STEM::IMovable::motion_bounce(bool horizon, bool vertical) {

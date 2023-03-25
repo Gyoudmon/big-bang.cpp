@@ -67,6 +67,17 @@ namespace WarGrey::STEM {
 	    SET_BOX(ry, dx * sinr + dy * cosr + oy);
     }
 
+    template<typename Fl>
+    Fl vector_clamp(Fl v, Fl ceil) {
+        if (v > ceil) {
+            v = ceil;
+        } else if (v < -ceil) {
+            v = -ceil;
+        }
+
+        return v;
+    }
+
     /*********************************************************************************************/
     template<typename Fl>
     bool point_inside(Fl px, Fl py, Fl x1, Fl y1, Fl x2, Fl y2) {

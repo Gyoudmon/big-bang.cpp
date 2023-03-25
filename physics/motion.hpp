@@ -74,7 +74,7 @@ namespace WarGrey::STEM {
         double vr = 0.0;
         double vx = 0.0;
         double vy = 0.0;
-        double tvx = 0.0;
-        double tvy = 0.0;
+        double tvx;
+        double tvy;
     };
 }
