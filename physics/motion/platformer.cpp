@@ -5,8 +5,8 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-void WarGrey::STEM::IPlatformMotion::dispatch_heading_event(float theta_rad, float vx, float vy, float pvr) {
-    float hsgn, vsgn;
+void WarGrey::STEM::IPlatformMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double pvr) {
+    double hsgn, vsgn;
 
     this->feed_flip_signs(&hsgn, &vsgn);
 
@@ -15,13 +15,13 @@ void WarGrey::STEM::IPlatformMotion::dispatch_heading_event(float theta_rad, flo
     }
 
     if (this->walk_only) {
-        if (vx != 0.0F) {
+        if (vx != 0.0) {
             this->on_walk(theta_rad, vx, vy);
         }
     } else {
-        if (vy == 0.0F) {
+        if (vy == 0.0) {
             this->on_walk(theta_rad, vx, vy);
-        } else if (vy < 0.0F) {
+        } else if (vy < 0.0) {
             this->on_jump(theta_rad, vx, vy);
         }
     }

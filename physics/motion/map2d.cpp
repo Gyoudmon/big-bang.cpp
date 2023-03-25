@@ -4,23 +4,23 @@
 
 using namespace WarGrey::STEM;
 
-static const float pi_f125 = q_pi_f * 0.5F;
+static const double pi_125 = q_pi * 0.5;
 
-static const float theta_threholds [] = {
-    pi_f125,
-    pi_f125 + q_pi_f, pi_f125 + h_pi_f, pi_f125 + q_pi_f * 3.0F, pi_f125 + pi_f,
-    pi_f125 + q_pi_f * 5.0F, pi_f125 + q_pi_f * 6.0F, pi_f125 + q_pi_f * 7.0F
+static const double theta_threholds [] = {
+    pi_125,
+    pi_125 + q_pi, pi_125 + h_pi, pi_125 + q_pi * 3.0, pi_125 + pi,
+    pi_125 + q_pi * 5.0, pi_125 + q_pi * 6.0, pi_125 + q_pi * 7.0
 };
 
 /*************************************************************************************************/
-void WarGrey::STEM::I4WayMotion::dispatch_heading_event(float theta_rad, float vx, float vy, float prev_vr) {
-    float theta = flabs(theta_rad);
+void WarGrey::STEM::I4WayMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double prev_vr) {
+    double theta = flabs(theta_rad);
 
-    if (theta < q_pi_f) {
+    if (theta < q_pi) {
         this->on_eward(theta_rad, vx, vy);
-    } else if (theta > q_pi_f * 3.0F) {
+    } else if (theta > q_pi * 3.0) {
         this->on_wward(theta_rad, vx, vy);
-    } else if (theta_rad >= 0.0F) {
+    } else if (theta_rad >= 0.0) {
         this->on_sward(theta_rad, vx, vy);
     } else {
         this->on_nward(theta_rad, vx, vy);
@@ -28,11 +28,11 @@ void WarGrey::STEM::I4WayMotion::dispatch_heading_event(float theta_rad, float v
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::I8WayMotion::dispatch_heading_event(float theta_rad, float vx, float vy, float prev_vr) {
-    float theta = theta_rad;
+void WarGrey::STEM::I8WayMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double prev_vr) {
+    double theta = theta_rad;
     
-    if (theta < 0.0F) {
-        theta = pi_f * 2.0F + theta;
+    if (theta < 0.0) {
+        theta = pi * 2.0 + theta;
     }
 
     if (theta <= theta_threholds[0]) {

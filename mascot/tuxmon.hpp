@@ -18,15 +18,15 @@ namespace WarGrey::STEM {
 
     protected:
         void on_motion_stopped() override;
-        void on_heading_changed(float theta_rad, float vx, float vy, float prev_vr) override;
+        void on_heading_changed(double theta_rad, double vx, double vy, double prev_vr) override;
         
     protected:
-        void on_walk(float theta_rad, float vx, float vy) override;
-        void on_jump(float theta_rad, float vx, float vy) override;
+        void on_walk(double theta_rad, double vx, double vy) override;
+        void on_jump(double theta_rad, double vx, double vy) override;
 
     protected:
         int get_initial_costume_index() override;
-        void feed_flip_signs(float* hsgn, float* vsgn) override;
+        void feed_flip_signs(double* hsgn, double* vsgn) override;
         void horizontal_flip() override { Sprite::flip(true, false); }
     };
 }

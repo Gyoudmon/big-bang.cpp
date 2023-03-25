@@ -304,9 +304,9 @@ namespace WarGrey::STEM {
 
     private:
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, bool absolute);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, float fx, float fy, float dx, float dy);
-        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
         bool do_move_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
         bool do_glide_via_info(IMatter* m, MatterInfo* info, float x, float y, float sec, float sec_delta, bool absolute);
         void do_motion_move(IMatter* m, MatterInfo* info, float dwidth, float dheight);

@@ -1,5 +1,6 @@
 #include "plane.hpp"
 #include "matter.hpp"
+#include "misc.hpp"
 
 #include "graphics/image.hpp"
 #include "graphics/geometry.hpp"
@@ -1393,13 +1394,6 @@ void WarGrey::STEM::IPlane::feed_background(SDL_Color* c) {
     RGB_FillColor(c, this->background, this->bg_alpha);
 }
 
-void WarGrey::STEM::IPlane::feed_mouse_location(float* mx, float* my) {
-    int fxmx, fxmy;
-
-    SDL_GetMouseState(&fxmx, &fxmy);
-    SET_VALUES(mx, float(fxmx), my, float(fxmy));
-}
-
 void WarGrey::STEM::IPlane::start_input_text(const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(prompt, fmt);
@@ -1577,7 +1571,7 @@ void WarGrey::STEM::IPlane::glide_to_random_location(float sec, IMatter* m) {
 void WarGrey::STEM::IPlane::glide_to_mouse(float sec, IMatter* m, MatterAnchor a, float dx, float dy) {
     float mx, my;
 
-    this->feed_mouse_location(&mx, &my);
+    feed_current_mouse_location(&mx, &my);
     this->glide_to(sec, m, mx, my, a, dx, dy);
 }
 
