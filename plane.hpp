@@ -91,7 +91,7 @@ namespace WarGrey::STEM {
         virtual WarGrey::STEM::IMatter* get_focused_matter() = 0;
         virtual void set_caret_owner(IMatter* m) = 0;
         virtual void notify_matter_ready(IMatter* m) = 0;
-        virtual void notify_matter_timeline_restart(IMatter* m, uint64_t count0, int duration = 0) = 0;
+        virtual void notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration = 0) = 0;
         
     public:
         void begin_update_sequence();
@@ -154,9 +154,9 @@ namespace WarGrey::STEM {
         virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
 
     protected:
-        virtual void on_motion_start(WarGrey::STEM::IMatter* m, float sec, float x, float y, float xspd, float yspd) {}
-        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, float xspd, float yspd) {}
-        virtual void on_motion_complete(WarGrey::STEM::IMatter* m, float x, float y, float xspd, float yspd) {}
+        virtual void on_motion_start(WarGrey::STEM::IMatter* m, float sec, float x, float y, double xspd, double yspd) {}
+        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd) {}
+        virtual void on_motion_complete(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd) {}
         
     protected:
         virtual void on_enter(WarGrey::STEM::IPlane* from);
@@ -272,7 +272,7 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* get_focused_matter() override;
         void set_caret_owner(IMatter* m) override;
         void notify_matter_ready(IMatter* m) override;
-        void notify_matter_timeline_restart(IMatter* m, uint64_t count0 = 1, int duration = 0) override;
+        void notify_matter_timeline_restart(IMatter* m, uint32_t count0 = 1, int duration = 0) override;
 
     public:
         void set_matter_fps(IMatter* m, int fps, bool restart = false);
@@ -330,8 +330,8 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* hovering_matter = nullptr;
         unsigned int mode = 0U;
         uint32_t local_frame_delta = 0U;
-        uint64_t local_frame_count = 1U;
-        uint64_t local_elapse = 0U;
+        uint32_t local_frame_count = 1U;
+        uint32_t local_elapse = 0U;
         float hovering_mgx = 0.0F;
         float hovering_mgy = 0.0F;
         float hovering_mlx = 0.0F;

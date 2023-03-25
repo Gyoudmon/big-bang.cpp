@@ -209,13 +209,13 @@ int WarGrey::STEM::ISprite::costume_name_to_index(const char* name) {
     return cidx;
 }
 
-int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t uptime) {
+int WarGrey::STEM::ISprite::update(uint64_t count, uint32_t interval, uint64_t uptime) {
     size_t frame_size = this->frame_refs.size();
     int duration = 0;
 
     if (frame_size > 0) {
         if (this->animation_rest != 0) {
-            uint32_t frame_idx = count % frame_size;
+            uint64_t frame_idx = count % frame_size;
         
             if (frame_idx == 0) {
                 if (this->next_branch >= 0) {
@@ -252,14 +252,14 @@ int WarGrey::STEM::ISprite::update(uint32_t count, uint32_t interval, uint32_t u
             this->stop();
         }
     } else if (frame_size == 0) {
-        int64_t idle_interval = this->preferred_idle_duration();
+        uint64_t idle_interval = this->preferred_idle_duration();
 
-        if (idle_interval > 0) {
-            if (this->idle_time0 <= 0) {
+        if (idle_interval > 0U) {
+            if (this->idle_time0 == 0) {
                 this->idle_time0 = uptime;
             }
 
-            if (idle_interval <= (int64_t(uptime) - this->idle_time0)) {
+            if (idle_interval <= (uptime - this->idle_time0)) {
                 int times = 1;
                 
                 this->next_branch = this->submit_idle_frames(this->frame_refs, times);
@@ -335,8 +335,8 @@ int WarGrey::STEM::ISprite::submit_idle_frames(std::vector<std::pair<int, int>>&
     return ISprite::submit_action_frames(frame_refs, "idle");
 }
 
-int WarGrey::STEM::ISprite::preferred_idle_duration() {
-    return random_uniform(2000, 4000);
+uint64_t WarGrey::STEM::ISprite::preferred_idle_duration() {
+    return static_cast<uint64_t>(random_uniform(2000, 4000));
 }
 
 void WarGrey::STEM::ISprite::flip(bool horizontal, bool vertical) {

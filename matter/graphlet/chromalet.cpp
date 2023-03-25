@@ -660,7 +660,7 @@ void WarGrey::STEM::Chromalet::set_pseudo_primary_color(uint32_t hex, size_t idx
 
     if (this->pseudo_primaries[idx] != hex) {
         if (hex == 0) {
-            this->recalculate_primary_colors(idx);
+            this->recalculate_primary_colors(int(idx));
         } else {
             this->pseudo_primaries[idx] = hex;
         }

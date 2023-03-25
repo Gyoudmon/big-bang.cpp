@@ -23,7 +23,7 @@ namespace WarGrey::STEM {
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        int update(uint32_t count, uint32_t interval, uint32_t uptime) override;
+        int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:
@@ -59,7 +59,7 @@ namespace WarGrey::STEM {
         virtual void goodbye(int repeat = 1) {}
 
     protected:
-        virtual int preferred_idle_duration();
+        virtual uint64_t preferred_idle_duration();
         virtual void feed_costume_extent(size_t idx, float* width, float* height) = 0;
         virtual const char* costume_index_to_name(size_t idx) = 0;
         virtual int costume_name_to_index(const char* name);
@@ -82,7 +82,7 @@ namespace WarGrey::STEM {
         std::vector<std::pair<int, int>> frame_refs;
         int animation_rest = 0;
         int next_branch = -1;
-        int idle_time0 = 0;
+        uint64_t idle_time0 = 0;
 
     private:
         size_t current_costume_idx = 0;

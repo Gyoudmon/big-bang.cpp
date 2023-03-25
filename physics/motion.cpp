@@ -187,8 +187,8 @@ void WarGrey::STEM::IMovable::step(float* sx, float* sy) {
     double flsy = double(*sy);
     
     this->step(&flsx, &flsy);
-    (*sx) = flsx;
-    (*sy) = flsy;
+    (*sx) = float(flsx);
+    (*sy) = float(flsy);
 }
 
 void WarGrey::STEM::IMovable::step(double* sx, double* sy) {

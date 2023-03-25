@@ -55,8 +55,8 @@ namespace WarGrey::STEM {
         unsigned int mode = 0U;
 
         uint32_t local_frame_delta = 0U;
-        uint64_t local_frame_count = 0U;
-        uint64_t local_elapse = 0U;
+        uint32_t local_frame_count = 0U;
+        uint32_t local_elapse = 0U;
         int duration = 0;
 
         // for queued motions
@@ -73,16 +73,16 @@ namespace WarGrey::STEM {
     };
 }
 
-static inline bool over_stepped(float tx, float cx, float spd) {
-    return flsign(tx - cx) != flsign(spd);
+static inline bool over_stepped(float tx, float cx, double spd) {
+    return flsign(double(tx - cx)) != flsign(spd);
 }
 
-static inline void reset_timeline(uint64_t& frame_count, uint64_t& elapse, uint64_t count0) {
+static inline void reset_timeline(uint32_t& frame_count, uint32_t& elapse, uint32_t count0) {
     elapse = 0U;
     frame_count = count0;
 }
 
-static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_delta, uint64_t& frame_count, uint64_t& elapse) {
+static inline void unsafe_set_local_fps(int fps, bool restart, uint32_t& frame_delta, uint32_t& frame_count, uint32_t& elapse) {
     frame_delta = (fps > 0) ? (1000U / fps) : 0U;
 
     if (restart) {
@@ -94,7 +94,7 @@ static inline void unsafe_set_matter_fps(MatterInfo* info, int fps, bool restart
     unsafe_set_local_fps(fps, restart, info->local_frame_delta, info->local_frame_count, info->local_elapse);
 }
 
-static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_frame_delta, uint64_t& local_elapse, int duration) {
+static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_frame_delta, uint32_t& local_elapse, int duration) {
     uint32_t interval = 0;
 
     if ((local_frame_delta > 0) || (duration > 0)) {
@@ -984,7 +984,7 @@ void WarGrey::STEM::Plane::set_local_fps(int fps, bool restart) {
 }
 
 
-void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint64_t count0, int duration) {
+void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1259,8 +1259,8 @@ void WarGrey::STEM::Plane::do_motion_move(IMatter* m, MatterInfo* info, float dw
     if (!m->motion_stopped()) {
         float hdist = 0.0F;
         float vdist = 0.0F;
-        float xspd = m->x_speed();
-        float yspd = m->y_speed();
+        double xspd = m->x_speed();
+        double yspd = m->y_speed();
         float ox = info->x;
         float oy = info->y;
         float cwidth, cheight;
