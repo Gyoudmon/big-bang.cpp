@@ -56,4 +56,3 @@ void WarGrey::STEM::IDisplay::log_message(int fgc, const char* fmt, ...) {
     VSNPRINT(text, fmt);
     this->log_message(fgc, text);
 }
-

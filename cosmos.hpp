@@ -7,7 +7,7 @@
 namespace WarGrey::STEM {
     class Cosmos : public WarGrey::STEM::IUniverse {
     public:
-        Cosmos(int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
+        Cosmos(uint32_t fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
         virtual ~Cosmos();
 
     public:

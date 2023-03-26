@@ -12,7 +12,7 @@ namespace WarGrey::STEM {
     class IUniverse : public WarGrey::STEM::IDisplay {
     public:
         /* 构造函数，用以设置帧频, 窗口标题, 前景背景色, 和混色模式 */
-        IUniverse(int fps, uint32_t fgc, uint32_t bgc);
+        IUniverse(uint32_t fps, uint32_t fgc, uint32_t bgc);
         
         /* 析构函数，销毁旧对象时自动调用，默认销毁游戏宇宙 */
         virtual ~IUniverse();
@@ -49,7 +49,7 @@ namespace WarGrey::STEM {
         void feed_window_size(int* width, int* height, bool logical = true);
         void set_window_fullscreen(bool yes);
         const char* get_renderer_name();
-        int frame_rate() override { return this->_fps; }
+        uint32_t frame_rate() override { return this->_fps; }
         uint32_t get_background_color() { return this->_bgc; }
         uint32_t get_foreground_color() { return this->_fgc; }
 
@@ -131,7 +131,7 @@ namespace WarGrey::STEM {
 
     private:
         SDL_TimerID timer;                      // SDL 定时器
-        int _fps;                               // 帧频
+        uint32_t _fps;                          // 帧频
 
     private:
         const char* current_usrin = nullptr;    // IME 原始输入
@@ -156,7 +156,7 @@ namespace WarGrey::STEM {
         Universe();
 
         /* 更有用一些的构造函数，创建新对象时根据参数自动选择 */
-        Universe(const char* title, int fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
+        Universe(const char* title, uint32_t fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
     
     public:
         /* 创建游戏世界，充当程序真正的 main 函数，默认什么都不做 */

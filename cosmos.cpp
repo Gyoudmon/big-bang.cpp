@@ -43,7 +43,7 @@ static inline void draw_plane(SDL_Renderer* renderer, IPlane* plane, float x, fl
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Cosmos::Cosmos(int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
+WarGrey::STEM::Cosmos::Cosmos(uint32_t fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
     this->screen = new OnionSkin(this);
 }
 

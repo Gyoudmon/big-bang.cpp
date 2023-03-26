@@ -167,7 +167,7 @@ static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* textu
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IUniverse::IUniverse(int fps, uint32_t fgc, uint32_t bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
+WarGrey::STEM::IUniverse::IUniverse(uint32_t fps, uint32_t fgc, uint32_t bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     game_create_world(1, 0, &this->window, &this->renderer);
@@ -646,7 +646,7 @@ void WarGrey::STEM::IUniverse::set_snapshot_folder(const std::string& dir) {
 
 /*************************************************************************************************/
 WarGrey::STEM::Universe::Universe() : Universe("The Big Bang!") {}
-WarGrey::STEM::Universe::Universe(const char *title, int fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
+WarGrey::STEM::Universe::Universe(const char *title, uint32_t fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
     this->set_window_title("%s", title);
 }
 

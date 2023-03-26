@@ -125,10 +125,10 @@ double WarGrey::STEM::IMovable::get_velocity_direction(bool need_radian) {
     return (need_radian ? rad : radians_to_degrees(rad));
 }
 
-void WarGrey::STEM::IMovable::set_terminal_velocity(double spd, double dir, bool is_radian) {
+void WarGrey::STEM::IMovable::set_terminal_velocity(double v, double dir, bool is_radian) {
     double vx, vy;
     
-    orthogonal_decomposition(spd, dir, &vx, &vy, is_radian);
+    orthogonal_decomposition(v, dir, &vx, &vy, is_radian);
     this->set_terminal_speed(vx, vy);
 }
 
@@ -154,7 +154,10 @@ void WarGrey::STEM::IMovable::set_terminal_speed(double mxspd, double myspd) {
 }
 
 void WarGrey::STEM::IMovable::heading_rotate(double theta, bool is_radian) {
-    vector_rotate(this->vx, this->vy, theta, &this->vx, &this->vy, 0.0, 0.0, is_radian);
+    if (theta != 0.0) {
+        vector_rotate(this->vx, this->vy, theta, &this->vx, &this->vy, 0.0, 0.0, is_radian);
+        this->on_velocity_changed();
+    }
 }
 
 void WarGrey::STEM::IMovable::on_border(float hoffset, float voffset) {
