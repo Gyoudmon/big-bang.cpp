@@ -155,7 +155,7 @@ namespace WarGrey::STEM {
 
     protected:
         virtual void on_motion_start(WarGrey::STEM::IMatter* m, float sec, float x, float y, double xspd, double yspd) {}
-        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd) {}
+        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd, float percentage) {}
         virtual void on_motion_complete(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd) {}
         
     protected:
@@ -307,9 +307,9 @@ namespace WarGrey::STEM {
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, bool absolute);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, float fx, float fy, float dx, float dy);
-        bool do_move_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
-        bool do_glide_via_info(IMatter* m, MatterInfo* info, float x, float y, float sec, float sec_delta, bool absolute);
-        void do_motion_move(IMatter* m, MatterInfo* info, float dwidth, float dheight);
+        bool do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
+        bool do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, float sec, float sec_delta, bool absolute);
+        void do_motion_moving(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         
     private:
         void do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F);
