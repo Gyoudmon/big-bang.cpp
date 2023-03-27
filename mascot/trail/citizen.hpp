@@ -28,15 +28,15 @@ namespace WarGrey::STEM {
         int preferred_local_fps() override { return 15; }
 
     protected:
-        void on_heading_changed(float theta_rad, float vx, float vy, float prev_vr) override;
-        void on_nward(float theta_rad, float vx, float vy) override;
-        void on_eward(float theta_rad, float vx, float vy) override;
-        void on_sward(float theta_rad, float vx, float vy) override;
-        void on_wward(float theta_rad, float vx, float vy) override;
-        void on_wnward(float theta_rad, float vx, float vy) override;
-        void on_wsward(float theta_rad, float vx, float vy) override;
-        void on_enward(float theta_rad, float vx, float vy) override;
-        void on_esward(float theta_rad, float vx, float vy) override;
+        void on_heading_changed(double theta_rad, double vx, double vy, double prev_vr) override;
+        void on_nward(double theta_rad, double vx, double vy) override;
+        void on_eward(double theta_rad, double vx, double vy) override;
+        void on_sward(double theta_rad, double vx, double vy) override;
+        void on_wward(double theta_rad, double vx, double vy) override;
+        void on_wnward(double theta_rad, double vx, double vy) override;
+        void on_wsward(double theta_rad, double vx, double vy) override;
+        void on_enward(double theta_rad, double vx, double vy) override;
+        void on_esward(double theta_rad, double vx, double vy) override;
     };
 
     /*********************************************************************************************/
