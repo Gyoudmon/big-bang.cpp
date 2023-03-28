@@ -145,9 +145,8 @@ static void game_create_world(int width, int height, SDL_Window** window, SDL_Re
 
 static inline void game_world_reset(SDL_Renderer* renderer, uint32_t fgc, uint32_t bgc) {
     unsigned char r, g, b;
-
     RGB_From_Hexadecimal(bgc, &r, &g, &b);
-    SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
+    SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF); // the `alpha` does not affect the window
     SDL_RenderClear(renderer);
 
     RGB_From_Hexadecimal(fgc, &r, &g, &b);
@@ -368,6 +367,12 @@ void WarGrey::STEM::IUniverse::on_editing(const char* text, int pos, int span) {
 }
 
 void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height) {
+    /**
+     * Even if the subclass has its own background,
+     *   resetting the renderer is also meaningful,
+     *   as the `alpha` does't affect the renderer here,
+     *      but does have effect for the subclass.
+     */
     game_world_reset(renderer, this->_fgc, this->_bgc);
     this->draw(renderer, x, y, width, height - this->get_cmdwin_height());
 

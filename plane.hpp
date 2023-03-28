@@ -62,9 +62,9 @@ namespace WarGrey::STEM {
         virtual void erase() = 0;
 
     public:
-        void set_background(uint32_t color, float a = 1.0F) { this->background = color; this->bg_alpha = a; }
-        void set_background(float hue, float saturation = 1.0F, float brightness = 1.0F, float a = 1.0F);
-        void feed_background(SDL_Color* color);
+        void set_background(uint32_t color, double a = 1.0) { this->background = color; this->bg_alpha = a; }
+        void set_background(double hue, double saturation = 1.0, double brightness = 1.0, double a = 1.0);
+        uint32_t get_background(double* alpha = nullptr);
         void feed_mouse_location(float* x, float* y);
         void start_input_text(const std::string& prompt);
         void start_input_text(const char* prompt, ...);
@@ -199,7 +199,7 @@ namespace WarGrey::STEM {
 
     protected:
         uint32_t background = 0U;
-        float bg_alpha = 0.0F;
+        double bg_alpha = 0.0F;
 
     protected:
         int column = 0;

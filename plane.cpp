@@ -1396,12 +1396,14 @@ void WarGrey::STEM::IPlane::on_enter(IPlane* from) {
     this->on_mission_start(width, height);
 }
 
-void WarGrey::STEM::IPlane::set_background(float hue, float saturation, float brightness, float alpha) {
+void WarGrey::STEM::IPlane::set_background(double hue, double saturation, double brightness, double alpha) {
     this->set_background(Hexadecimal_From_HSV(hue, saturation, brightness), alpha);
 }
 
-void WarGrey::STEM::IPlane::feed_background(SDL_Color* c) {
-    RGB_FillColor(c, this->background, this->bg_alpha);
+uint32_t WarGrey::STEM::IPlane::get_background(double* alpha) {
+    SET_BOX(alpha, this->bg_alpha);
+    
+    return this->background;
 }
 
 void WarGrey::STEM::IPlane::start_input_text(const char* fmt, ...) {
