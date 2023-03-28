@@ -95,7 +95,7 @@ void WarGrey::STEM::IShapelet::set_color_hsi(double hue, double saturation, doub
     this->set_color(Hexadecimal_From_HSI(hue, saturation, intensity));
 }
 
-double WarGrey::STEM::IShapelet::get_body_hsb_hue() {
+double WarGrey::STEM::IShapelet::get_color_hue() {
     double hue = flnan;
 
     if (this->color >= 0) {

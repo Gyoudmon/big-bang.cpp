@@ -23,7 +23,7 @@ namespace WarGrey::STEM {
         void set_color_hsl(double hue, double saturation, double lightness);
         void set_color_hsi(double hue, double saturation, double intensity);
         int32_t get_color() { return this->color; }
-        double get_body_hsb_hue();
+        double get_color_hue();
 
         void set_border_color(int32_t color);
         void set_border_color_hsv(double hue, double saturation, double value);
