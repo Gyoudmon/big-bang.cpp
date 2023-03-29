@@ -13,14 +13,14 @@ namespace WarGrey::STEM {
 
     class Estelle : public WarGrey::STEM::Bracer {
     public:
-        Estelle() : Bracer("Estelle") {}
+        Estelle() : Bracer("Estelle Bright") {}
 
         virtual ~Estelle() {}
     };
 
     class Agate : public WarGrey::STEM::Bracer {
     public:
-        Agate() : Bracer("Agate") {}
+        Agate() : Bracer("Agate Crosner") {}
         virtual ~Agate() {}
     };
 }

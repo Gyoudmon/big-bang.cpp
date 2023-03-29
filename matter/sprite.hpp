@@ -42,7 +42,6 @@ namespace WarGrey::STEM {
         const char* current_costume_name() { return this->costume_index_to_name(this->current_costume_index()); };
         void auto_virtual_canvas(const char* action_name = nullptr);
         void auto_virtual_canvas(const std::string& action_name) { this->auto_virtual_canvas(action_name.c_str()); }
-        
 
     public:
         int preferred_local_fps() override { return 10; }
