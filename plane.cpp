@@ -949,12 +949,11 @@ void WarGrey::STEM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
 void WarGrey::STEM::Plane::place_tooltip(WarGrey::STEM::IMatter* target) {
     float ttx, tty, width, height;
 
-    this->master()->feed_client_extent(&width, &height);
-
     this->move_to(this->tooltip, target,
         MatterAnchor::LB, MatterAnchor::LT,
         this->tooltip_dx, this->tooltip_dy);
 
+    this->master()->feed_client_extent(&width, &height);
     this->feed_matter_location(this->tooltip, &ttx, &tty, MatterAnchor::LB);
 
     if (tty > height) {
@@ -1185,7 +1184,7 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, flo
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute) {
     bool moved = false;
 
-    if (!info->gliding) {
+    if ((!info->gliding) || (m == this->tooltip)) {
         moved = this->do_moving_via_info(m, info, x, y, absolute);
     } else {
         if (info->motion_queues.empty()) {
