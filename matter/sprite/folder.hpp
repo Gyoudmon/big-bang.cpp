@@ -31,6 +31,9 @@ namespace WarGrey::STEM {
         const char* costume_index_to_name(size_t idx) override;
         void draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) override;
     
+    protected:
+        virtual void on_costumes_load() {}
+
     private:
         void load_costume(SDL_Renderer* renderer, const std::string& png);
         void load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png);

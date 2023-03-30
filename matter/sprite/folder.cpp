@@ -50,6 +50,7 @@ void WarGrey::STEM::Sprite::construct(SDL_Renderer* renderer) {
             this->load_costume(renderer, this->_pathname);
         }
 
+        this->on_costumes_load();
         ISprite::construct(renderer);
     }
 }

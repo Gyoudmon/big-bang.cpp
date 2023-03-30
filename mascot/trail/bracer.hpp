@@ -10,13 +10,12 @@ namespace WarGrey::STEM {
         Bracer(const char* name);
         virtual ~Bracer() {}
 
-        void construct(SDL_Renderer* renderer) override;
-
     public:
         void switch_mode(BracerMode mode, int repeat = -1, MatterAnchor anchor = MatterAnchor::CC);
         BracerMode current_mode() { return this->mode; }
 
     protected:
+        void on_costumes_load() override;
         void on_heading_changed(double theta_rad, double vx, double vy, double prev_vr) override;
         void on_nward(double theta_rad, double vx, double vy) override;
         void on_eward(double theta_rad, double vx, double vy) override;

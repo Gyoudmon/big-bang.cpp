@@ -8,25 +8,23 @@ using namespace WarGrey::STEM;
 WarGrey::STEM::Bracer::Bracer(const char* name)
     : Citizen(digimon_mascot_path(name, "", "digitama/big_bang/mascot/trail/Bracers")) {}
 
-void WarGrey::STEM::Bracer::construct(SDL_Renderer* renderer) {
-    Citizen::construct(renderer);
+void WarGrey::STEM::Bracer::on_costumes_load() {
     this->switch_mode(BracerMode::Walk);
 }
 
 void WarGrey::STEM::Bracer::switch_mode(BracerMode mode, int repeat, MatterAnchor anchor) {
     if (this->mode != mode) {
         this->mode = mode;
-
         this->moor(anchor);
-    
-        switch (this->mode) {
-        case BracerMode::Walk: this->on_walk_mode(repeat); break;
-        case BracerMode::Run: this->on_run_mode(repeat); break;
-        case BracerMode::Win: this->on_win_mode(repeat); break;
-        }
-    
-        this->clear_moor();
     }
+    
+    switch (this->mode) {
+    case BracerMode::Walk: this->on_walk_mode(repeat); break;
+    case BracerMode::Run: this->on_run_mode(repeat); break;
+    case BracerMode::Win: this->on_win_mode(repeat); break;
+    }
+    
+    this->clear_moor();
 }
 
 void WarGrey::STEM::Bracer::retrigger_heading_change_event() {
@@ -48,7 +46,7 @@ void WarGrey::STEM::Bracer::on_run_mode(int repeat) {
 }
 
 void WarGrey::STEM::Bracer::on_win_mode(int repeat) {
-    this->auto_virtual_canvas("win");
+    this->set_virtual_canvas(96.0F, 96.0F);
     this->play("win", repeat);
 }
 
