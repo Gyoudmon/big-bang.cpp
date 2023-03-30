@@ -46,6 +46,11 @@ void WarGrey::STEM::Bracer::on_run_mode(int repeat) {
 }
 
 void WarGrey::STEM::Bracer::on_win_mode(int repeat) {
+    this->set_virtual_canvas(90.0F, 90.0F);
+    this->play("win", repeat);
+}
+
+void WarGrey::STEM::Estelle::on_win_mode(int repeat) {
     this->set_virtual_canvas(96.0F, 96.0F);
     this->play("win", repeat);
 }

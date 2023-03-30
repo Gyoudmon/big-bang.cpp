@@ -45,6 +45,9 @@ namespace WarGrey::STEM {
         Estelle() : Bracer("Estelle") {}
         const char* name() override { return "Estelle Bright"; }
         virtual ~Estelle() {}
+
+    protected:
+        void on_win_mode(int repeat) override;
     };
 
     class Joshua : public WarGrey::STEM::Bracer {
@@ -52,6 +55,13 @@ namespace WarGrey::STEM {
         Joshua() : Bracer("Joshua") {}
         const char* name() override { return "Joshua Bright"; }
         virtual ~Joshua() {}
+    };
+
+    class Klose : public WarGrey::STEM::Bracer {
+    public:
+        Klose() : Bracer("Klose") {}
+        const char* name() override { return "Klose Rinz"; /* Klaudia von Auslese */ }
+        virtual ~Klose() {}
     };
 
     class Agate : public WarGrey::STEM::Bracer {
