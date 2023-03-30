@@ -114,7 +114,19 @@ void WarGrey::STEM::IMatter::resize(float w, float h, MatterAnchor anchor) {
 void WarGrey::STEM::IMatter::notify_updated() {
     if (this->info != nullptr) {
         if (this->anchor != MatterAnchor::LT) {
-            this->info->master->move_to(this, this->anchor_x, this->anchor_y, this->anchor);
+            float cx, cy;
+            this->info->master->feed_matter_location(this, &cx, &cy, this->anchor);
+
+            /** NOTE
+             * Gliding dramatically increasing the complexity of moving as glidings might be queued,
+             *   the anchored moving here therefore uses relative target position,
+             *   and do the moving immediately.
+             **/
+
+            if ((cx != this->anchor_x) || (cy != this->anchor_y)) {
+                this->info->master->move(this, this->anchor_x - cx, this->anchor_y - cy, true);
+            }
+
             this->clear_moor();
         }
 
@@ -132,13 +144,15 @@ void WarGrey::STEM::IMatter::moor(MatterAnchor anchor) {
     if (anchor != MatterAnchor::LT) {
         if (this->info != nullptr) {
             this->anchor = anchor;
-            this->info->master->feed_matter_location(this, &this->anchor_x, &this->anchor_y, anchor);
+            this->info->master->feed_matter_location(this, &this->anchor_x, &this->anchor_y, this->anchor);
         }
     }
 }
 
 void WarGrey::STEM::IMatter::clear_moor() {
     this->anchor = MatterAnchor::LT;
+    this->anchor_x = 0.0F;
+    this->anchor_y = 0.0F;
 }
 
 bool WarGrey::STEM::IMatter::has_caret() {

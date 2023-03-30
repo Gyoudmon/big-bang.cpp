@@ -50,7 +50,7 @@ namespace WarGrey::STEM {
         virtual bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) = 0;
         virtual void feed_matters_boundary(float* x, float* y, float* width, float* height) = 0;
         virtual void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
-        virtual void move(IMatter* m, float x, float y) = 0;
+        virtual void move(IMatter* m, float x, float y, bool ignore_gliding) = 0;
         virtual void move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
         virtual void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
         virtual void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx, float fy, float dx, float dy) = 0;
@@ -247,7 +247,7 @@ namespace WarGrey::STEM {
         bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) override;
         void feed_matters_boundary(float* x, float* y, float* width, float* height) override;
         void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) override;
-        void move(IMatter* m, float x, float y) override;
+        void move(IMatter* m, float x, float y, bool ignore_gliding = false) override;
         void move_to(IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
@@ -303,7 +303,7 @@ namespace WarGrey::STEM {
         void on_matter_ready(IMatter* m) override {}
 
     private:
-        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, bool absolute);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, float sec, float x, float y, float fx, float fy, float dx, float dy);

@@ -322,12 +322,12 @@ void WarGrey::STEM::Plane::erase() {
     }
 }
 
-void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
+void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_gliding) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
 
         if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
-            if (this->move_matter_via_info(m, info, x, y, false)) {
+            if (this->move_matter_via_info(m, info, x, y, false, ignore_gliding)) {
                 this->notify_updated();
             }
         }
@@ -338,7 +338,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
-                this->move_matter_via_info(m, info, x, y, false);
+                this->move_matter_via_info(m, info, x, y, false, ignore_gliding);
             }
 
             child = info->next;
@@ -1181,10 +1181,10 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, flo
     return moved;
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute) {
+bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding) {
     bool moved = false;
 
-    if ((!info->gliding) || (m == this->tooltip)) {
+    if ((!info->gliding) || (m == this->tooltip) || ignore_gliding) {
         moved = this->do_moving_via_info(m, info, x, y, absolute);
     } else {
         if (info->motion_queues.empty()) {
@@ -1209,13 +1209,13 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, f
     bool moved = false;
     
     if (sec <= 0.0F) {
-        moved = this->move_matter_via_info(m, info, x, y, absolute);
+        moved = this->move_matter_via_info(m, info, x, y, absolute, false);
     } else {
         IScreen* screen = this->master();
         float sec_delta = (screen != nullptr) ? (1.0F / float(screen->frame_rate())) : 0.0F;
 
         if ((sec <= sec_delta) || (sec_delta == 0.0F)) {
-            moved = this->move_matter_via_info(m, info, x, y, absolute);
+            moved = this->move_matter_via_info(m, info, x, y, absolute, false);
         } else {
             if (m->motion_stopped()) {
                 info->motion_queues.clear();

@@ -49,6 +49,11 @@ WarGrey::STEM::TrailStudent::TrailStudent(const char* name) : Citizen(digimon_ma
 }
 
 /*************************************************************************************************/
+void WarGrey::STEM::Citizen::construct(SDL_Renderer* renderer) {
+    Sprite::construct(renderer);
+    this->play("walk_s");
+}
+
 void WarGrey::STEM::Citizen::on_heading_changed(double theta_rad, double vx, double vy, double prev_vr) {
     I8WayMotion::dispatch_heading_event(theta_rad, vx, vy, prev_vr);
 }

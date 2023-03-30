@@ -24,6 +24,8 @@ namespace WarGrey::STEM {
         Citizen(const std::string& fullpath);
         virtual ~Citizen() {}
 
+        void construct(SDL_Renderer* renderer) override;
+
     public:
         int preferred_local_fps() override { return 15; }
 
