@@ -76,5 +76,8 @@ namespace WarGrey::STEM {
         Tita() : Bracer("Tita") {}
         const char* name() override { return "Tita Russell"; }
         virtual ~Tita() {}
+
+    protected:
+        void on_run_mode(int repeat) override;
     };
 }

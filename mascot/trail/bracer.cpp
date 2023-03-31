@@ -55,6 +55,11 @@ void WarGrey::STEM::Estelle::on_win_mode(int repeat) {
     this->play("win", repeat);
 }
 
+void WarGrey::STEM::Tita::on_run_mode(int repeat) {
+    this->set_virtual_canvas(64.0F, 72.0F);
+    this->retrigger_heading_change_event();
+}
+
 /*************************************************************************************************/
 void WarGrey::STEM::Bracer::on_heading_changed(double theta_rad, double vx, double vy, double prev_vr) {
     this->dispatch_heading_event(theta_rad, vx, vy, prev_vr);
