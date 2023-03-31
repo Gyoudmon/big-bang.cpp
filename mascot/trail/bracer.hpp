@@ -70,4 +70,11 @@ namespace WarGrey::STEM {
         const char* name() override { return "Agate Crosner"; }
         virtual ~Agate() {}
     };
+
+    class Tita : public WarGrey::STEM::Bracer {
+    public:
+        Tita() : Bracer("Tita") {}
+        const char* name() override { return "Tita Russell"; }
+        virtual ~Tita() {}
+    };
 }

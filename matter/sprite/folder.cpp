@@ -52,6 +52,8 @@ void WarGrey::STEM::Sprite::construct(SDL_Renderer* renderer) {
 
         this->on_costumes_load();
         ISprite::construct(renderer);
+    } else {
+        fprintf(stderr, "file[%s] not found.", this->_pathname.c_str());
     }
 }
 

@@ -153,6 +153,16 @@ void WarGrey::STEM::IMovable::set_terminal_speed(double mxspd, double myspd) {
     }
 }
 
+void WarGrey::STEM::IMovable::set_heading(double direction, bool is_radian) {
+    // Usually this is meaningful when stopped
+
+    if (!is_radian) {
+        direction = degrees_to_radians(direction);
+    }
+
+    this->check_heading_changing(direction);
+}
+
 void WarGrey::STEM::IMovable::heading_rotate(double theta, bool is_radian) {
     if (theta != 0.0) {
         vector_rotate(this->vx, this->vy, theta, &this->vx, &this->vy, 0.0, 0.0, is_radian);
@@ -271,12 +281,7 @@ void WarGrey::STEM::IMovable::on_acceleration_changed() {
 void WarGrey::STEM::IMovable::on_velocity_changed() {
     double rad = flatan(this->vy, this->vx);
 
-    if (this->vr != rad) {
-        double pvr = this->vr;
-
-        this->vr = rad;
-        this->on_heading_changed(rad, this->vx, this->vy, pvr);
-    }
+    this->check_heading_changing(rad);
 }
 
 void WarGrey::STEM::IMovable::check_velocity_changing() {
@@ -284,5 +289,14 @@ void WarGrey::STEM::IMovable::check_velocity_changing() {
         if (this->ar != this->vr) {
             this->on_velocity_changed();
         }
+    }
+}
+
+void WarGrey::STEM::IMovable::check_heading_changing(double rad) {
+    if (this->vr != rad) {
+        double pvr = this->vr;
+
+        this->vr = rad;
+        this->on_heading_changed(rad, this->vx, this->vy, pvr);
     }
 }

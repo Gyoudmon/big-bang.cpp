@@ -39,6 +39,7 @@
 #include "mascot/agent/linkmon.hpp"
 #include "mascot/tuxmon.hpp"
 #include "mascot/coinlet.hpp"
+#include "mascot/character.hpp"
 
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"
@@ -47,4 +48,5 @@
 #include "physics/motion/map2d.hpp"
 
 #include "datum/flonum.hpp"
+#include "datum/string.hpp"
 #include "virtualization/filesystem/imgdb.hpp"

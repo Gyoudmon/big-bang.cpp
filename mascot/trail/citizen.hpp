@@ -48,6 +48,7 @@ namespace WarGrey::STEM {
     class TrailKid : public WarGrey::STEM::Citizen {
     public:
         static std::vector<std::string> list_names();
+        static TrailKid* randomly_create();
 
     public:
         TrailKid(const std::string& name) : TrailKid(name.c_str()) {}
@@ -59,6 +60,7 @@ namespace WarGrey::STEM {
     class TrailStudent : public WarGrey::STEM::Citizen {
     public:
         static std::vector<std::string> list_names();
+        static TrailStudent* randomly_create();
 
     public:
         TrailStudent(const std::string& name) : TrailStudent(name.c_str()) {}

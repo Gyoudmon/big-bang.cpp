@@ -3,10 +3,12 @@
 #include <filesystem>
 
 #include "../../datum/path.hpp"
+#include "../../physics/random.hpp"
 
 using namespace WarGrey::STEM;
 using namespace std::filesystem;
 
+/*************************************************************************************************/
 static std::vector<std::string> list_citizen_names(const char* subdir) {
     std::string rootdir = digimon_subdir(subdir);
     std::vector<std::string> names;
@@ -33,6 +35,18 @@ std::vector<std::string> WarGrey::STEM::TrailKid::list_names() {
 
 std::vector<std::string> WarGrey::STEM::TrailStudent::list_names() {
     return list_citizen_names(TRIAL_STUDENTS_PATH);
+}
+
+TrailKid* WarGrey::STEM::TrailKid::randomly_create() {
+    std::vector<std::string> names = TrailKid::list_names();
+
+    return new TrailKid(names[random_uniform(0, names.size() - 1)]);
+}
+
+TrailStudent* WarGrey::STEM::TrailStudent::randomly_create() {
+    std::vector<std::string> names = TrailStudent::list_names();
+
+    return new TrailStudent(names[random_uniform(0, names.size() - 1)]);
 }
 
 /*************************************************************************************************/

@@ -37,6 +37,7 @@ namespace WarGrey::STEM {
         void set_terminal_velocity(double max_spd, double direction, bool is_radian = false);
         void set_terminal_speed(double mxspd, double myspd);
         double get_heading(bool need_radian = true) { return this->get_velocity_direction(); }
+        void set_heading(double direction, bool is_radian = false);
         void heading_rotate(double theta, bool is_radian = false);
 
     public:
@@ -63,6 +64,7 @@ namespace WarGrey::STEM {
     private:
         void on_acceleration_changed();
         void check_velocity_changing();
+        void check_heading_changing(double rad);
         void on_velocity_changed();
 
     private:
