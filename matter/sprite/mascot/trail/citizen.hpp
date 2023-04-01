@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../matter/sprite/folder.hpp"
-#include "../../datum/path.hpp"
+#include "../../folder.hpp"
+#include "../../../../datum/path.hpp"
 
-#include "../../physics/motion/map2d.hpp"
+#include "../../../../physics/motion/map2d.hpp"
 
 #include <vector>
 

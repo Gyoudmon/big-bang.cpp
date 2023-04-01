@@ -31,15 +31,16 @@
 #include "matter/sprite/folder.hpp"
 #include "matter/sprite/sheet.hpp"
 
+#include "matter/sprite/mascot/atlas/mario.hpp"
+#include "matter/sprite/mascot/agent/linkmon.hpp"
+#include "matter/sprite/mascot/tuxmon.hpp"
+#include "matter/sprite/mascot/coinlet.hpp"
+#include "matter/sprite/mascot/character.hpp"
+
 #include "matter/graphlet.hpp"
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/shapelet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
-
-#include "mascot/agent/linkmon.hpp"
-#include "mascot/tuxmon.hpp"
-#include "mascot/coinlet.hpp"
-#include "mascot/character.hpp"
 
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"

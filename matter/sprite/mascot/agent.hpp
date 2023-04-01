@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../matter/sprite/sheet.hpp"
-#include "../datum/path.hpp"
+#include "../sheet.hpp"
+#include "../../../datum/path.hpp"
 
 #include <optional>
 #include <vector>

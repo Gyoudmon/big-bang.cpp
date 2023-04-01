@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../matter/atlas.hpp"
+#include "../../../atlas.hpp"
 
 #include <utility>
 

@@ -1,5 +1,5 @@
 #include "mario.hpp"
-#include "../../datum/path.hpp"
+#include "../../../../datum/path.hpp"
 
 using namespace WarGrey::STEM;
 
