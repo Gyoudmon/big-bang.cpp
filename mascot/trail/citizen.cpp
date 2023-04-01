@@ -10,7 +10,7 @@ using namespace std::filesystem;
 
 /*************************************************************************************************/
 static std::vector<std::string> list_citizen_names(const char* subdir) {
-    std::string rootdir = digimon_subdir(subdir);
+    std::string rootdir = digimon_mascot_subdir(subdir);
     std::vector<std::string> names;
 
     for (auto entry : directory_iterator(rootdir)) {

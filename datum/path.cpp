@@ -139,22 +139,6 @@ void WarGrey::STEM::enter_digimon_zone(const char* process_path) {
 	zonedir.push_back(path::preferred_separator);
 }
 
-std::string WarGrey::STEM::digimon_zonedir() {
-	if (zonedir.empty()) {
-		enter_digimon_zone(nullptr);
-	}
-
-	return directory_path(zonedir);
-}
-
-std::string WarGrey::STEM::digimon_mascotdir() {
-	if (mascotdir.empty()) {
-		return digimon_subdir("stone/mascot");
-	} else {
-		return directory_path(mascotdir);
-	}
-}
-
 void WarGrey::STEM::digimon_mascot_setup(const char* shared_path) {
 	if ((shared_path != nullptr) && (shared_path[0] != '\0')) {
 		path folder = path(shared_path).make_preferred();
@@ -167,10 +151,32 @@ void WarGrey::STEM::digimon_mascot_setup(const char* shared_path) {
 	}
 }
 
+std::string WarGrey::STEM::digimon_zonedir() {
+	if (zonedir.empty()) {
+		enter_digimon_zone(nullptr);
+	}
+
+	return directory_path(zonedir);
+}
+
 std::string WarGrey::STEM::digimon_subdir(const char* dirpath) {
 	std::string subdir = directory_path(path(dirpath).make_preferred().string());
 
 	return digimon_zonedir().append(subdir);
+}
+
+std::string WarGrey::STEM::digimon_mascot_rootdir() {
+	if (mascotdir.empty()) {
+		return digimon_subdir("stone/mascot");
+	} else {
+		return directory_path(mascotdir);
+	}
+}
+
+std::string WarGrey::STEM::digimon_mascot_subdir(const char* dirpath) {
+	std::string subdir = directory_path(path(dirpath).make_preferred().string());
+
+	return digimon_mascot_rootdir().append(subdir);
 }
 
 std::string WarGrey::STEM::digimon_path(const char* file, const char* ext, const char* sub_rootdir) {
@@ -188,5 +194,5 @@ std::string WarGrey::STEM::digimon_mascot_path(const char* file, const char* ext
 	std::string file_ext = (file_extension_from_path(file_raw) == "") ? (file_raw.append(ext)) : file_raw;
 	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(path(sub_rootdir).make_preferred().string()).append(file_ext)));
 
-    return digimon_mascotdir().append(path_ext);
+    return digimon_mascot_rootdir().append(path_ext);
 }

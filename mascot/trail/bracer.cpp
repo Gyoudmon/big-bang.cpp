@@ -56,7 +56,7 @@ void WarGrey::STEM::Estelle::on_win_mode(int repeat) {
 }
 
 void WarGrey::STEM::Tita::on_run_mode(int repeat) {
-    this->set_virtual_canvas(64.0F, 72.0F);
+    this->set_virtual_canvas(50.0F, 72.0F);
     this->retrigger_heading_change_event();
 }
 
