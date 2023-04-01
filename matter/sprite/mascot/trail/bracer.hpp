@@ -80,4 +80,15 @@ namespace WarGrey::STEM {
     protected:
         void on_run_mode(int repeat) override;
     };
+
+    class Zin : public WarGrey::STEM::Bracer {
+    public:
+        Zin() : Bracer("Zin") {}
+        const char* name() override { return "Zin Vathek"; }
+        virtual ~Zin() {}
+
+    protected:
+        void on_walk_mode(int repeat) override;
+        void on_run_mode(int repeat) override;
+    };
 }
