@@ -144,7 +144,7 @@ void WarGrey::STEM::digimon_mascot_setup(const char* shared_path) {
 		path folder = path(shared_path).make_preferred();
 
 		if (folder.is_absolute()) {
-			mascotdir = directory_path(folder);
+			mascotdir = directory_path(folder.string());
 		} else {
 			mascotdir = digimon_subdir(folder.string().c_str());
 		}

@@ -39,14 +39,24 @@ std::vector<std::string> WarGrey::STEM::TrailStudent::list_names() {
 
 TrailKid* WarGrey::STEM::TrailKid::randomly_create() {
     std::vector<std::string> names = TrailKid::list_names();
+    TrailKid* kid = nullptr;
 
-    return new TrailKid(names[random_uniform(0, names.size() - 1)]);
+    if (!names.empty()) {
+        kid = new TrailKid(names[random_uniform(0, int(names.size()) - 1)]);
+    }
+
+    return kid;
 }
 
 TrailStudent* WarGrey::STEM::TrailStudent::randomly_create() {
     std::vector<std::string> names = TrailStudent::list_names();
+    TrailStudent* student = nullptr;
 
-    return new TrailStudent(names[random_uniform(0, names.size() - 1)]);
+    if (!names.empty()) {
+        student = new TrailStudent(names[random_uniform(0, int(names.size()) - 1)]);
+    }
+
+    return student;
 }
 
 /*************************************************************************************************/
