@@ -6,7 +6,7 @@ using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
 WarGrey::STEM::Bracer::Bracer(const char* name)
-    : Citizen(digimon_mascot_path(name, "", "digitama/big_bang/mascot/trail/Bracers")) {}
+    : Citizen(digimon_mascot_path(name, "", "trail/Bracers")) {}
 
 void WarGrey::STEM::Bracer::on_costumes_load() {
     this->switch_mode(BracerMode::Walk);

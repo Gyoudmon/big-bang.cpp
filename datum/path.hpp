@@ -16,6 +16,9 @@ namespace WarGrey::STEM {
 	void enter_digimon_zone(const char* process_path);
 	std::string digimon_zonedir();
 	std::string digimon_subdir(const char* dirpath);
-	std::string digimon_path(const char* file, const char* ext = "", const char* rootdir = "stone");
-	std::string digimon_mascot_path(const char* file, const char* ext = ".png", const char* rootdir = "digitama/big_bang/mascot");
+	std::string digimon_path(const char* file, const char* ext = "", const char* sub_rootdir = "stone");
+
+	void digimon_mascot_setup(const char* shared_dir);
+	std::string digimon_mascotdir();
+	std::string digimon_mascot_path(const char* file, const char* ext = ".png", const char* sub_rootdir = "");
 }

@@ -64,4 +64,3 @@ char WarGrey::STEM::decimal_ref(const char* src, size_t idx, char fallback_value
 void WarGrey::STEM::decimal_set(char* dest, size_t idx, char ch) {
     dest[idx] = decimal_to_byte(ch);
 }
-

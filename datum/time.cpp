@@ -70,4 +70,3 @@ std::string WarGrey::STEM::make_daytimestamp_utc(long long utc_s, bool locale) {
         
     return std::string(timestamp);
 }
-

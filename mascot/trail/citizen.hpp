@@ -10,9 +10,9 @@
 /* Protagonists in the RPG 空の軌跡 */
 
 namespace WarGrey::STEM {
-    #define TRIAL_KIDS_PATH "digitama/big_bang/mascot/trail/Kids"
-    #define TRIAL_STUDENTS_PATH "digitama/big_bang/mascot/trail/Students"
-    #define TRIAL_SPECIALS_PATH "digitama/big_bang/mascot/trail/Specials"
+    #define TRIAL_KIDS_PATH "trail/Kids"
+    #define TRIAL_STUDENTS_PATH "trail/Students"
+    #define TRIAL_SPECIALS_PATH "trail/Specials"
 
     class Citizen : public WarGrey::STEM::Sprite, protected WarGrey::STEM::I8WayMotion {
     public:

@@ -78,9 +78,13 @@ size_t WarGrey::STEM::SpriteGridSheet::costume_count() {
 int WarGrey::STEM::SpriteGridSheet::grid_cell_index(int x, int y, int* r,  int* c) {
     int xoff = (this->cell_inset ? this->cell_xgap : 0);
     int yoff = (this->cell_inset ? this->cell_ygap : 0);
+    int cl = 0;
+    int rw = 0;
 
-    int cl = (x - xoff) / (this->cell_width  + this->cell_xgap);
-    int rw = (y - yoff) / (this->cell_height + this->cell_ygap);
+    if ((this->cell_width > 0) && (this->cell_height > 0)) {
+        cl = (x - xoff) / (this->cell_width  + this->cell_xgap);
+        rw = (y - yoff) / (this->cell_height + this->cell_ygap);
+    }
     
     SET_VALUES(r, rw, c, cl);
     

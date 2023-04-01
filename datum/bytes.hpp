@@ -16,4 +16,3 @@ namespace WarGrey::STEM {
     char decimal_ref(const char* src, size_t idx, char fallback_value);
     void decimal_set(char* src, size_t idx, char dec);
 }
-

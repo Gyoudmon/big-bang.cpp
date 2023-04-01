@@ -25,4 +25,3 @@ namespace WarGrey::STEM {
     static const wchar_t wminus = (wchar_t)(minus);
     static const wchar_t wdot = (wchar_t)(dot);
 }
-
