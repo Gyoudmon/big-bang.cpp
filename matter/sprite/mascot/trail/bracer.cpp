@@ -9,14 +9,20 @@ WarGrey::STEM::Bracer::Bracer(const char* name)
     : Citizen(digimon_mascot_path(name, "", "trail/Bracers")) {}
 
 void WarGrey::STEM::Bracer::on_costumes_load() {
+    Citizen::on_costumes_load();
     this->switch_mode(BracerMode::Walk);
 }
 
 void WarGrey::STEM::Bracer::switch_mode(BracerMode mode, int repeat, MatterAnchor anchor) {
+    float cwidth, cheight;
+
     if (this->mode != mode) {
         this->mode = mode;
         this->moor(anchor);
     }
+
+    this->feed_canvas_size(mode, &cwidth, &cheight);
+    this->set_virtual_canvas(cwidth, cheight);
     
     switch (this->mode) {
     case BracerMode::Walk: this->on_walk_mode(repeat); break;
@@ -36,38 +42,46 @@ void WarGrey::STEM::Bracer::retrigger_heading_change_event() {
 
 /*************************************************************************************************/
 void WarGrey::STEM::Bracer::on_walk_mode(int repeat) {
-    this->set_virtual_canvas(36.0F, 72.0F);
     this->retrigger_heading_change_event();
 }
 
 void WarGrey::STEM::Bracer::on_run_mode(int repeat) {
-    this->set_virtual_canvas(48.0F, 72.0F);
     this->retrigger_heading_change_event();
 }
 
 void WarGrey::STEM::Bracer::on_win_mode(int repeat) {
-    this->set_virtual_canvas(90.0F, 90.0F);
     this->play("win", repeat);
 }
 
-void WarGrey::STEM::Estelle::on_win_mode(int repeat) {
-    this->set_virtual_canvas(96.0F, 96.0F);
-    this->play("win", repeat);
+void WarGrey::STEM::Bracer::feed_canvas_size(BracerMode mode, float* width, float* height) {
+    switch (mode) {
+    case BracerMode::Walk: SET_VALUES(width, 36.0F, height, 72.0F); break;
+    case BracerMode::Run:  SET_VALUES(width, 48.0F, height, 72.0F); break;
+    case BracerMode::Win:  SET_VALUES(width, 90.0F, height, 90.0F); break;
+    }
 }
 
-void WarGrey::STEM::Tita::on_run_mode(int repeat) {
-    this->set_virtual_canvas(50.0F, 72.0F);
-    this->retrigger_heading_change_event();
+void WarGrey::STEM::Estelle::feed_canvas_size(BracerMode mode, float* width, float* height) {
+    if (mode == BracerMode::Win) {
+        SET_VALUES(width, 96.0F, height, 96.0F);
+    } else {
+        Bracer::feed_canvas_size(mode, width, height);
+    }
 }
 
-void WarGrey::STEM::Zin::on_walk_mode(int repeat) {
-    this->set_virtual_canvas(64.0F, 96.0F);
-    this->retrigger_heading_change_event();
+void WarGrey::STEM::Tita::feed_canvas_size(BracerMode mode, float* width, float* height) {
+    switch (mode) {
+    case BracerMode::Walk: SET_VALUES(width, 48.0F, height, 72.0F); break;
+    case BracerMode::Run:  SET_VALUES(width, 50.0F, height, 72.0F); break;
+    default: Bracer::feed_canvas_size(mode, width, height);
+    }
 }
 
-void WarGrey::STEM::Zin::on_run_mode(int repeat) {
-    this->set_virtual_canvas(64.0F, 96.0F);
-    this->retrigger_heading_change_event();
+void WarGrey::STEM::Zin::feed_canvas_size(BracerMode mode, float* width, float* height) {
+    switch (mode) {
+    case BracerMode::Walk: case BracerMode::Run: SET_VALUES(width, 64.0F, height, 96.0F); break;
+    default: Bracer::feed_canvas_size(mode, width, height);
+    }
 }
 
 /*************************************************************************************************/

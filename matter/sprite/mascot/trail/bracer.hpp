@@ -27,6 +27,7 @@ namespace WarGrey::STEM {
         void on_esward(double theta_rad, double vx, double vy) override;
 
     protected:
+        virtual void feed_canvas_size(BracerMode mode, float* width, float* height);
         virtual void on_walk_mode(int repeat);
         virtual void on_run_mode(int repeat);
         virtual void on_win_mode(int repeat);
@@ -47,7 +48,7 @@ namespace WarGrey::STEM {
         virtual ~Estelle() {}
 
     protected:
-        void on_win_mode(int repeat) override;
+        void feed_canvas_size(BracerMode mode, float* width, float* height) override;
     };
 
     class Joshua : public WarGrey::STEM::Bracer {
@@ -55,6 +56,20 @@ namespace WarGrey::STEM {
         Joshua() : Bracer("Joshua") {}
         const char* name() override { return "Joshua Bright"; }
         virtual ~Joshua() {}
+    };
+
+    class Scherazard : public WarGrey::STEM::Bracer {
+    public:
+        Scherazard() : Bracer("Scherazard") {}
+        const char* name() override { return "Scherazard Harvey"; }
+        virtual ~Scherazard() {}
+    };
+
+    class Olivier : public WarGrey::STEM::Bracer {
+    public:
+        Olivier() : Bracer("Olivier") {}
+        const char* name() override { return "Olivier Lenheim"; }
+        virtual ~Olivier() {}
     };
 
     class Klose : public WarGrey::STEM::Bracer {
@@ -78,7 +93,7 @@ namespace WarGrey::STEM {
         virtual ~Tita() {}
 
     protected:
-        void on_run_mode(int repeat) override;
+        void feed_canvas_size(BracerMode mode, float* width, float* height) override;
     };
 
     class Zin : public WarGrey::STEM::Bracer {
@@ -88,7 +103,6 @@ namespace WarGrey::STEM {
         virtual ~Zin() {}
 
     protected:
-        void on_walk_mode(int repeat) override;
-        void on_run_mode(int repeat) override;
+        void feed_canvas_size(BracerMode mode, float* width, float* height) override;
     };
 }
