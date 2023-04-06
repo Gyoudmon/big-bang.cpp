@@ -147,7 +147,7 @@ void WarGrey::STEM::ISprite::auto_virtual_canvas(const char* action_name) {
         }
     }
 
-    this->set_virtual_canvas(cw, ch);
+    this->set_virtual_canvas(cwidth, cheight);
 }
 
 void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
