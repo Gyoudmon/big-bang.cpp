@@ -111,7 +111,7 @@ void WarGrey::STEM::Sprite::load_costume(SDL_Renderer* renderer, const std::stri
                     break;
                 }
             }
-        }     
+        }
     }
 }
 
