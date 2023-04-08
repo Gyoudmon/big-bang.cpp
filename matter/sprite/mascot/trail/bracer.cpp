@@ -14,23 +14,23 @@ void WarGrey::STEM::Bracer::on_costumes_load() {
 }
 
 void WarGrey::STEM::Bracer::switch_mode(BracerMode mode, int repeat, MatterAnchor anchor) {
-    float cwidth, cheight;
-
     if (this->mode != mode) {
-        this->mode = mode;
-        this->moor(anchor);
-    }
+        float cwidth, cheight;
 
-    this->feed_canvas_size(mode, &cwidth, &cheight);
-    this->set_virtual_canvas(cwidth, cheight);
+        this->mode = mode;
+
+        this->moor(anchor);
+        this->feed_canvas_size(mode, &cwidth, &cheight);
+        this->set_virtual_canvas(cwidth, cheight);
+        this->clear_moor();
+    }
     
+    // don't move this into the IF-block above
     switch (this->mode) {
     case BracerMode::Walk: this->on_walk_mode(repeat); break;
     case BracerMode::Run: this->on_run_mode(repeat); break;
     case BracerMode::Win: this->on_win_mode(repeat); break;
     }
-    
-    this->clear_moor();
 }
 
 void WarGrey::STEM::Bracer::retrigger_heading_change_event() {
@@ -61,6 +61,7 @@ void WarGrey::STEM::Bracer::feed_canvas_size(BracerMode mode, float* width, floa
     }
 }
 
+/*************************************************************************************************/
 void WarGrey::STEM::Estelle::feed_canvas_size(BracerMode mode, float* width, float* height) {
     if (mode == BracerMode::Win) {
         SET_VALUES(width, 96.0F, height, 96.0F);
@@ -85,10 +86,6 @@ void WarGrey::STEM::Zin::feed_canvas_size(BracerMode mode, float* width, float* 
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Bracer::on_heading_changed(double theta_rad, double vx, double vy, double prev_vr) {
-    this->dispatch_heading_event(theta_rad, vx, vy, prev_vr);
-}
-
 void WarGrey::STEM::Bracer::on_eward(double theta_rad, double vx, double vy) {
     switch (this->mode) {
     case BracerMode::Run: this->play("run_e_"); break;
