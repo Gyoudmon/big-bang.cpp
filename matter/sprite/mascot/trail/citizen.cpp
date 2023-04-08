@@ -26,15 +26,15 @@ static std::vector<std::string> list_citizen_names(const char* subdir) {
 
 /*************************************************************************************************/
 std::vector<std::string> WarGrey::STEM::Citizen::list_special_names() {
-    return list_citizen_names(TRIAL_SPECIALS_PATH);
+    return list_citizen_names(TRAIL_SPECIALS_PATH);
 }
 
 std::vector<std::string> WarGrey::STEM::TrailKid::list_names() {
-    return list_citizen_names(TRIAL_KIDS_PATH);
+    return list_citizen_names(TRAIL_KIDS_PATH);
 }
 
 std::vector<std::string> WarGrey::STEM::TrailStudent::list_names() {
-    return list_citizen_names(TRIAL_STUDENTS_PATH);
+    return list_citizen_names(TRAIL_STUDENTS_PATH);
 }
 
 TrailKid* WarGrey::STEM::TrailKid::randomly_create() {
@@ -64,11 +64,11 @@ WarGrey::STEM::Citizen::Citizen(const std::string& fullpath) : Sprite(fullpath) 
     this->set_virtual_canvas(36.0F, 72.0F);
 }
 
-WarGrey::STEM::TrailKid::TrailKid(const char* name) : Citizen(digimon_mascot_path(name, "", TRIAL_KIDS_PATH)) {
+WarGrey::STEM::TrailKid::TrailKid(const char* name) : Citizen(digimon_mascot_path(name, "", TRAIL_KIDS_PATH)) {
     this->set_virtual_canvas(32.0F, 56.0F);
 }
 
-WarGrey::STEM::TrailStudent::TrailStudent(const char* name) : Citizen(digimon_mascot_path(name, "", TRIAL_STUDENTS_PATH)) {
+WarGrey::STEM::TrailStudent::TrailStudent(const char* name) : Citizen(digimon_mascot_path(name, "", TRAIL_STUDENTS_PATH)) {
     this->set_virtual_canvas(32.0F, 68.0F);
 }
 

@@ -10,15 +10,15 @@
 /* Protagonists in the RPG 空の軌跡 */
 
 namespace WarGrey::STEM {
-    #define TRIAL_KIDS_PATH "trail/Kids"
-    #define TRIAL_STUDENTS_PATH "trail/Students"
-    #define TRIAL_SPECIALS_PATH "trail/Specials"
+    #define TRAIL_KIDS_PATH "trail/Kids"
+    #define TRAIL_STUDENTS_PATH "trail/Students"
+    #define TRAIL_SPECIALS_PATH "trail/Specials"
 
     class Citizen : public WarGrey::STEM::Sprite, protected WarGrey::STEM::I8WayMotion {
     public:
         static std::vector<std::string> list_special_names();
         static Citizen* create_special(const std::string& name) { return Citizen::create_special(name.c_str()); }
-        static Citizen* create_special(const char* name) { return new Citizen(digimon_mascot_path(name, "", TRIAL_SPECIALS_PATH)); }
+        static Citizen* create_special(const char* name) { return new Citizen(digimon_mascot_path(name, "", TRAIL_SPECIALS_PATH)); }
 
     public:
         Citizen(const std::string& fullpath);
