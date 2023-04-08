@@ -6,7 +6,7 @@ using namespace WarGrey::STEM;
 
 static const double pi_125 = q_pi * 0.5;
 
-static const double theta_threholds [] = {
+static const double theta_thresholds [] = {
     pi_125,
     pi_125 + q_pi, pi_125 + h_pi, pi_125 + q_pi * 3.0, pi_125 + pi,
     pi_125 + q_pi * 5.0, pi_125 + q_pi * 6.0, pi_125 + q_pi * 7.0
@@ -35,21 +35,21 @@ void WarGrey::STEM::I8WayMotion::dispatch_heading_event(double theta_rad, double
         theta = pi * 2.0 + theta;
     }
 
-    if (theta <= theta_threholds[0]) {
+    if (theta <= theta_thresholds[0]) {
         this->on_eward(theta_rad, vx, vy);
-    } else if (theta <= theta_threholds[1]) {
+    } else if (theta <= theta_thresholds[1]) {
         this->on_esward(theta_rad, vx, vy);
-    } else if (theta <= theta_threholds[2]) {
+    } else if (theta <= theta_thresholds[2]) {
         this->on_sward(theta_rad, vx, vy);
-    } else if (theta <= theta_threholds[3]) {
+    } else if (theta <= theta_thresholds[3]) {
         this->on_wsward(theta_rad, vx, vy);
-    } else if (theta <= theta_threholds[4]) {
+    } else if (theta <= theta_thresholds[4]) {
         this->on_wward(theta_rad, vx, vy);
-    } else if (theta <= theta_threholds[5]) {
+    } else if (theta <= theta_thresholds[5]) {
         this->on_wnward(theta_rad, vx, vy);
-    } else if (theta <= theta_threholds[6]) {
+    } else if (theta <= theta_thresholds[6]) {
         this->on_nward(theta_rad, vx, vy);
-    } else if (theta <= theta_threholds[7]) {
+    } else if (theta <= theta_thresholds[7]) {
         this->on_enward(theta_rad, vx, vy);
     } else {
         this->on_eward(theta_rad, vx, vy);
