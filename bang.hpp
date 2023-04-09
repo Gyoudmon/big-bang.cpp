@@ -1,7 +1,6 @@
 #pragma once
 
 #include "game.hpp"
-#include "physics/random.hpp"
 
 namespace WarGrey::STEM {
     /* Constants */
