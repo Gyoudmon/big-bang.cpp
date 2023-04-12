@@ -73,8 +73,7 @@ WarGrey::STEM::TrailStudent::TrailStudent(const char* name) : Citizen(digimon_ma
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Citizen::construct(SDL_Renderer* renderer) {
-    Sprite::construct(renderer);
+void WarGrey::STEM::Citizen::on_costumes_load() {
     this->play("walk_s");
 }
 

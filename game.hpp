@@ -32,6 +32,7 @@
 #include "matter/sprite/sheet.hpp"
 
 #include "matter/sprite/mascot/atlas/mario.hpp"
+#include "matter/sprite/mascot/atlas/planetcute.hpp"
 #include "matter/sprite/mascot/agent/linkmon.hpp"
 #include "matter/sprite/mascot/tuxmon.hpp"
 #include "matter/sprite/mascot/coinlet.hpp"
@@ -51,3 +52,6 @@
 #include "datum/flonum.hpp"
 #include "datum/string.hpp"
 #include "virtualization/filesystem/imgdb.hpp"
+
+/*************************************************************************************************/
+#define isinstance(object, Type) (dynamic_cast<Type*>(object) != nullptr)

@@ -22,6 +22,7 @@ namespace WarGrey::STEM {
         protected:
             WarGrey::STEM::AgentSpriteSheet* agent;
             WarGrey::STEM::Labellet* title;
+            WarGrey::STEM::Labellet* tooltip;
 
         private:
             uint32_t title_color;

@@ -3,7 +3,7 @@
 #include "citizen.hpp"
 
 namespace WarGrey::STEM {
-    enum class BracerMode { Walk, Run, Win };
+    enum class BracerMode { Walk, Run, Win, Lose };
 
     class Bracer : public WarGrey::STEM::Citizen {
     public:
@@ -30,9 +30,13 @@ namespace WarGrey::STEM {
         virtual void on_walk_mode(int repeat);
         virtual void on_run_mode(int repeat);
         virtual void on_win_mode(int repeat);
+        virtual void on_lose_mode(int repeat);
 
     protected:
         void retrigger_heading_change_event();
+
+    private:
+        void do_mode_switching(BracerMode mode, MatterAnchor anchor);
 
     private:
         BracerMode mode;
