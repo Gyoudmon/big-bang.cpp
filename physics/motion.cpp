@@ -265,7 +265,7 @@ void WarGrey::STEM::IMovable::motion_stop(bool horizon, bool vertical) {
 
     if (horizon && vertical) {
         this->ar = flnan;
-        this->vr = flnan;
+        // this->vr = flnan; // leaving it for heading
         this->on_motion_stopped();
     } else {
         this->on_acceleration_changed();
