@@ -20,9 +20,12 @@ namespace WarGrey::STEM {
             void load(float width, float height) override;
 
         protected:
-            WarGrey::STEM::AgentSpriteSheet* agent;
-            WarGrey::STEM::Labellet* title;
-            WarGrey::STEM::Labellet* tooltip;
+            float get_titlebar_height();
+
+        protected:
+            WarGrey::STEM::AgentSpriteSheet* agent = nullptr;
+            WarGrey::STEM::Labellet* title = nullptr;
+            WarGrey::STEM::Labellet* tooltip = nullptr;
 
         private:
             uint32_t title_color;

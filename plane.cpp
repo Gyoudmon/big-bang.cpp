@@ -66,8 +66,8 @@ namespace WarGrey::STEM {
         std::deque<GlidingMotion> motion_queues;
 
         // progressbar
-        float current_step = 1.0;
-        float progress_total = 1.0;
+        double current_step = 1.0;
+        double progress_total = 1.0;
 
         // for asynchronously loaded matters
         AsyncInfo* async = nullptr;

@@ -28,3 +28,13 @@ void WarGrey::STEM::TheBigBang::load(float width, float height) {
     this->tooltip = this->insert(make_label_for_tooltip(GameFont::Tooltip()));
     this->set_tooltip_matter(this->tooltip);
 }
+
+float WarGrey::STEM::TheBigBang::get_titlebar_height() {
+    float height = 0.0F;
+
+    if (this->agent != nullptr) {
+        this->agent->feed_extent(0.0F, 0.0F, nullptr, &height);
+    }
+
+    return height;
+}

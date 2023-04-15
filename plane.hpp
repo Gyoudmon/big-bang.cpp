@@ -157,7 +157,7 @@ namespace WarGrey::STEM {
 
     protected:
         virtual void on_motion_start(WarGrey::STEM::IMatter* m, double sec, float x, float y, double xspd, double yspd) {}
-        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd, float percentage) {}
+        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd, double percentage) {}
         virtual void on_motion_complete(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd) {}
         
     protected:
