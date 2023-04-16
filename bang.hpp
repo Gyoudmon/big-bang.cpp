@@ -23,7 +23,7 @@ namespace WarGrey::STEM {
             float get_titlebar_height();
 
         protected:
-            WarGrey::STEM::AgentSpriteSheet* agent = nullptr;
+            WarGrey::STEM::Linkmon* agent = nullptr;
             WarGrey::STEM::Labellet* title = nullptr;
             WarGrey::STEM::Labellet* tooltip = nullptr;
 
