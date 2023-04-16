@@ -91,9 +91,9 @@ const char* WarGrey::STEM::generic_font_family_name_for_ascii(FontFamily family)
     case FontFamily::sans_serif: return "LucidaGrande.ttc"; break;
     case FontFamily::serif: return "Times New Roman.ttf"; break;
     case FontFamily::monospace: return "Courier New Bold.ttf"; break;
-    case FontFamily::math: return "Bodoni 72.ttc"; break;
-    case FontFamily::cursive: return "Courier.ttc"; break;
-    case FontFamily::fantasy: return "Bodoni 72.ttc"; break;
+    case FontFamily::math: return "STIXTwoText-Italic.ttf"; break;
+    case FontFamily::cursive: return "Chancery.ttf"; break;
+    case FontFamily::fantasy: return "Comic Sans MS.ttf"; break;
 
     /* This is the only font that is elegant, although some characters are missing */
     case FontFamily::fangsong: return "PingFang.ttc"; break;
