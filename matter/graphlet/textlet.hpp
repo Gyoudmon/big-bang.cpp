@@ -26,8 +26,13 @@ namespace WarGrey::STEM {
     public:
         void set_font(shared_font_t font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         void set_text_color(uint32_t color_hex = SILVER, double alpha = 1.0);
+        uint32_t get_text_color(double* alpha = nullptr);
         void set_background_color(uint32_t bg_hex, double alpha = 1.0);
+        uint32_t get_background_color() { return this->bg_color; }
+        double get_background_alpha() { return this->bg_alpha; }
         void set_border_color(uint32_t border_hex, double alpha = 1.0);
+        uint32_t get_border_color() { return this->bg_color; }
+        double get_border_alpha() { return this->bg_alpha; }
 
     public:
         void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;

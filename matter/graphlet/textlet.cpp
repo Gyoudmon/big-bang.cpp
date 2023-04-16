@@ -35,6 +35,10 @@ void WarGrey::STEM::ITextlet::construct(SDL_Renderer* renderer) {
     this->update_texture();
 }
 
+uint32_t WarGrey::STEM::ITextlet::get_text_color(double* alpha) {
+    return Hexadecimal_From_Color(&this->text_color, alpha);
+}
+
 void WarGrey::STEM::ITextlet::set_text_color(uint32_t color_hex, double alpha) {
     double self_alpha = 0.0;
     uint32_t hex = Hexadecimal_From_Color(&this->text_color, &self_alpha);
