@@ -14,6 +14,8 @@ WarGrey::STEM::IMovable::IMovable() {
 
     this->tvx = infinity;
     this->tvy = infinity;
+    this->ar = flnan;
+    this->vr = flnan;
 }
 
 void WarGrey::STEM::IMovable::set_acceleration(double acc, double dir, bool is_radian) {

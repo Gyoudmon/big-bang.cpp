@@ -11,6 +11,9 @@ using namespace WarGrey::STEM;
 namespace {
     struct LinkedPlaneInfo : public IPlaneInfo {
         LinkedPlaneInfo(IScreen* master) : IPlaneInfo(master) {};
+
+        bool loaded = false;
+
         IPlane* next;
         IPlane* prev;
     };
@@ -25,17 +28,23 @@ static inline LinkedPlaneInfo* bind_plane_owership(IScreen* master, IPlane* plan
     return info;
 }
 
-static inline void construct_plane(IPlane* plane, float flwidth, float flheight) {
+static inline void reflow_plane(IPlane* plane, float width, float height) {
+    plane->reflow(width, height);
+}
+
+static inline void construct_plane(IPlane* plane, float flwidth, float flheight, bool need_reflow) {
     plane->begin_update_sequence();
 
     plane->construct(flwidth, flheight);
     plane->load(flwidth, flheight);
 
-    plane->end_update_sequence();
-}
+    PLANE_INFO(plane)->loaded = true;
 
-static inline void reflow_plane(IPlane* plane, float width, float height) {
-    plane->reflow(width, height);
+    if (need_reflow) {
+        reflow_plane(plane, flwidth, flheight);
+    }
+
+    plane->end_update_sequence();
 }
 
 static inline void draw_plane(SDL_Renderer* renderer, IPlane* plane, float x, float y, float width, float height) {
@@ -113,18 +122,8 @@ bool WarGrey::STEM::Cosmos::can_exit() {
 
 /*************************************************************************************************/
 void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
-    if (this->head_plane != nullptr) {
-        IPlane* child = this->head_plane;
-        float flwidth = float(width);
-        float flheight = float(height);
-
-        do {
-            LinkedPlaneInfo* info = PLANE_INFO(child);
-
-            construct_plane(child, flwidth, flheight);
-            child = info->next;
-        } while (child != this->head_plane);
-
+    if (this->recent_plane != nullptr) {
+        construct_plane(this->recent_plane, float(width), float(height), false);
         this->set_window_title("%s", this->recent_plane->name());
     }
 }
@@ -137,7 +136,10 @@ void WarGrey::STEM::Cosmos::reflow(float width, float height) {
             do {
                 LinkedPlaneInfo* info = PLANE_INFO(child);
 
-                reflow_plane(child, width, height);
+                if (info->loaded) {
+                    reflow_plane(child, width, height);
+                }
+
                 child = info->next;
             } while (child != this->head_plane);
         }
@@ -312,6 +314,13 @@ void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
 				this->recent_plane = PLANE_INFO(this->recent_plane)->prev;
 			}
 		}
+
+        if (!PLANE_INFO(this->recent_plane)->loaded) {
+            float flwidth, flheight;
+
+            this->feed_client_extent(&flwidth, &flheight);
+            construct_plane(this->recent_plane, flwidth, flheight, true);
+        }
 
         this->notify_transfer(this->from_plane, this->recent_plane);
         this->set_window_title("%s", this->recent_plane->name());
