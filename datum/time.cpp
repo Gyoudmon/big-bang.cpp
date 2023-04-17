@@ -47,6 +47,19 @@ void WarGrey::STEM::sleep_us(long long us) {
 }
 
 /*************************************************************************************************/
+std::string WarGrey::STEM::make_now_timestamp_utc(bool locale, bool needs_ms) {
+    long long ms = current_milliseconds();
+    long long s = ms / 1000;
+    std::string ts = make_timestamp_utc(s, locale);
+
+    if (needs_ms) {
+        ts.append(".", 1);
+        ts.append(std::to_string(ms % 1000));
+    }
+
+    return ts;
+}
+
 std::string WarGrey::STEM::make_timestamp_utc(long long utc_s, bool locale) {
     char timestamp[32];
 

@@ -169,7 +169,10 @@ namespace WarGrey::STEM {
 
     protected:
         virtual void on_matter_ready(IMatter* m) = 0;
-        virtual void on_save() {}
+
+    protected:
+        virtual const char* usrdata_extension() { return nullptr; }
+        virtual void on_save(const std::string& usrdata_path, std::ofstream& dev_datout) {}
 
     protected:
         virtual void draw_visible_selection(SDL_Renderer* renderer, float X, float Y, float width, float height) = 0;

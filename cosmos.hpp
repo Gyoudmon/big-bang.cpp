@@ -40,12 +40,13 @@ namespace WarGrey::STEM {
         void on_text(const char* text, size_t size, bool entire) override;
         void on_editing_text(const char* text, int pos, int span) override;
 
-        void on_save() override;
+        void on_save(const std::string& full_path, std::ofstream& dev_stdout) override;
 
     protected:
         void on_big_bang(int width, int height) override;
         void on_game_start() override;
         void on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) override;
+        const char* usrdata_extension() override;
 
     protected:
         WarGrey::STEM::IPlane* push_plane(WarGrey::STEM::IPlane* plane);

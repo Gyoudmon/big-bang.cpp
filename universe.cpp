@@ -1,4 +1,5 @@
 #include "universe.hpp"
+#include "misc.hpp"
 
 #include "graphics/geometry.hpp"
 #include "graphics/colorspace.hpp"
@@ -313,7 +314,7 @@ void WarGrey::STEM::IUniverse::on_keyboard_event(SDL_KeyboardEvent &keyboard, bo
 
             if (key.mod & ctrl_mod) {
                 switch (key.sym) {
-                    case SDLK_s: this->on_save(); break;
+                    case SDLK_s: this->save_file(is_shift_pressed()); break;
                     case SDLK_p: this->take_snapshot(); break;
                     default: this->on_char(key.sym, key.mod, keyboard.repeat, pressed);
                 }
@@ -629,13 +630,11 @@ SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
 
 void WarGrey::STEM::IUniverse::take_snapshot() {
     const char* basename = SDL_GetWindowTitle(this->window);
-    long long ms = current_milliseconds();
-    long long s = ms / 1000;
     path snapshot_png = (this->snapshot_rootdir.empty() ? current_path() : path(this->snapshot_rootdir))
-        / path(game_create_string("%s-%s.%lld.png", basename, make_timestamp_utc(s, true).c_str(), ms % 1000));
+        / path(game_create_string("%s-%s.png", basename, make_now_timestamp_utc(true).c_str()));
 
     if (this->save_snapshot(snapshot_png.string().c_str())) { // stupid windows as it requires `string()`
-        this->log_message(this->_fgc, "A snapshot has been saved as '%s'.", snapshot_png.c_str());
+        this->log_message(this->_fgc, "A snapshot has been saved as '%s'.", snapshot_png.string().c_str());
     } else {
         this->log_message(0xFF0000, "failed to save snapshot: %s", SDL_GetError());
     }
@@ -647,6 +646,42 @@ void WarGrey::STEM::IUniverse::set_snapshot_folder(const char* dir) {
 
 void WarGrey::STEM::IUniverse::set_snapshot_folder(const std::string& dir) {
     this->snapshot_rootdir = path(dir).make_preferred().string();
+}
+
+void WarGrey::STEM::IUniverse::save_file(bool is_save_as) {
+    const char* ext = this->usrdata_extension();
+
+    if (ext != nullptr) {
+        path data_path = this->usrdata_rootdir.empty() ? current_path() : path(this->usrdata_rootdir);
+        const char* basename = SDL_GetWindowTitle(this->window);
+    
+        if (!is_save_as) {
+            data_path /= path(game_create_string("%s%s", basename, ext));
+        } else {
+            data_path /= path(game_create_string("%s-%s%s", basename, make_now_timestamp_utc(true).c_str(), ext));
+        }
+
+        try {
+            std::ofstream dev_datout;
+
+            dev_datout.exceptions(std::ofstream::badbit | std::ofstream::failbit);
+            dev_datout.open(data_path.string(), std::ofstream::out);
+            this->on_save(data_path.string(), dev_datout);
+            dev_datout.close();
+
+            this->log_message(this->_fgc, "The user data have been saved as '%s'.", data_path.string().c_str());
+        } catch (const std::ofstream::failure &e) {
+            this->log_message(0xFF0000, "failed to save user data: %s", e.what());
+        }
+    }
+}
+
+void WarGrey::STEM::IUniverse::set_usrdata_folder(const char* dir) {
+    this->set_usrdata_folder(std::string(dir));
+}
+
+void WarGrey::STEM::IUniverse::set_usrdata_folder(const std::string& dir) {
+    this->usrdata_rootdir = path(dir).make_preferred().string();
 }
 
 /*************************************************************************************************/

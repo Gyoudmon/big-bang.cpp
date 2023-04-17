@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 
 #include <cstdint>
+#include <fstream>
 
 #include "graphics/font.hpp"
 
@@ -39,6 +40,8 @@ namespace WarGrey::STEM {
     public: // 常规操作
         void set_snapshot_folder(const char* path);
         void set_snapshot_folder(const std::string& path);
+        void set_usrdata_folder(const char* path);
+        void set_usrdata_folder(const std::string& path);
         SDL_Surface* snapshot() override;
         SDL_Renderer* master_renderer() override;
         
@@ -79,10 +82,11 @@ namespace WarGrey::STEM {
         virtual void on_text(const char* text, size_t size, bool entire) {}                  // 处理文本输入事件
         virtual void on_editing_text(const char* text, int pos, int span) {}                 // 处理文本输入事件
         
-        virtual void on_save() {}                                                            // 处理保存事件
+        virtual void on_save(const std::string& full_path, std::ofstream& dev_datout) {}     // 处理保存事件
 
     protected:
         virtual void draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height);
+        virtual const char* usrdata_extension() { return nullptr; }
 
     protected:
         /* 大爆炸之前最后的初始化宇宙机会，默认什么都不做 */
@@ -109,8 +113,9 @@ namespace WarGrey::STEM {
         virtual void on_user_input(const char* text);
         virtual void on_editing(const char* text, int pos, int span);
 
-        /* 处理预设事件  */
+        /* 处理数据事件，屏幕截图、保存用户数据  */
         virtual void take_snapshot();
+        virtual void save_file(bool is_save_as);
 
     private:
         void do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height);
@@ -148,6 +153,7 @@ namespace WarGrey::STEM {
 
     private:
         std::string snapshot_rootdir;           // 屏幕截图位置
+        std::string usrdata_rootdir;            // 用户数据保存位置
     };
 
     class Universe : public WarGrey::STEM::IUniverse {

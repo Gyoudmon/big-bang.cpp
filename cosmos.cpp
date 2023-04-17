@@ -242,9 +242,17 @@ void WarGrey::STEM::Cosmos::on_editing_text(const char* text, int pos, int span)
     }
 }
             
-void WarGrey::STEM::Cosmos::on_save() {
+void WarGrey::STEM::Cosmos::on_save(const std::string& full_path, std::ofstream& dev_datout) {
     if (this->recent_plane != nullptr) {
-        this->recent_plane->on_save();
+        this->recent_plane->on_save(full_path, dev_datout);
+    }
+}
+
+const char* WarGrey::STEM::Cosmos::usrdata_extension() {
+    if (this->recent_plane != nullptr) {
+        return this->recent_plane->usrdata_extension();
+    } else {
+        return nullptr;
     }
 }
 
