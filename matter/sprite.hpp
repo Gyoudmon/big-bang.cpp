@@ -24,7 +24,6 @@ namespace WarGrey::STEM {
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr) override;
-        void feed_original_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr) override;
         int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 

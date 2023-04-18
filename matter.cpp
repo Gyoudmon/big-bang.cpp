@@ -43,7 +43,7 @@ void WarGrey::STEM::IMatter::feed_extent(float x, float y, float* w, float* h) {
     SET_VALUES(w, 0.0F, h, 0.0F);
 }
 
-void WarGrey::STEM::IMatter::feed_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
+void WarGrey::STEM::IMatter::feed_original_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
     SET_VALUES(top, 0.0F, bottom, 0.0F);
     SET_VALUES(left, 0.0F, right, 0.0F);
 }

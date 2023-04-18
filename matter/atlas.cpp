@@ -10,6 +10,8 @@
 #include "../graphics/geometry.hpp"
 #include "../graphics/colorspace.hpp"
 
+#include "../physics/mathematics.hpp"
+
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
@@ -48,6 +50,13 @@ void WarGrey::STEM::IAtlas::feed_original_extent(float x, float y, float* width,
     SET_BOX(height, this->map_height);
 }
 
+void WarGrey::STEM::IAtlas::feed_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
+    float t, r, b, l;
+
+    this->feed_original_margin(x, y, &t, &r, &b, &l);
+    margin_scale(t, r, b, l, this->xscale, this->yscale, top, right, bottom, left);
+}
+
 void WarGrey::STEM::IAtlas::feed_map_extent(float* width, float* height) {
     SDL_FRect map_tile_region;
     float map_width = 0.0F;
@@ -69,6 +78,14 @@ size_t WarGrey::STEM::IAtlas::logic_tile_count() {
 
 SDL_RendererFlip WarGrey::STEM::IAtlas::current_flip_status() {
     return game_scales_to_flip(this->xscale, this->yscale);
+}
+
+float WarGrey::STEM::IAtlas::get_horizontal_scale() {
+    return flabs(this->xscale);
+}
+
+float WarGrey::STEM::IAtlas::get_vertical_scale() {
+    return flabs(this->yscale);
 }
 
 void WarGrey::STEM::IAtlas::on_resize(float width, float height, float old_width, float old_height) {
@@ -276,8 +293,14 @@ void WarGrey::STEM::GridAtlas::on_tilemap_load(shared_costume_t atlas) {
 }
 
 void WarGrey::STEM::GridAtlas::feed_map_extent(float* width, float* height) {
-    SET_BOX(width,  float(this->map_col) * (this->map_tile_width  + this->map_tile_xgap) - this->map_tile_xgap);
-    SET_BOX(height, float(this->map_row) * (this->map_tile_height + this->map_tile_ygap) - this->map_tile_ygap);
+    float t, r, b, l, hmargin, vmargin;
+
+    this->feed_original_map_overlay(&t, &r, &b, &l);
+    hmargin = l + r -  this->map_tile_xgap;
+    vmargin = t + b -  this->map_tile_ygap;
+
+    SET_BOX(width,  float(this->map_col) * (this->map_tile_width  - hmargin) + hmargin);
+    SET_BOX(height, float(this->map_row) * (this->map_tile_height - vmargin) + vmargin);
 }
 
 size_t WarGrey::STEM::GridAtlas::atlas_tile_count() {
@@ -306,11 +329,14 @@ void WarGrey::STEM::GridAtlas::feed_atlas_tile_region(SDL_Rect* region, size_t i
 }
 
 void WarGrey::STEM::GridAtlas::feed_map_tile_region(SDL_FRect* region, size_t idx) {
-    size_t r = idx / this->map_col;
-    size_t c = idx % this->map_col;
-
-    region->x = float(c) * (this->map_tile_width + this->map_tile_xgap);
-    region->y = float(r) * (this->map_tile_height + this->map_tile_ygap);
+    size_t row = idx / this->map_col;
+    size_t col = idx % this->map_col;
+    float t, r, b, l;
+    
+    this->feed_original_map_overlay(&t, &r, &b, &l);
+    
+    region->x = float(col) * (this->map_tile_width + this->map_tile_xgap - (l + r));
+    region->y = float(row) * (this->map_tile_height + this->map_tile_ygap - (t + b));
     region->w = this->map_tile_width;
     region->h = this->map_tile_height;
 }
@@ -406,4 +432,15 @@ void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x
     }
 
     this->feed_map_tile_location(row * this->map_col + col, x, y, a, local);
+}
+
+void WarGrey::STEM::GridAtlas::feed_map_overlay(float* top, float* right, float* bottom, float* left) {
+    float t, r, b, l;
+
+    this->feed_original_map_overlay(&t, &r, &b, &l);
+    margin_scale(t, r, b, l, this->xscale, this->yscale, top, right, bottom, left);
+}
+
+void WarGrey::STEM::GridAtlas::feed_original_map_overlay(float* top, float* right, float* bottom, float* left) {
+    this->feed_original_margin(0.0F, 0.0F, top, right, bottom, left);
 }

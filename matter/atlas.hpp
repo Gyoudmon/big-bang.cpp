@@ -16,15 +16,16 @@ namespace WarGrey::STEM {
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
         void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+        void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
-
+        
     public:
         virtual size_t atlas_tile_count() = 0;
         virtual size_t map_tile_count() = 0;
 
     public:
         int preferred_local_fps() override { return 4; }
-
+        
     public:
         void create_logic_grid(int row, int col);
         size_t logic_tile_count();
@@ -33,10 +34,10 @@ namespace WarGrey::STEM {
         void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void set_logic_grid_color(uint32_t color, float a = 1.0F) { this->logic_grid_color = color; this->logic_grid_alpha = a; }
-
+        
     protected:
-        virtual void feed_map_extent(float* width, float* height);
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }
+        virtual void feed_map_extent(float* width, float* height) = 0;
         virtual void on_tilemap_load(WarGrey::STEM::shared_costume_t atlas) = 0;
         virtual void feed_atlas_tile_region(SDL_Rect* tile, size_t idx) = 0;
         virtual void feed_map_tile_region(SDL_FRect* tile, size_t idx) = 0;
@@ -48,6 +49,8 @@ namespace WarGrey::STEM {
         void invalidate_map_size() { this->map_width = -1.0F; }
         void on_map_resize(float map_width, float map_height);
         SDL_RendererFlip current_flip_status();
+        float get_horizontal_scale();
+        float get_vertical_scale();
         
     protected:
         float xscale = 1.0F;
@@ -86,6 +89,10 @@ namespace WarGrey::STEM {
         int map_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
         void feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
+        void feed_map_overlay(float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
+        
+    protected:
+        virtual void feed_original_map_overlay(float* top, float* right, float* bottom, float* left);
 
     protected:
         void create_map_grid(int row, int col, float tile_width = 0.0F, float tile_height = 0.0F, float xgap = 0.0F, float ygap = 0.0F);

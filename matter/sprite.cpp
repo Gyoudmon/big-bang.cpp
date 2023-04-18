@@ -7,6 +7,7 @@
 #include "../graphics/geometry.hpp"
 
 #include "../physics/random.hpp"
+#include "../physics/mathematics.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -51,27 +52,7 @@ void WarGrey::STEM::ISprite::feed_margin(float x, float y, float* top, float* ri
     float t, r, b, l;
 
     this->feed_original_margin(x, y, &t, &r, &b, &l);
-    
-    if (this->xscale >= 0.0F) {
-        SET_BOX(left, l * this->xscale);
-        SET_BOX(right, r * this->xscale);
-    } else {
-        SET_BOX(left, -r * this->xscale);
-        SET_BOX(right, -l * this->xscale);
-    }
-    
-    if (this->yscale >= 0.0F) {
-        SET_BOX(top, t * this->yscale);
-        SET_BOX(bottom, b * this->yscale);
-    } else {
-        SET_BOX(top, -b * this->yscale);
-        SET_BOX(bottom, -t * this->yscale);
-    }
-}
-
-void WarGrey::STEM::ISprite::feed_original_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
-    SET_BOXES(top, right, 0.0F);
-    SET_BOXES(bottom, left, 0.0F);
+    margin_scale(t, r, b, l, this->xscale, this->yscale, top, right, bottom, left);
 }
 
 void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
