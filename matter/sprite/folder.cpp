@@ -95,20 +95,23 @@ void WarGrey::STEM::Sprite::take_off() {
 }
 
 void WarGrey::STEM::Sprite::load_costume(SDL_Renderer* renderer, const std::string& png) {
-    shared_costume_t costume = imgdb_ref(png, renderer);
+    std::string name = file_basename_from_path(png);
+    
+    if (!name.empty()) { // ignore dot files
+        shared_costume_t costume = imgdb_ref(png, renderer);
 
-    if (costume->okay()) {
-        std::string name = file_basename_from_path(png);
-        auto datum = std::pair<std::string, shared_costume_t>(name, costume);
+        if (costume->okay()) {
+            auto datum = std::pair<std::string, shared_costume_t>(name, costume);
         
-        for (auto it = this->costumes.begin(); ; it++) {
-            if (it == this->costumes.end()) {
-                this->costumes.push_back(datum);
-                break;
-            } else {
-                if (name.compare((*it).first) < 0) {
-                    this->costumes.insert(it, datum);
+            for (auto it = this->costumes.begin(); ; it++) {
+                if (it == this->costumes.end()) {
+                    this->costumes.push_back(datum);
                     break;
+                } else {
+                    if (name.compare((*it).first) < 0) {
+                        this->costumes.insert(it, datum);
+                        break;
+                    }
                 }
             }
         }
@@ -116,15 +119,18 @@ void WarGrey::STEM::Sprite::load_costume(SDL_Renderer* renderer, const std::stri
 }
 
 void WarGrey::STEM::Sprite::load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png) {
-    shared_costume_t deco_costume = imgdb_ref(png, renderer);
+    std::string c_name = file_basename_from_path(png);
 
-    if (deco_costume->okay()) {
-        std::string c_name = file_basename_from_path(png);
+    if (!c_name.empty()) {
+        shared_costume_t deco_costume = imgdb_ref(png, renderer);
 
-        if (this->decorates.find(d_name) == this->decorates.end()) {
-            this->decorates[d_name] = { { c_name, deco_costume } };
-        } else {
-            this->decorates[d_name][c_name] = deco_costume;
+        if (deco_costume->okay()) {
+        
+            if (this->decorates.find(d_name) == this->decorates.end()) {
+                this->decorates[d_name] = { { c_name, deco_costume } };
+            } else {
+                this->decorates[d_name][c_name] = deco_costume;
+            }
         }
     }
 }
