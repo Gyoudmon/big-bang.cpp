@@ -86,7 +86,32 @@ void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio, MatterAnchor
     }
 }
 
-void WarGrey::STEM::IMatter::resize(float w, float h, MatterAnchor anchor) {
+void WarGrey::STEM::IMatter::scale_by_size(float size, bool given_width, MatterAnchor anchor) {
+    if (this->can_resize) {
+        float width, height, nwidth, nheight;
+        float x = 0.0F;
+        float y = 0.0F;
+
+        this->feed_location(&x, &y, MatterAnchor::LT);
+        this->feed_extent(x, y, &width, &height);
+
+        if (given_width) {
+            nwidth = size;
+            nheight = height * (size / width);
+        } else {
+            nheight = size;
+            nwidth = width * (size / height);
+        }
+        
+        if ((nwidth != width) || (nheight != height)) {
+            this->moor(anchor);
+            this->on_resize(nwidth, nheight, width, height);
+	        this->notify_updated();
+        }
+    }
+}
+
+void WarGrey::STEM::IMatter::resize(float nwidth, float nheight, MatterAnchor anchor) {
     if (this->can_resize) {
         float width, height;
         float x = 0.0F;
@@ -95,17 +120,17 @@ void WarGrey::STEM::IMatter::resize(float w, float h, MatterAnchor anchor) {
         this->feed_location(&x, &y, MatterAnchor::LT);
         this->feed_extent(x, y, &width, &height);
 
-        if (w == 0.0F) {
-            w = width;
+        if (nwidth == 0.0F) {
+            nwidth = width;
         }
 
-        if (h == 0.0F) {
-            h = height;
+        if (nheight == 0.0F) {
+            nheight = height;
         }
 
-	    if ((width != w) || (height != h)) {
+	    if ((width != nwidth) || (height != nheight)) {
             this->moor(anchor);
-            this->on_resize(w, h, width, height);
+            this->on_resize(nwidth, nheight, width, height);
 	        this->notify_updated();
 	    }
     }

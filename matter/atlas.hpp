@@ -27,13 +27,19 @@ namespace WarGrey::STEM {
         int preferred_local_fps() override { return 4; }
         
     public:
-        void create_logic_grid(int row, int col);
         size_t logic_tile_count();
-        int logic_tile_index(int x, int y, int* r = nullptr,  int* c = nullptr, bool local = true);
+        void create_logic_grid(int row, int col, float top = 0.0F, float right = 0.0F, float bottom = 0.0F, float left = 0.0F);
+        int logic_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
+        void feed_logic_tile_fraction(int idx, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
+        void feed_logic_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
         void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void set_logic_grid_color(uint32_t color, float a = 1.0F) { this->logic_grid_color = color; this->logic_grid_alpha = a; }
+
+    public:
+        void move_to_logic_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_logic_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         
     protected:
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }
@@ -66,6 +72,10 @@ namespace WarGrey::STEM {
     private:
         int logic_row = 0;
         int logic_col = 0;
+        float logic_top = 0.0F;
+        float logic_right = 0.0F;
+        float logic_bottom = 0.0F;
+        float logic_left = 0.0F;
         float logic_tile_width = 0.0F;
         float logic_tile_height = 0.0F;
         uint32_t logic_grid_color = 0U;
@@ -83,14 +93,22 @@ namespace WarGrey::STEM {
     public:
         size_t atlas_tile_count() override;
         size_t map_tile_count() override;
+        float atlas_tile_size_ratio();
+        float map_tile_size_ratio();
 
     public:
-        int map_tile_index(int x, int y, int* r = nullptr,  int* c = nullptr, bool local = true);
+        int map_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int map_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
+        void feed_map_tile_fraction(int idx, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
+        void feed_map_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
         void feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void feed_map_overlay(float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
         
+    public:
+        void move_to_map_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_map_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+
     protected:
         virtual void feed_original_map_overlay(float* top, float* right, float* bottom, float* left);
 

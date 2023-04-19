@@ -1,6 +1,7 @@
 #include "sprite.hpp"
 
 #include "../datum/box.hpp"
+#include "../datum/fixnum.hpp"
 #include "../datum/flonum.hpp"
 #include "../datum/string.hpp"
 
@@ -167,16 +168,10 @@ void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
     long maxsize = long(this->costume_count());
 
     if (maxsize > 0) {
-        int actual_idx = idx;
+        long actual_idx = safe_index(long(idx), maxsize);
         
-        if (actual_idx >= maxsize) {
-            actual_idx %= maxsize;
-        } else if (actual_idx < 0) {
-            actual_idx = maxsize - ((-actual_idx) % maxsize);
-        }
-
         if (actual_idx != this->current_costume_idx) {
-            this->current_costume_idx = actual_idx;
+            this->current_costume_idx = size_t(actual_idx);
             this->notify_updated();
         }
     }

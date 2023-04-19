@@ -66,7 +66,9 @@ namespace WarGrey::STEM {
         void scale_to(float x_ratio, float y_ratio, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
         void resize(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->resize(size, size, anchor); }
         void resize(float width, float height, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
-
+        void resize_by_width(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->scale_by_size(size, true, anchor); }
+        void resize_by_height(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->scale_by_size(size, false, anchor); }
+        
     public:
         bool events_allowed() { return this->deal_with_events; }
         bool low_level_events_allowed() { return (this->events_allowed() && this->deal_with_low_level_events); }
@@ -94,6 +96,9 @@ namespace WarGrey::STEM {
 
     public:
         IMatterInfo* info = nullptr;
+
+    private:
+        void scale_by_size(float size, bool given_width, WarGrey::STEM::MatterAnchor anchor);
 
     protected:
         void enable_events(bool yes = true, bool low_level = false) { this->deal_with_events = yes; this->deal_with_low_level_events = low_level; }

@@ -25,4 +25,15 @@ namespace WarGrey::STEM {
     long long inline fxceiling(long long fx, double precision) { return (long long)(std::ceil(double(fx) * precision)); }
 
     static inline size_t integer_length(unsigned long long n) { size_t s = 0;  while (n) { n >>= 1; s++; } return s; }
+
+    template<typename I> I
+    inline safe_index(I idx, I size) {
+        if (idx >= size) {
+            idx = idx % size;
+        } else if (idx < 0) {
+            idx = size - (-idx % size);            
+        }
+
+        return idx;
+    }
 }
