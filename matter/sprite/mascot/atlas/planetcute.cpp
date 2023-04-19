@@ -7,7 +7,6 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-#define GROUND_PATH digimon_mascot_path("atlas/planetcute", "")
 #define GROUND_ATLAS_PATH digimon_mascot_path("atlas/planetcute", ".png")
 
 static const float planet_cute_tile_top_margin = 32.0F;
