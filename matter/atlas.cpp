@@ -299,7 +299,8 @@ void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row,
 
 void WarGrey::STEM::IAtlas::feed_logic_tile_extent(float* width, float* height) {
     if ((this->logic_col > 0) && (this->logic_row > 0)) {
-        SET_VALUES(width, this->logic_tile_width, height, this->logic_tile_height);
+        SET_BOX(width,  this->logic_tile_width  * flabs(this->xscale));
+        SET_BOX(height, this->logic_tile_height * flabs(this->yscale));
     } else {
         SET_VALUES(width, 0.0F, height, 0.0F);
     }

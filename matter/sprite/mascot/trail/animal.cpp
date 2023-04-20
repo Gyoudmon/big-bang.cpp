@@ -11,15 +11,15 @@ using namespace WarGrey::STEM;
 WarGrey::STEM::Animal::Animal(const std::string& fullpath) : Sprite(fullpath) {}
 
 WarGrey::STEM::Cat::Cat() : Animal(digimon_mascot_path("Cat", "", "trail/Animals")) {
-
+    this->set_virtual_canvas(48.0F, 48.0F);
 }
 
 WarGrey::STEM::Cow::Cow() : Animal(digimon_mascot_path("Cow", "", "trail/Animals")) {
-    this->set_virtual_canvas(64.0F, 64.0F);
+    this->set_virtual_canvas(96.0F, 96.0F);
 }
 
 WarGrey::STEM::Rooster::Rooster() : Animal(digimon_mascot_path("Rooster", "", "trail/Animals")) {
-
+    this->set_virtual_canvas(42.0F, 42.0F);
 }
 
 /*************************************************************************************************/
