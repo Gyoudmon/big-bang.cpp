@@ -58,7 +58,7 @@ namespace WarGrey::STEM {
         virtual void glide_to(double sec, IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
         virtual void glide_to(double sec, IMatter* m, IMatter* tm, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
         virtual void glide_to(double sec, IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx, float fy, float dx, float dy) = 0;
-        virtual void remove(IMatter* m) = 0;
+        virtual void remove(IMatter* m, bool needs_delete) = 0;
         virtual void erase() = 0;
 
     public:
@@ -260,7 +260,7 @@ namespace WarGrey::STEM {
         void glide_to(double sec, IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void glide_to(double sec, IMatter* m, IMatter* tm, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void glide_to(double sec, IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
-        void remove(IMatter* m) override;
+        void remove(IMatter* m, bool needs_delete = true) override;
         void erase() override;
         void size_cache_invalid();
 

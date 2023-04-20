@@ -273,7 +273,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
     }
 }
 
-void WarGrey::STEM::Plane::remove(IMatter* m) {
+void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
@@ -295,7 +295,10 @@ void WarGrey::STEM::Plane::remove(IMatter* m) {
             this->hovering_matter = nullptr;
         }
         
-        delete m; // m's destructor will delete the associated info object
+        if (needs_delete) {
+            delete m; // m's destructor will delete the associated info object
+        }
+        
         this->notify_updated();
         this->size_cache_invalid();
     }

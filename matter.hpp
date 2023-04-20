@@ -31,10 +31,10 @@ namespace WarGrey::STEM {
 
     public:
         void attach_metadata(IMatterMetadata* metadata);
-        IMatterMetadata* metadata() { return this->_metatdata; }
+        IMatterMetadata* metadata() const { return this->_metatdata; }
 
         template<typename MD>
-        MD* unsafe_metadata() { return static_cast<MD*>(this->metadata()); }
+        MD* unsafe_metadata() const { return static_cast<MD*>(this->metadata()); }
 
     public:
         virtual void construct(SDL_Renderer* renderer) {}
