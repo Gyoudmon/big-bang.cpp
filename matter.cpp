@@ -16,6 +16,11 @@ WarGrey::STEM::IMatter::~IMatter() {
         delete this->info;
         this->info = nullptr;
     }
+
+    if (this->_metatdata != nullptr) {
+        delete this->_metatdata;
+        this->_metatdata = nullptr;
+    }
 }
 
 IPlane* WarGrey::STEM::IMatter::master() {
@@ -37,6 +42,14 @@ SDL_Renderer* WarGrey::STEM::IMatter::master_renderer() {
     }
 
     return renderer;
+}
+
+void WarGrey::STEM::IMatter::attach_metadata(IMatterMetadata* metadata) {
+    if (this->_metatdata != nullptr) {
+        delete this->_metatdata;
+    }
+
+    this->_metatdata = metadata;
 }
 
 void WarGrey::STEM::IMatter::feed_extent(float x, float y, float* w, float* h) {

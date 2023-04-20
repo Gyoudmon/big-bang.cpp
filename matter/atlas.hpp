@@ -31,6 +31,7 @@ namespace WarGrey::STEM {
         void create_logic_grid(int row, int col, float top = 0.0F, float right = 0.0F, float bottom = 0.0F, float left = 0.0F);
         int logic_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
+        void feed_logic_tile_extent(float* width = nullptr, float* height = nullptr);
         void feed_logic_tile_fraction(int idx, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
         void feed_logic_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
         void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
@@ -40,6 +41,8 @@ namespace WarGrey::STEM {
     public:
         void move_to_logic_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move_to_logic_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_logic_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_logic_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         
     protected:
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }

@@ -18,6 +18,8 @@ namespace WarGrey::STEM {
         IPlane* master;
     };
 
+    class IMatterMetadata {};
+
     class IMatter : public WarGrey::STEM::IMovable {
     public:
         IMatter() {}
@@ -26,6 +28,13 @@ namespace WarGrey::STEM {
     public:
         WarGrey::STEM::IPlane* master();
         SDL_Renderer* master_renderer();
+
+    public:
+        void attach_metadata(IMatterMetadata* metadata);
+        IMatterMetadata* metadata() { return this->_metatdata; }
+
+        template<typename MD>
+        MD* unsafe_metadata() { return static_cast<MD*>(this->metadata()); }
 
     public:
         virtual void construct(SDL_Renderer* renderer) {}
@@ -117,5 +126,8 @@ namespace WarGrey::STEM {
         WarGrey::STEM::MatterAnchor anchor = WarGrey::STEM::MatterAnchor::LT;
         float anchor_x = 0.0F;
         float anchor_y = 0.0F;
+
+    private:
+        WarGrey::STEM::IMatterMetadata* _metatdata = nullptr;
     };
 }

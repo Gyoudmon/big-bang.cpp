@@ -277,6 +277,34 @@ void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, Mat
     }
 }
 
+void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+    int total = this->logic_col * this->logic_row;
+    
+    if (total > 0) {
+        idx = safe_index(idx, total);
+        this->glide_to_logic_tile(sec, m, idx / this->logic_col, idx / this->logic_row, ta, a, dx, dy);
+    }
+}
+
+void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+    auto master = this->master();
+    
+    if (master != nullptr) {
+        float x, y;
+
+        this->feed_logic_tile_location(row, col, &x, &y, ta, false);
+        master->glide_to(sec, m, x, y, a, dx, dy);
+    }
+}
+
+void WarGrey::STEM::IAtlas::feed_logic_tile_extent(float* width, float* height) {
+    if ((this->logic_col > 0) && (this->logic_row > 0)) {
+        SET_VALUES(width, this->logic_tile_width, height, this->logic_tile_height);
+    } else {
+        SET_VALUES(width, 0.0F, height, 0.0F);
+    }
+}
+
 void WarGrey::STEM::IAtlas::on_map_resize(float map_width, float map_height) {
     if ((this->logic_row > 0) && (this->logic_col > 0)) {
         this->logic_tile_width  = (map_width  - this->logic_left - this->logic_right) / float(this->logic_col);
