@@ -196,8 +196,8 @@ int WarGrey::STEM::IAtlas::logic_tile_index(float x, float y, int* r, int* c, bo
     }
     
     if ((x >= this->logic_left) && (y >= this->logic_top)) {
-        int cl = int(flfloor((x - this->logic_left) / this->logic_tile_width  * flabs(this->xscale)));
-        int rw = int(flfloor((y - this->logic_top) / this->logic_tile_height * flabs(this->yscale)));
+        int cl = int(flfloor((x - this->logic_left) / (this->logic_tile_width  * flabs(this->xscale))));
+        int rw = int(flfloor((y - this->logic_top) / (this->logic_tile_height * flabs(this->yscale))));
     
         if ((rw < this->logic_row) && (cl < this->logic_col)) {
             SET_VALUES(r, rw, c, cl);
@@ -448,6 +448,11 @@ int WarGrey::STEM::GridAtlas::map_tile_index(int x, int y, int* r, int* c, bool 
 }
 
 int WarGrey::STEM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, bool local) {
+    float htile_step = (this->map_tile_width  + this->map_tile_xgap) * flabs(this->xscale);
+    float vtile_step = (this->map_tile_height + this->map_tile_ygap) * flabs(this->yscale);
+    float top, right, bottom, left;
+    int cl ,rw;
+    
     if (!local) {
         auto master = this->master();
 
@@ -460,8 +465,12 @@ int WarGrey::STEM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, b
         }
     }
     
-    int cl = x / fl2fxi((this->map_tile_width  + this->map_tile_xgap) * flabs(this->xscale));
-    int rw = y / fl2fxi((this->map_tile_height + this->map_tile_ygap) * flabs(this->yscale));
+    this->feed_map_overlay(&top, &right, &bottom, &left);
+    htile_step -= (left + right);
+    vtile_step -= (top + bottom);
+
+    cl = (x < left) ? 0 : fxmin(int(flfloor((x - left) / htile_step)), this->map_col - 1);
+    rw = (y < top) ? 0 : fxmin(int(flfloor((y - top) / vtile_step)), this->map_row - 1);
     
     SET_VALUES(r, rw, c, cl);
     
@@ -528,6 +537,23 @@ void WarGrey::STEM::GridAtlas::move_to_map_tile(IMatter* m, int row, int col, Ma
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
     this->move_to_map_tile(m, row * this->map_col + col, ta, a, dx, dy);
+}
+
+void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+    auto master = this->master();
+
+    if (master != nullptr) {
+        float x, y;
+            
+        this->feed_map_tile_location(idx, &x, &y, ta, false);
+        master->glide_to(sec, m, x, y, a, dx, dy);
+    }
+}
+
+void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+    row = safe_index(row, this->map_row);
+    col = safe_index(col, this->map_col);
+    this->glide_to_map_tile(sec, m, row * this->map_col + col, ta, a, dx, dy);
 }
 
 void WarGrey::STEM::GridAtlas::feed_map_overlay(float* top, float* right, float* bottom, float* left) {

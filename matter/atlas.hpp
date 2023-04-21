@@ -111,6 +111,8 @@ namespace WarGrey::STEM {
     public:
         void move_to_map_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move_to_map_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_map_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_map_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
 
     protected:
         virtual void feed_original_map_overlay(float* top, float* right, float* bottom, float* left);

@@ -42,8 +42,6 @@ namespace WarGrey::STEM {
         Cat();
         virtual ~Cat() {}
 
-        const char* name() override { return "猫"; }
-
     public:
         Animal* asexually_reproduce() override { return new Cat(); }
     };
@@ -52,8 +50,6 @@ namespace WarGrey::STEM {
     public:
         Cow();
         virtual ~Cow() {}
-
-        const char* name() override { return "奶牛"; }
 
     public:
         Animal* asexually_reproduce() override { return new Cow(); }
@@ -64,8 +60,6 @@ namespace WarGrey::STEM {
         Rooster();
         virtual ~Rooster() {}
 
-        const char* name() override { return "公鸡"; }
-
     public:
         Animal* asexually_reproduce() override { return new Rooster(); }
     };
@@ -74,8 +68,6 @@ namespace WarGrey::STEM {
     public:
         Pigeon();
         virtual ~Pigeon() {}
-
-        const char* name() override { return "鸽子"; }
 
     public:
         Animal* asexually_reproduce() override { return new Pigeon(); }
