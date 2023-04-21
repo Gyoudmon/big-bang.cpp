@@ -51,4 +51,10 @@ namespace WarGrey::STEM {
         Rooster();
         virtual ~Rooster() {}
     };
+
+    class Pigeon : public WarGrey::STEM::Animal {
+    public:
+        Pigeon();
+        virtual ~Pigeon() {}
+    };
 }
