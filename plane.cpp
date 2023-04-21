@@ -245,15 +245,24 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
         if (this->head_matter == nullptr) {
             this->head_matter = m;
             info->prev = this->head_matter;
-        } else {
+            info->next = this->head_matter;
+        } else if (this->tooltip == nullptr) {
             MatterInfo* head_info = MATTER_INFO(this->head_matter);
             MatterInfo* prev_info = MATTER_INFO(head_info->prev);
             
             info->prev = head_info->prev;
+            info->next = this->head_matter;
             prev_info->next = m;
             head_info->prev = m;
+        } else {
+            MatterInfo* tool_info = MATTER_INFO(this->tooltip);
+            MatterInfo* prev_info = MATTER_INFO(tool_info->prev);
+
+            info->prev = tool_info->prev;
+            info->next = this->tooltip;
+            prev_info->next = m;
+            tool_info->prev = m;
         }
-        info->next = this->head_matter;
 
         this->begin_update_sequence();
         m->construct(master_renderer);
@@ -298,7 +307,7 @@ void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
         if (needs_delete) {
             delete m; // m's destructor will delete the associated info object
         }
-        
+
         this->notify_updated();
         this->size_cache_invalid();
     }

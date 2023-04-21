@@ -17,7 +17,11 @@ WarGrey::STEM::ISpriteSheet::ISpriteSheet(const std::string& pathname) : _pathna
 }
 
 const char* WarGrey::STEM::ISpriteSheet::name() {
-    return file_basename_from_path(this->_pathname.c_str()).c_str();
+    static std::string _name;
+
+    _name = file_basename_from_path(this->_pathname.c_str());
+
+    return _name.c_str();
 }
 
 void WarGrey::STEM::ISpriteSheet::construct(SDL_Renderer* renderer) {

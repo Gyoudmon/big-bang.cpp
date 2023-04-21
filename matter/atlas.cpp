@@ -21,7 +21,11 @@ WarGrey::STEM::IAtlas::IAtlas(const std::string& pathname) : _pathname(pathname)
 }
 
 const char* WarGrey::STEM::IAtlas::name() {
-    return file_basename_from_path(this->_pathname.c_str()).c_str();
+    static std::string _name;
+
+    _name = file_basename_from_path(this->_pathname.c_str());
+
+    return _name.c_str();
 }
 
 void WarGrey::STEM::IAtlas::construct(SDL_Renderer* renderer) {

@@ -71,7 +71,7 @@ std::string WarGrey::STEM::file_name_from_path(const std::string& path) {
 	int size = int(path.size());
 	const char* raw = path.c_str();
 	int last_slash_idx = last_slash_position(raw, size);
-	
+
 	if (last_slash_idx >= 0) { // TODO: how to deal with directories?
 		filename = substring(path, last_slash_idx + 1, size);
 	}

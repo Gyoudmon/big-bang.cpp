@@ -23,7 +23,7 @@ WarGrey::STEM::Rooster::Rooster() : Animal(digimon_mascot_path("Rooster", "", "t
 }
 
 WarGrey::STEM::Pigeon::Pigeon() : Animal(digimon_mascot_path("Pigeon", "", "trail/Animals")) {
-    this->set_virtual_canvas(36.0F, 36.0F);
+    this->set_virtual_canvas(32.0F, 32.0F);
 }
 
 /*************************************************************************************************/

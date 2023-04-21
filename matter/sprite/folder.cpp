@@ -25,7 +25,11 @@ WarGrey::STEM::Sprite::Sprite(const std::string& pathname) : _pathname(pathname)
 }
 
 const char* WarGrey::STEM::Sprite::name() {
-    return file_name_from_path(this->_pathname.c_str()).c_str();
+    static std::string _name;
+
+    _name = file_name_from_path(_pathname);
+    
+    return _name.c_str();
 }
 
 void WarGrey::STEM::Sprite::construct(SDL_Renderer* renderer) {

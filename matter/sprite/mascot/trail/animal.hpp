@@ -18,6 +18,9 @@ namespace WarGrey::STEM {
     public:
         int preferred_local_fps() override { return 15; }
 
+    public:
+        virtual Animal* asexually_reproduce() = 0;
+
     protected:
         void on_heading_changed(double theta_rad, double vx, double vy, double prev_vr) override;
         void on_nward(double theta_rad, double vx, double vy) override;
@@ -38,23 +41,43 @@ namespace WarGrey::STEM {
     public:
         Cat();
         virtual ~Cat() {}
+
+        const char* name() override { return "猫"; }
+
+    public:
+        Animal* asexually_reproduce() override { return new Cat(); }
     };
 
     class Cow : public WarGrey::STEM::Animal {
     public:
         Cow();
         virtual ~Cow() {}
+
+        const char* name() override { return "奶牛"; }
+
+    public:
+        Animal* asexually_reproduce() override { return new Cow(); }
     };
 
     class Rooster : public WarGrey::STEM::Animal {
     public:
         Rooster();
         virtual ~Rooster() {}
+
+        const char* name() override { return "公鸡"; }
+
+    public:
+        Animal* asexually_reproduce() override { return new Rooster(); }
     };
 
     class Pigeon : public WarGrey::STEM::Animal {
     public:
         Pigeon();
         virtual ~Pigeon() {}
+
+        const char* name() override { return "鸽子"; }
+
+    public:
+        Animal* asexually_reproduce() override { return new Pigeon(); }
     };
 }
