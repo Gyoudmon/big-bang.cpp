@@ -264,7 +264,7 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
     fix_imaginary_size(flwidth, flheight, &imaginary_width, &imaginary_height);
 
     if (this->diagram == nullptr) {
-        // doubling the size does make it more smooth, and causes other problems
+        // doubling the size doesn't make it more smooth, and causes other problems
         this->diagram = game_blank_image(renderer, fl2fxi(imaginary_width) + 1, fl2fxi(imaginary_height) + 1);
 
         if (this->diagram != nullptr) {

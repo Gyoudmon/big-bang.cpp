@@ -114,6 +114,9 @@ static SDL_Texture* game_create_texture(SDL_Window* window, SDL_Renderer* render
         SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, r_width, r_height),
         nullptr, "纹理创建失败: ", SDL_GetError);
 
+
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+
     return texture;
 }
 

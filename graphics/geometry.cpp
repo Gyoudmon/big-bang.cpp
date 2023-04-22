@@ -253,6 +253,16 @@ void WarGrey::STEM::game_draw_frame(SDL_Renderer* renderer, int x, int y, int wi
     SDL_RenderDrawRect(renderer, &box);
 }
 
+void WarGrey::STEM::game_clear(SDL_Renderer* renderer, uint32_t rgb, double alpha) {
+    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+    SDL_RenderClear(renderer);
+}
+
+void WarGrey::STEM::game_clear(SDL_Renderer* renderer, double hue, double saturation, double value, double alpha) {
+    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
+    SDL_RenderClear(renderer);
+}
+
 void WarGrey::STEM::game_draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, int xoff, int yoff) {
     int xend = xoff + col * cell_width;
     int yend = yoff + row * cell_height;
@@ -593,6 +603,26 @@ void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, f
 void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, double hue, double saturation, double value, double alpha) {
     HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
     SDL_RenderDrawLineF(renderer, x1, y1, x2, y2);
+}
+
+void WarGrey::STEM::game_draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, uint32_t rgb, double alpha) {
+    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+    SDL_RenderDrawPointsF(renderer, pts, size);
+}
+
+void WarGrey::STEM::game_draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, double hue, double saturation, double value, double alpha) {
+    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
+    SDL_RenderDrawPointsF(renderer, pts, size);
+}
+
+void WarGrey::STEM::game_draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, uint32_t rgb, double alpha) {
+    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+    SDL_RenderDrawLinesF(renderer, pts, size);
+}
+
+void WarGrey::STEM::game_draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, double hue, double saturation, double value, double alpha) {
+    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
+    SDL_RenderDrawLinesF(renderer, pts, size);
 }
 
 void WarGrey::STEM::game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha) {

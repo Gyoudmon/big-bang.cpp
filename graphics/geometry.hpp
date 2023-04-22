@@ -10,6 +10,9 @@ namespace WarGrey::STEM {
     void game_flip_to_signs(SDL_RendererFlip flip, float* hsgn = nullptr, float* vsgn = nullptr);
     void game_flip_to_signs(SDL_RendererFlip flip, double* hsgn = nullptr, double* vsgn = nullptr);
 
+    void game_clear(SDL_Renderer* renderer, uint32_t rgb = 0U, double alpha = 0.0);
+    void game_clear(SDL_Renderer* renderer, double hue, double saturation = 1.0 , double value = 1.0, double alpha = 1.0);
+
     void game_draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height);
     void game_draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, int xoff = 0, int yoff = 0);
     void game_fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, int xoff = 0, int yoff = 0);
@@ -78,6 +81,11 @@ namespace WarGrey::STEM {
     void game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, uint32_t rgb, double alpha = 1.0);
     void game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
     
+    void game_draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, uint32_t rgb, double alpha = 1.0);
+    void game_draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    void game_draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, uint32_t rgb, double alpha = 1.0);
+    void game_draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+
     void game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha = 1.0);
     void game_draw_rect(SDL_Renderer* renderer, SDL_FRect* box, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
     void game_fill_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha = 1.0);
