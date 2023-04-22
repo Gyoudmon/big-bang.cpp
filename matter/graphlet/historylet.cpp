@@ -57,7 +57,7 @@ void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fl
                 SDL_SetRenderTarget(renderer, this->diagram);
 
                 game_clear(renderer, 0U, 0.0);
-                game_draw_lines(renderer, dots.data(), n, this->color, this->alpha);
+                game_draw_lines(renderer, dots.data(), int(n), this->color, this->alpha);
 
                 SDL_SetRenderTarget(renderer, origin);
             }
