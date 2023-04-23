@@ -161,7 +161,8 @@ void WarGrey::STEM::Linelet::on_resize(float w, float h, float width, float heig
 }
 
 void WarGrey::STEM::Linelet::feed_extent(float x, float y, float* width, float* height) {
-    SET_VALUES(width, flabs(this->epx), height, flabs(this->epy));
+    SET_BOX(width, flmax(flabs(this->epx), 1.0F));
+    SET_BOX(height, flmax(flabs(this->epy), 1.0F));
 }
 
 void WarGrey::STEM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
