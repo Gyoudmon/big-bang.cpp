@@ -24,6 +24,7 @@ namespace WarGrey::STEM {
      */
     class IPlane {
     friend class WarGrey::STEM::Cosmos;
+    friend class WarGrey::STEM::Continent;
     public:
         virtual ~IPlane();
         IPlane(const std::string& name);

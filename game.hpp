@@ -27,6 +27,7 @@
 #include "graphics/text.hpp"
 
 #include "matter/atlas.hpp"
+#include "matter/continent.hpp"
 #include "matter/sprite.hpp"
 #include "matter/sprite/folder.hpp"
 #include "matter/sprite/sheet.hpp"
@@ -42,6 +43,7 @@
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/shapelet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
+#include "matter/graphlet/historylet.hpp"
 
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"

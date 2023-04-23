@@ -1,0 +1,44 @@
+#pragma once
+
+#include "../matter.hpp"
+#include "../virtualization/screen.hpp"
+#include "../forward.hpp"
+
+namespace WarGrey::STEM {
+	class Continent : public WarGrey::STEM::IMatter {
+	public:
+		virtual ~Continent() noexcept;
+		
+		Continent(WarGrey::STEM::IPlane* planet, uint32_t background = 0U, double alpha = 0.0);
+		Continent(WarGrey::STEM::IPlane* planet, float width, float height = 0.0F, uint32_t background = 0U, double alpha = 0.0);
+		
+	public:
+		void construct(SDL_Renderer* renderer) override;
+		void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+		int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
+		void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+
+	public:
+		void enable_stretch(bool yes_or_no);
+		void enable_stretch(bool resizable_width, bool resizable_height);
+		void set_stretch_anchor(WarGrey::STEM::MatterAnchor anchor);
+
+    public: // low-level events
+        bool on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) override;
+        bool on_pointer_move(uint32_t state, float local_x, float local_y, float dx, float dy, bool bye) override;
+        bool on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) override;
+
+	protected:
+		WarGrey::STEM::IPlane* plane;
+
+	private:
+		void triggle_resize_event_if_needed();
+
+	private:
+		WarGrey::STEM::IScreen* screen;
+		uint32_t background;
+		double bg_alpha;
+		float width;
+		float height;
+	};
+}

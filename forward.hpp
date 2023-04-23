@@ -5,6 +5,7 @@ namespace WarGrey::STEM {
     class IMatter;
     class ISprite;
     class Cosmos;
+    class Continent;
 
     enum class MatterAnchor { LT, CT, RT, LC, CC, RC, LB, CB, RB };
     enum class BorderEdge { TOP, RIGHT, BOTTOM, LEFT, NONE };
