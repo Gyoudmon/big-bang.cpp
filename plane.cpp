@@ -1420,7 +1420,7 @@ uint32_t WarGrey::STEM::IPlane::get_background(double* alpha) {
 void WarGrey::STEM::IPlane::start_input_text(const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(prompt, fmt);
-        this->start_input_text(prompt);
+        this->info->master->start_input_text(prompt);
     }
 }
 

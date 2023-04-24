@@ -46,7 +46,7 @@ WarGrey::STEM::Continent::Continent(IPlane* plane, uint32_t background, double a
 	: Continent(plane, 0.0F, 0.0F, background, alpha) {}
 
 WarGrey::STEM::Continent::Continent(IPlane* plane, float width, float height, uint32_t background, double alpha)
-	: plane(plane), width(width), height(height), background(background), bg_alpha(alpha) {
+	: plane(plane), background(background), bg_alpha(alpha), width(width), height(height) {
 	if (this->plane == nullptr) {
 		this->plane = new PlaceholderPlane();
 	}
@@ -58,16 +58,19 @@ WarGrey::STEM::Continent::Continent(IPlane* plane, float width, float height, ui
 	// this->enable_events(true, true);
 }
 
-WarGrey::STEM::Continent::~Continent() {
+WarGrey::STEM::Continent::~Continent() noexcept {
 	delete this->plane;
 	delete this->screen;
+}
+
+const char* WarGrey::STEM::Continent::name() {
+	return this->plane->name();
 }
 
 /*************************************************************************************************/
 void WarGrey::STEM::Continent::construct(SDL_Renderer* renderer) {
 	bind_subplane_owership(this->screen, this->plane);
 	construct_subplane(this->plane, this->width, this->height);
-	this->triggle_resize_event_if_needed();
 }
 
 void WarGrey::STEM::Continent::feed_extent(float x, float y, float* width, float* height) {
@@ -105,13 +108,13 @@ void WarGrey::STEM::Continent::draw(SDL_Renderer* renderer, float x, float y, fl
 
 /**************************************************************************************************/
 bool WarGrey::STEM::Continent::on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) {
-	this->plane->on_pointer_pressed(button, local_x, local_y, clicks);
+	return this->plane->on_pointer_pressed(button, local_x, local_y, clicks);
 }
 
 bool WarGrey::STEM::Continent::on_pointer_move(uint32_t state, float local_x, float local_y, float dx, float dy, bool bye) {
-	this->plane->on_pointer_move(state, local_x, local_y, dx, dy);
+	return this->plane->on_pointer_move(state, local_x, local_y, dx, dy);
 }
 
 bool WarGrey::STEM::Continent::on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) {
-	this->plane->on_pointer_released(button, local_x, local_y, clicks);
+	return this->plane->on_pointer_released(button, local_x, local_y, clicks);
 }
