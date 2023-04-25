@@ -243,6 +243,36 @@ double WarGrey::STEM::scan_flonum(const char* src, size_t* pos, size_t end, bool
     return value * sign;
 }
 
+std::string WarGrey::STEM::scan_string(const char* src, size_t* pos, size_t end, char delim, bool skip_trailing_space) {
+    size_t idx = (*pos);
+    size_t size = 0;
+    std::string s;
+
+    while ((*pos) < end) {
+        char c = src[(*pos)];
+
+        if (c == delim) {
+            break;
+        }
+
+        (*pos) += 1;
+
+        if (c != space) {
+            size = (*pos) - idx;
+        }
+    }
+
+    if (size > 0) {
+        s = std::string(src).substr(idx, size);
+    }
+
+    if (skip_trailing_space) {
+        scan_skip_space(src, pos, end);
+    }
+
+    return s;
+}
+
 void WarGrey::STEM::scan_bytes(const char* src, size_t* pos, size_t end, char* bs, size_t bs_start, size_t bs_end, bool terminating) {
     size_t bsize = bs_end - bs_start;
     size_t size = fxmin(end - (*pos), bsize);
@@ -289,6 +319,22 @@ size_t WarGrey::STEM::scan_skip_space(const char* src, size_t* pos, size_t end) 
         char c = src[(*pos)];
 
         if (c != space) {
+            break;
+        }
+
+        (*pos) += 1;
+    }
+
+    return (*pos) - idx;
+}
+
+size_t WarGrey::STEM::scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim) {
+    size_t idx = (*pos);
+
+    while ((*pos) < end) {
+        char c = src[(*pos)];
+
+        if ((c != space) && (c != delim)) {
             break;
         }
 
@@ -567,5 +613,60 @@ bool WarGrey::STEM::string_suffix(const std::string& src, const char* sub) {
 }
 
 bool WarGrey::STEM::string_suffix(const std::string& src, const std::string& sub) {
+    return string_suffix(src.c_str(), sub.c_str(), int(src.size()));
+}
+
+/************************************************************************************************/
+bool WarGrey::STEM::string_ci_prefix(const char* src, const char* sub, int max0) {
+    bool yes = true;
+    size_t max = (max0 >= 0) ? max0 : strlen(src);
+    size_t n = strnlen(sub, max + 1);
+
+    if (max >= n) {
+        for (size_t i = 0; i < n; i ++) {
+            if (!char_ci_eq(src[i], sub[i])) {
+                yes = false;
+                break;
+            }
+        }
+    } else {
+        yes = false;
+    }
+
+    return yes;
+}
+
+bool WarGrey::STEM::string_ci_prefix(const std::string& src, const char* sub) {
+    return string_ci_prefix(src.c_str(), sub, int(src.size()));
+}
+
+bool WarGrey::STEM::string_ci_prefix(const std::string& src, const std::string& sub) {
+    return string_ci_prefix(src.c_str(), sub.c_str(), int(src.size()));
+}
+
+bool WarGrey::STEM::string_ci_suffix(const char* src, const char* sub, int max0) {
+    bool yes = true;
+    size_t max = (max0 >= 0) ? max0 : strlen(src);
+    size_t n = strnlen(sub, max + 1);
+
+    if (max >= n) {
+        for (size_t i = n; i > 0; i --) {
+            if (!char_ci_eq(src[--max], sub[i - 1])) {
+                yes = false;
+                break;
+            }
+        }
+    } else {
+        yes = false;
+    }
+
+    return yes;
+}
+
+bool WarGrey::STEM::string_ci_suffix(const std::string& src, const char* sub) {
+    return string_suffix(src.c_str(), sub, int(src.size()));
+}
+
+bool WarGrey::STEM::string_ci_suffix(const std::string& src, const std::string& sub) {
     return string_suffix(src.c_str(), sub.c_str(), int(src.size()));
 }

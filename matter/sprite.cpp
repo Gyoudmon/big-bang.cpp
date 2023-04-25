@@ -143,7 +143,7 @@ void WarGrey::STEM::ISprite::auto_virtual_canvas(const char* action_name) {
     float cw, ch;
 
     for (size_t idx = 0; idx < this->costume_count(); idx ++) {
-        if ((action_name == nullptr) || string_prefix(this->costume_index_to_name(idx), action_name)) {
+        if ((action_name == nullptr) || string_ci_prefix(this->costume_index_to_name(idx), action_name)) {
             this->feed_costume_extent(idx, &cw, &ch);
 
             if (cw > cwidth) {
@@ -194,7 +194,7 @@ int WarGrey::STEM::ISprite::costume_name_to_index(const char* name) {
     int cidx = -1;
     
     for (size_t idx = 0; idx < this->costume_count(); idx ++) {
-        if (strcmp(this->costume_index_to_name(idx), name) == 0) {
+        if (strcasecmp(this->costume_index_to_name(idx), name) == 0) {
             cidx = int(idx);
             break;
         }
@@ -202,7 +202,7 @@ int WarGrey::STEM::ISprite::costume_name_to_index(const char* name) {
 
     if (cidx < 0) {
         for (int idx = 0; idx < this->costume_count(); idx ++) {
-            if (string_prefix(this->costume_index_to_name(idx), name)) {
+            if (string_ci_prefix(this->costume_index_to_name(idx), name)) {
                 cidx = idx;
                 break;
             }
@@ -326,7 +326,7 @@ void WarGrey::STEM::ISprite::stop(int rest) {
 
 int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
     for (int i = 0; i < this->costume_count(); i++) {
-        if (string_prefix(this->costume_index_to_name(i), action)) {
+        if (string_ci_prefix(this->costume_index_to_name(i), action)) {
             frame_refs.push_back({ i, 0 });
         }
     }

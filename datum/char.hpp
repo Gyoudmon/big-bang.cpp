@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cctype>
+
 namespace WarGrey::STEM {
     static const char linefeed = 0x0A;
     static const char carriage_return = 0x0D;
@@ -24,4 +26,9 @@ namespace WarGrey::STEM {
     static const wchar_t wcomma = (wchar_t)(comma);
     static const wchar_t wminus = (wchar_t)(minus);
     static const wchar_t wdot = (wchar_t)(dot);
+
+    template<typename C>
+    inline bool char_ci_eq(C& src, C& sub) {
+        return (src == sub) || (std::tolower(src) == std::tolower(sub));
+    }
 }

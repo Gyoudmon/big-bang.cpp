@@ -44,10 +44,12 @@ namespace WarGrey::STEM {
     unsigned long long scan_natural(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
     long long scan_integer(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
     double scan_flonum(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
+    std::string scan_string(const char* src, size_t* pos, size_t end, char delimiter = ' ', bool skip_trailing_space = true);
     void scan_bytes(const char* src, size_t* pos, size_t end, char* bs, size_t bs_start, size_t bs_end, bool terminating = true);
     
     size_t scan_skip_token(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
     size_t scan_skip_space(const char* src, size_t* pos, size_t end);
+    size_t scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim = ',');
     size_t scan_skip_newline(const char* src, size_t* pos, size_t end);
     size_t scan_skip_this_line(const char* src, size_t* pos, size_t end);
 
@@ -75,4 +77,11 @@ namespace WarGrey::STEM {
     bool string_suffix(const char* src, const char* sub, int max = -1);
     bool string_suffix(const std::string& src, const char* sub);
     bool string_suffix(const std::string& src, const std::string& sub);
+
+    bool string_ci_prefix(const char* src, const char* sub, int max = -1);
+    bool string_ci_prefix(const std::string& src, const char* sub);
+    bool string_ci_prefix(const std::string& src, const std::string& sub);
+    bool string_ci_suffix(const char* src, const char* sub, int max = -1);
+    bool string_ci_suffix(const std::string& src, const char* sub);
+    bool string_ci_suffix(const std::string& src, const std::string& sub);
 }
