@@ -328,17 +328,15 @@ size_t WarGrey::STEM::scan_skip_space(const char* src, size_t* pos, size_t end) 
     return (*pos) - idx;
 }
 
-size_t WarGrey::STEM::scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim) {
+size_t WarGrey::STEM::scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim, bool skip_trailing_space) {
     size_t idx = (*pos);
 
-    while ((*pos) < end) {
-        char c = src[(*pos)];
-
-        if ((c != space) && (c != delim)) {
-            break;
-        }
-
+    if (src[idx] == delim) {
         (*pos) += 1;
+
+        if (skip_trailing_space) {
+            scan_skip_space(src, pos, end);
+        }
     }
 
     return (*pos) - idx;

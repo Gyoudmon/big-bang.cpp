@@ -20,6 +20,10 @@ namespace WarGrey::STEM {
 		int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
 		void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
+	public:
+		void set_background_color(uint32_t color, double alpha = 1.0);
+		void set_border_color(uint32_t color, double alpha = 1.0);
+
     public: // low-level events
         bool on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) override;
         bool on_pointer_move(uint32_t state, float local_x, float local_y, float dx, float dy, bool bye) override;
@@ -35,6 +39,8 @@ namespace WarGrey::STEM {
 		WarGrey::STEM::IScreen* screen;
 		uint32_t background;
 		double bg_alpha;
+		uint32_t border_color;
+		double bd_alpha;
 		float width;
 		float height;
 	};

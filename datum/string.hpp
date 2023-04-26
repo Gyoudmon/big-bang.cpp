@@ -49,7 +49,7 @@ namespace WarGrey::STEM {
     
     size_t scan_skip_token(const char* src, size_t* pos, size_t end, bool skip_trailing_space = true);
     size_t scan_skip_space(const char* src, size_t* pos, size_t end);
-    size_t scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim = ',');
+    size_t scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim = ',', bool skip_trailing_space = true);
     size_t scan_skip_newline(const char* src, size_t* pos, size_t end);
     size_t scan_skip_this_line(const char* src, size_t* pos, size_t end);
 

@@ -46,7 +46,7 @@ WarGrey::STEM::Continent::Continent(IPlane* plane, uint32_t background, double a
 	: Continent(plane, 0.0F, 0.0F, background, alpha) {}
 
 WarGrey::STEM::Continent::Continent(IPlane* plane, float width, float height, uint32_t background, double alpha)
-	: plane(plane), background(background), bg_alpha(alpha), width(width), height(height) {
+	: plane(plane), background(background), bg_alpha(alpha), bd_alpha(0.0), width(width), height(height) {
 	if (this->plane == nullptr) {
 		this->plane = new PlaceholderPlane();
 	}
@@ -100,10 +100,31 @@ int WarGrey::STEM::Continent::update(uint64_t count, uint32_t interval, uint64_t
 
 void WarGrey::STEM::Continent::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
 	if (this->bg_alpha > 0.0F) {
-        game_fill_rect(renderer, x, y, width, height, this->background, this->bg_alpha);
+        game_fill_rect(renderer, x, y, Width, Height, this->background, this->bg_alpha);
+    }
+
+	if (this->bd_alpha > 0.0F) {
+        game_draw_rect(renderer, x, y, Width, Height, this->border_color, this->bd_alpha);
     }
 
 	this->plane->draw(renderer, x, y, Width, Height);
+}
+
+/**************************************************************************************************/
+void WarGrey::STEM::Continent::set_background_color(uint32_t color, double alpha) {
+	if ((this->background != color) || (this->bg_alpha != alpha)) {
+		this->background = color;
+		this->bg_alpha = alpha;
+		this->notify_updated();
+	} 
+}
+
+void WarGrey::STEM::Continent::set_border_color(uint32_t color, double alpha) {
+	if ((this->border_color != color) || (this->bd_alpha != alpha)) {
+		this->border_color = color;
+		this->bd_alpha = alpha;
+		this->notify_updated();
+	} 
 }
 
 /**************************************************************************************************/
