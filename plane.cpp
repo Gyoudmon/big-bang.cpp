@@ -965,7 +965,7 @@ void WarGrey::STEM::Plane::place_tooltip(WarGrey::STEM::IMatter* target) {
         MatterAnchor::LB, MatterAnchor::LT,
         this->tooltip_dx, this->tooltip_dy);
 
-    this->master()->feed_extent(&width, &height);
+    this->master()->feed_client_extent(&width, &height);
     this->feed_matter_location(this->tooltip, &ttx, &tty, MatterAnchor::LB);
 
     if (tty > height) {

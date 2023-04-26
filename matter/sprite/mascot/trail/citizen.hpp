@@ -16,12 +16,16 @@ namespace WarGrey::STEM {
 
     class Citizen : public WarGrey::STEM::Sprite, protected WarGrey::STEM::I8WayMotion {
     public:
+        static size_t special_name_count();
         static std::vector<std::string> list_special_names();
         static Citizen* create_special(const std::string& name) { return Citizen::create_special(name.c_str()); }
         static Citizen* create_special(const char* name) { return new Citizen(digimon_mascot_path(name, "", TRAIL_SPECIALS_PATH)); }
 
     public:
         Citizen(const std::string& fullpath);
+        Citizen(const std::string& name, const char* rootdir) : Citizen(name.c_str(), rootdir) {}
+        Citizen(const char* name, const char* rootdir);
+        Citizen(size_t seq, const char* rootdir);
         virtual ~Citizen() {}
 
     public:
@@ -48,24 +52,28 @@ namespace WarGrey::STEM {
     // https://kiseki.fandom.com/wiki/Category:Trails_in_the_Sky_FC_NPCs
     class TrailKid : public WarGrey::STEM::Citizen {
     public:
+        static size_t name_count();
         static std::vector<std::string> list_names();
         static TrailKid* randomly_create();
 
     public:
         TrailKid(const std::string& name) : TrailKid(name.c_str()) {}
         TrailKid(const char* name);
+        TrailKid(size_t seq);
         virtual ~TrailKid() {}
     };
 
     // https://kiseki.fandom.com/wiki/Jenis_Royal_Academy
     class TrailStudent : public WarGrey::STEM::Citizen {
     public:
+        static size_t name_count();
         static std::vector<std::string> list_names();
         static TrailStudent* randomly_create();
 
     public:
         TrailStudent(const std::string& name) : TrailStudent(name.c_str()) {}
         TrailStudent(const char* name);
+        TrailStudent(size_t seq);
         virtual ~TrailStudent() {}
     };
 }
