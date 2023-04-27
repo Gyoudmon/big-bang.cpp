@@ -26,7 +26,7 @@ namespace WarGrey::STEM {
 
     template<typename Fl>
     Fl radians_normalize(Fl radians, Fl degrees_start = Fl(0.0)) {
-	    Fl radians_start = quick_degrees_to_radians(degrees_start);
+	    Fl radians_start = degrees_to_radians(degrees_start);
 	    Fl radians_end = radians_start + Fl(d_pi);
 
 	    while (radians < radians_start) radians += Fl(d_pi);
