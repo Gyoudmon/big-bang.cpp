@@ -331,11 +331,13 @@ size_t WarGrey::STEM::scan_skip_space(const char* src, size_t* pos, size_t end) 
 size_t WarGrey::STEM::scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim, bool skip_trailing_space) {
     size_t idx = (*pos);
 
-    if (src[idx] == delim) {
-        (*pos) += 1;
+    if (idx < end) {
+        if (src[idx] == delim) {
+            (*pos) += 1;
 
-        if (skip_trailing_space) {
-            scan_skip_space(src, pos, end);
+            if (skip_trailing_space) {
+                scan_skip_space(src, pos, end);
+            }
         }
     }
 
