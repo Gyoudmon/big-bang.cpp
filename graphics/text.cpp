@@ -123,7 +123,7 @@ void WarGrey::STEM::game_text_size(shared_font_t font, float* width, float* heig
 }
 
 /*************************************************************************************************/
-SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, shared_font_t sfont, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
+SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, shared_font_t& sfont, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
     SDL_Surface* surface = nullptr;
     TTF_Font* font = (disable_font_selection) ? sfont->self() : select_font(sfont, text);
 
@@ -157,13 +157,29 @@ SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, shared_fo
     return surface;
 }
 
-SDL_Texture* WarGrey::STEM::game_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t font, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
+SDL_Texture* WarGrey::STEM::game_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
     SDL_Surface* surface = game_text_surface(text, font, mode, fgc, bgc, wrap);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
     SDL_FreeSurface(surface);
 
     return texture;
+}
+
+SDL_Texture* WarGrey::STEM::game_solid_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, int wrap) {
+    game_text_texture(renderer, text, font, TextRenderMode::Solid, fgc, fgc, wrap);
+}
+
+SDL_Texture* WarGrey::STEM::game_shaded_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
+    game_text_texture(renderer, text, font, TextRenderMode::Shaded, fgc, bgc, wrap);
+}
+
+SDL_Texture* WarGrey::STEM::game_lcd_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
+    game_text_texture(renderer, text, font, TextRenderMode::LCD, fgc, bgc, wrap);
+}
+
+SDL_Texture* WarGrey::STEM::game_blended_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, int wrap) {
+    game_text_texture(renderer, text, font, TextRenderMode::Blender, fgc, fgc, wrap);
 }
 
 /*************************************************************************************************/

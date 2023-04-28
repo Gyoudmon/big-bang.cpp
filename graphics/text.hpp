@@ -15,8 +15,13 @@ namespace WarGrey::STEM {
 
     /*********************************************************************************************/
     std::string game_create_string(const char* fmt, ...);
-    SDL_Surface* game_text_surface(const std::string& text, shared_font_t font, WarGrey::STEM::TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap);
-    SDL_Texture* game_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t font, WarGrey::STEM::TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap);
+    SDL_Surface* game_text_surface(const std::string& text, shared_font_t& font, WarGrey::STEM::TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap = 0);
+    SDL_Texture* game_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, WarGrey::STEM::TextRenderMode mode, SDL_Color& fgc, SDL_Color& bgc, int wrap = 0);
+
+    SDL_Texture* game_solid_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, int wrap = 0);
+    SDL_Texture* game_shaded_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, SDL_Color& bgc, int wrap = 0);
+    SDL_Texture* game_lcd_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, SDL_Color& bgc, int wrap = 0);
+    SDL_Texture* game_blended_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, int wrap = 0);
 
     /*********************************************************************************************/
     void game_text_size(shared_font_t font, int* width, int* height, const char* fmt, ...);
