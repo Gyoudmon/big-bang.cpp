@@ -14,16 +14,16 @@ using namespace WarGrey::STEM;
 using namespace std::filesystem;
 
 /*************************************************************************************************/
-static shared_costume_t empty_costume = std::make_shared<Costume>(nullptr);
-static std::map<std::string, std::unordered_map<SDL_Renderer*, shared_costume_t>> costumes;
+static shared_texture_t empty_costume = std::make_shared<Texture>(nullptr);
+static std::map<std::string, std::unordered_map<SDL_Renderer*, shared_texture_t>> costumes;
 static std::string imgdb_rootdir;
 
 static inline std::string path_normalize(const std::string& str_path) {
     return path(str_path).is_absolute() ? str_path : imgdb_rootdir + str_path;
 }
 
-static inline shared_costume_t imgdb_load(SDL_Renderer* renderer, const std::string& abspath) {
-    return std::make_shared<Costume>(game_load_image(renderer, abspath));
+static inline shared_texture_t imgdb_load(SDL_Renderer* renderer, const std::string& abspath) {
+    return std::make_shared<Texture>(game_load_image(renderer, abspath));
 }
 
 /*************************************************************************************************/
@@ -41,13 +41,13 @@ void WarGrey::STEM::imgdb_teardown() {
     costumes.clear();
 }
 
-std::shared_ptr<Costume> WarGrey::STEM::imgdb_ref(const char* pathname, SDL_Renderer* renderer) {
+shared_texture_t WarGrey::STEM::imgdb_ref(const char* pathname, SDL_Renderer* renderer) {
     return imgdb_ref(std::string(pathname), renderer);
 }
 
-std::shared_ptr<Costume> WarGrey::STEM::imgdb_ref(const std::string& pathname, SDL_Renderer* renderer) {
+shared_texture_t WarGrey::STEM::imgdb_ref(const std::string& pathname, SDL_Renderer* renderer) {
     std::string abspath = path_normalize(pathname);
-    shared_costume_t texture = empty_costume;
+    shared_texture_t texture = empty_costume;
 
     if (string_suffix(abspath, ".png") || string_suffix(abspath, ".svg")) {
         if (costumes.find(abspath) != costumes.end()) {
@@ -95,19 +95,4 @@ std::string WarGrey::STEM::imgdb_absolute_path(const char* pathname) {
 
 std::string WarGrey::STEM::imgdb_absolute_path(const std::string& pathname) {
     return path_normalize(pathname);
-}
-
-/*************************************************************************************************/
-void WarGrey::STEM::Costume::feed_extent(int* width, int* height) {
-    if (this->costume != nullptr) {
-        SDL_QueryTexture(this->costume, nullptr, nullptr, width, height);
-    }
-}
-
-void WarGrey::STEM::Costume::feed_extent(float* width, float* height) {
-    int w, h;
-    
-    this->feed_extent(&w, &h);
-    SET_BOX(width, float(w));
-    SET_BOX(height, float(h));
 }

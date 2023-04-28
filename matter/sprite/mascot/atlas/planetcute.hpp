@@ -23,7 +23,7 @@ namespace WarGrey::STEM {
         GroundBlockType get_tile_type(int r, int c) { return this->tiles[r][c]; }
 
     protected:
-        void on_tilemap_load(WarGrey::STEM::shared_costume_t atlas) override;
+        void on_tilemap_load(WarGrey::STEM::shared_texture_t atlas) override;
         int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) override;
         void feed_original_map_overlay(float* top, float* right, float* bottom, float* left) override;
 

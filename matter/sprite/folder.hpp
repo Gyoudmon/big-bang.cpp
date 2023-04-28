@@ -39,8 +39,8 @@ namespace WarGrey::STEM {
         void load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png);
         
     private:
-        std::vector<std::pair<std::string, shared_costume_t>> costumes;
-        std::unordered_map<std::string, std::unordered_map<std::string, shared_costume_t>> decorates;
+        std::vector<std::pair<std::string, shared_texture_t>> costumes;
+        std::unordered_map<std::string, std::unordered_map<std::string, shared_texture_t>> decorates;
         std::string current_decorate;
 
     private:

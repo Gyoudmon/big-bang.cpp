@@ -66,7 +66,6 @@ namespace WarGrey::STEM {
     };
 
     typedef std::shared_ptr<GameFont> shared_font_t;
-    static shared_font_t invalid_font = std::make_shared<GameFont>(static_cast<TTF_Font*>(nullptr), 0);
 
     /*********************************************************************************************/
     void game_fonts_initialize();

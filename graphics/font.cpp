@@ -156,7 +156,7 @@ shared_font_t WarGrey::STEM::game_create_shared_font(const char* face, int fonts
 
         if (font == nullptr) {
             fprintf(stderr, "无法加载字体 '%s': %s\n", face, TTF_GetError());
-            fontdb[font_key] = invalid_font;
+            fontdb[font_key] = nullptr;
         } else {
             basenames[std::string(TTF_FontFaceFamilyName(font))] = std::string(face);
             fontdb[font_key] = std::make_shared<GameFont>(font, fontsize);

@@ -128,21 +128,6 @@ WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle&
     this->set_style(style);
 }
 
-WarGrey::STEM::Dimensionlet::~Dimensionlet() {
-    this->texture_collapse();
-}
-
-void WarGrey::STEM::Dimensionlet::texture_collapse() {
-    size_t n = sizeof(this->textures) / sizeof(SDL_Texture*);
-
-    for (size_t idx = 0; idx < n; idx ++) {
-        if (this->textures[idx] != nullptr) {
-            SDL_DestroyTexture(this->textures[idx]);
-            this->textures[idx] = nullptr;
-        }
-    }
-}
-
 void WarGrey::STEM::Dimensionlet::feed_extent(float x, float y, float* w, float* h) {
     size_t n = sizeof(this->textures) / sizeof(SDL_Texture*);
     
@@ -154,7 +139,7 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
     
     if ((self->w > 0.0F) && (self->h > 0.0F)) {
         float bottom = y + Height;
-        SDL_Texture* texture = this->textures[idx];
+        shared_texture_t texture = this->textures[idx];
         
         self->x += x;
         self->h = Height;
@@ -168,11 +153,11 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
             game_draw_rect(ds, self, static_cast<uint32_t>(bcolor));
         }
 
-        if (texture != nullptr) {
+        if (texture.use_count() > 0) {
             int width, height;
 
-            SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
-            game_render_texture(ds, texture, self->x + (self->w - width) * xfraction, bottom - height);
+            texture->feed_extent(&width, &height);
+            game_render_texture(ds, texture->self(), self->x + (self->w - width) * xfraction, bottom - height);
         }
 
         self->x -= x;
@@ -214,21 +199,17 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 
 void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
     SDL_Color color;
-
-    this->texture_collapse();
 	
     if (!this->label.empty()) {
         RGB_FillColor(&color, style.label_color);
-        this->textures[label_idx] = game_text_texture(renderer,
-                this->label, style.label_font, TextRenderMode::Blender, color, color, 0);
+        this->textures[label_idx].reset(new Texture(game_blended_text_texture(renderer, this->label, style.label_font, color, 0)));
     }
 
     this->update_number_texture(renderer, this->get_value(), style);
 
     if (!this->unit.empty()) {
         RGB_FillColor(&color, style.unit_color);
-        this->textures[unit_idx] = game_text_texture(renderer,
-                this->unit, style.unit_font, TextRenderMode::Blender, color, color, 0);
+        this->textures[unit_idx].reset(new Texture(game_blended_text_texture(renderer, this->unit, style.unit_font, color, 0)));
     }
 	
     this->update_drawing_box(label_idx, style.minimize_label_width, style.label_font, 0.0F);
@@ -244,22 +225,20 @@ void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, 
     SDL_Color color;
 
     RGB_FillColor(&color, style.number_color);
-	this->textures[datum_idx] = game_text_texture(renderer,
-            flstring(value, style.precision), style.number_font,
-            TextRenderMode::Blender, color, color, 0);
+	this->textures[datum_idx].reset(new Texture(game_blended_text_texture(renderer,
+        flstring(value, style.precision), style.number_font, color, 0)));
 }
 
 void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, shared_font_t font, float leading_space) {
-    SDL_Texture* self = this->textures[idx];
+    shared_texture_t self = this->textures[idx];
     SDL_FRect* sbox = &this->boxes[idx];
     int width, height;
 
     this->feed_subextent(idx, &sbox->x);
     sbox->x += leading_space;
 
-    if (self != nullptr) {
-        SDL_QueryTexture(self, nullptr, nullptr, &width, &height);
-
+    if (self.use_count() > 0) {
+        self->feed_extent(&width, &height);
         sbox->w = flmax(float(width), min_width);
         sbox->h = float(height);
     } else if (min_width > 0.0F) {

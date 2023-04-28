@@ -1,35 +1,16 @@
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "../../graphics/texture.hpp"
 
 #include <string>
-#include <memory>
 
 namespace WarGrey::STEM {
-    class Costume {
-    public:
-        Costume(SDL_Texture* raw) : costume(raw) {}
-        virtual ~Costume() { if (this->okay()) SDL_DestroyTexture(this->costume); }
-
-    public:
-        bool okay() { return this->costume != nullptr; }
-        SDL_Texture* texture() { return this->costume; }
-        void feed_extent(int* width, int* height);
-        void feed_extent(float* width, float* height);
-        
-    private:
-        SDL_Texture* costume = nullptr;
-    };
-
-    typedef std::shared_ptr<Costume> shared_costume_t;
-
-    /*********************************************************************************************/
     void imgdb_setup(const char* rootdir);
     void imgdb_setup(const std::string& rootdir);
     void imgdb_teardown();
 
-    shared_costume_t imgdb_ref(const char* subpath, SDL_Renderer* rendener);
-    shared_costume_t imgdb_ref(const std::string& subpath, SDL_Renderer* rendener);
+    shared_texture_t imgdb_ref(const char* subpath, SDL_Renderer* rendener);
+    shared_texture_t imgdb_ref(const std::string& subpath, SDL_Renderer* rendener);
 
     void imgdb_remove(const char* subpath);
     void imgdb_remove(const std::string& subpath);

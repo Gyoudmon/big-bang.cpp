@@ -25,6 +25,7 @@
 #include "graphics/geometry.hpp"
 #include "graphics/font.hpp"
 #include "graphics/text.hpp"
+#include "graphics/texture.hpp"
 
 #include "matter/atlas.hpp"
 #include "matter/continent.hpp"

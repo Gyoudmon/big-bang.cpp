@@ -64,14 +64,14 @@ void WarGrey::STEM::Sprite::feed_costume_extent(size_t idx, float* width, float*
 }
 
 void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
-    game_render_texture(renderer, this->costumes[idx].second->texture(), src, &argv->dst, argv->flip);
+    game_render_texture(renderer, this->costumes[idx].second->self(), src, &argv->dst, argv->flip);
 
     if (this->current_decorate.size() > 0) {
         std::string c_name = this->costumes[idx].first;
         auto decorate = this->decorates[this->current_decorate];
 
         if (decorate.find(c_name) != decorate.end()) {
-            game_render_texture(renderer, decorate[c_name]->texture(), src, &argv->dst, argv->flip);
+            game_render_texture(renderer, decorate[c_name]->self(), src, &argv->dst, argv->flip);
         }
     }
 }
@@ -102,10 +102,10 @@ void WarGrey::STEM::Sprite::load_costume(SDL_Renderer* renderer, const std::stri
     std::string name = file_basename_from_path(png);
     
     if (!name.empty()) { // ignore dot files
-        shared_costume_t costume = imgdb_ref(png, renderer);
+        shared_texture_t costume = imgdb_ref(png, renderer);
 
         if (costume->okay()) {
-            auto datum = std::pair<std::string, shared_costume_t>(name, costume);
+            auto datum = std::pair<std::string, shared_texture_t>(name, costume);
         
             for (auto it = this->costumes.begin(); ; it++) {
                 if (it == this->costumes.end()) {
@@ -126,7 +126,7 @@ void WarGrey::STEM::Sprite::load_decorate(SDL_Renderer* renderer, const std::str
     std::string c_name = file_basename_from_path(png);
 
     if (!c_name.empty()) {
-        shared_costume_t deco_costume = imgdb_ref(png, renderer);
+        shared_texture_t deco_costume = imgdb_ref(png, renderer);
 
         if (deco_costume->okay()) {
         

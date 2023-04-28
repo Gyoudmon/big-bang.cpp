@@ -49,7 +49,7 @@ void WarGrey::STEM::PlanetCuteAtlas::set_tile_type(int r, int c, GroundBlockType
     }
 }
 
-void WarGrey::STEM::PlanetCuteAtlas::on_tilemap_load(shared_costume_t atlas) {
+void WarGrey::STEM::PlanetCuteAtlas::on_tilemap_load(shared_texture_t atlas) {
     GridAtlas::on_tilemap_load(atlas);
 
     this->tiles = new GroundBlockType*[this->map_row];

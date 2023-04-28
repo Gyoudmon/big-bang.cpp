@@ -25,12 +25,6 @@ WarGrey::STEM::ITextlet::ITextlet() {
     this->set_text_color();
 }
 
-WarGrey::STEM::ITextlet::~ITextlet() {
-    if (this->texture != nullptr) {
-        SDL_DestroyTexture(this->texture);
-    }
-}
-
 void WarGrey::STEM::ITextlet::construct(SDL_Renderer* renderer) {
     this->update_texture();
 }
@@ -69,7 +63,7 @@ void WarGrey::STEM::ITextlet::set_border_color(uint32_t border_hex, double alpha
 void WarGrey::STEM::ITextlet::set_font(shared_font_t font, MatterAnchor anchor) {
     this->moor(anchor);
 
-    this->text_font = (font->okay() ? font : GameFont::Default());
+    this->text_font = (((font.use_count() > 0) && (font->okay())) ? font : GameFont::Default());
     this->set_text(this->raw, anchor);
     this->on_font_changed();
 
@@ -81,8 +75,8 @@ void WarGrey::STEM::ITextlet::set_text(const std::string& content, MatterAnchor 
 
     this->moor(anchor);
 
-    if (!this->text_font->okay()) {
-        this->set_font(invalid_font, anchor);
+    if ((this->text_font.use_count() == 0) || (!this->text_font->okay())) {
+        this->set_font(nullptr, anchor);
     } else {
         this->update_texture();
     }
@@ -107,20 +101,15 @@ void WarGrey::STEM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...
 }
 
 void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) {
-    if (this->texture != nullptr) {
-        int width, height;
-
-        SDL_QueryTexture(this->texture, nullptr, nullptr, &width, &height);
-
-        SET_BOX(w, float(width));
-        SET_BOX(h, float(height));
+    if ((this->texture.use_count() > 0) && (this->texture->okay())) {
+        this->texture->feed_extent(w, h);
     } else {
         IGraphlet::feed_extent(x, y, w, h);
     }
 }
 
 void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
-    if (this->texture != nullptr) {
+    if ((this->texture.use_count() > 0) && this->texture->okay()) {
         if (this->bg_alpha > 0.0F) {
             game_fill_rect(renderer, x, y, Width, Height, this->bg_color, this->bg_alpha);
         }
@@ -129,23 +118,18 @@ void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, flo
             game_draw_rect(renderer, x + 0.5F, y + 0.5F, Width - 1.0F, Height - 1.0F, this->border_color, this->border_alpha);
         }
 
-        game_render_texture(renderer, this->texture, x, y);
+        game_render_texture(renderer, this->texture->self(), x, y);
     }
 }
 
 void WarGrey::STEM::ITextlet::update_texture() {
     SDL_Renderer* renderer = this->master_renderer();
 
-    if (this->texture != nullptr) {
-        SDL_DestroyTexture(this->texture);
-    }
-
     if ((this->raw.empty()) || (renderer == nullptr)) {
-        this->texture = nullptr;
+        this->texture.reset();
     } else {
-        this->texture = game_text_texture(renderer,
-                this->raw, this->text_font, TextRenderMode::Blender,
-                this->text_color, this->text_color, 0);
+        this->texture.reset(new Texture(game_blended_text_texture(renderer,
+            this->raw, this->text_font, this->text_color, 0)));
     }
 }
 

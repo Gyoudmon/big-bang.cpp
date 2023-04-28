@@ -167,19 +167,19 @@ SDL_Texture* WarGrey::STEM::game_text_texture(SDL_Renderer* renderer, const std:
 }
 
 SDL_Texture* WarGrey::STEM::game_solid_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, int wrap) {
-    game_text_texture(renderer, text, font, TextRenderMode::Solid, fgc, fgc, wrap);
+    return game_text_texture(renderer, text, font, TextRenderMode::Solid, fgc, fgc, wrap);
 }
 
 SDL_Texture* WarGrey::STEM::game_shaded_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
-    game_text_texture(renderer, text, font, TextRenderMode::Shaded, fgc, bgc, wrap);
+    return game_text_texture(renderer, text, font, TextRenderMode::Shaded, fgc, bgc, wrap);
 }
 
 SDL_Texture* WarGrey::STEM::game_lcd_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, SDL_Color& bgc, int wrap) {
-    game_text_texture(renderer, text, font, TextRenderMode::LCD, fgc, bgc, wrap);
+    return game_text_texture(renderer, text, font, TextRenderMode::LCD, fgc, bgc, wrap);
 }
 
 SDL_Texture* WarGrey::STEM::game_blended_text_texture(SDL_Renderer* renderer, const std::string& text, shared_font_t& font, SDL_Color& fgc, int wrap) {
-    game_text_texture(renderer, text, font, TextRenderMode::Blender, fgc, fgc, wrap);
+    return game_text_texture(renderer, text, font, TextRenderMode::Blender, fgc, fgc, wrap);
 }
 
 /*************************************************************************************************/

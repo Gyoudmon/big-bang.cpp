@@ -50,7 +50,7 @@ void WarGrey::STEM::ISpriteSheet::draw_costume(SDL_Renderer* renderer, size_t id
         src->y += this->costume_region.y;
     }
 
-    game_render_texture(renderer, this->sprite_sheet->texture(), src, &argv->dst, argv->flip);
+    game_render_texture(renderer, this->sprite_sheet->self(), src, &argv->dst, argv->flip);
 }
 
 /*************************************************************************************************/
@@ -61,7 +61,7 @@ WarGrey::STEM::SpriteGridSheet::SpriteGridSheet(const std::string& pathname, int
     : ISpriteSheet(pathname), row(fxmax(row, 1)), col(fxmax(col, 1))
     , cell_inset(inset), cell_xgap(xgap), cell_ygap(ygap) {}
 
-void WarGrey::STEM::SpriteGridSheet::on_sheet_load(shared_costume_t sprite_sheet) {
+void WarGrey::STEM::SpriteGridSheet::on_sheet_load(shared_texture_t sprite_sheet) {
     int w, h;
 
     sprite_sheet->feed_extent(&w, &h);

@@ -47,7 +47,7 @@ namespace WarGrey::STEM {
     protected:
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }
         virtual void feed_map_extent(float* width, float* height) = 0;
-        virtual void on_tilemap_load(WarGrey::STEM::shared_costume_t atlas) = 0;
+        virtual void on_tilemap_load(WarGrey::STEM::shared_texture_t atlas) = 0;
         virtual void feed_atlas_tile_region(SDL_Rect* tile, size_t idx) = 0;
         virtual void feed_map_tile_region(SDL_FRect* tile, size_t idx) = 0;
 
@@ -66,7 +66,7 @@ namespace WarGrey::STEM {
         float yscale = 1.0F;
 
     private:
-        WarGrey::STEM::shared_costume_t atlas;
+        WarGrey::STEM::shared_texture_t atlas;
 
     private:
         float map_width = -1.0F;
@@ -121,7 +121,7 @@ namespace WarGrey::STEM {
         void create_map_grid(int row, int col, float tile_width = 0.0F, float tile_height = 0.0F, float xgap = 0.0F, float ygap = 0.0F);
         
     protected:
-        void on_tilemap_load(WarGrey::STEM::shared_costume_t atlas) override;
+        void on_tilemap_load(WarGrey::STEM::shared_texture_t atlas) override;
         void feed_map_extent(float* width, float* height) override;
         void feed_atlas_tile_region(SDL_Rect* tile, size_t idx) override;
         void feed_map_tile_region(SDL_FRect* tile, size_t idx) override;

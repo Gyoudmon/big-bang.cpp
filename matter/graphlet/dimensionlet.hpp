@@ -10,6 +10,7 @@
 
 #include "../graphlet.hpp"
 #include "../../graphics/font.hpp"
+#include "../../graphics/texture.hpp"
 #include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
@@ -72,7 +73,7 @@ namespace WarGrey::STEM {
         Dimensionlet(WarGrey::STEM::DimensionStyle& style, const char* unit, const char* label_fmt, ...);
         Dimensionlet(WarGrey::STEM::DimensionState& state, WarGrey::STEM::DimensionStyle& style, const char* unit, const std::string& label = "");
         Dimensionlet(WarGrey::STEM::DimensionState& state, WarGrey::STEM::DimensionStyle& style, const char* unit, const char* label_fmt, ...);
-        virtual ~Dimensionlet();
+        virtual ~Dimensionlet() noexcept {}
 
     public:
         void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
@@ -86,14 +87,13 @@ namespace WarGrey::STEM {
         void on_value_changed(SDL_Renderer* ds, float value) override;
 
     private:
-        void texture_collapse();
         void feed_subextent(int n, float* w = nullptr, float* h = nullptr);
         void update_drawing_box(int idx, float minimize_width, shared_font_t font, float leading_space);
         void update_number_texture(SDL_Renderer* ds, float value, WarGrey::STEM::DimensionStyle& style);
         void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor);
 
     private:
-        SDL_Texture* textures[3] = {};
+        shared_texture_t textures[3] = {};
         SDL_FRect boxes[3] = {}; // `FRect.y` is useless
 
     private:

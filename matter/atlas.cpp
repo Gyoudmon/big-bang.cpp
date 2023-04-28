@@ -104,7 +104,7 @@ void WarGrey::STEM::IAtlas::on_resize(float width, float height, float old_width
 }
 
 void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
-    SDL_Texture* tilemap = this->atlas->texture();
+    SDL_Texture* tilemap = this->atlas->self();
     SDL_RendererFlip flip = this->current_flip_status();
     float sx = flabs(this->xscale);
     float sy = flabs(this->yscale);
@@ -328,7 +328,7 @@ WarGrey::STEM::GridAtlas::GridAtlas(const std::string& pathname, int row, int co
     : IAtlas(pathname), atlas_row(fxmax(row, 1)), atlas_col(fxmax(col, 1))
     , atlas_inset(inset), atlas_tile_xgap(xgap), atlas_tile_ygap(ygap) {}
 
-void WarGrey::STEM::GridAtlas::on_tilemap_load(shared_costume_t atlas) {
+void WarGrey::STEM::GridAtlas::on_tilemap_load(shared_texture_t atlas) {
     float t, r, b, l;
     int w, h;
 

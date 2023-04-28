@@ -7,13 +7,14 @@
 #include "../graphlet.hpp"
 
 #include "../../graphics/font.hpp"
+#include "../../graphics/texture.hpp"
 #include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
     class ITextlet : public virtual WarGrey::STEM::IGraphlet {
     public:
         ITextlet();
-        virtual ~ITextlet();
+        virtual ~ITextlet() noexcept {}
 
         void construct(SDL_Renderer* render) override;
 
@@ -51,7 +52,7 @@ namespace WarGrey::STEM {
     protected:
         SDL_Color text_color;
         shared_font_t text_font = nullptr;
-        SDL_Texture* texture = nullptr;
+        shared_texture_t texture = nullptr;
         uint32_t bg_color;
         double bg_alpha = 0.0;
         uint32_t border_color;
