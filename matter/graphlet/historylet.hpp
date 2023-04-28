@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../graphlet.hpp"
+#include "../../graphics/texture.hpp"
 
 #include <vector>
 
@@ -29,7 +30,7 @@ namespace WarGrey::STEM {
         void invalidate_geometry();
 
     private:
-        SDL_Texture* diagram = nullptr;
+        shared_texture_t diagram = nullptr;
         std::vector<std::pair<float, float>> raw_dots;
         size_t capacity;
         bool needs_refresh_diagram;

@@ -263,14 +263,14 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
 
     fix_imaginary_size(flwidth, flheight, &imaginary_width, &imaginary_height);
 
-    if (this->diagram == nullptr) {
+    if (this->diagram.use_count() == 0) {
         // doubling the size doesn't make it more smooth, and causes other problems
-        this->diagram = game_blank_image(renderer, fl2fxi(imaginary_width) + 1, fl2fxi(imaginary_height) + 1);
+        this->diagram = std::make_shared<Texture>(game_blank_image(renderer, fl2fxi(imaginary_width) + 1, fl2fxi(imaginary_height) + 1));
 
-        if (this->diagram != nullptr) {
+        if (this->diagram->okay()) {
             SDL_Texture* origin = SDL_GetRenderTarget(renderer);
 
-            SDL_SetRenderTarget(renderer, this->diagram);
+            SDL_SetRenderTarget(renderer, this->diagram->self());
 
             // this->draw_color_map(renderer, imaginary_width, imaginary_height);
             this->draw_spectral_locus(renderer, imaginary_width, imaginary_height);
@@ -286,8 +286,8 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
     game_draw_grid(renderer, 10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, flx, fly);
     SDL_RenderDrawLineF(renderer, flx, fly, flx + flwidth, fly + flheight);
 
-    if (this->diagram != nullptr) {
-        game_render_texture(renderer, this->diagram, flx, fly, flwidth, flheight);
+    if (this->diagram->okay()) {
+        game_render_texture(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
     } else {
         this->draw_chromaticity(renderer, imaginary_width, imaginary_height, flx, fly);
     }
@@ -623,10 +623,7 @@ void WarGrey::STEM::Chromalet::invalidate_geometry() {
 }
 
 void WarGrey::STEM::Chromalet::invalidate_diagram() {
-    if (this->diagram != nullptr) {
-        SDL_DestroyTexture(this->diagram);
-        this->diagram = nullptr;
-    }
+    this->diagram.reset();
 }
 
 void WarGrey::STEM::Chromalet::invalidate_locus() {

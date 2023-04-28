@@ -31,11 +31,11 @@ void WarGrey::STEM::Historylet::on_resize(float w, float h, float width, float h
 }
 
 void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
-    if (this->diagram == nullptr) {
-        this->diagram = game_blank_image(renderer, fl2fxi(this->width) + 1, fl2fxi(this->height) + 1);
+    if (this->diagram.use_count() == 0) {
+        this->diagram = std::make_shared<Texture>(game_blank_image(renderer, fl2fxi(this->width) + 1, fl2fxi(this->height) + 1));
     }
 
-    if (this->diagram != nullptr) {
+    if (this->diagram->okay()) {
         if (this->needs_refresh_diagram) {
             SDL_Texture* origin = SDL_GetRenderTarget(renderer);
             size_t n = this->raw_dots.size();
@@ -54,7 +54,7 @@ void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fl
                     dots[idx] = { (X - this->xmin) * xratio, flheight - (Y - this->ymin) * yratio };
                 }
 
-                SDL_SetRenderTarget(renderer, this->diagram);
+                SDL_SetRenderTarget(renderer, this->diagram->self());
 
                 game_clear(renderer, 0U, 0.0);
                 game_draw_lines(renderer, dots.data(), int(n), this->color, this->alpha);
@@ -65,7 +65,7 @@ void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fl
             this->needs_refresh_diagram = false;
         }
 
-        game_render_texture(renderer, this->diagram, flx, fly, flwidth, flheight);
+        game_render_texture(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
     } else {
         fprintf(stderr, "无法绘制历史曲线：%s\n", SDL_GetError());
     }
@@ -73,9 +73,8 @@ void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fl
 
 /*************************************************************************************************/
 void WarGrey::STEM::Historylet::invalidate_geometry() {
-    if (this->diagram != nullptr) {
-        SDL_DestroyTexture(this->diagram);
-        this->diagram = nullptr;
+    if (this->diagram.use_count() > 0) {
+        this->diagram.reset();
         this->clear_geometry();
     }
 }

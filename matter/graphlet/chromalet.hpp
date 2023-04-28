@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../graphlet.hpp"
+#include "../../graphics/texture.hpp"
 #include "../../graphics/colorspace.hpp"
 
 namespace WarGrey::STEM {
@@ -55,7 +56,7 @@ namespace WarGrey::STEM {
         void invalidate_locus();
 
     private:
-        SDL_Texture* diagram = nullptr;
+        shared_texture_t diagram = nullptr;
         float width;
         float height;
 

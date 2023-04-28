@@ -110,13 +110,13 @@ void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float flx, float fly
     int height = fl2fxi(flheight);
     uint8_t r, g, b;
 
-    if (this->geometry == nullptr) {
-        this->geometry = game_blank_image(renderer, width + 1, height + 1);
+    if (this->geometry.use_count() == 0U) {
+        this->geometry = std::make_shared<Texture>(game_blank_image(renderer, width + 1, height + 1));
 
-        if (this->geometry != nullptr) {
+        if (this->geometry->okay()) {
             SDL_Texture* origin = SDL_GetRenderTarget(renderer);
 
-            SDL_SetRenderTarget(renderer, this->geometry);
+            SDL_SetRenderTarget(renderer, this->geometry->self());
 
             if (this->color >= 0) {
                 RGB_From_Hexadecimal(this->color, &r, &g, &b);
@@ -129,22 +129,19 @@ void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float flx, float fly
             }
 
             SDL_SetRenderTarget(renderer, origin);
-            SDL_SetTextureBlendMode(this->geometry, color_mixture_to_blend_mode(this->mixture));
+            SDL_SetTextureBlendMode(this->geometry->self(), color_mixture_to_blend_mode(this->mixture));
         } else {
             fprintf(stderr, "无法绘制几何图形：%s\n", SDL_GetError());
         }
     }
 
-    if (this->geometry != nullptr) {
-        game_render_texture(renderer, this->geometry, flx, fly, flwidth, flheight);
+    if (this->geometry->okay()) {
+        game_render_texture(renderer, this->geometry->self(), flx, fly, flwidth, flheight);
     }
 }
 
 void WarGrey::STEM::IShapelet::invalidate_geometry() {
-    if (this->geometry != nullptr) {
-        SDL_DestroyTexture(this->geometry);
-        this->geometry = nullptr;
-    }
+    this->geometry.reset();
 }
 
 /*************************************************************************************************/

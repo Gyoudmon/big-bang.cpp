@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../graphlet.hpp"
+#include "../../graphics/texture.hpp"
 #include "../../graphics/colorspace.hpp"
 
 namespace WarGrey::STEM {
     class IShapelet : public WarGrey::STEM::IGraphlet {
     public:
         IShapelet(int32_t color = -1, int32_t border_color = -1);
-        virtual ~IShapelet() { this->invalidate_geometry(); }
+        virtual ~IShapelet() noexcept {}
 
     public:
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
@@ -46,7 +47,7 @@ namespace WarGrey::STEM {
         unsigned char alpha = 0xFFU;
 
     private:
-        SDL_Texture* geometry;
+        shared_texture_t geometry = nullptr;
     };
 
     /**********************************************************************************************/
