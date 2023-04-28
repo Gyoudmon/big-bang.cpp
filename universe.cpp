@@ -299,27 +299,32 @@ void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseWheelEvent &mouse) {
 
 void WarGrey::STEM::IUniverse::on_keyboard_event(SDL_KeyboardEvent &keyboard, bool pressed) {
     SDL_Keysym key = keyboard.keysym;
+    int ctrl_mod = KMOD_LCTRL | KMOD_RCTRL;
+
+#if defined(__macosx__)
+    ctrl_mod = ctrl_mod | KMOD_LGUI | KMOD_RGUI;
+#endif
 
     if (this->in_editing) {
         if (!pressed) {
-            switch (key.sym) {
+            if (key.mod & ctrl_mod) {
+                switch (key.sym) {
+                case SDLK_p: this->take_snapshot(); break;
+                }
+            } else {
+                switch (key.sym) {
                 case SDLK_RETURN: this->enter_input_text(); break;
                 case SDLK_BACKSPACE: this->popback_input_text(); break;
+                }
             }
         }
     } else {
         if (!pressed) {
-            int ctrl_mod = KMOD_LCTRL | KMOD_RCTRL;
-
-#if defined(__macosx__)
-            ctrl_mod = ctrl_mod | KMOD_LGUI | KMOD_RGUI;
-#endif
-
             if (key.mod & ctrl_mod) {
                 switch (key.sym) {
-                    case SDLK_s: this->save_file(is_shift_pressed()); break;
-                    case SDLK_p: this->take_snapshot(); break;
-                    default: this->on_char(key.sym, key.mod, keyboard.repeat, pressed);
+                case SDLK_s: this->save_file(is_shift_pressed()); break;
+                case SDLK_p: this->take_snapshot(); break;
+                default: this->on_char(key.sym, key.mod, keyboard.repeat, pressed);
                 }
             } else {
                 this->on_char(key.sym, key.mod, keyboard.repeat, pressed);
