@@ -198,18 +198,16 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 }
 
 void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
-    SDL_Color color;
-	
     if (!this->label.empty()) {
-        RGB_FillColor(&color, style.label_color);
-        this->textures[label_idx].reset(new Texture(game_blended_text_texture(renderer, this->label, style.label_font, color, 0)));
+        this->textures[label_idx].reset(new Texture(game_blended_text_texture(renderer, this->label, style.label_font,
+            static_cast<uint32_t>(style.label_color), 0)));
     }
 
     this->update_number_texture(renderer, this->get_value(), style);
 
     if (!this->unit.empty()) {
-        RGB_FillColor(&color, style.unit_color);
-        this->textures[unit_idx].reset(new Texture(game_blended_text_texture(renderer, this->unit, style.unit_font, color, 0)));
+        this->textures[unit_idx].reset(new Texture(game_blended_text_texture(renderer, this->unit, style.unit_font,
+            static_cast<uint32_t>(style.unit_color), 0)));
     }
 	
     this->update_drawing_box(label_idx, style.minimize_label_width, style.label_font, 0.0F);
@@ -222,11 +220,9 @@ void WarGrey::STEM::Dimensionlet::on_value_changed(SDL_Renderer* ds, float value
 }
 
 void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, float value, DimensionStyle& style) {
-    SDL_Color color;
-
-    RGB_FillColor(&color, style.number_color);
-	this->textures[datum_idx].reset(new Texture(game_blended_text_texture(renderer,
-        flstring(value, style.precision), style.number_font, color, 0)));
+    this->textures[datum_idx].reset(new Texture(game_blended_text_texture(renderer,
+        flstring(value, style.precision), style.number_font,
+        static_cast<uint32_t>(style.number_color), 0)));
 }
 
 void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, shared_font_t font, float leading_space) {

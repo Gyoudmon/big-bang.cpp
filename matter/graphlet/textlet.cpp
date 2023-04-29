@@ -128,8 +128,8 @@ void WarGrey::STEM::ITextlet::update_texture() {
     if ((this->raw.empty()) || (renderer == nullptr)) {
         this->texture.reset();
     } else {
-        this->texture.reset(new Texture(game_blended_text_texture(renderer,
-            this->raw, this->text_font, this->text_color, 0)));
+        this->texture.reset(new Texture(game_text_texture(renderer, this->raw, this->text_font,
+            TextRenderMode::Blender, this->text_color, this->text_color, 0)));
     }
 }
 
