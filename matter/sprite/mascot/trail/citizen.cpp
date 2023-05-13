@@ -39,7 +39,7 @@ static size_t citizen_name_count(const char* subdir) {
     return n;
 }
 
-static std::string citizen_name_ref(const char* subdir, uint8_t idx) {
+static std::string citizen_name_ref(const char* subdir, size_t idx) {
     std::vector<std::string> names = list_citizen_names(subdir);
     
     if (names.empty()) {
