@@ -13,6 +13,11 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
+#ifdef __windows__
+#define strcasecmp _stricmp
+#endif
+
+/*************************************************************************************************/
 void WarGrey::STEM::ISprite::construct(SDL_Renderer* renderer) {
     int idx = this->get_initial_costume_index();
 
