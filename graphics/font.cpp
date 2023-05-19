@@ -74,6 +74,7 @@ void WarGrey::STEM::game_fonts_destroy() {
 }
 
 int WarGrey::STEM::generic_font_size(FontSize size) {
+    // It's okay to work with integer-division
     switch (size) {
         case FontSize::xx_large: return medium_fontsize * 2;
         case FontSize::x_large:  return medium_fontsize * 3 / 2;
@@ -92,7 +93,7 @@ const char* WarGrey::STEM::generic_font_family_name_for_ascii(FontFamily family)
     case FontFamily::serif: return "Times New Roman.ttf"; break;
     case FontFamily::monospace: return "Courier New Bold.ttf"; break;
     case FontFamily::math: return "STIXTwoText-Italic.ttf"; break;
-    case FontFamily::cursive: return "Chancery.ttf"; break;
+    case FontFamily::cursive: return "Apple Chancery.ttf"; break;
     case FontFamily::fantasy: return "Comic Sans MS.ttf"; break;
 
     /* This is the only font that is elegant, although some characters are missing */
