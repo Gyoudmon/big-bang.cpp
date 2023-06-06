@@ -95,7 +95,11 @@ static void game_initialize(uint32_t flags) {
     }
 
     /* Initialize SDL2_Mixer for playing music */ {
+#if defined(__macosx__)
         int mix_request_flags = MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC;
+#else
+        int mix_request_flags = MIX_INIT_MP3 | MIX_INIT_OGG;
+#endif
         int mix_okay_flags = Mix_Init(mix_request_flags);
 
         if ((mix_okay_flags & mix_request_flags) != mix_request_flags) {
