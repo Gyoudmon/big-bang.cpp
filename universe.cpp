@@ -10,6 +10,10 @@
 #include "datum/box.hpp"
 #include "datum/time.hpp"
 
+#include "virtualization/socket.hpp"
+
+#include <SDL2/SDL_mixer.h>
+
 #include <filesystem>
 
 using namespace WarGrey::STEM;
@@ -74,25 +78,34 @@ static unsigned int trigger_timer_event(unsigned int interval, void* datum) {
 static void game_initialize(uint32_t flags) {
     Call_With_Safe_Exit(SDL_Init(flags), "SDL 初始化失败: ", SDL_Quit, SDL_GetError);
     Call_With_Safe_Exit(TTF_Init(), "TTF 初始化失败: ", TTF_Quit, TTF_GetError);
+    Call_With_Safe_Exit(SDLNet_Init(), "SDL Net 初始化失败: ", SDLNet_Quit, SDLNet_GetError);
 
+    /* Initializing SDL2_IMG for loading images */ {
 #if defined(__macosx__)
-    IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+        int img_request_flags = IMG_INIT_JPG | IMG_INIT_PNG;
 #else
-    IMG_Init(IMG_INIT_PNG);
+        int img_request_flags = IMG_INIT_PNG;
 #endif
-    /* manually check errors */ {
-        std::string err = std::string(IMG_GetError());
+        int img_okay_flags = IMG_Init(img_request_flags);
 
-        if (err.size() > 0) {
-            fprintf(stderr, "IMG 初始化失败: %s\n", err.c_str());
+        if ((img_okay_flags & img_request_flags) != img_request_flags) {
+            fprintf(stderr, "IMG 初始化失败: %s\n", IMG_GetError());
             exit(1);
         }
     }
-        
-    // SDL_SetHint("SDL_IME_SHOW_UI", "1");
+
+    /* Initialize SDL2_Mixer for playing music */ {
+        int mix_request_flags = MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC;
+        int mix_okay_flags = Mix_Init(mix_request_flags);
+
+        if ((mix_okay_flags & mix_request_flags) != mix_request_flags) {
+            fprintf(stderr, "Mix 初始化失败: %s\n", Mix_GetError());
+        }
+    }
 
     game_fonts_initialize();
 
+    atexit(Mix_Quit);
     atexit(IMG_Quit);
     atexit(game_fonts_destroy);
 }
