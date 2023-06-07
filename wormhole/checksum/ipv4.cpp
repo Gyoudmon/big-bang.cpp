@@ -5,10 +5,10 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-static unsigned short update_sum(unsigned short sum, const uint8_t* message, size_t start, size_t end) {
+static uint16_t update_sum(uint16_t sum, const uint8_t* message, size_t start, size_t end) {
     size_t count = end - start;
-    unsigned short H = (sum >> 8U);
-    unsigned short L = (sum & 0xFFU);
+    uint16_t H = (sum >> 8U);
+    uint16_t L = (sum & 0xFFU);
 
     if ((count & 0x01) == 1) {
         H += message[--end];
@@ -20,8 +20,8 @@ static unsigned short update_sum(unsigned short sum, const uint8_t* message, siz
     }
 
     while ((H > 0xFF) || (L > 0xFF)) {
-        unsigned short Hcarry = H >> 8U;
-        unsigned short Lcarry = L >> 8U;
+        uint16_t Hcarry = H >> 8U;
+        uint16_t Lcarry = L >> 8U;
 
         H = (H & 0xFF) + Lcarry;
         L = (L & 0xFF) + Hcarry;
@@ -31,16 +31,16 @@ static unsigned short update_sum(unsigned short sum, const uint8_t* message, siz
 }
 
 /*************************************************************************************************/
-unsigned short WarGrey::STEM::checksum_ipv4(const uint8_t* message, size_t start, size_t end) {
+uint16_t WarGrey::STEM::checksum_ipv4(const uint8_t* message, size_t start, size_t end) {
     return update_sum(0xFFFFL, message, start, end);
 }
 
-unsigned short WarGrey::STEM::checksum_ipv4(unsigned short acc_crc, const uint8_t* message, size_t start, size_t end) {
+uint16_t WarGrey::STEM::checksum_ipv4(uint16_t acc_crc, const uint8_t* message, size_t start, size_t end) {
     return update_sum(~acc_crc, message, start, end);
 }
 
-unsigned short  WarGrey::STEM::checksum_ipv4(unsigned short* acc_crc, const uint8_t* message, size_t start, size_t end) {
-    unsigned short sum = 0UL;
+uint16_t WarGrey::STEM::checksum_ipv4(uint16_t* acc_crc, const uint8_t* message, size_t start, size_t end) {
+    uint16_t sum = 0UL;
 
     if (acc_crc == nullptr) {
         sum = checksum_ipv4(message, start, end);
