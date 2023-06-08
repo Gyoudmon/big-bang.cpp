@@ -14,27 +14,27 @@ namespace WarGrey::STEM {
 		Natural();
 		Natural(uint64_t n);
 
-		Natural(WarGrey::STEM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
-		Natural(std::string& nstr, size_t nstart = 0, size_t nend = 0);
-		Natural(std::wstring& nstr, size_t nstart = 0, size_t nend = 0);
-		Natural(uint8_t base, WarGrey::STEM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
-		Natural(uint8_t base, std::string& nstr, size_t nstart = 0, size_t nend = 0);
-		Natural(uint8_t base, std::wstring& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(const WarGrey::STEM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(const std::string& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(const std::wstring& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(uintptr_t base, const WarGrey::STEM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(uintptr_t base, const std::string& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(uintptr_t base, const std::wstring& nstr, size_t nstart = 0, size_t nend = 0);
 		
 		template<typename BYTE, size_t N>
 		Natural(const BYTE(&ns)[N], size_t nstart = 0, size_t nend = N)
-			: Natural((const BYTE*)ns, nstart, nend) {}
+			: Natural(reinterpret_cast<const BYTE*>(ns), nstart, nend) {}
 
 		template<typename BYTE, size_t N>
-		Natural(uint8_t base, const BYTE(&ns)[N], size_t nstart = 0, size_t nend = N)
-			: Natural(base, (const BYTE*)ns, nstart, nend) {}
+		Natural(uintptr_t base, const BYTE(&ns)[N], size_t nstart = 0, size_t nend = N)
+			: Natural(base, reinterpret_cast<const BYTE*>(ns), nstart, nend) {}
 
 		template<typename BYTE>
 		Natural(const BYTE ns[], size_t nstart, size_t nend)
-			: Natural((uint8_t)0U, ns, nstart, nend) {}
+			: Natural(0U, ns, nstart, nend) {}
 
 		template<typename BYTE>
-		Natural(uint8_t base, const BYTE ns[], size_t nstart, size_t nend) : natural(nullptr), capacity(0U), payload(0U) {
+		Natural(uintptr_t base, const BYTE ns[], size_t nstart, size_t nend) : natural(nullptr), capacity(0U), payload(0U) {
 			switch (base) {
 			case 16: this->from_base16(ns, nstart, nend); break;
 			case 10: this->from_base10(ns, nstart, nend); break;

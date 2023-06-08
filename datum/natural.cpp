@@ -14,8 +14,8 @@ static size_t natural_from_base16(uint8_t* natural, const BYTE n[], size_t nstar
 	size_t payload = 0U;
 
 	do {
-		uint8_t lsb = ((nend > nstart) ? byte_to_hexadecimal((uint8_t)n[--nend], 0U) : 0U);
-		uint8_t msb = ((nend > nstart) ? byte_to_hexadecimal((uint8_t)n[--nend], 0U) : 0U);
+		uint8_t lsb = ((nend > nstart) ? byte_to_hexadecimal(_U8(n[--nend]), 0U) : 0U);
+		uint8_t msb = ((nend > nstart) ? byte_to_hexadecimal(_U8(n[--nend]), 0U) : 0U);
 
 		natural[slot--] = (msb << 4U | lsb);
 
@@ -28,25 +28,25 @@ static size_t natural_from_base16(uint8_t* natural, const BYTE n[], size_t nstar
 }
 
 template<typename BYTE>
-static size_t natural_from_base(uint8_t base, uint8_t* natural, const BYTE n[], int nstart, int nend, size_t capacity) {
+static size_t natural_from_base(uintptr_t base, uint8_t* natural, const BYTE n[], int nstart, int nend, size_t capacity) {
 	size_t cursor = capacity - 2;
 	size_t payload = 0U;
 
 	natural[capacity - 1] = 0;
 
 	do {
-		uint16_t decimal = byte_to_decimal((uint8_t)n[nstart++], 0U);
+		uint16_t decimal = byte_to_decimal(_U8(n[nstart++]), 0U);
 		
 		for (size_t idx = capacity - 1; idx > cursor; idx--) {
 			uint16_t digit = natural[idx] * base + decimal;
 
-			natural[idx] = (uint8_t)(digit & 0xFFU);
+			natural[idx] = _U8(digit & 0xFFU);
 			decimal = digit >> 8;
 		}
 
 		if (decimal > 0) {
 			payload = capacity - cursor;
-			natural[cursor--] = (uint8_t)decimal;
+			natural[cursor--] = _U8(decimal);
 			
 		}
 	} while (nstart < nend);
@@ -160,7 +160,7 @@ static void natural_modular_expt(Natural* self, Natural* me, uint64_t b, N n) {
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Natural::~Natural() {
+WarGrey::STEM::Natural::~Natural() noexcept {
 	if (this->natural != nullptr) {
 		delete [] this->natural;
 	}
@@ -173,22 +173,22 @@ WarGrey::STEM::Natural::Natural(uint64_t n) : natural(nullptr), capacity(sizeof(
 	this->replaced_by_fixnum(n);
 }
 
-WarGrey::STEM::Natural::Natural(bytes& nstr, size_t nstart, size_t nend)
+WarGrey::STEM::Natural::Natural(const bytes& nstr, size_t nstart, size_t nend)
 	: Natural(nstr.c_str(), nstart, ((nend <= nstart) ? nstr.size() : nend)) {}
 
-WarGrey::STEM::Natural::Natural(std::string& nstr, size_t nstart, size_t nend)
+WarGrey::STEM::Natural::Natural(const std::string& nstr, size_t nstart, size_t nend)
 	: Natural(reinterpret_cast<const uint8_t*>(nstr.c_str()), nstart, ((nend <= nstart) ? nstr.size() : nend)) {}
 
-WarGrey::STEM::Natural::Natural(std::wstring& nstr, size_t nstart, size_t nend)
+WarGrey::STEM::Natural::Natural(const std::wstring& nstr, size_t nstart, size_t nend)
 	: Natural(reinterpret_cast<const uint16_t*>(nstr.c_str()), nstart, ((nend <= nstart) ? nstr.size() : nend)) {}
 
-WarGrey::STEM::Natural::Natural(uint8_t base, bytes& nstr, size_t nstart, size_t nend)
+WarGrey::STEM::Natural::Natural(uintptr_t base, const bytes& nstr, size_t nstart, size_t nend)
 	: Natural(base, nstr.c_str(), nstart, ((nend <= nstart) ? nstr.size() : nend)) {}
 
-WarGrey::STEM::Natural::Natural(uint8_t base, std::string& nstr, size_t nstart, size_t nend)
+WarGrey::STEM::Natural::Natural(uintptr_t base, const std::string& nstr, size_t nstart, size_t nend)
 	: Natural(base, reinterpret_cast<const uint8_t*>(nstr.c_str()), nstart, ((nend <= nstart) ? nstr.size() : nend)) {}
 
-WarGrey::STEM::Natural::Natural(uint8_t base, std::wstring& nstr, size_t nstart, size_t nend)
+WarGrey::STEM::Natural::Natural(uintptr_t base, const std::wstring& nstr, size_t nstart, size_t nend)
 	: Natural(base, reinterpret_cast<const uint16_t*>(nstr.c_str()), nstart, ((nend <= nstart) ? nstr.size() : nend)) {}
 
 bool WarGrey::STEM::Natural::is_zero() const {

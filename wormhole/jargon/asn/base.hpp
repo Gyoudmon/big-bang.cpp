@@ -24,40 +24,40 @@ namespace WarGrey::STEM {
     WarGrey::STEM::octets asn_octets_box(uint8_t tag, const WarGrey::STEM::octets& content, size_t size);
     size_t asn_octets_unbox(const uint8_t* basn, size_t* offset = nullptr);
     inline size_t asn_octets_unbox(const WarGrey::STEM::octets& basn, size_t* offset = nullptr) { return asn_octets_unbox(basn.c_str(), offset); }
-    WarGrey::STEM::octets asn_int64_to_octets(long long integer, WarGrey::STEM::ASNPrimitive id = ASNPrimitive::Integer);
-    size_t asn_int64_into_octets(long long integer, uint8_t* octets, size_t offset, WarGrey::STEM::ASNPrimitive id = ASNPrimitive::Integer);
+    WarGrey::STEM::octets asn_int64_to_octets(int64_t integer, WarGrey::STEM::ASNPrimitive id = ASNPrimitive::Integer);
+    size_t asn_int64_into_octets(int64_t integer, uint8_t* octets, size_t offset, WarGrey::STEM::ASNPrimitive id = ASNPrimitive::Integer);
 
     // NOTE: `asn_xxx_into_octets` does not check the boundary, please ensure that the destination is sufficient. 
     // NOTE: `asn_octets_to_xxx` does not check the tag, please ensure that the octets is really what it should be.
-    size_t asn_boolean_span(bool b);
+    inline size_t asn_boolean_span(bool b) { return 1; }
     WarGrey::STEM::octets asn_boolean_to_octets(bool b);
-    size_t asn_boolean_into_octets(bool b, uint8_t* octets, size_t offset);
+    size_t asn_boolean_into_octets(bool b, uint8_t* octets, size_t offset = 0);
     bool asn_octets_to_boolean(const uint8_t* bbool, size_t* offset = nullptr);
     inline bool asn_octets_to_boolean(const WarGrey::STEM::octets& bbool, size_t* offset = nullptr) { return asn_octets_to_boolean(bbool.c_str(), offset); }
 
-    size_t asn_fixnum_span(long long integer);
-    inline WarGrey::STEM::octets asn_fixnum_to_octets(long long integer) { return asn_int64_to_octets(integer, ASNPrimitive::Integer); }
-    inline size_t asn_fixnum_into_octets(long long integer, uint8_t* octets, size_t offset = 0) { return asn_int64_into_octets(integer, octets, offset, ASNPrimitive::Integer); }
-    long long asn_octets_to_fixnum(const uint8_t* bint, size_t* offset = nullptr);
-    inline long long asn_octets_to_fixnum(const WarGrey::STEM::octets& bint, size_t* offset = nullptr) { return asn_octets_to_fixnum(bint.c_str(), offset); }
+    inline size_t asn_null_span(std::nullptr_t placeholder) { return 0; }
+    WarGrey::STEM::octets asn_null_to_octets(std::nullptr_t placeholder);
+    size_t asn_null_into_octets(std::nullptr_t placeholder, uint8_t* octets, size_t offset = 0);
+    std::nullptr_t asn_octets_to_null(const uint8_t* bnull, size_t* offset = nullptr);
+    inline std::nullptr_t asn_octets_to_null(const WarGrey::STEM::octets& bnull, size_t* offset = nullptr) { return asn_octets_to_null(bnull.c_str(), offset); }
+
+    size_t asn_fixnum_span(int64_t integer);
+    inline WarGrey::STEM::octets asn_fixnum_to_octets(int64_t integer) { return asn_int64_to_octets(integer, ASNPrimitive::Integer); }
+    inline size_t asn_fixnum_into_octets(int64_t integer, uint8_t* octets, size_t offset = 0) { return asn_int64_into_octets(integer, octets, offset, ASNPrimitive::Integer); }
+    int64_t asn_octets_to_fixnum(const uint8_t* bint, size_t* offset = nullptr);
+    inline int64_t asn_octets_to_fixnum(const WarGrey::STEM::octets& bint, size_t* offset = nullptr) { return asn_octets_to_fixnum(bint.c_str(), offset); }
+
+    size_t asn_flonum_span(double real);
+    WarGrey::STEM::octets asn_flonum_to_octets(double real);
+    size_t asn_flonum_into_octets(double real, uint8_t* octets, size_t offset = 0);
+    double asn_octets_to_flonum(const uint8_t* breal, size_t* offset = nullptr);
+    inline double asn_octets_to_flonum(const WarGrey::STEM::octets& breal, size_t* offset = nullptr) { return asn_octets_to_flonum(breal.c_str(), offset); }
 
     size_t asn_natural_span(WarGrey::STEM::Natural& nat);
     WarGrey::STEM::octets asn_natural_to_octets(WarGrey::STEM::Natural& nat);
     size_t asn_natural_into_octets(WarGrey::STEM::Natural& nat, uint8_t* octets, size_t offset = 0);
     WarGrey::STEM::Natural asn_octets_to_natural(const uint8_t* bnat, size_t* offset = nullptr);
     inline WarGrey::STEM::Natural asn_octets_to_natural(const WarGrey::STEM::octets& bnat, size_t* offset = nullptr) { return asn_octets_to_natural(bnat.c_str(), offset); }
-
-    size_t asn_null_span(std::nullptr_t placeholder);
-    WarGrey::STEM::octets asn_null_to_octets(std::nullptr_t placeholder);
-    size_t asn_null_into_octets(std::nullptr_t placeholder, uint8_t* octets, size_t offset = 0);
-    std::nullptr_t asn_octets_to_null(const uint8_t* bnull, size_t* offset = nullptr);
-    inline std::nullptr_t asn_octets_to_null(const WarGrey::STEM::octets& bnull, size_t* offset = nullptr) { return asn_octets_to_null(bnull.c_str(), offset); }
-
-    size_t asn_real_span(double real);
-    WarGrey::STEM::octets asn_real_to_octets(double real);
-    size_t asn_real_into_octets(double real, uint8_t* octets, size_t offset = 0);
-    double asn_octets_to_real(const uint8_t* breal, size_t* offset = nullptr);
-    inline double asn_octets_to_real(const WarGrey::STEM::octets& breal, size_t* offset = nullptr) { return asn_octets_to_real(breal.c_str(), offset); }
 
     size_t asn_ia5_span(const std::string& ia5_str);
     WarGrey::STEM::octets asn_ia5_to_octets(const std::string& ia5_str);

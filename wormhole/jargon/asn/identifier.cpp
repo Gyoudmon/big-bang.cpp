@@ -35,6 +35,7 @@ uint8_t WarGrey::STEM::asn_identifier_octet(uint8_t tag, bool constructed, ASN1T
     case ASN1TagClass::Application:     type_octet = 0b01000000; break;
     case ASN1TagClass::ContextSpecific: type_octet = 0b10000000; break;
     case ASN1TagClass::Private:         type_octet = 0b11000000; break;
+    default: /* default */; break;
     }
 
     return type_octet | (constructed ? 0b00100000 : 0b00000000) | tag;
@@ -74,6 +75,7 @@ uint8_t WarGrey::STEM::asn_primitive_identifier_octet(ASNPrimitive type) {
     case ASNPrimitive::Enumerated:  idx = 0x0A; break;
     case ASNPrimitive::UTF8_String: idx = 0x0C; break;
     case ASNPrimitive::IA5_String:  idx = 0x16; break;
+    default: /* default */; break;
     }
 
     return primitive_identifiers[idx];

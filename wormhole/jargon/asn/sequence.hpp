@@ -13,7 +13,7 @@ namespace WarGrey::STEM {
         WarGrey::STEM::octets to_octets();
         size_t into_octets(uint8_t* octets, size_t offset = 0);
         void from_octets(const uint8_t* basn, size_t* offset = nullptr);
-        inline void from_octets(WarGrey::STEM::octets& basn, size_t* offset = nullptr) { this->from_octets(basn.c_str(), offset); }
+        inline void from_octets(const WarGrey::STEM::octets& basn, size_t* offset = nullptr) { this->from_octets(basn.c_str(), offset); }
 
     protected:
         virtual size_t field_payload_span(size_t idx) = 0;

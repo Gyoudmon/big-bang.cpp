@@ -5,7 +5,7 @@
 
 namespace WarGrey::STEM {
 #define define_asn_enum(e, E, ...) \
-private enum class E { __VA_ARGS__ }; \
+enum class E { __VA_ARGS__ }; \
 inline size_t asn_##e##_span(E e) { return asn_enum_span(e); } \
 inline WarGrey::STEM::octets asn_##e##_to_octets(E e) { return asn_enum_to_octets(e); } \
 inline size_t asn_##e##_into_octets(E e, uint8_t* octets, size_t offset = 0) { return asn_enum_into_octets(e, octets, offset); } \

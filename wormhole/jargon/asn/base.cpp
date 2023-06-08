@@ -7,19 +7,29 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-static const uint8_t default_real_base = 2; // TODO: implememnt base 10 representation
+static const uint8_t default_flonum_base = 2; // TODO: implememnt base 10 representation
 
 static inline size_t fill_ufixnum_octets(uint8_t* pool, uint64_t n, size_t capacity, size_t payload) {
     do {
-        payload++;
-        pool[capacity - payload] = static_cast<uint8_t>(n & 0xFF);
+        payload ++;
+        pool[capacity - payload] = _U8(n & 0xFFU);
         n >>= 8U;
     } while (n > 0U);
 
     return payload;
 }
 
-static inline size_t fill_fixnum_octets(uint8_t* pool, long long n, size_t capacity, size_t payload) {
+static inline size_t fill_nfixnum_octets(uint8_t* pool, int64_t n, size_t capacity, size_t payload) {
+    do {
+        payload ++;
+        pool[capacity - payload] = _U8(n & 0xFFU);
+        n >>= 8U;
+    } while (n < -1);
+
+    return payload;
+}
+
+static size_t fill_fixnum_octets(uint8_t* pool, int64_t n, size_t capacity, size_t payload) {
     if (n >= 0) {
         payload = fill_ufixnum_octets(pool, n, capacity, payload);
 
@@ -27,37 +37,38 @@ static inline size_t fill_fixnum_octets(uint8_t* pool, long long n, size_t capac
             pool[capacity - (++payload)] = 0;
         }
     } else {
-        do {
-            payload++;
-            pool[capacity - payload] = static_cast<uint8_t>(n & 0xFF);
-            n >>= 8U;
-        } while (n < -1);
+        payload = fill_nfixnum_octets(pool, n, capacity, payload);
+ 
+        if (pool[capacity - payload] < 0b10000000) {
+            pool[capacity - (++payload)] = 0xFFU;
+        }
     }
 
     return payload;
 }
 
-static inline size_t fill_length_octets(uint8_t* pool, size_t length, size_t capacity) {
+static size_t fill_length_octets(uint8_t* pool, size_t length, size_t capacity) {
     size_t payload = 1U;
     
     if (length <= 127) {
-        pool[capacity - payload] = static_cast<uint8_t>(length);
+        pool[capacity - payload] = _U8(length);
     } else {
         payload = fill_ufixnum_octets(pool, length, capacity, payload - 1);
-        pool[capacity - (++payload)] = static_cast<uint8_t>(0b10000000 | payload);
+        payload += 1;
+        pool[capacity - payload] = _U8(0b10000000 | (payload - 1));
     }
 
     return payload;
 }
 
-static inline void substitude_trailing_zero(long long* E, long long* N, uint8_t delta, uint64_t mask, uint8_t rshift) {
+static inline void substitude_trailing_zero(int64_t* E, int64_t* N, uint8_t delta, uint64_t mask, uint8_t rshift) {
     while (((*N) & mask) == 0) {
         (*E) += delta;
         (*N) >>= rshift;
     }
 }
 
-static void fill_real_binary(double real, double base, long long* E, long long* N) {
+static void fill_flonum_binary(double real, double base, int64_t* E, int64_t* N) {
     double r = real;
 
     (*E) = 0;
@@ -68,7 +79,7 @@ static void fill_real_binary(double real, double base, long long* E, long long* 
         (*E) -= 1U;
     }
 
-    (*N) = static_cast<long long>(flfloor(r));
+    (*N) = _S64(flfloor(r));
 
     if (base == 16.0) {
         substitude_trailing_zero(E, N, 2, 0xFF, -8);
@@ -93,7 +104,7 @@ static inline void fill_integer_from_bytes(N* n, const uint8_t* pool, size_t sta
 }
 
 
-static uint8_t make_real_infoctet(double real, uint8_t base, size_t E_size, size_t binary_scaling_factor) {
+static uint8_t make_flonum_infoctet(double real, uint8_t base, size_t E_size, size_t binary_scaling_factor) {
     uint8_t infoctet = ((real > 0.0) ? 0b10000000 : 0b11000000);
     
     switch (base) {
@@ -135,11 +146,12 @@ size_t WarGrey::STEM::asn_length_span(size_t length) {
 }
 
 octets WarGrey::STEM::asn_length_to_octets(size_t length) {
-    uint8_t pool[10];
-    size_t capacity = sizeof(pool) / sizeof(uint8_t);
-    size_t payload = fill_length_octets(pool, length, capacity);
+    size_t span = asn_length_span(length);
+    octets asn(span, '\0');
 
-    return octets(pool + (capacity - payload), payload);
+    asn_length_into_octets(length, const_cast<uint8_t*>(asn.c_str()));
+
+    return asn;
 }
 
 size_t WarGrey::STEM::asn_length_into_octets(size_t length, uint8_t* octets, size_t offset) {
@@ -206,10 +218,6 @@ size_t WarGrey::STEM::asn_octets_unbox(const uint8_t* basn, size_t* offset) {
 }
 
 /*************************************************************************************************/
-size_t WarGrey::STEM::asn_boolean_span(bool b) {
-    return 1;
-}
-
 octets WarGrey::STEM::asn_boolean_to_octets(bool b) {
     octets bbool(3, '\0');
 
@@ -237,38 +245,66 @@ bool WarGrey::STEM::asn_octets_to_boolean(const uint8_t* bnat, size_t* offset0) 
     return (bnat[offset - size] > 0x00);
 }
 
-size_t WarGrey::STEM::asn_fixnum_span(long long fixnum) {
+octets WarGrey::STEM::asn_null_to_octets(std::nullptr_t placeholder) {
+    uint8_t pool[2];
+
+    asn_null_into_octets(placeholder, pool, 0);
+
+    return octets(pool, sizeof(pool) / sizeof(uint8_t));
+}
+
+size_t WarGrey::STEM::asn_null_into_octets(std::nullptr_t placeholder, uint8_t* octets, size_t offset) {
+    octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::Null);
+    octets[offset++] = 0x00;
+
+    return offset;
+}
+
+std::nullptr_t WarGrey::STEM::asn_octets_to_null(const uint8_t* bnull, size_t* offset0) {
+    size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
+    
+    asn_octets_unbox(bnull, &offset);
+    SET_BOX(offset0, offset);
+
+    return nullptr;
+}
+
+size_t WarGrey::STEM::asn_fixnum_span(int64_t fixnum) {
     size_t span = 0;
 
-    if (fixnum >= 0) {
-        while (fixnum > 0xFF) {
-            span++;
-            fixnum >>= 8U;
-        }
+    /**
+     * TODO: To be proven
+     *   ASN.1 requires that the leading 9 bits must be neither all 0s nor all 1s.
+     * That is, the sign bit is important and should be counted on for both
+     * positive and negative integers. Thus, it should be okay to do bitwise
+     * flipping on negative integers and treat them like positive ones, but
+     * no need for their exact counterparts.
+     */
 
-        span += ((fixnum >= 0b10000000) ? 2 : 1);
-    } else {
-        do {
-            span++;
-            fixnum >>= 8U;
-        } while (fixnum < -1);
+    if (fixnum < 0) {
+        fixnum = ~fixnum;
     }
+
+    while (fixnum > 0xFF) {
+        span++;
+        fixnum >>= 8U;
+    }
+
+    span += ((fixnum >= 0b10000000) ? 2 : 1);
 
     return span;
 }
 
-octets WarGrey::STEM::asn_int64_to_octets(long long fixnum, ASNPrimitive id) {
-    uint8_t pool[12];
-    size_t capacity = sizeof(pool) / sizeof(uint8_t);
-    size_t payload = fill_fixnum_octets(pool, fixnum, capacity, 0U);
+octets WarGrey::STEM::asn_int64_to_octets(int64_t fixnum, ASNPrimitive id) {
+    size_t span = asn_span(asn_fixnum_span(fixnum));
+    octets asn(span, '\0');
+    
+    asn_int64_into_octets(fixnum, const_cast<uint8_t*>(asn.c_str()), 0, id);
 
-    pool[capacity - (++payload)] = (uint8_t)payload;
-    pool[capacity - (++payload)] = asn_primitive_identifier_octet(id);
-
-    return octets(pool + (capacity - payload), payload);
+    return asn;
 }
 
-size_t WarGrey::STEM::asn_int64_into_octets(long long fixnum, uint8_t* octets, size_t offset, ASNPrimitive id) {
+size_t WarGrey::STEM::asn_int64_into_octets(int64_t fixnum, uint8_t* octets, size_t offset, ASNPrimitive id) {
     size_t span = asn_fixnum_span(fixnum);
     
     octets[offset++] = asn_primitive_identifier_octet(id);
@@ -279,10 +315,10 @@ size_t WarGrey::STEM::asn_int64_into_octets(long long fixnum, uint8_t* octets, s
     return offset + span;
 }
 
-long long WarGrey::STEM::asn_octets_to_fixnum(const uint8_t* bfixnum, size_t* offset0) {
+int64_t WarGrey::STEM::asn_octets_to_fixnum(const uint8_t* bfixnum, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(bfixnum, &offset);
-    long long integer = 0;
+    int64_t integer = 0;
 
     fill_integer_from_bytes(&integer, bfixnum, offset - size, offset, true);
 
@@ -339,35 +375,7 @@ Natural WarGrey::STEM::asn_octets_to_natural(const uint8_t* bnat, size_t* offset
     return nat;
 }
 
-size_t WarGrey::STEM::asn_null_span(std::nullptr_t placeholder) {
-    return 0;
-}
-
-octets WarGrey::STEM::asn_null_to_octets(std::nullptr_t placeholder) {
-    uint8_t pool[2];
-
-    asn_null_into_octets(placeholder, pool, 0);
-
-    return octets(pool, sizeof(pool) / sizeof(uint8_t));
-}
-
-size_t WarGrey::STEM::asn_null_into_octets(std::nullptr_t placeholder, uint8_t* octets, size_t offset) {
-    octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::Null);
-    octets[offset++] = 0x00;
-
-    return offset;
-}
-
-std::nullptr_t WarGrey::STEM::asn_octets_to_null(const uint8_t* bnull, size_t* offset0) {
-    size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
-    size_t size = asn_octets_unbox(bnull, &offset);
-
-    SET_BOX(offset0, offset);
-
-    return nullptr;
-}
-
-size_t WarGrey::STEM::asn_real_span(double real) {
+size_t WarGrey::STEM::asn_flonum_span(double real) {
     size_t span = 1;
     uint8_t base = 2;
 
@@ -378,10 +386,10 @@ size_t WarGrey::STEM::asn_real_span(double real) {
                 span = 0;
             }
         } else {
-            long long E, N;
+            int64_t E, N;
             size_t E_size;
 
-            fill_real_binary(flabs(real), double(base), &E, &N);
+            fill_flonum_binary(flabs(real), double(base), &E, &N);
             E_size = asn_fixnum_span(E);
             
             span = 1 + E_size + asn_fixnum_span(N);
@@ -395,50 +403,16 @@ size_t WarGrey::STEM::asn_real_span(double real) {
     return span;
 }
 
-octets WarGrey::STEM::asn_real_to_octets(double real) {
-    uint8_t pool[64];
-    size_t capacity = sizeof(pool) / sizeof(uint8_t);
-    size_t payload = 0U;
+octets WarGrey::STEM::asn_flonum_to_octets(double real) {
+    size_t span = asn_span(asn_flonum_span(real));
+    octets asn(span, '\0');
     
-    if (!flisfinite(real)) {
-        payload = 1U;
-        
-        if (real > 0.0) {
-            pool[capacity - payload] = 0x40;
-        } else if (real < 0.0) {
-            pool[capacity - payload] = 0x41;
-        } else {
-            pool[capacity - payload] = 0x42;
-        }
-    } else if (real == 0.0) {
-        // WARNING: 0.0 is +0.0, hence 1.0
-        if (flsign(real) == -1.0) {
-            payload = 1U;
-            pool[capacity - payload] = 0x43;
-        }
-    } else {
-        size_t E_size;
-        long long E, N;
-        
-        fill_real_binary(flabs(real), double(default_real_base), &E, &N);
-        E_size = fill_fixnum_octets(pool, N, capacity, payload);
-        payload = fill_fixnum_octets(pool, E, capacity, E_size);
-        E_size = payload - E_size;
+    asn_flonum_into_octets(real, const_cast<uint8_t*>(asn.c_str()), 0);
 
-        if (E_size >= 4) {
-            pool[capacity - (++payload)] = _U8(E_size);
-        }
-
-        pool[capacity - (++payload)] = make_real_infoctet(real, default_real_base, E_size, 0);
-    }
-
-    pool[capacity - (++payload)] = _U8(payload);
-    pool[capacity - (++payload)] = asn_primitive_identifier_octet(ASNPrimitive::Real);
-
-    return octets(pool + (capacity - payload), payload);
+    return asn;
 }
 
-size_t WarGrey::STEM::asn_real_into_octets(double real, uint8_t* octets, size_t offset) {
+size_t WarGrey::STEM::asn_flonum_into_octets(double real, uint8_t* octets, size_t offset) {
     octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::Real);
 
     if (!flisfinite(real)) {
@@ -461,14 +435,14 @@ size_t WarGrey::STEM::asn_real_into_octets(double real, uint8_t* octets, size_t 
         }
     } else {
         size_t E_size, N_size;
-        long long E, N;
+        int64_t E, N;
 
-        fill_real_binary(flabs(real), double(default_real_base), &E, &N);
+        fill_flonum_binary(flabs(real), double(default_flonum_base), &E, &N);
         E_size = asn_fixnum_span(E);
         N_size = asn_fixnum_span(N);
 
         offset = asn_length_into_octets(1 + ((E_size >= 4) ? 1 : 0) + E_size + N_size, octets, offset);
-        octets[offset++] = make_real_infoctet(real, default_real_base, E_size, 0);
+        octets[offset++] = make_flonum_infoctet(real, default_flonum_base, E_size, 0);
 
         if (E_size >= 4) {
             octets[offset++] = _U8(E_size);
@@ -483,7 +457,7 @@ size_t WarGrey::STEM::asn_real_into_octets(double real, uint8_t* octets, size_t 
     return offset;
 }
 
-double WarGrey::STEM::asn_octets_to_real(const uint8_t* breal, size_t* offset0) {
+double WarGrey::STEM::asn_octets_to_flonum(const uint8_t* breal, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(breal, &offset);
     double real = flnan;
@@ -512,7 +486,7 @@ double WarGrey::STEM::asn_octets_to_real(const uint8_t* breal, size_t* offset0) 
             }
 
             if (E_end < offset) {
-                long long E, N;
+                int64_t E, N;
 
                 fill_integer_from_bytes(&E, breal, E_start, E_end, true);
                 fill_integer_from_bytes(&N, breal, E_end, offset, true);
