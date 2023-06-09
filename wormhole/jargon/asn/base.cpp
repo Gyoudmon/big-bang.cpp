@@ -516,10 +516,12 @@ size_t WarGrey::STEM::asn_ia5_span(const std::string& str) {
 }
 
 octets WarGrey::STEM::asn_ia5_to_octets(const std::string& str) {
-    size_t size = str.length();
-    octets payload(reinterpret_cast<const uint8_t*>(str.c_str()), 0, size);
-   
-    return asn_octets_box(asn_primitive_identifier_octet(ASNPrimitive::IA5_String), payload, size);
+    size_t payload = asn_ia5_span(str);
+    octets asn(asn_span(payload), '\0');
+
+    asn_ia5_into_octets(str, const_cast<uint8_t*>(asn.c_str()), 0U);
+
+    return asn;
 }
 
 size_t WarGrey::STEM::asn_ia5_into_octets(const std::string& str, uint8_t* octets, size_t offset) {
@@ -547,11 +549,11 @@ size_t WarGrey::STEM::asn_utf8_span(const std::string& str) {
 
 octets WarGrey::STEM::asn_utf8_to_octets(const std::string& str) {
     size_t payload = asn_utf8_span(str);
-    octets pool(asn_span(payload), '\0');
+    octets asn(asn_span(payload), '\0');
 
-    asn_utf8_into_octets(str, const_cast<uint8_t*>(pool.c_str()), 0U);
+    asn_utf8_into_octets(str, const_cast<uint8_t*>(asn.c_str()), 0U);
 
-    return pool;
+    return asn;
 }
 
 size_t WarGrey::STEM::asn_utf8_into_octets(const std::string& str, uint8_t* octets, size_t offset) {
