@@ -245,7 +245,7 @@ bytes WarGrey::STEM::Natural::to_bytes() const {
 	return bytes(this->natural + (this->capacity - this->payload), this->payload);
 }
 
-bytes WarGrey::STEM::Natural::to_hexstring() const {
+bytes WarGrey::STEM::Natural::to_hexstring(char ten) const {
 	bytes hex(fxmax(_U32(this->payload), 1U) * 2, '0');
 	size_t payload_idx = this->capacity - this->payload;
 	size_t msb_idx = 0U;
@@ -255,10 +255,10 @@ bytes WarGrey::STEM::Natural::to_hexstring() const {
 		
 		if (ubyte <= 0xF) {
 			msb_idx++;
-			hex[msb_idx++] = hexadecimal_to_byte(ubyte);
+			hex[msb_idx++] = hexadecimal_to_byte(ubyte, ten);
 		} else {
-			hex[msb_idx++] = hexadecimal_to_byte(ubyte >> 4);
-			hex[msb_idx++] = hexadecimal_to_byte(ubyte & 0xF);
+			hex[msb_idx++] = hexadecimal_to_byte(ubyte >> 4, ten);
+			hex[msb_idx++] = hexadecimal_to_byte(ubyte & 0xF, ten);
 		}
 	}
 

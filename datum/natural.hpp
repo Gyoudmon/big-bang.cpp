@@ -189,7 +189,7 @@ namespace WarGrey::STEM {
 
 	public:
 		WarGrey::STEM::bytes to_bytes() const;
-		WarGrey::STEM::bytes to_hexstring() const;
+		WarGrey::STEM::bytes to_hexstring(char ten = 'A') const;
 		WarGrey::STEM::bytes to_binstring(uint8_t alignment = 0U) const;
 
 	private:

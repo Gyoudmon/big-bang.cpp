@@ -11,7 +11,7 @@ namespace WarGrey::STEM {
 
     /*********************************************************************************************/
     char byte_to_hexadecimal(char ch, char fallback_value);
-    char hexadecimal_to_byte(char ch);
+    char hexadecimal_to_byte(char ch, char ten = 'A');
     char byte_to_decimal(char ch, char fallback_value);
     char decimal_to_byte(char ch);
     char byte_to_octal(char ch, char fallback_value);

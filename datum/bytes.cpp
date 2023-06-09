@@ -37,8 +37,8 @@ char WarGrey::STEM::byte_to_octal(char ch, char fallback_value) {
     return ch;
 }
 
-char WarGrey::STEM::hexadecimal_to_byte(char ch) {
-    return ((ch >= 10) ? (ch - 10 + 'A') : (ch + '0'));
+char WarGrey::STEM::hexadecimal_to_byte(char ch, char ten) {
+    return ((ch >= 10) ? (ch - 10 + ten) : (ch + '0'));
 }
 
 char WarGrey::STEM::decimal_to_byte(char ch) {
