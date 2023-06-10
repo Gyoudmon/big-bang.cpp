@@ -6,8 +6,8 @@
 #include <fstream>
 
 #include "graphics/font.hpp"
-
 #include "virtualization/display.hpp"
+#include "wormhole/socket.hpp"
 
 namespace WarGrey::STEM {
     class IUniverse : public WarGrey::STEM::IDisplay {
@@ -70,6 +70,10 @@ namespace WarGrey::STEM {
         
         using WarGrey::STEM::IDisplay::log_message;
         void log_message(int fgc, const std::string& message) override;
+
+    public: // 网络游戏通信接口
+        bool network_initialize(int timeout_ms = 64, int maxsockets = 16);
+        bool udp_listen(uint16_t port, int packet_max_size = 512);
 
     protected: // 常规事件处理和分派函数
         virtual void on_click(int x, int y) {}                                               // 处理单击事件
@@ -137,6 +141,7 @@ namespace WarGrey::STEM {
     private:
         SDL_TimerID timer;                      // SDL 定时器
         uint32_t _fps;                          // 帧频
+        SocketDaemon* socket_daemon = nullptr;  // 套接字管理员
 
     private:
         const char* current_usrin = nullptr;    // IME 原始输入

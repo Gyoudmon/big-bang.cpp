@@ -10,8 +10,6 @@
 #include "datum/box.hpp"
 #include "datum/time.hpp"
 
-#include "wormhole/socket.hpp"
-
 #include <SDL2/SDL_mixer.h>
 
 #include <filesystem>
@@ -78,8 +76,7 @@ static unsigned int trigger_timer_event(unsigned int interval, void* datum) {
 static void game_initialize(uint32_t flags) {
     Call_With_Safe_Exit(SDL_Init(flags), "SDL 初始化失败: ", SDL_Quit, SDL_GetError);
     Call_With_Safe_Exit(TTF_Init(), "TTF 初始化失败: ", TTF_Quit, TTF_GetError);
-    Call_With_Safe_Exit(SDLNet_Init(), "SDL Net 初始化失败: ", SDLNet_Quit, SDLNet_GetError);
-
+    
     /* Initializing SDL2_IMG for loading images */ {
 #if defined(__macosx__)
         int img_request_flags = IMG_INIT_JPG | IMG_INIT_PNG;
@@ -707,6 +704,40 @@ void WarGrey::STEM::IUniverse::set_usrdata_folder(const char* dir) {
 
 void WarGrey::STEM::IUniverse::set_usrdata_folder(const std::string& dir) {
     this->usrdata_rootdir = path(dir).make_preferred().string();
+}
+
+/*************************************************************************************************/
+bool WarGrey::STEM::IUniverse::network_initialize(int timeout_ms, int maxsockets) {
+    bool okay = false;
+
+    if (this->socket_daemon == nullptr) {
+        okay = (SDLNet_Init() == 0);
+
+        if (okay) {
+            atexit(SDLNet_Quit);
+
+            this->socket_daemon = new SocketDaemon(maxsockets);
+            this->socket_daemon->start_wait_read_process_loop(timeout_ms);
+        } else {
+            fprintf(stderr, "SDL Net 初始化失败: %s\n", SDLNet_GetError());
+        }
+    }
+    
+    return okay;
+}
+
+bool WarGrey::STEM::IUniverse::udp_listen(uint16_t port, int packet_max_size) {
+    bool okay = false;
+    
+    if (this->socket_daemon != nullptr) {
+        this->network_initialize();
+    }
+
+    if (this->socket_daemon != nullptr) {
+        okay = this->socket_daemon->udp_listen(port, packet_max_size);
+    }
+
+    return okay;
 }
 
 /*************************************************************************************************/
