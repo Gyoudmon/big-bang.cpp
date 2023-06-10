@@ -5,6 +5,8 @@
 #include <thread>
 #include <map>
 
+#include "udp/udp_socket.hpp"
+
 /**************************************************************************************************/
 namespace WarGrey::STEM {
     class SocketDaemon {
@@ -23,7 +25,7 @@ namespace WarGrey::STEM {
 
     private:
         SDLNet_SocketSet master = nullptr;
-        std::map<uint16_t, UDPsocket> udp_deamons;
+        std::map<uint16_t, shared_udp_daemon_t> udp_deamons;
 
     private:
         std::thread* wrpl = nullptr;

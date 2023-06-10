@@ -1,7 +1,5 @@
 #include "datagram.hpp"
 
-#include <SDL2/SDL_net.h>
-
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/

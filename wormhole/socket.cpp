@@ -13,6 +13,12 @@ WarGrey::STEM::SocketDaemon::SocketDaemon(int maxsockets) {
 }
 
 WarGrey::STEM::SocketDaemon::~SocketDaemon() noexcept {
+    for (auto it : this->udp_deamons) {
+        it.second->unregister_from(this->master);
+    }
+
+    this->udp_deamons.clear();
+
     if (this->master != nullptr) {
         SDLNet_FreeSocketSet(this->master);
         this->master = nullptr;
@@ -27,27 +33,16 @@ WarGrey::STEM::SocketDaemon::~SocketDaemon() noexcept {
 /*************************************************************************************************/
 bool WarGrey::STEM::SocketDaemon::udp_listen(uint16_t port, int packet_max_size) {
     if (this->udp_deamons.find(port) == this->udp_deamons.end()) {
-        UDPsocket udp = SDLNet_UDP_Open(port);
-        IPaddress addrv4;
-
-        addrv4.host = INADDR_ANY;
-        addrv4.port = port;
-
-        if (udp == nullptr) {
-            fprintf(stderr, "Error in creating UDP Socket: %s!\n", SDLNet_GetError());
-        } else {
-            int useless = SDLNet_UDP_Bind(udp, -1, &addrv4);
-
-            if (useless == -1) {
-                fprintf(stderr, "Error in binding UDP Address: %s!\n", SDLNet_GetError());
-            }
-            
-            if (SDLNet_UDP_AddSocket(this->master, udp) == -1) {                
-                fprintf(stderr, "Error in watching UDP socket: %s!\n", SDLNet_GetError());
-                SDLNet_UDP_Close(udp);
-            } else {
+        shared_udp_daemon_t udp = std::make_shared<UDPDaemon>(port);
+        
+        if (udp->okay()) {
+            if (udp->register_to(this->master)) {
                 this->udp_deamons[port] = udp;
+            } else {
+                fprintf(stderr, "Error in watching UDP socket: %s!\n", SDLNet_GetError());
             }
+        } else {
+            fprintf(stderr, "Error in creating UDP Socket: %s!\n", SDLNet_GetError());
         }
     }
 
@@ -69,7 +64,7 @@ void WarGrey::STEM::SocketDaemon::wait_read_process_loop(int timeout_ms) {
     int ready = 0;
     
     while (this->master != nullptr) {
-        // it's efficient than thread sleeping
+        // it's efficient than sleeping thread
         ready = SDLNet_CheckSockets(this->master, timeout);
 
         if (ready > 0) {
@@ -77,9 +72,9 @@ void WarGrey::STEM::SocketDaemon::wait_read_process_loop(int timeout_ms) {
                 packet.resize(this->udp_packet_size);
             }
             
-            for (auto it = this->udp_deamons.begin(); it != this->udp_deamons.end(); ++ it) {
-                if (SDLNet_SocketReady(it->second)) {
-                    if (packet.recv(it->second)) {
+            for (auto it : this->udp_deamons) {
+                if (it.second->ready()) {
+                    if (it.second->recv_into(&packet)) {
                         printf("[%s:%d] says: %s\n",
                             packet.hostname(), packet.port(),
                             packet.message().c_str());
