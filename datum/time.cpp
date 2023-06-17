@@ -37,6 +37,10 @@ long long WarGrey::STEM::current_milliseconds() {
     return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }
 
+double WarGrey::STEM::current_inexact_milliseconds() {
+    return double(duration_cast<microseconds>(system_clock::now().time_since_epoch()).count()) / 1000.0;
+}
+
 /**************************************************************************************************/
 void WarGrey::STEM::sleep(long long ms) {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));

@@ -7,27 +7,21 @@ using namespace WarGrey::STEM;
 /*************************************************************************************************/
 static uint16_t update_sum(uint16_t sum, const uint8_t* message, size_t start, size_t end) {
     size_t count = end - start;
-    uint16_t H = (sum >> 8U);
-    uint16_t L = (sum & 0xFFU);
-
+    uint32_t HL = sum;
+    
     if ((count & 0x01) == 1) {
-        H += message[--end];
+        HL += (message[--end] << 8U);
     }
 
     for (size_t idx = start; idx < end; idx += 2) {
-        H += message[idx];
-        L += message[idx + 1];
+        HL += ((message[idx] << 8U) ^ message[idx + 1]);
     }
 
-    while ((H > 0xFF) || (L > 0xFF)) {
-        uint16_t Hcarry = H >> 8U;
-        uint16_t Lcarry = L >> 8U;
-
-        H = (H & 0xFF) + Lcarry;
-        L = (L & 0xFF) + Hcarry;
+    while (HL > 0xFFFFU) {
+        HL = (HL & 0xFFFFU) + (HL >> 16U);
     }
 
-    return ~((H << 8U) ^ L);
+    return ~(static_cast<uint16_t>(HL));
 }
 
 /*************************************************************************************************/

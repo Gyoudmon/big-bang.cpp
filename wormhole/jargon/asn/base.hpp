@@ -77,5 +77,5 @@ namespace WarGrey::STEM {
     inline size_t asn_span(Span span, T v) { return asn_span(span(v)); }
 
     template<class C>
-    inline size_t asn_span(C instance) { return asn_span(instance->payload_span()); }
+    inline size_t asn_span(C instance) { return asn_span(instance->span()); }
 }

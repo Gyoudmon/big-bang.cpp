@@ -5,7 +5,7 @@
 #include <thread>
 #include <map>
 
-#include "udp/udp_socket.hpp"
+#include "slang/udp.hpp"
 
 /**************************************************************************************************/
 namespace WarGrey::STEM {
@@ -15,7 +15,10 @@ namespace WarGrey::STEM {
         virtual ~SocketDaemon() noexcept;
 
     public:
-        bool udp_listen(uint16_t port, int packet_max_size);
+        template<typename E>
+        bool udp_listen(WarGrey::STEM::UDPLocalPeer<E>* peer, uint16_t service, int packet_capacity = 512) {
+            return this->udp_listen(new WarGrey::STEM::UDPDaemon<E>(peer, service, packet_capacity));
+        }
 
     public:
         void start_wait_read_process_loop(int timeout_ms);
@@ -24,12 +27,14 @@ namespace WarGrey::STEM {
         void wait_read_process_loop(int timeout_ms);
 
     private:
+        bool udp_listen(WarGrey::STEM::IUDPDaemon* daemon);
+
+    private:
         SDLNet_SocketSet master = nullptr;
         std::map<uint16_t, shared_udp_daemon_t> udp_deamons;
 
     private:
         std::thread* wrpl = nullptr;
         int fallback_timeout = 1;
-        int udp_packet_size = 1;
     };
 }

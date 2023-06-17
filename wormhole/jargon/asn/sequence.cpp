@@ -6,7 +6,7 @@ using namespace WarGrey::STEM;
 /*************************************************************************************************/
 WarGrey::STEM::IASNSequence::IASNSequence(size_t count) : count(count) {}
 
-size_t WarGrey::STEM::IASNSequence::payload_span() {
+size_t WarGrey::STEM::IASNSequence::span() {
     size_t payload = 0;
 
     for (size_t idx = 0; idx < this->count; idx++) {        
@@ -17,7 +17,7 @@ size_t WarGrey::STEM::IASNSequence::payload_span() {
 }
 
 octets WarGrey::STEM::IASNSequence::to_octets() {
-    size_t ospan = asn_span(this->payload_span());
+    size_t ospan = asn_span(this->span());
     octets basn(ospan, '\0');
 
     this->into_octets(const_cast<uint8_t*>(basn.c_str()), 0);
@@ -26,7 +26,7 @@ octets WarGrey::STEM::IASNSequence::to_octets() {
 }
 
 size_t WarGrey::STEM::IASNSequence::into_octets(uint8_t* octets, size_t offset) {
-    size_t pay_span = this->payload_span();
+    size_t pay_span = this->span();
 
     octets[offset++] = asn_constructed_identifier_octet(ASNConstructed::Sequence);
     offset = asn_length_into_octets(pay_span, octets, offset);

@@ -707,40 +707,6 @@ void WarGrey::STEM::IUniverse::set_usrdata_folder(const std::string& dir) {
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::IUniverse::network_initialize(int timeout_ms, int maxsockets) {
-    bool okay = false;
-
-    if (this->socket_daemon == nullptr) {
-        okay = (SDLNet_Init() == 0);
-
-        if (okay) {
-            atexit(SDLNet_Quit);
-
-            this->socket_daemon = new SocketDaemon(maxsockets);
-            this->socket_daemon->start_wait_read_process_loop(timeout_ms);
-        } else {
-            fprintf(stderr, "SDL Net 初始化失败: %s\n", SDLNet_GetError());
-        }
-    }
-    
-    return okay;
-}
-
-bool WarGrey::STEM::IUniverse::udp_listen(uint16_t port, int packet_max_size) {
-    bool okay = false;
-    
-    if (this->socket_daemon != nullptr) {
-        this->network_initialize();
-    }
-
-    if (this->socket_daemon != nullptr) {
-        okay = this->socket_daemon->udp_listen(port, packet_max_size);
-    }
-
-    return okay;
-}
-
-/*************************************************************************************************/
 WarGrey::STEM::Universe::Universe() : Universe("The Big Bang!") {}
 WarGrey::STEM::Universe::Universe(const char *title, uint32_t fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
     this->set_window_title("%s", title);

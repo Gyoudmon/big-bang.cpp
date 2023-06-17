@@ -9,7 +9,7 @@ namespace WarGrey::STEM {
         IASNSequence(size_t count);
 
     public:
-        size_t payload_span();
+        size_t span();
         WarGrey::STEM::octets to_octets();
         size_t into_octets(uint8_t* octets, size_t offset = 0);
         void from_octets(const uint8_t* basn, size_t* offset = nullptr);
