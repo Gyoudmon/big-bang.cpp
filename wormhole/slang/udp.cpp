@@ -144,7 +144,7 @@ bool WarGrey::STEM::IUDPClient::okay() {
     return (this->self != nullptr);
 }
 
-size_t WarGrey::STEM::IUDPDaemon::packet_capacity() {
+size_t WarGrey::STEM::IUDPClient::packet_capacity() {
     if (this->packet != nullptr) {
         return this->packet->capacity();
     } else {
@@ -152,7 +152,7 @@ size_t WarGrey::STEM::IUDPDaemon::packet_capacity() {
     }
 }
 
-size_t WarGrey::STEM::IUDPDaemon::packet_resize(size_t new_size) {
+size_t WarGrey::STEM::IUDPClient::packet_resize(size_t new_size) {
     if (this->packet != nullptr) {
         return this->packet->resize(new_size);
     } else {
