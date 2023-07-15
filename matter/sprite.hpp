@@ -13,7 +13,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    class ISprite : public WarGrey::STEM::IMatter {
+    class __lambda__ ISprite : public WarGrey::STEM::IMatter {
     public:
         ISprite() {}
         virtual ~ISprite() {}

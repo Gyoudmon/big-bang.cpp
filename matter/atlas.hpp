@@ -4,7 +4,7 @@
 #include "../virtualization/filesystem/imgdb.hpp"
 
 namespace WarGrey::STEM {
-    class IAtlas : public WarGrey::STEM::IMatter {
+    class __lambda__ IAtlas : public WarGrey::STEM::IMatter {
     public:
         IAtlas(const std::string& pathname);
         IAtlas(const char* pathname) : IAtlas(std::string(pathname)) {}
@@ -88,7 +88,7 @@ namespace WarGrey::STEM {
         std::string _pathname;
     };
 
-    class GridAtlas : public WarGrey::STEM::IAtlas {
+    class __lambda__ GridAtlas : public WarGrey::STEM::IAtlas {
     public:
         GridAtlas(const char* pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0, bool inset = false);
         GridAtlas(const std::string& pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0, bool inset = false);

@@ -21,7 +21,7 @@ namespace WarGrey::STEM {
     
     /** TODO: how to safely release the fonts, meanwhile leave them with memory leaks **/
 
-    struct DimensionStyle {
+    struct __lambda__ DimensionStyle {
 		shared_font_t label_font = nullptr;
 		long label_color = -1;
 		long label_border_color = -1;
@@ -49,18 +49,18 @@ namespace WarGrey::STEM {
 		int precision = -1;
 	};
 
-    WarGrey::STEM::DimensionStyle make_plain_dimension_style(int lfontsize, int nfontsize, int ufontsize, int precision = -1);
-	WarGrey::STEM::DimensionStyle make_plain_dimension_style(int nfontsize, unsigned int min_n, int precision = -1);
-	WarGrey::STEM::DimensionStyle make_setting_dimension_style(int nfontsize, unsigned int min_n, int precision = -1, uint32_t color = SILVER);
+    __lambda__ WarGrey::STEM::DimensionStyle make_plain_dimension_style(int lfontsize, int nfontsize, int ufontsize, int precision = -1);
+	__lambda__ WarGrey::STEM::DimensionStyle make_plain_dimension_style(int nfontsize, unsigned int min_n, int precision = -1);
+	__lambda__ WarGrey::STEM::DimensionStyle make_setting_dimension_style(int nfontsize, unsigned int min_n, int precision = -1, uint32_t color = SILVER);
 
-	WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_n, int precision = -1,
+	__lambda__ WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_n, int precision = -1,
             uint32_t number_bgcolor = GOLDENROD, uint32_t label_bgcolor = FORESTGREEN, uint32_t color = GHOSTWHITE);
     
-	WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_label, unsigned int min_n, int precision,
+	__lambda__ WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_label, unsigned int min_n, int precision,
             uint32_t number_bgcolor = GOLDENROD, uint32_t label_bgcolor = FORESTGREEN, uint32_t color = GHOSTWHITE);
 
     /*********************************************************************************************/
-    class Dimensionlet
+    class __lambda__ Dimensionlet
         : public virtual WarGrey::STEM::IGraphlet
         , public virtual WarGrey::STEM::IValuelet<float>
         , public virtual WarGrey::STEM::IStatelet<WarGrey::STEM::DimensionState, WarGrey::STEM::DimensionStyle> {

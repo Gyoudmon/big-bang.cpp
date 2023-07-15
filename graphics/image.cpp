@@ -68,6 +68,10 @@ void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, in
     }
 }
 
+void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, int x, int y, SDL_RendererFlip flip, double angle) {
+    game_render_texture(renderer, image, x, y, flip, angle);
+}
+
 void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
     game_render_texture(renderer, image, x, y, width, height, flip, angle);
 }

@@ -4,7 +4,7 @@
 #include "../../forward.hpp"
 
 namespace WarGrey::STEM {
-	class Pasteboard : public WarGrey::STEM::IScreen {
+	class __lambda__ Pasteboard : public WarGrey::STEM::IScreen {
 	public:
 		Pasteboard(WarGrey::STEM::IMatter* master) : matter(master) {}
 	

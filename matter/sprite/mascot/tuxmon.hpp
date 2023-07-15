@@ -8,7 +8,7 @@
 /* https://github.com/SuperTux/supertux */
 
 namespace WarGrey::STEM {
-    class Tuxmon : public WarGrey::STEM::Sprite, protected virtual WarGrey::STEM::IPlatformMotion {
+    class __lambda__ Tuxmon : public WarGrey::STEM::Sprite, protected virtual WarGrey::STEM::IPlatformMotion {
     public:
         Tuxmon(bool walk_only = false);
         virtual ~Tuxmon() {}

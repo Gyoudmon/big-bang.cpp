@@ -10,7 +10,7 @@ namespace WarGrey::STEM {
     enum class GroundBlockType { Soil, Wood, Water, Stone, Grass, Dirt, Wall, Plain };
 
     /*********************************************************************************************/
-    class PlanetCuteAtlas : public WarGrey::STEM::GridAtlas {
+    class __lambda__ PlanetCuteAtlas : public WarGrey::STEM::GridAtlas {
     public:
         PlanetCuteAtlas(int row, int col, GroundBlockType default_type = GroundBlockType::Plain);
         virtual ~PlanetCuteAtlas();
@@ -33,7 +33,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    class PlanetCuteTile : public WarGrey::STEM::GridAtlas {
+    class __lambda__ PlanetCuteTile : public WarGrey::STEM::GridAtlas {
     public:
         PlanetCuteTile(GroundBlockType default_type, int row = 1, int col = 1);
 

@@ -10,36 +10,36 @@ namespace WarGrey::STEM {
     typedef std::basic_string<unsigned char> bytes;
 
     /*********************************************************************************************/
-    char byte_to_hexadecimal(char ch, char fallback_value);
-    char hexadecimal_to_byte(char ch, char ten = 'A');
-    char byte_to_decimal(char ch, char fallback_value);
-    char decimal_to_byte(char ch);
-    char byte_to_octal(char ch, char fallback_value);
-    char octal_to_byte(char ch);
+    __lambda__ char byte_to_hexadecimal(char ch, char fallback_value);
+    __lambda__ char hexadecimal_to_byte(char ch, char ten = 'A');
+    __lambda__ char byte_to_decimal(char ch, char fallback_value);
+    __lambda__ char decimal_to_byte(char ch);
+    __lambda__ char byte_to_octal(char ch, char fallback_value);
+    __lambda__ char octal_to_byte(char ch);
 
-    char hexadecimal_ref(const char* src, size_t idx, char fallback_value);
-    void hexadecimal_set(char* src, size_t idx, char hex);
-    char decimal_ref(const char* src, size_t idx, char fallback_value);
-    void decimal_set(char* src, size_t idx, char dec);
+    __lambda__ char hexadecimal_ref(const char* src, size_t idx, char fallback_value);
+    __lambda__ void hexadecimal_set(char* src, size_t idx, char hex);
+    __lambda__ char decimal_ref(const char* src, size_t idx, char fallback_value);
+    __lambda__ void decimal_set(char* src, size_t idx, char dec);
 
     /*********************************************************************************************/
-    uint8_t network_uint8_ref(const uint8_t* src, size_t idx);
-	void network_uint8_set(uint8_t* dest, size_t idx, uint8_t x);
+    __lambda__ uint8_t network_uint8_ref(const uint8_t* src, size_t idx);
+	__lambda__ void network_uint8_set(uint8_t* dest, size_t idx, uint8_t x);
 
-	uint16_t network_uint16_ref(const uint8_t* src, size_t idx);
-	void network_uint16_set(uint8_t* dest, size_t idx, uint16_t x);
+	__lambda__ uint16_t network_uint16_ref(const uint8_t* src, size_t idx);
+	__lambda__ void network_uint16_set(uint8_t* dest, size_t idx, uint16_t x);
 
-	uint32_t network_uint32_ref(const uint8_t* src, size_t idx);
-	void network_uint32_set(uint8_t* dest, size_t idx, uint32_t x);
+	__lambda__ uint32_t network_uint32_ref(const uint8_t* src, size_t idx);
+	__lambda__ void network_uint32_set(uint8_t* dest, size_t idx, uint32_t x);
 
-	uint64_t network_uint64_ref(const uint8_t* src, size_t idx);
-	void network_uint64_set(uint8_t* dest, size_t idx, uint64_t x);
+	__lambda__ uint64_t network_uint64_ref(const uint8_t* src, size_t idx);
+	__lambda__ void network_uint64_set(uint8_t* dest, size_t idx, uint64_t x);
 
-	float network_float_ref(const uint8_t* src, size_t idx);
-	void network_float_set(uint8_t* dest, size_t idx, float x);
+	__lambda__ float network_float_ref(const uint8_t* src, size_t idx);
+	__lambda__ void network_float_set(uint8_t* dest, size_t idx, float x);
 
-	float network_flword_ref(const uint8_t* src, size_t idx, float scale = 1.0F);
-	void network_flword_set(uint8_t* dest, size_t idx, float x, float scale = 1.0F);
+	__lambda__ float network_flword_ref(const uint8_t* src, size_t idx, float scale = 1.0F);
+	__lambda__ void network_flword_set(uint8_t* dest, size_t idx, float x, float scale = 1.0F);
 
-	void read_network_floats(uint8_t* src, size_t address, size_t quantity, float* dest);
+	__lambda__ void read_network_floats(uint8_t* src, size_t address, size_t quantity, float* dest);
 }

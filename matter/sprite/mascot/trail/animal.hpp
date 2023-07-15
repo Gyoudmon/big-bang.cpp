@@ -10,7 +10,7 @@
 namespace WarGrey::STEM {
     #define TRAIL_ANIMALS_PATH "trail/Animals"
 
-    class Animal : public WarGrey::STEM::Sprite, protected WarGrey::STEM::I8WayMotion {
+    class __lambda__ Animal : public WarGrey::STEM::Sprite, protected WarGrey::STEM::I8WayMotion {
     public:
         Animal(const std::string& fullpath);
         virtual ~Animal() {}
@@ -37,7 +37,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    class Cat : public WarGrey::STEM::Animal {
+    class __lambda__ Cat : public WarGrey::STEM::Animal {
     public:
         Cat();
         virtual ~Cat() {}
@@ -46,7 +46,7 @@ namespace WarGrey::STEM {
         Animal* asexually_reproduce() override { return new Cat(); }
     };
 
-    class Cow : public WarGrey::STEM::Animal {
+    class __lambda__ Cow : public WarGrey::STEM::Animal {
     public:
         Cow();
         virtual ~Cow() {}
@@ -55,7 +55,7 @@ namespace WarGrey::STEM {
         Animal* asexually_reproduce() override { return new Cow(); }
     };
 
-    class Rooster : public WarGrey::STEM::Animal {
+    class __lambda__ Rooster : public WarGrey::STEM::Animal {
     public:
         Rooster();
         virtual ~Rooster() {}
@@ -64,7 +64,7 @@ namespace WarGrey::STEM {
         Animal* asexually_reproduce() override { return new Rooster(); }
     };
 
-    class Pigeon : public WarGrey::STEM::Animal {
+    class __lambda__ Pigeon : public WarGrey::STEM::Animal {
     public:
         Pigeon();
         virtual ~Pigeon() {}

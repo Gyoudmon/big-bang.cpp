@@ -6,11 +6,11 @@ namespace WarGrey::STEM {
     /* Constants */
     static const char* unknown_plane_name = "冒险越来越深入了";
     
-    void the_big_bang_name(const char* name);
-    const char* the_big_bang_name();
+    __lambda__ void the_big_bang_name(const char* name);
+    __lambda__ const char* the_big_bang_name();
 
     /*********************************************************************************************/
-    class TheBigBang : public WarGrey::STEM::Plane {
+    class __lambda__ TheBigBang : public WarGrey::STEM::Plane {
         public:
             TheBigBang(const char* name = unknown_plane_name, uint32_t title_color = BLACK)
                 : WarGrey::STEM::Plane(name), title_color(title_color) {}

@@ -7,7 +7,7 @@
 #include <unordered_map>
 
 namespace WarGrey::STEM {
-    class Sprite : public WarGrey::STEM::ISprite {
+    class __lambda__ Sprite : public WarGrey::STEM::ISprite {
     public:
         Sprite(const std::string& pathname);
         Sprite(const char* pathname_fmt, ...);

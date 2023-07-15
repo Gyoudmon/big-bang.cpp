@@ -19,7 +19,7 @@ namespace WarGrey::STEM {
     enum class MarioHPipeDirection { Left, Right, Both };
 
     /*********************************************************************************************/
-    class MarioGroundAtlas : public WarGrey::STEM::GridAtlas {
+    class __lambda__ MarioGroundAtlas : public WarGrey::STEM::GridAtlas {
     public:
         MarioGroundAtlas(size_t slot, int row, int col, float tile_size = 0.0F);
 
@@ -34,7 +34,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    class MarioPipe : public WarGrey::STEM::GridAtlas {
+    class __lambda__ MarioPipe : public WarGrey::STEM::GridAtlas {
     public:
         MarioPipe(int row, int col,
             WarGrey::STEM::MarioPipeColor color = MarioPipeColor::Green,
@@ -48,7 +48,7 @@ namespace WarGrey::STEM {
         int color_idx;
     };
 
-    class MarioVPipe : public WarGrey::STEM::MarioPipe {
+    class __lambda__ MarioVPipe : public WarGrey::STEM::MarioPipe {
     public:
         MarioVPipe(int length,
             WarGrey::STEM::MarioVPipeDirection dir = MarioVPipeDirection::Up,
@@ -62,7 +62,7 @@ namespace WarGrey::STEM {
         WarGrey::STEM::MarioVPipeDirection direction;
     };
 
-    class MarioHPipe : public WarGrey::STEM::MarioPipe {
+    class __lambda__ MarioHPipe : public WarGrey::STEM::MarioPipe {
     public:
         MarioHPipe(int length,
             WarGrey::STEM::MarioHPipeDirection dir = MarioHPipeDirection::Both,

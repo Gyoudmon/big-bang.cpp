@@ -1,5 +1,5 @@
 #pragma once
 
 namespace WarGrey::STEM {
-    void network_initialize();
+    __lambda__ void network_initialize();
 }

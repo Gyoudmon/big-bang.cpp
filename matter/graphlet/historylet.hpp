@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace WarGrey::STEM {
-    class Historylet : public WarGrey::STEM::IGraphlet {
+    class __lambda__ Historylet : public WarGrey::STEM::IGraphlet {
     public:
         Historylet(float size, uint32_t hex, double alpha = 1.0) : Historylet(size, size, hex, alpha) {}
         Historylet(float width, float height, uint32_t hex, double alpha = 1.0);

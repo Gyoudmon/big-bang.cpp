@@ -3,7 +3,7 @@
 #include "base.hpp"
 
 namespace WarGrey::STEM {
-    class IASNSequence {
+    class __lambda__ IASNSequence {
     public:
         virtual ~IASNSequence() noexcept {}
         IASNSequence(size_t count);

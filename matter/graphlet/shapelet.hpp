@@ -5,7 +5,7 @@
 #include "../../graphics/colorspace.hpp"
 
 namespace WarGrey::STEM {
-    class IShapelet : public WarGrey::STEM::IGraphlet {
+    class __lambda__ IShapelet : public WarGrey::STEM::IGraphlet {
     public:
         IShapelet(int32_t color = -1, int32_t border_color = -1);
         virtual ~IShapelet() noexcept {}
@@ -51,7 +51,7 @@ namespace WarGrey::STEM {
     };
 
     /**********************************************************************************************/
-    class Linelet : public WarGrey::STEM::IShapelet {
+    class __lambda__ Linelet : public WarGrey::STEM::IShapelet {
     public:
 	    Linelet(float ex, float ey, int32_t color);
 	    Linelet(float ex, float ey, uint32_t color);
@@ -70,14 +70,14 @@ namespace WarGrey::STEM {
         float epy;
     };
 
-    class HLinelet : public WarGrey::STEM::Linelet {
+    class __lambda__ HLinelet : public WarGrey::STEM::Linelet {
     public:
         HLinelet(float width, int32_t color) : Linelet(width, 0.0F, color) {}
         HLinelet(float width, uint32_t color) : Linelet(width, 0.0F, color) {}
 	    HLinelet(float width, double hue, double saturation = 1.0, double brightness = 1.0) : Linelet(width, 0.0F, hue, saturation, brightness) {}
     };
 
-    class VLinelet : public WarGrey::STEM::Linelet {
+    class __lambda__ VLinelet : public WarGrey::STEM::Linelet {
     public:
         VLinelet(float height, int32_t color) : Linelet(0.0F, height, color) {}
         VLinelet(float height, uint32_t color) : Linelet(0.0F, height, color) {}
@@ -85,7 +85,7 @@ namespace WarGrey::STEM {
     };
 
     /**********************************************************************************************/
-    class Rectanglet : public WarGrey::STEM::IShapelet {
+    class __lambda__ Rectanglet : public WarGrey::STEM::IShapelet {
     public:
 	    Rectanglet(float edge_size, int32_t color, int32_t border_color = -1);
 	    Rectanglet(float edge_size, uint32_t color, int32_t border_color = -1);
@@ -107,7 +107,7 @@ namespace WarGrey::STEM {
 	    float height;
     };
 
-    class Squarelet : public WarGrey::STEM::Rectanglet {
+    class __lambda__ Squarelet : public WarGrey::STEM::Rectanglet {
     public:
         Squarelet(float edge_size, int32_t color, int32_t border_color = -1)
             : Rectanglet(edge_size, color, border_color) {}
@@ -119,7 +119,7 @@ namespace WarGrey::STEM {
             : Rectanglet(edge_size, hue, saturation, brightness, border_color) {}
     };
 
-    class RoundedRectanglet : public WarGrey::STEM::IShapelet {
+    class __lambda__ RoundedRectanglet : public WarGrey::STEM::IShapelet {
     public:
 	    RoundedRectanglet(float edge_size, float radius, int32_t color, int32_t border_color = -1);
 	    RoundedRectanglet(float edge_size, float radius, uint32_t color, int32_t border_color = -1);
@@ -142,7 +142,7 @@ namespace WarGrey::STEM {
         float radius;
     };
 
-    class RoundedSquarelet : public WarGrey::STEM::RoundedRectanglet {
+    class __lambda__ RoundedSquarelet : public WarGrey::STEM::RoundedRectanglet {
     public:
         RoundedSquarelet(float edge_size, float radius, int32_t color, int32_t border_color = -1)
             : RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
@@ -154,7 +154,7 @@ namespace WarGrey::STEM {
             : RoundedRectanglet(edge_size, edge_size, radius, hue, saturation, brightness, border_color) {}
     };
 
-    class Ellipselet : public WarGrey::STEM::IShapelet {
+    class __lambda__ Ellipselet : public WarGrey::STEM::IShapelet {
     public:
 	    Ellipselet(float radius, int32_t color, int32_t border_color = -1);
 	    Ellipselet(float radius, uint32_t color, int32_t border_color = -1);
@@ -176,7 +176,7 @@ namespace WarGrey::STEM {
 	    float bradius;
     };
     
-    class Circlet : public WarGrey::STEM::Ellipselet {
+    class __lambda__ Circlet : public WarGrey::STEM::Ellipselet {
     public:
 	    Circlet(float radius, int32_t color, int32_t border_color = -1)
             : Ellipselet(radius, radius, color, border_color) {}
@@ -188,7 +188,7 @@ namespace WarGrey::STEM {
             : Ellipselet(radius, radius, hue, saturation, brightness, border_color) {}
     };
     
-    class Trianglet : public WarGrey::STEM::IShapelet {
+    class __lambda__ Trianglet : public WarGrey::STEM::IShapelet {
     public:
 	    Trianglet(float x2, float y2, float x3, float y3, int32_t color, int32_t border_color = -1);
 	    Trianglet(float x2, float y2, float x3, float y3, uint32_t color, int32_t border_color = -1);
@@ -209,7 +209,7 @@ namespace WarGrey::STEM {
         float y3;
     };
 
-    class RegularPolygonlet : public WarGrey::STEM::IShapelet {
+    class __lambda__ RegularPolygonlet : public WarGrey::STEM::IShapelet {
     public:
 	    RegularPolygonlet(int n, float radius, int32_t color, int32_t border_color = -1);
 	    RegularPolygonlet(int n, float radius, uint32_t color, int32_t border_color = -1);

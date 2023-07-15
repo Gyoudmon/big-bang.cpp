@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace WarGrey::STEM {
-    struct Datagram {
+    struct __lambda__ Datagram {
         int64_t timestamp;
         const char* remote_host;
         uint16_t respond_port;
@@ -17,7 +17,7 @@ namespace WarGrey::STEM {
     typedef std::shared_ptr<Datagram> shared_datagram_t;
 
     /*********************************************************************************************/
-    class UserDatagramPacket {
+    class __lambda__ UserDatagramPacket {
     public:
         UserDatagramPacket(size_t size = 512);
         virtual ~UserDatagramPacket() noexcept;

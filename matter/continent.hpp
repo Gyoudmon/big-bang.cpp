@@ -5,7 +5,7 @@
 #include "../forward.hpp"
 
 namespace WarGrey::STEM {
-	class Continent : public WarGrey::STEM::IMatter {
+	class __lambda__ Continent : public WarGrey::STEM::IMatter {
 	public:
 		virtual ~Continent() noexcept;
 		

@@ -9,7 +9,7 @@
 #include "virtualization/display.hpp"
 
 namespace WarGrey::STEM {
-    class IUniverse : public WarGrey::STEM::IDisplay {
+    class __lambda__ IUniverse : public WarGrey::STEM::IDisplay {
     public:
         /* 构造函数，用以设置帧频, 窗口标题, 前景背景色, 和混色模式 */
         IUniverse(uint32_t fps, uint32_t fgc, uint32_t bgc);
@@ -155,7 +155,7 @@ namespace WarGrey::STEM {
         std::string usrdata_rootdir;            // 用户数据保存位置
     };
 
-    class Universe : public WarGrey::STEM::IUniverse {
+    class __lambda__ Universe : public WarGrey::STEM::IUniverse {
     public:
         /* 构造函数，创建新对象时自动调用，默认创建一个黑底白字的窗口 */
         Universe();

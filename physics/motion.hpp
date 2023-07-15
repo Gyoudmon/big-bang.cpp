@@ -3,7 +3,7 @@
 #include "../forward.hpp"
 
 namespace WarGrey::STEM {
-    class IMovable {
+    class __lambda__ IMovable {
     public:
         IMovable();
         virtual ~IMovable() {}

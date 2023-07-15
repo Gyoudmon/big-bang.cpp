@@ -5,7 +5,7 @@
 #include "virtualization/screen.hpp"
 
 namespace WarGrey::STEM {
-    class Cosmos : public WarGrey::STEM::IUniverse {
+    class __lambda__ Cosmos : public WarGrey::STEM::IUniverse {
     public:
         Cosmos(uint32_t fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
         virtual ~Cosmos();

@@ -5,7 +5,7 @@
 namespace WarGrey::STEM {
     enum class BracerMode { Walk, Run, Win, Lose };
 
-    class Bracer : public WarGrey::STEM::Citizen {
+    class __lambda__ Bracer : public WarGrey::STEM::Citizen {
     public:
         Bracer(const char* name);
         virtual ~Bracer() {}
@@ -44,7 +44,7 @@ namespace WarGrey::STEM {
 
 
     /*********************************************************************************************/
-    class Estelle : public WarGrey::STEM::Bracer {
+    class __lambda__ Estelle : public WarGrey::STEM::Bracer {
     public:
         Estelle() : Bracer("Estelle") {}
         const char* name() override { return "Estelle Bright"; }
@@ -54,14 +54,14 @@ namespace WarGrey::STEM {
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;
     };
 
-    class Joshua : public WarGrey::STEM::Bracer {
+    class __lambda__ Joshua : public WarGrey::STEM::Bracer {
     public:
         Joshua() : Bracer("Joshua") {}
         const char* name() override { return "Joshua Bright"; }
         virtual ~Joshua() {}
     };
 
-    class Scherazard : public WarGrey::STEM::Bracer {
+    class __lambda__ Scherazard : public WarGrey::STEM::Bracer {
     public:
         Scherazard() : Bracer("Scherazard") {}
         const char* name() override { return "Scherazard Harvey"; }
@@ -75,21 +75,21 @@ namespace WarGrey::STEM {
         virtual ~Olivier() {}
     };
 
-    class Klose : public WarGrey::STEM::Bracer {
+    class __lambda__ Klose : public WarGrey::STEM::Bracer {
     public:
         Klose() : Bracer("Klose") {}
         const char* name() override { return "Klose Rinz"; /* Klaudia von Auslese */ }
         virtual ~Klose() {}
     };
 
-    class Agate : public WarGrey::STEM::Bracer {
+    class __lambda__ Agate : public WarGrey::STEM::Bracer {
     public:
         Agate() : Bracer("Agate") {}
         const char* name() override { return "Agate Crosner"; }
         virtual ~Agate() {}
     };
 
-    class Tita : public WarGrey::STEM::Bracer {
+    class __lambda__ Tita : public WarGrey::STEM::Bracer {
     public:
         Tita() : Bracer("Tita") {}
         const char* name() override { return "Tita Russell"; }
@@ -99,7 +99,7 @@ namespace WarGrey::STEM {
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;
     };
 
-    class Zin : public WarGrey::STEM::Bracer {
+    class __lambda__ Zin : public WarGrey::STEM::Bracer {
     public:
         Zin() : Bracer("Zin") {}
         const char* name() override { return "Zin Vathek"; }

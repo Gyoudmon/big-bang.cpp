@@ -5,7 +5,7 @@
 
 /**************************************************************************************************/
 namespace WarGrey::STEM {
-    class IDisplay {
+    class __lambda__ IDisplay {
     public:
         IDisplay() {}
         virtual ~IDisplay() {}

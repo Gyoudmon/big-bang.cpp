@@ -10,7 +10,7 @@ namespace WarGrey::STEM {
     enum class FontSize { xx_small, x_small, small, medium, large, x_large, xx_large };
     enum class FontFamily { sans_serif, serif, cursive, fantasy, math, monospace, fangsong, _ };
 
-    class GameFont {
+    class __lambda__ GameFont {
     public:
         static void fontsize(int fontsize = 16);
 
@@ -68,17 +68,17 @@ namespace WarGrey::STEM {
     typedef std::shared_ptr<GameFont> shared_font_t;
 
     /*********************************************************************************************/
-    void game_fonts_initialize();
-    void game_fonts_destroy();
+    __lambda__ void game_fonts_initialize();
+    __lambda__ void game_fonts_destroy();
 
-    int generic_font_size(FontSize size);
-    const char* generic_font_family_name_for_ascii(FontFamily family);
-    const char* generic_font_family_name_for_chinese(FontFamily family);
+    __lambda__ int generic_font_size(FontSize size);
+    __lambda__ const char* generic_font_family_name_for_ascii(FontFamily family);
+    __lambda__ const char* generic_font_family_name_for_chinese(FontFamily family);
 
-    shared_font_t game_create_shared_font(const char* basename, int fontsize);
-    shared_font_t game_create_shared_font(const char* basename, float fontsize);
-    TTF_Font* game_create_font(const char* basename, int fontsize);
-    TTF_Font* game_create_font(const char* basename, float fontsize);
-    void game_destory_font(TTF_Font* font);
-    const std::string* game_fontname_list(int* n, int fontsize = 16);
+    __lambda__ shared_font_t game_create_shared_font(const char* basename, int fontsize);
+    __lambda__ shared_font_t game_create_shared_font(const char* basename, float fontsize);
+    __lambda__ TTF_Font* game_create_font(const char* basename, int fontsize);
+    __lambda__ TTF_Font* game_create_font(const char* basename, float fontsize);
+    __lambda__ void game_destory_font(TTF_Font* font);
+    __lambda__ const std::string* game_fontname_list(int* n, int fontsize = 16);
 }

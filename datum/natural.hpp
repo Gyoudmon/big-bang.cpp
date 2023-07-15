@@ -7,7 +7,7 @@
 namespace WarGrey::STEM {
 	enum class Fixnum { Uint16, Uint32, Uint64 };
 
-	class Natural {
+	class __lambda__ Natural {
 	public:
 		~Natural() noexcept;
 		

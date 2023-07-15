@@ -9,7 +9,7 @@
 
 /**************************************************************************************************/
 namespace WarGrey::STEM {
-    class SocketDaemon {
+    class __lambda__ SocketDaemon {
     public:
         SocketDaemon(int maxsockets = 16);
         virtual ~SocketDaemon() noexcept;

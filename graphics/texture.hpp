@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace WarGrey::STEM {
-    class Texture {
+    class __lambda__ Texture {
     public:
         Texture(SDL_Texture* raw) : _self(raw) {}
         virtual ~Texture() { if (this->okay()) SDL_DestroyTexture(this->_self); }

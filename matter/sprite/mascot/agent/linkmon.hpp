@@ -3,7 +3,7 @@
 #include "../agent.hpp"
 
 namespace WarGrey::STEM {
-    class Linkmon : public WarGrey::STEM::AgentSpriteSheet {
+    class __lambda__ Linkmon : public WarGrey::STEM::AgentSpriteSheet {
     public:
         Linkmon();
 

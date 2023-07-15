@@ -5,7 +5,7 @@
 #include "virtualization/screen.hpp"
 
 namespace WarGrey::STEM {
-    class IPlaneInfo {
+    class __lambda__ IPlaneInfo {
     public:
         virtual ~IPlaneInfo() {}
         IPlaneInfo(IScreen* master) : master(master) {}
@@ -22,7 +22,7 @@ namespace WarGrey::STEM {
      *
      *  Do not `delete` it on your own.
      */
-    class IPlane {
+    class __lambda__ IPlane {
     friend class WarGrey::STEM::Cosmos;
     friend class WarGrey::STEM::Continent;
     public:
@@ -66,7 +66,6 @@ namespace WarGrey::STEM {
         void set_background(uint32_t color, double a = 1.0) { this->background = color; this->bg_alpha = a; }
         void set_background(double hue, double saturation = 1.0, double brightness = 1.0, double a = 1.0);
         uint32_t get_background(double* alpha = nullptr);
-        void feed_mouse_location(float* x, float* y);
         void start_input_text(const std::string& prompt);
         void start_input_text(const char* prompt, ...);
         void log_message(int fgc, const char* fmt, ...);
@@ -221,7 +220,7 @@ namespace WarGrey::STEM {
         std::string caption;
     };
 
-    class Plane : public WarGrey::STEM::IPlane {
+    class __lambda__ Plane : public WarGrey::STEM::IPlane {
     public:
         virtual ~Plane();
         Plane(const std::string& caption, unsigned int initial_mode = 0);

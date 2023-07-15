@@ -11,7 +11,7 @@
 #include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
-    class ITextlet : public virtual WarGrey::STEM::IGraphlet {
+    class __lambda__ ITextlet : public virtual WarGrey::STEM::IGraphlet {
     public:
         ITextlet();
         virtual ~ITextlet() noexcept {}
@@ -62,7 +62,7 @@ namespace WarGrey::STEM {
         std::string raw;
     };
 
-    class Labellet : public virtual WarGrey::STEM::ITextlet {
+    class __lambda__ Labellet : public virtual WarGrey::STEM::ITextlet {
     public:
         Labellet(const char* fmt, ...);
         Labellet(shared_font_t font, const char* fmt, ...);
@@ -73,7 +73,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    Labellet* make_label_for_tooltip(shared_font_t font,
+    __lambda__ Labellet* make_label_for_tooltip(shared_font_t font,
         uint32_t fg_color = BLACK,
         uint32_t bg_color = SNOW,
         uint32_t border_color = GOLD);

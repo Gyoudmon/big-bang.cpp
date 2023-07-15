@@ -9,7 +9,7 @@
 #include <string>
 
 namespace WarGrey::STEM {
-    class IMatterInfo {
+    class __lambda__ IMatterInfo {
     public:
         virtual ~IMatterInfo() {};
         IMatterInfo(IPlane* master) : master(master) {};
@@ -18,9 +18,9 @@ namespace WarGrey::STEM {
         IPlane* master;
     };
 
-    class IMatterMetadata {};
+    class __lambda__ IMatterMetadata {};
 
-    class IMatter : public WarGrey::STEM::IMovable {
+    class __lambda__ IMatter : public WarGrey::STEM::IMovable {
     public:
         IMatter() {}
         virtual ~IMatter();

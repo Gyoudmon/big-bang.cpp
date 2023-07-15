@@ -6,7 +6,7 @@
 #include "datagram.hpp"
 
 namespace WarGrey::STEM {
-    class IUDPLocalPeer {
+    class __lambda__ IUDPLocalPeer {
     public:
         virtual bool absent() { return false; }
 
@@ -15,7 +15,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    class IUDPDaemon {
+    class __lambda__ IUDPDaemon {
     public:
         IUDPDaemon(IUDPLocalPeer* peer, uint16_t service, int packet_size);
         virtual ~IUDPDaemon() noexcept;
@@ -45,7 +45,7 @@ namespace WarGrey::STEM {
 
     typedef std::shared_ptr<IUDPDaemon> shared_udp_daemon_t;
 
-    class IUDPClient {
+    class __lambda__ IUDPClient {
     public:
         IUDPClient(int packet_size, uint16_t response_port);
         virtual ~IUDPClient() noexcept;

@@ -3,7 +3,7 @@
 #include "../../forward.hpp"
 
 namespace WarGrey::STEM {
-    class IPlatformMotion {
+    class __lambda__ IPlatformMotion {
     public:
         IPlatformMotion(bool facing_right = true, bool walk_only = false)
             : default_facing_sgn(facing_right ? 1.0 : -1.0), walk_only(walk_only) {}

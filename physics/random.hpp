@@ -2,7 +2,6 @@
 
 namespace WarGrey::STEM {
     /** 声明函数接口 **/
-    int random_raw();
-    int random_uniform(int min, int max);
+    __lambda__ int random_raw();
+    __lambda__ int random_uniform(int min, int max);
 }
-

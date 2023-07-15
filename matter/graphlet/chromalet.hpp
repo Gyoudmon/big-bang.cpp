@@ -5,7 +5,7 @@
 #include "../../graphics/colorspace.hpp"
 
 namespace WarGrey::STEM {
-    class Chromalet : public WarGrey::STEM::IGraphlet {
+    class __lambda__ Chromalet : public WarGrey::STEM::IGraphlet {
     public:
         Chromalet(float width, float height = 0.0F, WarGrey::STEM::CIE_Standard std = CIE_Standard::Primary, double Y = 1.0);
         virtual ~Chromalet() { this->invalidate_geometry(); }

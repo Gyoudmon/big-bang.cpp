@@ -4,7 +4,7 @@
 #include "../../virtualization/filesystem/imgdb.hpp"
 
 namespace WarGrey::STEM {
-    class ISpriteSheet : public WarGrey::STEM::ISprite {
+    class __lambda__ ISpriteSheet : public WarGrey::STEM::ISprite {
     public:
         ISpriteSheet(const std::string& pathname);
         ISpriteSheet(const char* pathname);
@@ -29,7 +29,7 @@ namespace WarGrey::STEM {
         std::string _pathname;
     };
 
-    class SpriteGridSheet : public WarGrey::STEM::ISpriteSheet {
+    class __lambda__ SpriteGridSheet : public WarGrey::STEM::ISpriteSheet {
     public:
         SpriteGridSheet(const char* pathname, int row, int col, int xgap = 0, int ygap = 0, bool inset = false);
         SpriteGridSheet(const std::string& pathname, int row, int col, int xgap = 0, int ygap = 0, bool inset = false);
