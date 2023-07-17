@@ -11,7 +11,7 @@
 /* https://github.com/jaseg/clippy */
 
 namespace WarGrey::STEM {
-    class AgentSpriteSheet : public WarGrey::STEM::SpriteGridSheet {
+    class __lambda__ AgentSpriteSheet : public WarGrey::STEM::SpriteGridSheet {
     public:
         AgentSpriteSheet(const std::string& pathname, int row, int col)
             : SpriteGridSheet(pathname, row, col) {}

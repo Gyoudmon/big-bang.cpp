@@ -63,7 +63,7 @@ namespace WarGrey::STEM {
 
     /*********************************************************************************************/
     template<typename E>
-    class UDPLocalPeer : public WarGrey::STEM::IUDPLocalPeer {
+    class __lambda__ UDPLocalPeer : public WarGrey::STEM::IUDPLocalPeer {
     public:
         void on_user_datagram(uint16_t service, int type, const shared_datagram_t& datagram) override {
             this->on_user_datagram(service, static_cast<E>(type), datagram);
@@ -74,7 +74,7 @@ namespace WarGrey::STEM {
     };
 
     template<typename E>
-    class UDPDaemon : public WarGrey::STEM::IUDPDaemon {
+    class __lambda__ UDPDaemon : public WarGrey::STEM::IUDPDaemon {
     public:
         UDPDaemon(UDPLocalPeer<E>* peer, uint16_t service, int packet_size)
             : IUDPDaemon(peer, service, packet_size) {}

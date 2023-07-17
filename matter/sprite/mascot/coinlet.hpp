@@ -6,7 +6,7 @@
 /* https://github.com/SuperTux/supertux */
 
 namespace WarGrey::STEM {
-    class Coinlet : public WarGrey::STEM::Sprite {
+    class __lambda__ Coinlet : public WarGrey::STEM::Sprite {
     public:
         Coinlet(const char* name, int idx)
             : WarGrey::STEM::Sprite(WarGrey::STEM::digimon_mascot_path("coinlet", ""))

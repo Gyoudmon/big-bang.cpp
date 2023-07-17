@@ -68,7 +68,7 @@ namespace WarGrey::STEM {
         virtual ~Scherazard() {}
     };
 
-    class Olivier : public WarGrey::STEM::Bracer {
+    class __lambda__ Olivier : public WarGrey::STEM::Bracer {
     public:
         Olivier() : Bracer("Olivier") {}
         const char* name() override { return "Olivier Lenheim"; }

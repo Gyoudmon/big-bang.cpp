@@ -3,7 +3,7 @@
 #include "display.hpp"
 
 namespace WarGrey::STEM {
-    class IScreen {
+    class __lambda__ IScreen {
     public:
         IScreen() {}
         virtual ~IScreen() {}

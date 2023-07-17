@@ -3,7 +3,7 @@
 #include "../screen.hpp"
 
 namespace WarGrey::STEM {
-    class OnionSkin : public WarGrey::STEM::IScreen {
+    class __lambda__ OnionSkin : public WarGrey::STEM::IScreen {
     public:
         OnionSkin(WarGrey::STEM::IDisplay* display) : _display(display) {}
 

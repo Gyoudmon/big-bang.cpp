@@ -38,7 +38,7 @@ static size_t natural_from_base(uintptr_t base, uint8_t* natural, const BYTE n[]
 		uint16_t decimal = byte_to_decimal(_U8(n[nstart++]), 0U);
 		
 		for (size_t idx = capacity - 1; idx > cursor; idx--) {
-			uint16_t digit = natural[idx] * base + decimal;
+			uint16_t digit = static_cast<uint16_t>(natural[idx] * base) + decimal;
 
 			natural[idx] = _U8(digit & 0xFFU);
 			decimal = digit >> 8;

@@ -6,12 +6,12 @@
 #include "../datum/flonum.hpp"
 
 namespace WarGrey::STEM {
-    class IGraphlet : public WarGrey::STEM::IMatter {
+    class __lambda__ IGraphlet : public WarGrey::STEM::IMatter {
         // Yes, Meanwhile it's empty
     };
 
     template<typename T>
-	class IValuelet : public virtual WarGrey::STEM::IGraphlet {
+	class __lambda__ IValuelet : public virtual WarGrey::STEM::IGraphlet {
     public:
 		T get_value() {
 			return this->value;
@@ -48,7 +48,7 @@ namespace WarGrey::STEM {
 	};
 
     template<typename T>
-	class IRangelet : public virtual WarGrey::STEM::IValuelet<T> {
+	class __lambda__ IRangelet : public virtual WarGrey::STEM::IValuelet<T> {
 	public:
 		IRangelet(T vmin, T vmax) {
 			if (vmin <= vmax) {
@@ -123,7 +123,7 @@ namespace WarGrey::STEM {
 	};
 
 	template<typename State, typename Style>
-	class IStatelet : public virtual WarGrey::STEM::IGraphlet {
+	class __lambda__ IStatelet : public virtual WarGrey::STEM::IGraphlet {
 	public:
 		IStatelet() : IStatelet(State::_) {}
 
