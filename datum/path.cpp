@@ -8,6 +8,7 @@ using namespace std::filesystem;
 
 /*************************************************************************************************/
 static std::string zonedir;
+static std::string appdatadir;
 static std::string mascotdir;
 
 /*************************************************************************************************/
@@ -139,6 +140,18 @@ void WarGrey::STEM::enter_digimon_zone(const char* process_path) {
 	zonedir.push_back(path::preferred_separator);
 }
 
+void WarGrey::STEM::digimon_appdata_setup(const char* appdata_path) {
+	if ((appdata_path != nullptr) && (appdata_path[0] != '\0')) {
+		path folder = path(appdata_path).make_preferred();
+
+		if (folder.is_absolute()) {
+			appdatadir = directory_path(folder.string());
+		} else {
+			appdatadir = digimon_subdir(folder.string().c_str());
+		}
+	}
+}
+
 void WarGrey::STEM::digimon_mascot_setup(const char* shared_path) {
 	if ((shared_path != nullptr) && (shared_path[0] != '\0')) {
 		path folder = path(shared_path).make_preferred();
@@ -165,6 +178,20 @@ std::string WarGrey::STEM::digimon_subdir(const char* dirpath) {
 	return digimon_zonedir().append(subdir);
 }
 
+std::string WarGrey::STEM::digimon_appdata_rootdir() {
+	if (appdatadir.empty()) {
+		return digimon_subdir("stone");
+	} else {
+		return directory_path(appdatadir);
+	}
+}
+
+std::string WarGrey::STEM::digimon_appdata_subdir(const char* dirpath) {
+	std::string subdir = directory_path(path(dirpath).make_preferred().string());
+
+	return digimon_appdata_rootdir().append(subdir);
+}
+
 std::string WarGrey::STEM::digimon_mascot_rootdir() {
 	if (mascotdir.empty()) {
 		return digimon_subdir("stone/mascot");
@@ -186,6 +213,15 @@ std::string WarGrey::STEM::digimon_path(const char* file, const char* ext, const
 	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(path(sub_rootdir).make_preferred().string()).append(file_ext)));
 
     return directory_path(zonedir).append(path_ext);
+}
+
+std::string WarGrey::STEM::digimon_appdata_path(const char* file, const char* ext, const char* sub_rootdir) {
+	std::string root_dir(sub_rootdir);
+	std::string file_raw = path(file).make_preferred().string();
+	std::string file_ext = (file_extension_from_path(file_raw) == "") ? (file_raw.append(ext)) : file_raw;
+	std::string path_ext = ((root_dir == "") ? file_ext : (directory_path(path(sub_rootdir).make_preferred().string()).append(file_ext)));
+
+    return digimon_appdata_rootdir().append(path_ext);
 }
 
 std::string WarGrey::STEM::digimon_mascot_path(const char* file, const char* ext, const char* sub_rootdir) {

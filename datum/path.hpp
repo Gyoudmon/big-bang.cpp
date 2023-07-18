@@ -18,6 +18,11 @@ namespace WarGrey::STEM {
 	__lambda__ std::string digimon_subdir(const char* dirpath);
 	__lambda__ std::string digimon_path(const char* file, const char* ext = "", const char* sub_rootdir = "stone");
 
+	__lambda__ void digimon_appdata_setup(const char* appdata_dir);
+	__lambda__ std::string digimon_appdata_rootdir();
+	__lambda__ std::string digimon_appdata_subdir(const char* dirpath);
+	__lambda__ std::string digimon_appdata_path(const char* file, const char* ext = ".png", const char* sub_rootdir = "stone");
+
 	__lambda__ void digimon_mascot_setup(const char* shared_dir);
 	__lambda__ std::string digimon_mascot_rootdir();
 	__lambda__ std::string digimon_mascot_subdir(const char* dirpath);

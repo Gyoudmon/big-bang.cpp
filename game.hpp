@@ -48,12 +48,13 @@
 
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"
-
 #include "physics/motion/platformer.hpp"
 #include "physics/motion/map2d.hpp"
 
 #include "datum/flonum.hpp"
 #include "datum/string.hpp"
+#include "datum/path.hpp"
+
 #include "virtualization/filesystem/imgdb.hpp"
 
 /*************************************************************************************************/
