@@ -269,9 +269,12 @@ void WarGrey::STEM::IUniverse::big_bang() {
 
                 quit_time = e.quit.timestamp;
             }; break;
+            default: { this->on_unhandled_event(e.type, e); };
             }
    
             this->end_update_sequence();
+        } else {
+            this->log_message(0xFF0000, "failed to pop the event: %s", SDL_GetError());
         }
     }
 }
