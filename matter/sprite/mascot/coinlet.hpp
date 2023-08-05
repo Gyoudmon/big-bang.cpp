@@ -11,6 +11,9 @@ namespace WarGrey::STEM {
         Coinlet(const char* name, int idx)
             : WarGrey::STEM::Sprite(WarGrey::STEM::digimon_mascot_path("coinlet", ""))
             , name(name), idx(idx) {}
+
+        Coinlet(const std::string& name, int idx) : Coinlet(name.c_str(), idx) {}
+        
         virtual ~Coinlet() {}
 
     public:
