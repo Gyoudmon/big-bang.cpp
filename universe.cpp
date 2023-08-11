@@ -269,7 +269,6 @@ void WarGrey::STEM::IUniverse::big_bang() {
 
                 quit_time = e.quit.timestamp;
             }; break;
-            default: { this->on_unhandled_event(e.type, e); };
             }
    
             this->end_update_sequence();

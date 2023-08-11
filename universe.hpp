@@ -83,8 +83,6 @@ namespace WarGrey::STEM {
         
         virtual void on_save(const std::string& full_path, std::ofstream& dev_datout) {}     // 处理保存事件
 
-        virtual void on_unhandled_event(uint32_t type, SDL_Event& self) {}                   // 处理其他事件（调试用）
-
     protected:
         virtual void draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height);
         virtual const char* usrdata_extension() { return nullptr; }
