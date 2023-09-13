@@ -40,8 +40,8 @@ static void draw_filled_circle(SDL_Renderer* renderer, int cx, int cy, int radiu
     int y = 0;
     
     do {
-        SDL_RenderDrawLine(renderer, cx + x, cy + y, cx - x, cy + y); // Q I, Q II
-        SDL_RenderDrawLine(renderer, cx + x, cy,     cx + x, cy - y); // Q III
+        SDL_RenderDrawLine(renderer, cx + x, cy + y, cx - x, cy + y); // Q III, Q IV
+        SDL_RenderDrawLine(renderer, cx + x, cy,     cx + x, cy - y); // Q II
         SDL_RenderDrawLine(renderer, cx - x, cy - y, cx,     cy - y); // Q I
 
         radius = err;
@@ -96,8 +96,8 @@ static void draw_filled_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, 
     long err = dx + dy;
 
     do {
-        SDL_RenderDrawLine(renderer, cx + x, cy + y, cx - x, cy + y); // Q I, Q II
-        SDL_RenderDrawLine(renderer, cx + x, cy,     cx + x, cy - y); // Q III
+        SDL_RenderDrawLine(renderer, cx + x, cy + y, cx - x, cy + y); // Q III, Q IV
+        SDL_RenderDrawLine(renderer, cx + x, cy,     cx + x, cy - y); // Q II
         SDL_RenderDrawLine(renderer, cx - x, cy - y, cx,     cy - y); // Q I
 
         e2 = 2 * err;
