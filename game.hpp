@@ -54,6 +54,7 @@
 #include "datum/flonum.hpp"
 #include "datum/string.hpp"
 #include "datum/path.hpp"
+#include "datum/vector.hpp"
 
 #include "virtualization/filesystem/imgdb.hpp"
 
