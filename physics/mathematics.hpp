@@ -149,6 +149,11 @@ namespace WarGrey::STEM {
 	    SET_BOX(y, (y0 - y1) * flt + y1);
     }
 
+    template<typename Fl>
+    Fl line_slope(Fl x0, Fl y0, Fl x1, Fl y1) {
+	    return (x1 == x0) ? Fl(flnan) : (y1 - y0) / (x1 - x0);
+    }
+
     /*********************************************************************************************/
     template<typename Fl>
     bool lines_intersect(Fl x11, Fl y11, Fl x12, Fl y12, Fl x21, Fl y21, Fl x22, Fl y22,
