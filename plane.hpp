@@ -51,6 +51,10 @@ namespace WarGrey::STEM {
         virtual bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) = 0;
         virtual void feed_matters_boundary(float* x, float* y, float* width, float* height) = 0;
         virtual void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
+        virtual void bring_to_front(IMatter* m, IMatter* target) = 0;
+        virtual void bring_forward(IMatter* m, int n) = 0;
+        virtual void send_to_back(IMatter* m, IMatter* target) = 0;
+        virtual void send_backward(IMatter* m, int n) = 0;
         virtual void move(IMatter* m, float x, float y, bool ignore_gliding) = 0;
         virtual void move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
         virtual void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
@@ -223,15 +227,8 @@ namespace WarGrey::STEM {
     class __lambda__ Plane : public WarGrey::STEM::IPlane {
     public:
         virtual ~Plane();
-        Plane(const std::string& caption, unsigned int initial_mode = 0);
-        Plane(const char* caption, unsigned int initial_mode = 0);
-
-    public:
-        // NOTE: mode 0 is designed for UI elements which will be unmasked in all modes
-        void shift_to_mode(unsigned int mode);
-        unsigned int current_mode();
-
-        bool matter_unmasked(WarGrey::STEM::IMatter* m);
+        Plane(const std::string& caption);
+        Plane(const char* caption);
 
     public:
         bool has_mission_completed() override;
@@ -252,6 +249,10 @@ namespace WarGrey::STEM {
         bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) override;
         void feed_matters_boundary(float* x, float* y, float* width, float* height) override;
         void insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) override;
+        void bring_to_front(IMatter* m, IMatter* target = nullptr) override;
+        void bring_forward(IMatter* m, int n = 1) override;
+        void send_to_back(IMatter* m, IMatter* target = nullptr) override;
+        void send_backward(IMatter* m, int n = 1) override;
         void move(IMatter* m, float x, float y, bool ignore_gliding = false) override;
         void move_to(IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
@@ -317,6 +318,7 @@ namespace WarGrey::STEM {
         void do_motion_moving(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         
     private:
+        IMatter* do_draw(SDL_Renderer* renderer, IMatter* self, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
         void do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F);
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
@@ -333,7 +335,6 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* head_matter = nullptr;
         WarGrey::STEM::IMatter* focused_matter = nullptr;
         WarGrey::STEM::IMatter* hovering_matter = nullptr;
-        unsigned int mode = 0U;
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 1U;
         uint32_t local_elapse = 0U;

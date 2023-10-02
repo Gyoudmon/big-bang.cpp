@@ -47,12 +47,11 @@ namespace WarGrey::STEM {
     };
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
-        MatterInfo(WarGrey::STEM::IPlane* master, unsigned int mode) : IMatterInfo(master), mode(mode) {};
+        MatterInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {};
 
         float x = 0.0F;
         float y = 0.0F;
         bool selected = false;
-        unsigned int mode = 0U;
 
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 0U;
@@ -115,8 +114,8 @@ static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_f
     return interval;
 }
 
-static inline MatterInfo* bind_matter_owership(IPlane* master, unsigned int mode, IMatter* m) {
-    auto info = new MatterInfo(master, mode);
+static inline MatterInfo* bind_matter_owership(IPlane* master, IMatter* m) {
+    auto info = new MatterInfo(master);
     
     unsafe_set_matter_fps(info, m->preferred_local_fps(), true);
     m->info = info;
@@ -134,10 +133,6 @@ static inline MatterInfo* plane_matter_info(IPlane* master, IMatter* m) {
     }
     
     return info;
-}
-
-static inline bool unsafe_matter_unmasked(MatterInfo* info, unsigned int mode) {
-    return ((info->mode & mode) == info->mode);
 }
 
 static void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float* x, float* y, float* width, float* height) {
@@ -161,14 +156,14 @@ static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* m
     master->end_update_sequence();
 }
 
-static IMatter* do_search_selected_matter(IMatter* start, unsigned int mode, IMatter* terminator) {
+static IMatter* do_search_selected_matter(IMatter* start, IMatter* terminator) {
     IMatter* found = nullptr;
     IMatter* child = start;
 
     do {
         MatterInfo* info = MATTER_INFO(child);
 
-        if (info->selected && (unsafe_matter_unmasked(info, mode))) {
+        if (info->selected) {
             found = child;
             break;
         }
@@ -180,33 +175,11 @@ static IMatter* do_search_selected_matter(IMatter* start, unsigned int mode, IMa
 }
 
 /*************************************************************************************************/
-Plane::Plane(const char* name, unsigned int initial_mode)
-    : IPlane(name), head_matter(nullptr), mode(initial_mode) {}
-
-Plane::Plane(const std::string& name, unsigned int initial_mode)
-    : Plane(name.c_str(), initial_mode) {}
+Plane::Plane(const char* name) : IPlane(name), head_matter(nullptr) {}
+Plane::Plane(const std::string& name) : Plane(name.c_str()) {}
 
 Plane::~Plane() {
     this->erase();
-}
-
-void WarGrey::STEM::Plane::shift_to_mode(unsigned int mode) {
-    if (mode != this->mode) {
-        this->no_selected();
-        this->mode = mode;
-        this->size_cache_invalid();
-        this->notify_updated();
-    }
-}
-
-unsigned int WarGrey::STEM::Plane::current_mode() {
-    return this->mode;
-}
-
-bool WarGrey::STEM::Plane::matter_unmasked(IMatter* m) {
-    MatterInfo* info = plane_matter_info(this, m);
-
-    return ((info != nullptr) && unsafe_matter_unmasked(info, this->mode));
 }
 
 void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
@@ -237,16 +210,105 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
     }
 }
 
+void WarGrey::STEM::Plane::bring_to_front(IMatter* m, IMatter* target) {
+    MatterInfo* tinfo = plane_matter_info(this, target);
+
+    if (tinfo == nullptr) {
+        if (this->head_matter != nullptr) {
+            this->bring_to_front(m, MATTER_INFO(this->head_matter)->prev);
+        }
+    } else {
+        MatterInfo* sinfo = plane_matter_info(this, m);
+        
+        if ((sinfo != nullptr) && (m != target)) {
+            if (tinfo->next != m) {
+                MATTER_INFO(sinfo->prev)->next = sinfo->next;
+                MATTER_INFO(sinfo->next)->prev = sinfo->prev;
+                MATTER_INFO(tinfo->next)->prev = m;
+                sinfo->prev = target;
+                sinfo->next = tinfo->next;
+                tinfo->next = m;
+            }
+
+            if (this->head_matter == m) {
+                this->head_matter = sinfo->next;
+            }
+            
+            this->notify_updated();
+        }
+    }
+}
+
+void WarGrey::STEM::Plane::bring_forward(IMatter* m, int n) {
+    MatterInfo* sinfo = plane_matter_info(this, m);
+    
+    if (sinfo != nullptr) {
+        IMatter* sentry = MATTER_INFO(this->head_matter)->prev;
+        IMatter* target = m;
+
+        while ((target != sentry) && (n > 0)) {
+            n --;
+            target = MATTER_INFO(target)->next;
+        }
+
+        this->bring_to_front(m, target);
+    }
+}
+
+void WarGrey::STEM::Plane::send_to_back(IMatter* m, IMatter* target) {
+    MatterInfo* tinfo = plane_matter_info(this, target);
+
+    if (tinfo == nullptr) {
+        if (this->head_matter != nullptr) {
+            this->send_to_back(m, this->head_matter);
+        }
+    } else {
+        MatterInfo* sinfo = plane_matter_info(this, m);
+        
+        if ((sinfo != nullptr) && (m != target)) {
+            if (tinfo->prev != m) {
+                MATTER_INFO(sinfo->prev)->next = sinfo->next;
+                MATTER_INFO(sinfo->next)->prev = sinfo->prev;
+                MATTER_INFO(tinfo->prev)->next = m;
+                sinfo->next = target;
+                sinfo->prev = tinfo->prev;
+                tinfo->prev = m;
+            }
+
+            if (this->head_matter == target) {
+                this->head_matter = m;
+            }
+
+            this->notify_updated();
+        }
+    }
+}
+
+void WarGrey::STEM::Plane::send_backward(IMatter* m, int n) {
+    MatterInfo* sinfo = plane_matter_info(this, m);
+    
+    if (sinfo != nullptr) {
+        IMatter* target = m;
+
+        while ((target != this->head_matter) && (n > 0)) {
+            n --;
+            target = MATTER_INFO(target)->prev;
+        }
+
+        this->send_to_back(m, target);
+    }
+}
+
 void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
     if (m->info == nullptr) {
-        MatterInfo* info = bind_matter_owership(this, this->mode, m);
+        MatterInfo* info = bind_matter_owership(this, m);
         SDL_Renderer* master_renderer = this->master_renderer();
 
         if (this->head_matter == nullptr) {
             this->head_matter = m;
             info->prev = this->head_matter;
             info->next = this->head_matter;
-        } else if (this->tooltip == nullptr) {
+        } else {
             MatterInfo* head_info = MATTER_INFO(this->head_matter);
             MatterInfo* prev_info = MATTER_INFO(head_info->prev);
             
@@ -254,14 +316,6 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
             info->next = this->head_matter;
             prev_info->next = m;
             head_info->prev = m;
-        } else {
-            MatterInfo* tool_info = MATTER_INFO(this->tooltip);
-            MatterInfo* prev_info = MATTER_INFO(tool_info->prev);
-
-            info->prev = tool_info->prev;
-            info->next = this->tooltip;
-            prev_info->next = m;
-            tool_info->prev = m;
         }
 
         this->begin_update_sequence();
@@ -285,12 +339,9 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
 void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
     MatterInfo* info = plane_matter_info(this, m);
 
-    if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
-        MatterInfo* prev_info = MATTER_INFO(info->prev);
-        MatterInfo* next_info = MATTER_INFO(info->next);
-
-        prev_info->next = info->next;
-        next_info->prev = info->prev;
+    if (info != nullptr) {
+        MATTER_INFO(info->prev)->next = info->next;
+        MATTER_INFO(info->next)->prev = info->prev;
 
         if (this->head_matter == m) {
             if (this->head_matter == info->next) {
@@ -338,7 +389,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_glidin
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
 
-        if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+        if (info != nullptr) {
             if (this->move_matter_via_info(m, info, x, y, false, ignore_gliding)) {
                 this->notify_updated();
             }
@@ -349,7 +400,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_glidin
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
+            if (info->selected) {
                 this->move_matter_via_info(m, info, x, y, false, ignore_gliding);
             }
 
@@ -363,7 +414,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_glidin
 void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
     MatterInfo* info = plane_matter_info(this, m);
     
-    if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+    if (info != nullptr) {
         if (this->move_matter_via_info(m, info, x, y, fx, fy, dx, dy)) {
             this->notify_updated();
         }
@@ -375,7 +426,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* target, float tfx, float
     float x = 0.0F;
     float y = 0.0F;
 
-    if ((tinfo != nullptr) && unsafe_matter_unmasked(tinfo, this->mode)) {
+    if (tinfo != nullptr) {
         float tsx, tsy, tsw, tsh;
 
         unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
@@ -392,8 +443,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMat
     float x = 0.0F;
     float y = 0.0F;
 
-    if ((xinfo != nullptr) && unsafe_matter_unmasked(xinfo, this->mode)
-        && (yinfo != nullptr) && unsafe_matter_unmasked(yinfo, this->mode)) {
+    if ((xinfo != nullptr) && (yinfo != nullptr)) {
         float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
 
         unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
@@ -409,7 +459,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
 
-        if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+        if (info != nullptr) {
             this->glide_matter_via_info(m, info, sec, x, y, false);
         }
     } else if (this->head_matter != nullptr) {
@@ -418,7 +468,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
+            if (info->selected) {
                 this->glide_matter_via_info(m, info, sec, x, y, false);
             }
 
@@ -430,7 +480,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
 void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
     MatterInfo* info = plane_matter_info(this, m);
     
-    if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+    if (info != nullptr) {
         this->glide_matter_via_info(m, info, sec, x, y, fx, fy, dx, dy);
     }
 }
@@ -440,7 +490,7 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* target, flo
     float x = 0.0F;
     float y = 0.0F;
 
-    if ((tinfo != nullptr) && unsafe_matter_unmasked(tinfo, this->mode)) {
+    if (tinfo != nullptr) {
         float tsx, tsy, tsw, tsh;
 
         unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
@@ -457,8 +507,7 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* xtarget, fl
     float x = 0.0F;
     float y = 0.0F;
 
-    if ((xinfo != nullptr) && unsafe_matter_unmasked(xinfo, this->mode)
-        && (yinfo != nullptr) && unsafe_matter_unmasked(yinfo, this->mode)) {
+    if ((xinfo != nullptr) && (yinfo != nullptr)) {
         float xsx, xsy, xsw, xsh, ysx, ysy, ysw, ysh;
 
         unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
@@ -480,20 +529,18 @@ IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, f
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (unsafe_matter_unmasked(info, this->mode)) {
-                if (child->visible()) {
-                    float sx, sy, sw, sh;
+            if (child->visible()) {
+                float sx, sy, sw, sh;
 
-                    unsafe_feed_matter_bound(child, info, &sx, &sy, &sw, &sh);
+                unsafe_feed_matter_bound(child, info, &sx, &sy, &sw, &sh);
 
-                    sx += (this->translate_x * this->scale_x);
-                    sy += (this->translate_y * this->scale_y);
+                sx += (this->translate_x * this->scale_x);
+                sy += (this->translate_y * this->scale_y);
 
-                    if (flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))) {
-                        if (child->is_colliding_with_mouse(x - sx, y - sy)) {
-                            found = child;
-                            break;
-                        }
+                if (flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))) {
+                    if (child->is_colliding_with_mouse(x - sx, y - sy)) {
+                        found = child;
+                        break;
                     }
                 }
             }
@@ -516,13 +563,13 @@ IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
     
     if (start == nullptr) {
         if (this->head_matter != nullptr) {
-            found = do_search_selected_matter(this->head_matter, this->mode, this->head_matter);
+            found = do_search_selected_matter(this->head_matter, this->head_matter);
         }
     } else {
         MatterInfo* info = plane_matter_info(this, start);
 
-        if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
-            found = do_search_selected_matter(info->next, this->mode, this->head_matter);
+        if (info != nullptr) {
+            found = do_search_selected_matter(info->next, this->head_matter);
         }
     }
 
@@ -533,7 +580,7 @@ bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, 
     MatterInfo* info = plane_matter_info(this, m);
     bool okay = false;
     
-    if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+    if (info != nullptr) {
         float sx, sy, sw, sh;
 
         unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
@@ -550,7 +597,7 @@ bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, 
     MatterInfo* info = plane_matter_info(this, m);
     bool okay = false;
     
-    if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+    if (info != nullptr) {
         float sx, sy, sw, sh;
             
         unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
@@ -595,13 +642,11 @@ void WarGrey::STEM::Plane::recalculate_matters_extent_when_invalid() {
             do {
                 MatterInfo* info = MATTER_INFO(child);
 
-                if (unsafe_matter_unmasked(info, this->mode)) {
-                    unsafe_feed_matter_bound(child, info, &rx, &ry, &width, &height);
-                    this->matters_left = flmin(this->matters_left, rx);
-                    this->matters_top = flmin(this->matters_top, ry);
-                    this->matters_right = flmax(this->matters_right, rx + width);
-                    this->matters_bottom = flmax(this->matters_bottom, ry + height);
-                }
+                unsafe_feed_matter_bound(child, info, &rx, &ry, &width, &height);
+                this->matters_left = flmin(this->matters_left, rx);
+                this->matters_top = flmin(this->matters_top, ry);
+                this->matters_right = flmax(this->matters_right, rx + width);
+                this->matters_bottom = flmax(this->matters_bottom, ry + height);
 
                 child = info->next;
             } while (child != this->head_matter);
@@ -614,7 +659,7 @@ void WarGrey::STEM::Plane::add_selected(IMatter* m) {
         MatterInfo* info = plane_matter_info(this, m);
 
         if ((info != nullptr) && (!info->selected)) {
-            if (unsafe_matter_unmasked(info, this->mode) && this->can_select(m)) {
+            if (this->can_select(m)) {
                 unsafe_add_selected(this, m, info);
             }
         }
@@ -625,7 +670,7 @@ void WarGrey::STEM::Plane::set_selected(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (!info->selected)) {
-        if (unsafe_matter_unmasked(info, this->mode) && (this->can_select(m))) {
+        if (this->can_select(m)) {
             unsafe_set_selected(this, m, info);
         }
     }
@@ -640,7 +685,7 @@ void WarGrey::STEM::Plane::no_selected() {
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
+            if (info->selected) {
                 this->before_select(child, false);
                 info->selected = false;
                 this->after_select(child, false);
@@ -658,7 +703,7 @@ bool WarGrey::STEM::Plane::is_selected(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
     bool selected = false;
 
-    if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+    if (info != nullptr) {
         selected = info->selected;
     }
 
@@ -674,7 +719,7 @@ size_t WarGrey::STEM::Plane::count_selected() {
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (info->selected && unsafe_matter_unmasked(info, this->mode)) {
+            if (info->selected) {
                 n += 1U;
             }
 
@@ -686,7 +731,7 @@ size_t WarGrey::STEM::Plane::count_selected() {
 }
 
 IMatter* WarGrey::STEM::Plane::get_focused_matter() {
-    return (this->matter_unmasked(this->focused_matter) ? this->focused_matter : nullptr);
+    return this->focused_matter;
 }
 
 void WarGrey::STEM::Plane::set_caret_owner(IMatter* m) {
@@ -694,7 +739,7 @@ void WarGrey::STEM::Plane::set_caret_owner(IMatter* m) {
         if ((m != nullptr) && (m->events_allowed())) {
             MatterInfo* info = plane_matter_info(this, m);
 
-            if ((info != nullptr) && unsafe_matter_unmasked(info, this->mode)) {
+            if (info != nullptr) {
                 if (this->focused_matter != nullptr) {
                     this->focused_matter->own_caret(false);
                     this->on_focus(this->focused_matter, false);
@@ -1020,17 +1065,15 @@ void WarGrey::STEM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t
         do {
             MatterInfo* info = MATTER_INFO(child);
             
-            if (unsafe_matter_unmasked(info, this->mode)) {
-                elapse = local_timeline_elapse(interval, info->local_frame_delta, info->local_elapse, info->duration);
+            elapse = local_timeline_elapse(interval, info->local_frame_delta, info->local_elapse, info->duration);
                 
-                if (elapse > 0U) {
-                    info->duration = child->update(info->local_frame_count ++, elapse, uptime);
-                }
-
-                /* controlling motion via global timeline makes it more smooth */
-                this->do_motion_moving(child, info, dwidth, dheight);
+            if (elapse > 0U) {
+                info->duration = child->update(info->local_frame_count ++, elapse, uptime);
             }
-            
+
+            /* controlling motion via global timeline makes it more smooth */
+            this->do_motion_moving(child, info, dwidth, dheight);
+
             child = info->next;
         } while (child != this->head_matter);
     }
@@ -1069,48 +1112,60 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
 
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
-        float mx, my, mwidth, mheight;
-        SDL_Rect clip;
         
         do {
-            MatterInfo* info = MATTER_INFO(child);
-
-            if (unsafe_matter_unmasked(info, this->mode) && child->visible()) {
-                child->feed_extent(info->x, info->y, &mwidth, &mheight);
-
-                mx = (info->x + this->translate_x) * this->scale_x + X;
-                my = (info->y + this->translate_y) * this->scale_y + Y;
-                
-                if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
-                    clip.x = fl2fxi(flfloor(mx));
-                    clip.y = fl2fxi(flfloor(my));
-                    clip.w = fl2fxi(flceiling(mwidth));
-                    clip.h = fl2fxi(flceiling(mheight));
-
-                    SDL_RenderSetClipRect(renderer, &clip);
-
-                    if (child->ready()) {
-                        child->draw(renderer, mx, my, mwidth, mheight);
-                    } else {
-                        child->draw_in_progress(renderer, mx, my, mwidth, mheight);
-                    }
-
-                    if (info->selected) {
-                        SDL_RenderSetClipRect(renderer, nullptr);
-                        this->draw_visible_selection(renderer, mx, my, mwidth, mheight);
-                    }
-                }
+            if (this->tooltip != child) {
+                child = this->do_draw(renderer, child, X, Y, dsX, dsY, dsWidth, dsHeight);
+            } else {
+                child = MATTER_INFO(child)->next;
             }
-
-            child = info->next;
         } while (child != this->head_matter);
-                    
+
+        if (this->tooltip != nullptr) {
+            this->do_draw(renderer, this->tooltip, X, Y, dsX, dsY, dsWidth, dsHeight);
+        }
+
         SDL_RenderSetClipRect(renderer, nullptr);
     }
 }
 
 void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
     game_draw_rect(renderer, x, y, width, height, 0x00FFFFU);
+}
+
+IMatter* WarGrey::STEM::Plane::do_draw(SDL_Renderer* renderer, IMatter* child, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
+    MatterInfo* info = MATTER_INFO(child);
+    float mx, my, mwidth, mheight;
+    SDL_Rect clip;
+    
+    if (child->visible()) {
+        child->feed_extent(info->x, info->y, &mwidth, &mheight);
+
+        mx = (info->x + this->translate_x) * this->scale_x + X;
+        my = (info->y + this->translate_y) * this->scale_y + Y;
+                
+        if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
+            clip.x = fl2fxi(flfloor(mx));
+            clip.y = fl2fxi(flfloor(my));
+            clip.w = fl2fxi(flceiling(mwidth));
+            clip.h = fl2fxi(flceiling(mheight));
+
+            SDL_RenderSetClipRect(renderer, &clip);
+
+            if (child->ready()) {
+                child->draw(renderer, mx, my, mwidth, mheight);
+            } else {
+                child->draw_in_progress(renderer, mx, my, mwidth, mheight);
+            }
+
+            if (info->selected) {
+                SDL_RenderSetClipRect(renderer, nullptr);
+                this->draw_visible_selection(renderer, mx, my, mwidth, mheight);
+            }
+        }
+    }
+
+    return info->next;
 }
 
 void WarGrey::STEM::Plane::do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x, float prev_scale_y) {
