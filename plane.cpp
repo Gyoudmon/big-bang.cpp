@@ -519,12 +519,13 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* xtarget, fl
     this->glide_to(sec, m, x, y, fx, fy, dx, dy);
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, float y) {
+IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, float y, IMatter* after) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
         MatterInfo* head_info = MATTER_INFO(this->head_matter);
-        IMatter* child = head_info->prev;
+        MatterInfo* aftr_info = plane_matter_info(this, after);
+        IMatter* child = (aftr_info == nullptr) ? head_info->prev : aftr_info->prev;
 
         do {
             MatterInfo* info = MATTER_INFO(child);
@@ -552,8 +553,8 @@ IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, f
     return found;
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter(float x, float y) {
-    IMatter* found = this->find_matter_including_camouflaged_ones(x, y);
+IMatter* WarGrey::STEM::Plane::find_matter(float x, float y, IMatter* after) {
+    IMatter* found = this->find_matter_including_camouflaged_ones(x, y, after);
 
     return ((found == nullptr) || found->concealled()) ? nullptr : found;
 }

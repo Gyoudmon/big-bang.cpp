@@ -46,7 +46,7 @@ namespace WarGrey::STEM {
         virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
     
     public:
-        virtual WarGrey::STEM::IMatter* find_matter(float x, float y) = 0;
+        virtual WarGrey::STEM::IMatter* find_matter(float x, float y, IMatter* after) = 0;
         virtual bool feed_matter_location(IMatter* m, float* x, float* y, float fx, float fy) = 0;
         virtual bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) = 0;
         virtual void feed_matters_boundary(float* x, float* y, float* width, float* height) = 0;
@@ -244,7 +244,7 @@ namespace WarGrey::STEM {
         using WarGrey::STEM::IPlane::move_to;
         using WarGrey::STEM::IPlane::glide_to;
 
-        WarGrey::STEM::IMatter* find_matter(float x, float y) override;
+        WarGrey::STEM::IMatter* find_matter(float x, float y, IMatter* after = nullptr) override;
         bool feed_matter_location(IMatter* m, float* x, float* y, float fx = 0.0F, float fy = 0.0F) override;
         bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) override;
         void feed_matters_boundary(float* x, float* y, float* width, float* height) override;
@@ -322,7 +322,7 @@ namespace WarGrey::STEM {
         void do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F);
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
-        WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y);
+        WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y, IMatter* after = nullptr);
         void place_tooltip(WarGrey::STEM::IMatter* target);
 
     private:
