@@ -47,16 +47,22 @@ void WarGrey::STEM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
         if (this->diagram->okay()) {
             if (this->master != nullptr) {
                 SDL_Texture* origin = SDL_GetRenderTarget(this->master);
+                short fx1 = fl2fx<short>(x1);
+                short fy1 = fl2fx<short>(y1);
+                short fx2 = fl2fx<short>(x2);
+                short fy2 = fl2fx<short>(y2);
                 uint8_t a = color_component_to_byte(this->alpha);
                 uint8_t r, g, b;
 
                 SDL_SetRenderTarget(this->master, this->diagram->self());
 
                 RGB_From_Hexadecimal(this->color, &r, &g, &b);
-                thickLineRGBA(this->master,
-                    fl2fx<short>(x1), fl2fx<short>(y1),
-                    fl2fx<short>(x2), fl2fx<short>(y2),
-                    this->line_width, r, g, b, a);
+
+                if (this->line_width == 1) {
+                    aalineRGBA(this->master, fx1, fy1, fx2, fy2, r, g, b, a);
+                } else {
+                    thickLineRGBA(this->master, fx1, fy1, fx2, fy2, this->line_width, r, g, b, a);
+                }
 
                 SDL_SetRenderTarget(this->master, origin);
 
