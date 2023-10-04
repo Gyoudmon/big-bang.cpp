@@ -11,6 +11,7 @@ namespace WarGrey::STEM {
         virtual ~Bracer() {}
 
     public:
+        void try_switch_mode(BracerMode mode, int repeat = -1, MatterAnchor anchor = MatterAnchor::CC);
         void switch_mode(BracerMode mode, int repeat = -1, MatterAnchor anchor = MatterAnchor::CC);
         BracerMode current_mode() { return this->mode; }
 

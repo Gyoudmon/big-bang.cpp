@@ -13,6 +13,12 @@ void WarGrey::STEM::Bracer::on_costumes_load() {
     this->do_mode_switching(BracerMode::Walk, MatterAnchor::CC);
 }
 
+void WarGrey::STEM::Bracer::try_switch_mode(BracerMode mode, int repeat, MatterAnchor anchor) {
+    if (this->mode != mode) {
+        this->switch_mode(mode, repeat, anchor);
+    }
+}
+
 void WarGrey::STEM::Bracer::switch_mode(BracerMode mode, int repeat, MatterAnchor anchor) {
     if (this->mode != mode) {
         this->do_mode_switching(mode, anchor);

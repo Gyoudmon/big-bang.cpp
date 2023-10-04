@@ -15,7 +15,7 @@ WarGrey::STEM::IMovable::IMovable() {
     this->tvx = infinity;
     this->tvy = infinity;
     this->ar = flnan;
-    this->vr = flnan;
+    this->vr = 0.0; // for heading
 }
 
 void WarGrey::STEM::IMovable::set_acceleration(double acc, double dir, bool is_radian) {
@@ -119,10 +119,6 @@ double WarGrey::STEM::IMovable::get_velocity(double* direction, double* x, doubl
 
 double WarGrey::STEM::IMovable::get_velocity_direction(bool need_radian) {
     double rad = this->vr;
-
-    if (flisnan(rad)) {
-        rad = flatan(this->vy, this->vx);
-    }
 
     return (need_radian ? rad : radians_to_degrees(rad));
 }

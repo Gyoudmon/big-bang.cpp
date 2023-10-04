@@ -51,6 +51,15 @@ SDL_Texture* WarGrey::STEM::game_load_image(SDL_Renderer* renderer, const char* 
     return IMG_LoadTexture(renderer, file);
 }
 
+void WarGrey::STEM::game_clear_image(SDL_Renderer* renderer, SDL_Texture* image) {
+    SDL_Texture* origin = SDL_GetRenderTarget(renderer);
+            
+    SDL_SetRenderTarget(renderer, image);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+    SDL_SetRenderTarget(renderer, origin);
+}
+
 void WarGrey::STEM::game_unload_image(SDL_Texture* image) {
     SDL_DestroyTexture(image);
 }

@@ -43,6 +43,7 @@
 #include "matter/graphlet.hpp"
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/shapelet.hpp"
+#include "matter/graphlet/tracklet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
 #include "matter/graphlet/historylet.hpp"
 

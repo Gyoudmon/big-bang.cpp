@@ -55,10 +55,12 @@ namespace WarGrey::STEM {
         virtual void bring_forward(IMatter* m, int n) = 0;
         virtual void send_to_back(IMatter* m, IMatter* target) = 0;
         virtual void send_backward(IMatter* m, int n) = 0;
+        virtual void move(IMatter* m, double length, bool ignore_gliding) = 0;
         virtual void move(IMatter* m, float x, float y, bool ignore_gliding) = 0;
         virtual void move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
         virtual void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
         virtual void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx, float fy, float dx, float dy) = 0;
+        virtual void glide(double sec, IMatter* m, double length) = 0;
         virtual void glide(double sec, IMatter* m, float x, float y) = 0;
         virtual void glide_to(double sec, IMatter* m, float x, float y, float fx, float fy, float dx, float dy) = 0;
         virtual void glide_to(double sec, IMatter* m, IMatter* tm, float tfx, float tfy, float fx, float fy, float dx, float dy) = 0;
@@ -110,11 +112,13 @@ namespace WarGrey::STEM {
         bool is_colliding(IMatter* m, IMatter* target, MatterAnchor a);
         bool feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a);
         void insert_at(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void move(IMatter* m, float length, bool ignore_gliding = false) { this->move(m, double(length), ignore_gliding); }
         void move_to(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move_to(IMatter* m, IMatter* tm, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move_to(IMatter* m, IMatter* tm, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
         void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void glide(double sec, IMatter* m, float length) { this->glide(sec, m, double(length)); }
         void glide_to(double sec, IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void glide_to(double sec, IMatter* m, IMatter* tm, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void glide_to(double sec, IMatter* m, IMatter* tm, MatterAnchor ta, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F);
@@ -241,7 +245,9 @@ namespace WarGrey::STEM {
     public: // learn C++ "Name Hiding"
         using WarGrey::STEM::IPlane::feed_matter_location;
         using WarGrey::STEM::IPlane::insert_at;
+        using WarGrey::STEM::IPlane::move;
         using WarGrey::STEM::IPlane::move_to;
+        using WarGrey::STEM::IPlane::glide;
         using WarGrey::STEM::IPlane::glide_to;
 
         WarGrey::STEM::IMatter* find_matter(float x, float y, IMatter* after = nullptr) override;
@@ -253,10 +259,12 @@ namespace WarGrey::STEM {
         void bring_forward(IMatter* m, int n = 1) override;
         void send_to_back(IMatter* m, IMatter* target = nullptr) override;
         void send_backward(IMatter* m, int n = 1) override;
+        void move(IMatter* m, double length, bool ignore_gliding = false) override;
         void move(IMatter* m, float x, float y, bool ignore_gliding = false) override;
         void move_to(IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void move_to(IMatter* m, IMatter* tm, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void move_to(IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
+        void glide(double sec, IMatter* m, double length) override;
         void glide(double sec, IMatter* m, float x, float y) override;
         void glide_to(double sec, IMatter* m, float x, float y, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
         void glide_to(double sec, IMatter* m, IMatter* tm, float tfx, float tfy, float fx = 0.0F, float fy = 0.0F, float dx = 0.0F, float dy = 0.0F) override;
@@ -309,8 +317,10 @@ namespace WarGrey::STEM {
         void on_matter_ready(IMatter* m) override {}
 
     private:
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
+        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy);
         bool do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);

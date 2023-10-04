@@ -385,6 +385,32 @@ void WarGrey::STEM::Plane::erase() {
     }
 }
 
+void WarGrey::STEM::Plane::move(IMatter* m, double length, bool ignore_gliding) {
+    if (m != nullptr) {
+        MatterInfo* info = plane_matter_info(this, m);
+
+        if (info != nullptr) {
+            if (this->move_matter_via_info(m, info, length, ignore_gliding)) {
+                this->notify_updated();
+            }
+        }
+    } else if (this->head_matter != nullptr) {
+        IMatter* child = this->head_matter;
+
+        do {
+            MatterInfo* info = MATTER_INFO(child);
+
+            if (info->selected) {
+                this->move_matter_via_info(child, info, length, ignore_gliding);
+            }
+
+            child = info->next;
+        } while (child != this->head_matter);
+
+        this->notify_updated();
+    }
+}
+
 void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_gliding) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
@@ -401,7 +427,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_glidin
             MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected) {
-                this->move_matter_via_info(m, info, x, y, false, ignore_gliding);
+                this->move_matter_via_info(child, info, x, y, false, ignore_gliding);
             }
 
             child = info->next;
@@ -455,6 +481,28 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMat
     this->move_to(m, x, y, fx, fy, dx, dy);
 }
 
+void WarGrey::STEM::Plane::glide(double sec, IMatter* m, double length) {
+    if (m != nullptr) {
+        MatterInfo* info = plane_matter_info(this, m);
+
+        if (info != nullptr) {
+            this->glide_matter_via_info(m, info, sec, length);
+        }
+    } else if (this->head_matter != nullptr) {
+        IMatter* child = this->head_matter;
+
+        do {
+            MatterInfo* info = MATTER_INFO(child);
+
+            if (info->selected) {
+                this->glide_matter_via_info(child, info, sec, length);
+            }
+
+            child = info->next;
+        } while (child != this->head_matter);
+    }
+}
+
 void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
@@ -469,7 +517,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected) {
-                this->glide_matter_via_info(m, info, sec, x, y, false);
+                this->glide_matter_via_info(child, info, sec, x, y, false);
             }
 
             child = info->next;
@@ -1249,6 +1297,14 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, flo
     return moved;
 }
 
+bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding) {
+    double x, y;
+
+    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    
+    return this->move_matter_via_info(m, info, float(x), float(y), false, ignore_gliding);
+}
+
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding) {
     bool moved = false;
 
@@ -1271,6 +1327,14 @@ bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, fl
     }
 
     return moved;
+}
+
+bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length) {
+    double x, y;
+
+    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    
+    return this->glide_matter_via_info(m, info, sec, float(x), float(y), false);
 }
 
 bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute) {
