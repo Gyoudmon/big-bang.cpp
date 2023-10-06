@@ -278,6 +278,7 @@ namespace WarGrey::STEM {
         void bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, MatterAnchor anchor, bool shared = false);
         void bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, float fx = 0.5F, float fy = 0.5F, bool shared = false);
         void reset_pen(IMatter* m);
+        void stamp(IMatter* m);
         void pen_down(IMatter* m) { this->set_drawing(m, true); }
         void pen_up(IMatter* m) { this->set_drawing(m, false); }
         void set_drawing(IMatter* m, bool yes_or_no);
@@ -335,8 +336,8 @@ namespace WarGrey::STEM {
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding, bool heading);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length);
-        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute);
-        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy);
+        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute, bool heading);
+        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading);
         bool do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_track, bool heading);
         bool do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, double sec, double sec_delta, bool absolute, bool ignore_track);
         bool do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec);

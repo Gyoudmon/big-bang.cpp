@@ -30,7 +30,7 @@ using namespace WarGrey::STEM;
 #define MATTER_INFO(m) (static_cast<MatterInfo*>(m->info))
 
 namespace WarGrey::STEM {
-    enum class MotionActionType { Motion, TrackReset, TrackDrawing, PenColor, PenWidth, Heading, Rotation };
+    enum class MotionActionType { Motion, TrackReset, TrackDrawing, PenColor, PenWidth, Heading, Rotation, Stamp };
     
     struct AsyncInfo {
         double second;
@@ -40,6 +40,7 @@ namespace WarGrey::STEM {
         float fy0;
         float dx0;
         float dy0;
+        bool heading;
     };
 
     struct GMTarget {
@@ -78,7 +79,8 @@ namespace WarGrey::STEM {
     };
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
-        MatterInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {};
+        MatterInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {}
+        ~MatterInfo() { if (this->async != nullptr) delete this->async; }
 
         float x = 0.0F;
         float y = 0.0F;
@@ -168,7 +170,7 @@ static inline void unsafe_canvas_sync_settings(MatterInfo* info) {
     info->canvas->set_pen_color(info->draw_color, info->draw_alpha);
 }
 
-static void unsafe_canvas_info_do_setting(IMatter* m, MatterInfo* info, const MotionAction& op) {
+static void unsafe_canvas_info_do_setting(IPlane* self, IMatter* m, MatterInfo* info, const MotionAction& op) {
     switch (op.type) {
     case MotionActionType::PenColor: {
         info->draw_color = op.argv.color.hex;
@@ -179,6 +181,12 @@ static void unsafe_canvas_info_do_setting(IMatter* m, MatterInfo* info, const Mo
     case MotionActionType::TrackReset: unsafe_canvas_info_reset(info); break;
     case MotionActionType::Rotation: m->add_heading(op.argv.theta, true); break;
     case MotionActionType::Heading: m->set_heading(op.argv.direction, true); break;
+    case MotionActionType::Stamp: {
+        float x, y;
+
+        self->feed_matter_location(m, &x, &y, MatterAnchor::LT);
+        info->canvas->stamp(m, x, y);
+     }; break;
     default: /* ignored */;
     }
 }
@@ -187,7 +195,7 @@ static void unsafe_do_canvas_setting(Plane* self, IMatter* m, MatterInfo* info, 
     if (info->gliding) {
         info->motion_actions.push_back(op);
     } else {
-        unsafe_canvas_info_do_setting(m, info, op);
+        unsafe_canvas_info_do_setting(self, m, info, op);
 
         if (!info->shared_canvas) {
             unsafe_canvas_sync_settings(info);
@@ -301,7 +309,8 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
                 info->async->second,
                 info->async->x0, info->async->y0,
                 info->async->fx0, info->async->fy0,
-                info->async->dx0, info->async->dy0);
+                info->async->dx0, info->async->dy0,
+                info->async->heading);
 
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
                 this->do_resize(m, info, info->async->fx0, info->async->fy0, this->scale_x, this->scale_y);
@@ -615,7 +624,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
         MatterInfo* info = plane_matter_info(this, m);
 
         if (info != nullptr) {
-            this->glide_matter_via_info(m, info, sec, x, y, false);
+            this->glide_matter_via_info(m, info, sec, x, y, false, true);
         }
     } else if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
@@ -624,7 +633,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected) {
-                this->glide_matter_via_info(child, info, sec, x, y, false);
+                this->glide_matter_via_info(child, info, sec, x, y, false, true);
             }
 
             child = info->next;
@@ -636,7 +645,7 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, float x, float y, fl
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        this->glide_matter_via_info(m, info, sec, x, y, fx, fy, dx, dy);
+        this->glide_matter_via_info(m, info, sec, x, y, fx, fy, dx, dy, true);
     }
 }
 
@@ -1460,17 +1469,17 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute) {
+bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute, bool heading) {
     bool moved = false;
     
     if (sec <= 0.0F) {
-        moved = this->move_matter_via_info(m, info, x, y, absolute, false, true);
+        moved = this->move_matter_via_info(m, info, x, y, absolute, false, heading);
     } else {
         IScreen* screen = this->master();
         double sec_delta = (screen != nullptr) ? (1.0 / double(screen->frame_rate())) : 0.0;
 
         if ((sec <= sec_delta) || (sec_delta == 0.0)) {
-            moved = this->move_matter_via_info(m, info, x, y, absolute, false, true);
+            moved = this->move_matter_via_info(m, info, x, y, absolute, false, heading);
         } else {
             if (!info->gliding) {
                 moved = this->do_gliding_via_info(m, info, x, y, sec, sec_delta, absolute, false);
@@ -1478,7 +1487,7 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
                 MotionAction action;
                 
                 action.type = MotionActionType::Motion;
-                action.argv.motion = { .target.dot = { x, y }, sec, sec_delta, absolute, true };
+                action.argv.motion = { .target.dot = { x, y }, sec, sec_delta, absolute, heading };
 
                 info->motion_actions.push_back(action);
             }
@@ -1488,7 +1497,7 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy) {
+bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading) {
     float ax = 0.0F;
     float ay = 0.0F;
     
@@ -1508,13 +1517,14 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
         info->async->fy0 = fy;
         info->async->dx0 = dx;
         info->async->dy0 = dy;
+        info->async->heading = heading;
     }
     
-    return this->glide_matter_via_info(m, info, sec, x - ax + dx, y - ay + dy, true);
+    return this->glide_matter_via_info(m, info, sec, x - ax + dx, y - ay + dy, true, heading);
 }
 
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
-    return this->glide_matter_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy);
+    return this->glide_matter_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy, false);
 }
 
 void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
@@ -1615,7 +1625,7 @@ void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float 
                     this->notify_updated();
                 }
             } else {
-                unsafe_canvas_info_do_setting(m, info, next_move);
+                unsafe_canvas_info_do_setting(this, m, info, next_move);
 
                 if (!info->shared_canvas) {
                     unsafe_canvas_sync_settings(info);
@@ -1630,7 +1640,7 @@ bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, doubl
 
     orthogonal_decomposition(length, m->get_heading(), &x, &y);
     
-    return this->glide_matter_via_info(m, info, sec, float(x), float(y), false);
+    return this->glide_matter_via_info(m, info, sec, float(x), float(y), false, true);
 }
 
 
@@ -1664,6 +1674,17 @@ void WarGrey::STEM::Plane::reset_pen(IMatter* m) {
         MotionAction action;
 
         action.type = MotionActionType::TrackReset;
+        unsafe_do_canvas_setting(this, m, info, action);
+    }
+}
+
+void WarGrey::STEM::Plane::stamp(IMatter* m) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        MotionAction action;
+
+        action.type = MotionActionType::Stamp;
         unsafe_do_canvas_setting(this, m, info, action);
     }
 }
