@@ -41,7 +41,9 @@ namespace WarGrey::STEM {
         void set_terminal_velocity(double max_spd, double direction, bool is_radian = false);
         void set_terminal_speed(double mxspd, double myspd);
         double get_heading(bool need_radian = true) { return this->get_velocity_direction(need_radian); }
+        void set_heading(double dx, double dy);
         void set_heading(double direction, bool is_radian = false);
+        void add_heading(double theta, bool is_radian = false);
         void heading_rotate(double theta, bool is_radian = false);
 
     public:

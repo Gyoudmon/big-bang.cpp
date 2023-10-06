@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../../forward.hpp"
+
 #include "../graphlet.hpp"
 #include "../../graphics/texture.hpp"
-
-#include <vector>
 
 namespace WarGrey::STEM {
     class __lambda__ Tracklet : public WarGrey::STEM::IGraphlet {
@@ -21,6 +21,7 @@ namespace WarGrey::STEM {
     public:
         void pen_down() { this->in_drawing = true; }
         void pen_up() { this->in_drawing = false; }
+        void set_drawing(bool yes_or_no) { this->in_drawing = yes_or_no; }
         bool is_drawing() { return this->in_drawing; }
         void set_pen_color(uint32_t hex, double alpha = 1.0);
         void set_pen_color(double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
@@ -33,7 +34,7 @@ namespace WarGrey::STEM {
     public:
         void add_line(float x1, float y1, float x2, float y2);
         void stamp(WarGrey::STEM::IMatter* matter, float x, float y);
-        void clear();
+        void erase();
 
     private:
         void invalidate_geometry();

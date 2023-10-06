@@ -151,6 +151,11 @@ void WarGrey::STEM::IMovable::set_terminal_speed(double mxspd, double myspd) {
     }
 }
 
+void WarGrey::STEM::IMovable::set_heading(double dx, double dy) {
+    // Usually this is meaningful when stopped
+    this->set_heading(flatan(dy, dx), true);
+}
+
 void WarGrey::STEM::IMovable::set_heading(double direction, bool is_radian) {
     // Usually this is meaningful when stopped
 
@@ -159,6 +164,16 @@ void WarGrey::STEM::IMovable::set_heading(double direction, bool is_radian) {
     }
 
     this->check_heading_changing(direction);
+}
+
+void WarGrey::STEM::IMovable::add_heading(double theta, bool is_radian) {
+    // Usually this is meaningful when stopped
+
+    if (!is_radian) {
+        theta = degrees_to_radians(theta);
+    }
+
+    this->check_heading_changing(this->vr + theta);
 }
 
 void WarGrey::STEM::IMovable::heading_rotate(double theta, bool is_radian) {

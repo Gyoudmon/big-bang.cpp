@@ -272,6 +272,20 @@ namespace WarGrey::STEM {
         void remove(IMatter* m, bool needs_delete = true) override;
         void erase() override;
         void size_cache_invalid();
+        void clear_motion_actions(IMatter* m);
+
+    public:
+        void bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, MatterAnchor anchor, bool shared = false);
+        void bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, float fx = 0.5F, float fy = 0.5F, bool shared = false);
+        void reset_pen(IMatter* m);
+        void pen_down(IMatter* m) { this->set_drawing(m, true); }
+        void pen_up(IMatter* m) { this->set_drawing(m, false); }
+        void set_drawing(IMatter* m, bool yes_or_no);
+        void set_pen_width(IMatter* m, uint8_t width);
+        void set_pen_color(IMatter* m, uint32_t hex, double alpha = 1.0);
+        void set_pen_color(IMatter* m, double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
+        void set_heading(IMatter* m, double direction, bool is_radian = false);
+        void turn(IMatter* m, double theta, bool is_radian = false);
 
     public:
         IMatter* find_next_selected_matter(IMatter* start = nullptr) override;
@@ -317,14 +331,15 @@ namespace WarGrey::STEM {
         void on_matter_ready(IMatter* m) override {}
 
     private:
-        bool move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding);
-        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding);
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading);
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding, bool heading);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy);
-        bool do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute);
-        bool do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, double sec, double sec_delta, bool absolute);
+        bool do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_track, bool heading);
+        bool do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, double sec, double sec_delta, bool absolute, bool ignore_track);
+        bool do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec);
         void do_motion_moving(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         
     private:

@@ -19,7 +19,7 @@ WarGrey::STEM::Tracklet::Tracklet(float width, float height, uint32_t hex, doubl
         this->height = this->width;
     }
 
-    this->clear();
+    this->erase();
     this->enable_resize(false);
     this->camouflage(true);
 }
@@ -58,9 +58,13 @@ void WarGrey::STEM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
 
                 RGB_From_Hexadecimal(this->color, &r, &g, &b);
 
-                if (this->line_width == 1) {
+                if (this->line_width <= 1) {
                     aalineRGBA(this->master, fx1, fy1, fx2, fy2, r, g, b, a);
                 } else {
+                    int radius = this->line_width / 2;
+
+                    filledCircleRGBA(this->master, fx1, fy1, radius, r, g, b, a);
+                    filledCircleRGBA(this->master, fx2, fy2, radius, r, g, b, a);
                     thickLineRGBA(this->master, fx1, fy1, fx2, fy2, this->line_width, r, g, b, a);
                 }
 
@@ -109,7 +113,7 @@ void WarGrey::STEM::Tracklet::clear_geometry() {
     }
 }
 
-void WarGrey::STEM::Tracklet::clear() {
+void WarGrey::STEM::Tracklet::erase() {
     if (this->xmax != -infinity) {
         this->xmax = this->ymax = -infinity;
         this->xmin = this->ymin = +infinity;

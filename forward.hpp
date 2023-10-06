@@ -4,6 +4,7 @@ namespace WarGrey::STEM {
     class IPlane;
     class IMatter;
     class ISprite;
+    class Tracklet;
     class Cosmos;
     class Continent;
 

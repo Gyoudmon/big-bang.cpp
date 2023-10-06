@@ -7,6 +7,8 @@
 #include "graphics/colorspace.hpp"
 
 #include "matter/sprite.hpp"
+#include "matter/graphlet/tracklet.hpp"
+
 #include "physics/mathematics.hpp"
 #include "physics/random.hpp"
 
@@ -28,6 +30,8 @@ using namespace WarGrey::STEM;
 #define MATTER_INFO(m) (static_cast<MatterInfo*>(m->info))
 
 namespace WarGrey::STEM {
+    enum class MotionActionType { Motion, TrackReset, TrackDrawing, PenColor, PenWidth, Heading, Rotation };
+    
     struct AsyncInfo {
         double second;
         float x0;
@@ -38,12 +42,39 @@ namespace WarGrey::STEM {
         float dy0;
     };
 
+    struct GMTarget {
+        float x;
+        float y;
+    };
+
     struct GlidingMotion {
-        float target_x;
-        float target_y;
+        union {
+            double length;
+            GMTarget dot;      
+        } target;
+        
         double second;
-        double sec_delta;
+        double sec_delta; // 0.0 means the target is based on current heading
         bool absolute;
+        bool heading; // moving only
+    };
+
+    struct PenColor {
+        uint32_t hex;
+        double alpha;
+    };
+
+    struct MotionAction {
+        MotionActionType type;
+        
+        union {
+            bool drawing;
+            double direction;
+            double theta;
+            uint8_t pen_width;
+            PenColor color;
+            GlidingMotion motion;
+        } argv;
     };
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
@@ -58,11 +89,21 @@ namespace WarGrey::STEM {
         uint32_t local_elapse = 0U;
         int duration = 0;
 
+        // for track
+        Tracklet* canvas = nullptr;
+        bool shared_canvas = false;
+        bool is_drawing = false;
+        float draw_fx = 0.5F;
+        float draw_fy = 0.5F;
+        uint32_t draw_color = 0x0U;
+        double draw_alpha = 1.0;
+        uint8_t draw_width = 1U;
+
         // for queued motions
         bool gliding = false;
         float gliding_tx = 0.0F;
         float gliding_ty = 0.0F;
-        std::deque<GlidingMotion> motion_queues;
+        std::deque<MotionAction> motion_actions;
 
         // progressbar
         double current_step = 1.0;
@@ -112,6 +153,72 @@ static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_f
     }
 
     return interval;
+}
+
+static inline void unsafe_canvas_info_reset(MatterInfo* info) {
+    info->is_drawing = false;
+    info->draw_color = 0x0U;
+    info->draw_alpha = 1.0;
+    info->draw_width = 1U;
+}
+
+static inline void unsafe_canvas_sync_settings(MatterInfo* info) {
+    info->canvas->set_drawing(info->is_drawing);
+    info->canvas->set_pen_width(info->draw_width);
+    info->canvas->set_pen_color(info->draw_color, info->draw_alpha);
+}
+
+static void unsafe_canvas_info_do_setting(IMatter* m, MatterInfo* info, const MotionAction& op) {
+    switch (op.type) {
+    case MotionActionType::PenColor: {
+        info->draw_color = op.argv.color.hex;
+        info->draw_alpha = op.argv.color.alpha;
+    }; break;
+    case MotionActionType::TrackDrawing: info->is_drawing = op.argv.drawing; break;
+    case MotionActionType::PenWidth: info->draw_width = op.argv.pen_width; break;
+    case MotionActionType::TrackReset: unsafe_canvas_info_reset(info); break;
+    case MotionActionType::Rotation: m->add_heading(op.argv.theta, true); break;
+    case MotionActionType::Heading: m->set_heading(op.argv.direction, true); break;
+    default: /* ignored */;
+    }
+}
+
+static void unsafe_do_canvas_setting(Plane* self, IMatter* m, MatterInfo* info, MotionAction& op) {
+    if (info->gliding) {
+        info->motion_actions.push_back(op);
+    } else {
+        unsafe_canvas_info_do_setting(m, info, op);
+
+        if (!info->shared_canvas) {
+            unsafe_canvas_sync_settings(info);
+        }
+    }
+}
+
+static void unsafe_canvas_do_drawing(IMatter* m, MatterInfo* info, float x1, float y1, float x2, float y2) {
+    if ((info->draw_fx != 0.0F) || (info->draw_fy != 0.0F)) {
+        float dx, dy, mwidth, mheight;
+        
+        m->feed_extent(x1, y1, &mwidth, &mheight);
+        dx = info->draw_fx * mwidth;
+        dy = info->draw_fy * mheight;
+
+        info->canvas->add_line(x1 + dx, y1 + dy, x2 + dx, y2 + dy);
+    } else {
+        info->canvas->add_line(x1, y1, x2, y2);
+    }
+}
+
+static inline void unsafe_location_changed(IMatter* m, MatterInfo* info, float ox, float oy, bool ignore_track) {
+    m->on_location_changed(info->x, info->y, ox, oy);
+
+    if ((info->canvas != nullptr) && (!ignore_track)) {
+        if (info->shared_canvas) {
+            unsafe_canvas_sync_settings(info);
+        }
+
+        unsafe_canvas_do_drawing(m, info, ox, oy, info->x, info->y);
+    }
 }
 
 static inline MatterInfo* bind_matter_owership(IPlane* master, IMatter* m) {
@@ -390,7 +497,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, double length, bool ignore_gliding) 
         MatterInfo* info = plane_matter_info(this, m);
 
         if (info != nullptr) {
-            if (this->move_matter_via_info(m, info, length, ignore_gliding)) {
+            if (this->move_matter_via_info(m, info, length, ignore_gliding, false)) {
                 this->notify_updated();
             }
         }
@@ -401,7 +508,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, double length, bool ignore_gliding) 
             MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected) {
-                this->move_matter_via_info(child, info, length, ignore_gliding);
+                this->move_matter_via_info(child, info, length, ignore_gliding, false);
             }
 
             child = info->next;
@@ -416,7 +523,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_glidin
         MatterInfo* info = plane_matter_info(this, m);
 
         if (info != nullptr) {
-            if (this->move_matter_via_info(m, info, x, y, false, ignore_gliding)) {
+            if (this->move_matter_via_info(m, info, x, y, false, ignore_gliding, false)) {
                 this->notify_updated();
             }
         }
@@ -427,7 +534,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_glidin
             MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected) {
-                this->move_matter_via_info(child, info, x, y, false, ignore_gliding);
+                this->move_matter_via_info(child, info, x, y, false, ignore_gliding, false);
             }
 
             child = info->next;
@@ -565,6 +672,14 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* xtarget, fl
     }
 
     this->glide_to(sec, m, x, y, fx, fy, dx, dy);
+}
+
+void WarGrey::STEM::Plane::clear_motion_actions(IMatter* m) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        info->motion_actions.clear();
+    }
 }
 
 IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, float y, IMatter* after) {
@@ -1230,12 +1345,12 @@ void WarGrey::STEM::Plane::do_resize(IMatter* m, MatterInfo* info, float fx, flo
         nx = sx + (sw - nw) * fx;
         ny = sy + (sh - nh) * fy;
 
-        this->do_moving_via_info(m, info, nx, ny, true);
+        this->do_moving_via_info(m, info, nx, ny, true, true, false);
     }
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute) {
+bool WarGrey::STEM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_track, bool heading) {
     bool moved = false;
     
     if (!absolute) {
@@ -1250,7 +1365,11 @@ bool WarGrey::STEM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, floa
         info->x = x;
         info->y = y;
 
-        m->on_location_changed(info->x, info->y, ox, oy);
+        if (heading) {
+            m->set_heading(x - ox, y - oy);
+        }
+
+        unsafe_location_changed(m, info, ox, oy, ignore_track);
         this->size_cache_invalid();
         moved = true;
     }
@@ -1258,7 +1377,7 @@ bool WarGrey::STEM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, floa
     return moved;
 }
 
-bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, double sec, double sec_delta, bool absolute) {
+bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, double sec, double sec_delta, bool absolute, bool ignore_track) {
     bool moved = false;
     
     if (!absolute) {
@@ -1289,7 +1408,7 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, flo
         this->on_motion_start(m, sec, info->x, info->y, xspd, yspd);
         m->step(&info->x, &info->y);
         this->on_motion_step(m, info->x, info->y, xspd, yspd, info->current_step / info->progress_total);
-        m->on_location_changed(info->x, info->y, x - dx, y - dy);
+        unsafe_location_changed(m, info, x - dx, y - dy, ignore_track);
         this->size_cache_invalid();
         moved = true;
     }
@@ -1297,65 +1416,71 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, flo
     return moved;
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding) {
+bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading) {
     double x, y;
 
     orthogonal_decomposition(length, m->get_heading(), &x, &y);
     
-    return this->move_matter_via_info(m, info, float(x), float(y), false, ignore_gliding);
+    return this->move_matter_via_info(m, info, float(x), float(y), false, ignore_gliding, heading);
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding) {
+bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding, bool heading) {
     bool moved = false;
 
-    if ((!info->gliding) || (m == this->tooltip) || ignore_gliding) {
-        moved = this->do_moving_via_info(m, info, x, y, absolute);
+    if ((!info->gliding) || ignore_gliding) {
+        moved = this->do_moving_via_info(m, info, x, y, absolute, false, heading);
+    } else if (m == this->tooltip) {
+        moved = this->do_moving_via_info(m, info, x, y, absolute, true, heading);
     } else {
-        if (info->motion_queues.empty()) {
-            info->motion_queues.push_back( { x, y, 0.0F, 0.0F, absolute } );
-        } else {
-            auto back = info->motion_queues.back();
+        MotionAction action;
 
-            if (back.second == 0.0F) {
-                back.target_x = x;
-                back.target_y = y;
-                back.absolute = absolute;
-            } else {
-                info->motion_queues.push_back( { x, y, 0.0F, 0.0F, absolute } );
-            }
-        }
+        action.type = MotionActionType::Motion;
+        action.argv.motion = { .target.dot = { x, y }, 0.0F, 0.0F, absolute, heading };
+
+        info->motion_actions.push_back(action);
     }
 
     return moved;
 }
 
 bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length) {
-    double x, y;
+    bool moved = false;
 
-    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    if (!info->gliding) {
+        this->do_vector_gliding(m, info, length, sec);
+    } else {
+        MotionAction action;
+
+        action.type = MotionActionType::Motion;
+        action.argv.motion = { .target.length = length, sec, 0.0F, false, true };
+
+        info->motion_actions.push_back(action);   
+    }
     
-    return this->glide_matter_via_info(m, info, sec, float(x), float(y), false);
+    return moved;
 }
 
 bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute) {
     bool moved = false;
     
     if (sec <= 0.0F) {
-        moved = this->move_matter_via_info(m, info, x, y, absolute, false);
+        moved = this->move_matter_via_info(m, info, x, y, absolute, false, true);
     } else {
         IScreen* screen = this->master();
         double sec_delta = (screen != nullptr) ? (1.0 / double(screen->frame_rate())) : 0.0;
 
         if ((sec <= sec_delta) || (sec_delta == 0.0)) {
-            moved = this->move_matter_via_info(m, info, x, y, absolute, false);
+            moved = this->move_matter_via_info(m, info, x, y, absolute, false, true);
         } else {
-            if (m->motion_stopped()) {
-                info->motion_queues.clear();
-                moved = this->do_gliding_via_info(m, info, x, y, sec, sec_delta, absolute);
-            } else if (!info->gliding) {
-                moved = this->do_gliding_via_info(m, info, x, y, sec, sec_delta, absolute);
+            if (!info->gliding) {
+                moved = this->do_gliding_via_info(m, info, x, y, sec, sec_delta, absolute, false);
             } else {
-                info->motion_queues.push_back({ x, y, sec, sec_delta, absolute });
+                MotionAction action;
+                
+                action.type = MotionActionType::Motion;
+                action.argv.motion = { .target.dot = { x, y }, sec, sec_delta, absolute, true };
+
+                info->motion_actions.push_back(action);
             }
         }
     }
@@ -1461,26 +1586,150 @@ void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float 
         }
 
         if ((info->x != ox) || (info->y != oy)) {
-            m->on_location_changed(info->x, info->y, ox, oy);
+            unsafe_location_changed(m, info, ox, oy, false);
             this->size_cache_invalid();
             this->notify_updated();
         }
     } else {
-        while (!info->motion_queues.empty()) {
-            GlidingMotion gm = info->motion_queues.front();
+        while (!info->motion_actions.empty()) {
+            MotionAction next_move = info->motion_actions.front();
 
-            info->motion_queues.pop_front();
+            info->motion_actions.pop_front();
 
-            if (gm.second > 0.0F) {
-                if (this->do_gliding_via_info(m, info, gm.target_x, gm.target_y, gm.second, gm.sec_delta, gm.absolute)) {
+            if (next_move.type == MotionActionType::Motion) {
+                GlidingMotion gm = next_move.argv.motion;
+
+                if (gm.second > 0.0) {
+                    if (gm.sec_delta > 0.0) {
+                        if (this->do_gliding_via_info(m, info, gm.target.dot.x, gm.target.dot.y, gm.second, gm.sec_delta, gm.absolute, false)) {
+                            this->notify_updated();
+                            break;
+                        }
+                    } else {
+                        if (this->do_vector_gliding(m, info, gm.target.length, gm.second)) {
+                            this->notify_updated();
+                            break;
+                        }
+                    }
+                } else if (this->do_moving_via_info(m, info, gm.target.dot.x, gm.target.dot.y, gm.absolute, false, gm.heading)) {
                     this->notify_updated();
-                    break;
                 }
-            } else if (this->do_moving_via_info(m, info, gm.target_x, gm.target_y, gm.absolute)) {
-                this->notify_updated();
+            } else {
+                unsafe_canvas_info_do_setting(m, info, next_move);
+
+                if (!info->shared_canvas) {
+                    unsafe_canvas_sync_settings(info);
+                }
             }
         }
     }
+}
+
+bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec) {
+    double x, y;
+
+    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    
+    return this->glide_matter_via_info(m, info, sec, float(x), float(y), false);
+}
+
+
+/*************************************************************************************************/
+void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, MatterAnchor anchor, bool shared) {
+    float fx, fy;
+
+    matter_anchor_fraction(anchor, &fx, &fy);
+    this->bind_canvas(m, canvas, fx, fy, shared);
+}
+
+void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, float fx, float fy, bool shared) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        info->canvas = canvas;
+        info->shared_canvas = shared;
+        info->draw_fx = fx;
+        info->draw_fy = fy;
+
+        if (!info->shared_canvas) {
+            unsafe_canvas_sync_settings(info);
+        }
+    }
+}
+
+void WarGrey::STEM::Plane::reset_pen(IMatter* m) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        MotionAction action;
+
+        action.type = MotionActionType::TrackReset;
+        unsafe_do_canvas_setting(this, m, info, action);
+    }
+}
+
+void WarGrey::STEM::Plane::set_drawing(IMatter* m, bool yes_or_no) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if ((info != nullptr) && (info->master != nullptr)) {
+        MotionAction action;
+
+        action.type = MotionActionType::TrackDrawing;
+        action.argv.drawing = yes_or_no;
+        unsafe_do_canvas_setting(this, m, info, action);
+    }
+}
+
+void WarGrey::STEM::Plane::set_pen_width(IMatter* m, uint8_t width) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if ((info != nullptr) && (info->master != nullptr)) {
+        MotionAction action;
+
+        action.type = MotionActionType::PenWidth;
+        action.argv.pen_width = width;
+        unsafe_do_canvas_setting(this, m, info, action);
+    }
+}
+
+void WarGrey::STEM::Plane::set_pen_color(IMatter* m, uint32_t hex, double alpha) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if ((info != nullptr) && (info->master != nullptr)) {
+        MotionAction action;
+
+        action.type = MotionActionType::PenColor;
+        action.argv.color = { hex, alpha };
+        unsafe_do_canvas_setting(this, m, info, action);
+    }
+}
+
+void WarGrey::STEM::Plane::set_heading(IMatter* m, double direction, bool is_radian) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if ((info != nullptr) && (info->master != nullptr)) {
+        MotionAction action;
+
+        action.type = MotionActionType::Heading;
+        action.argv.direction = (is_radian ? direction : degrees_to_radians(direction));
+        unsafe_do_canvas_setting(this, m, info, action);
+    }
+}
+
+void WarGrey::STEM::Plane::turn(IMatter* m, double theta, bool is_radian) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if ((info != nullptr) && (info->master != nullptr)) {
+        MotionAction action;
+
+        action.type = MotionActionType::Rotation;
+        action.argv.theta = (is_radian ? theta : degrees_to_radians(theta));
+        unsafe_do_canvas_setting(this, m, info, action);
+    }
+}
+
+void WarGrey::STEM::Plane::set_pen_color(IMatter* m, double hue, double saturation, double brightness, double alpha) {
+    this->set_pen_color(m, Hexadecimal_From_HSV(hue, saturation, brightness), alpha);
 }
 
 /*************************************************************************************************/
