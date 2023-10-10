@@ -70,8 +70,8 @@ namespace WarGrey::STEM {
     private:
         void on_acceleration_changed();
         void check_velocity_changing();
-        void check_heading_changing(double rad);
-        void on_velocity_changed();
+        void check_heading_changing(double rad, bool always_trigger_event);
+        void on_velocity_changed(bool always_trigger_heading_event);
 
     private:
         WarGrey::STEM::BorderStrategy border_strategies[4];

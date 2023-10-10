@@ -980,7 +980,7 @@ bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, 
 
     switch (button) {
         case SDL_BUTTON_LEFT: {
-            IMatter* unmasked_matter = this->find_matter(x, y);
+            IMatter* unmasked_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
 
             if (unmasked_matter != nullptr) {
                 MatterInfo* info = MATTER_INFO(unmasked_matter);
@@ -1010,7 +1010,7 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
     bool handled = false;
 
     if (state == 0) {
-        IMatter* unmasked_matter = this->find_matter_including_camouflaged_ones(x, y);
+        IMatter* unmasked_matter = this->find_matter_including_camouflaged_ones(x, y, static_cast<IMatter*>(nullptr));
 
         if ((unmasked_matter == nullptr) || (unmasked_matter != this->hovering_matter)) {
             if ((unmasked_matter != nullptr) && !unmasked_matter->concealled()) {
@@ -1066,7 +1066,7 @@ bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y,
 
     switch (button) {
         case SDL_BUTTON_LEFT: {
-            IMatter* unmasked_matter = this->find_matter(x, y);
+            IMatter* unmasked_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
 
             if (unmasked_matter != nullptr) {
                 MatterInfo* info = MATTER_INFO(unmasked_matter);

@@ -78,22 +78,20 @@ void WarGrey::STEM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
 }
 
 void WarGrey::STEM::Tracklet::stamp(WarGrey::STEM::IMatter* matter, float x, float y) {
-    if (this->is_drawing()) {
-        if (this->diagram->okay()) {
-            if (this->master != nullptr) {
-                SDL_Texture* origin = SDL_GetRenderTarget(this->master);
-                float mwidth, mheight;
+    if (this->diagram->okay()) {
+        if (this->master != nullptr) {
+            SDL_Texture* origin = SDL_GetRenderTarget(this->master);
+            float mwidth, mheight;
                 
-                SDL_SetRenderTarget(this->master, this->diagram->self());
+            SDL_SetRenderTarget(this->master, this->diagram->self());
 
-                matter->feed_extent(x, y, &mwidth, &mheight);
-                matter->draw(this->master, x, y, mwidth, mheight);
+            matter->feed_extent(x, y, &mwidth, &mheight);
+            matter->draw(this->master, x, y, mwidth, mheight);
 
-                SDL_SetRenderTarget(this->master, origin);
+            SDL_SetRenderTarget(this->master, origin);
 
-                this->resolve_boundary(x, y);
-                this->resolve_boundary(x + mwidth, mheight);
-            }
+            this->resolve_boundary(x, y);
+            this->resolve_boundary(x + mwidth, mheight);
         }
     }
 }
