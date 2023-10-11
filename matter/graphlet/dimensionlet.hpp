@@ -62,7 +62,7 @@ namespace WarGrey::STEM {
     /*********************************************************************************************/
     class __lambda__ Dimensionlet
         : public virtual WarGrey::STEM::IGraphlet
-        , public virtual WarGrey::STEM::IValuelet<float>
+        , public virtual WarGrey::STEM::IValuelet<double>
         , public virtual WarGrey::STEM::IStatelet<WarGrey::STEM::DimensionState, WarGrey::STEM::DimensionStyle> {
     public:
         Dimensionlet(const char* unit, const std::string& label = "");
@@ -84,12 +84,12 @@ namespace WarGrey::STEM {
 		void apply_style(WarGrey::STEM::DimensionStyle& style, SDL_Renderer* renderer) override;
 
     protected:
-        void on_value_changed(SDL_Renderer* ds, float value) override;
+        void on_value_changed(SDL_Renderer* ds, double value) override;
 
     private:
         void feed_subextent(size_t n, float* w = nullptr, float* h = nullptr);
         void update_drawing_box(size_t idx, float minimize_width, shared_font_t font, float leading_space);
-        void update_number_texture(SDL_Renderer* ds, float value, WarGrey::STEM::DimensionStyle& style);
+        void update_number_texture(SDL_Renderer* ds, double value, WarGrey::STEM::DimensionStyle& style);
         void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor);
 
     private:

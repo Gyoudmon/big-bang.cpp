@@ -215,11 +215,11 @@ void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Rendere
     this->update_drawing_box( unit_idx, -1.0F, style.unit_font, style.unit_leading_space);
 }
 
-void WarGrey::STEM::Dimensionlet::on_value_changed(SDL_Renderer* ds, float value) {
+void WarGrey::STEM::Dimensionlet::on_value_changed(SDL_Renderer* ds, double value) {
 	this->update_number_texture(ds, value, this->get_style());
 }
 
-void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, float value, DimensionStyle& style) {
+void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, double value, DimensionStyle& style) {
     this->textures[datum_idx].reset(new Texture(game_blended_text_texture(renderer,
         flstring(value, style.precision), style.number_font,
         static_cast<uint32_t>(style.number_color), 0)));

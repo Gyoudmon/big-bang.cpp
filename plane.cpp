@@ -958,9 +958,10 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
 
         if (!info->selected) {
             if (this->can_select(m)) {
-                unsafe_set_selected(this, m, info);
-
-                if (m->events_allowed()) {
+                if (this->can_select_multiple()) {
+                    unsafe_add_selected(this, m, info);
+                } else {
+                    unsafe_set_selected(this, m, info);
                     this->set_caret_owner(m);
                 }
 
@@ -968,7 +969,7 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
                     this->update_tooltip(m, local_x, local_y, local_x + info->x, local_y + info->y);
                     this->place_tooltip(m);
                 }
-            } else {
+            } else if (!this->can_select_multiple()) {
                 this->no_selected();
             }
         }
@@ -980,21 +981,23 @@ bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, 
 
     switch (button) {
         case SDL_BUTTON_LEFT: {
-            IMatter* unmasked_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
+            IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
 
-            if (unmasked_matter != nullptr) {
-                MatterInfo* info = MATTER_INFO(unmasked_matter);
+            if (self_matter != nullptr) {
+                MatterInfo* info = MATTER_INFO(self_matter);
 
                 if (!info->selected) {
-                    this->set_caret_owner(unmasked_matter);
-                    this->no_selected();
+                    if (!this->can_select_multiple()) {
+                        this->set_caret_owner(self_matter);
+                        this->no_selected();
+                    }
                 }
                 
-                if (unmasked_matter->low_level_events_allowed()) {
+                if (self_matter->low_level_events_allowed()) {
                     float local_x = x - info->x;
                     float local_y = y - info->y;
 
-                    handled = unmasked_matter->on_pointer_pressed(button, local_x, local_y, clicks);
+                    handled = self_matter->on_pointer_pressed(button, local_x, local_y, clicks);
                 }
             } else {
                 this->set_caret_owner(nullptr);
@@ -1010,35 +1013,35 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
     bool handled = false;
 
     if (state == 0) {
-        IMatter* unmasked_matter = this->find_matter_including_camouflaged_ones(x, y, static_cast<IMatter*>(nullptr));
+        IMatter* self_matter = this->find_matter_including_camouflaged_ones(x, y, static_cast<IMatter*>(nullptr));
 
-        if ((unmasked_matter == nullptr) || (unmasked_matter != this->hovering_matter)) {
-            if ((unmasked_matter != nullptr) && !unmasked_matter->concealled()) {
+        if ((self_matter == nullptr) || (self_matter != this->hovering_matter)) {
+            if ((self_matter != nullptr) && !self_matter->concealled()) {
                 this->say_goodbye_to_hover_matter(state, x, y, dx, dy);
             }
 
-            if ((this->tooltip != nullptr) && (this->tooltip != unmasked_matter) && this->tooltip->visible()) {
+            if ((this->tooltip != nullptr) && (this->tooltip != self_matter) && this->tooltip->visible()) {
                 this->tooltip->show(false);
             }
         }
 
-        if (unmasked_matter != nullptr) {
-            MatterInfo* info = MATTER_INFO(unmasked_matter);
+        if (self_matter != nullptr) {
+            MatterInfo* info = MATTER_INFO(self_matter);
             float local_x = x - info->x;
             float local_y = y - info->y;
 
-            if (!unmasked_matter->concealled()) {
-                this->hovering_matter = unmasked_matter;
+            if (!self_matter->concealled()) {
+                this->hovering_matter = self_matter;
                 this->hovering_mgx = x;
                 this->hovering_mgy = y;
                 this->hovering_mlx = local_x;
                 this->hovering_mly = local_y;
 
-                if (unmasked_matter->events_allowed()) {
-                    unmasked_matter->on_hover(local_x, local_y);
+                if (self_matter->events_allowed()) {
+                    self_matter->on_hover(local_x, local_y);
 
-                    if (unmasked_matter->low_level_events_allowed()) {
-                        unmasked_matter->on_pointer_move(state, local_x, local_y, dx, dy, false);
+                    if (self_matter->low_level_events_allowed()) {
+                        self_matter->on_pointer_move(state, local_x, local_y, dx, dy, false);
                     }
                 }
 
@@ -1047,12 +1050,12 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
             }
 
             if (this->tooltip != nullptr) {
-                if (this->update_tooltip(unmasked_matter, local_x, local_y, x, y)) {
+                if (this->update_tooltip(self_matter, local_x, local_y, x, y)) {
                     if (!this->tooltip->visible()) {
                         this->tooltip->show(true);
                     }
 
-                    this->place_tooltip(unmasked_matter);
+                    this->place_tooltip(self_matter);
                 }
             }
         }
@@ -1066,33 +1069,33 @@ bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y,
 
     switch (button) {
         case SDL_BUTTON_LEFT: {
-            IMatter* unmasked_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
+            IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
 
-            if (unmasked_matter != nullptr) {
-                MatterInfo* info = MATTER_INFO(unmasked_matter);
+            if (self_matter != nullptr) {
+                MatterInfo* info = MATTER_INFO(self_matter);
                 float local_x = x - info->x;
                 float local_y = y - info->y;
 
-                if (unmasked_matter->events_allowed()) {
+                if (self_matter->events_allowed()) {
                     if (clicks == 1) {
-                        unmasked_matter->on_tap(local_x, local_y);
+                        self_matter->on_tap(local_x, local_y);
                     }
 
-                    if (unmasked_matter->low_level_events_allowed()) {
-                        unmasked_matter->on_pointer_released(button, local_x, local_y, clicks);
+                    if (self_matter->low_level_events_allowed()) {
+                        self_matter->on_pointer_released(button, local_x, local_y, clicks);
                     }
                 }
 
                 if (clicks == 1) {
                     if (info->selected) {
-                        this->on_tap_selected(unmasked_matter, local_x, local_y);
+                        this->on_tap_selected(self_matter, local_x, local_y);
                     } else {
-                        this->on_tap(unmasked_matter, local_x, local_y);
+                        this->on_tap(self_matter, local_x, local_y);
                     }
 
                     handled = info->selected;
                 } else {
-                    if ((unmasked_matter == this->sentry) && (this->can_select(unmasked_matter))) {
+                    if ((self_matter == this->sentry) && (this->can_select(self_matter))) {
                         this->on_double_tap_sentry_sprite(this->sentry);
                     }
                 }
