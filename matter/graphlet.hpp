@@ -19,9 +19,14 @@ namespace WarGrey::STEM {
 
 		void set_value(T value0) {
 			*(this->value) = value0;
+			this->update_value_now();
+		}
+
+		void bind_value(T& address) {
+			this->value = &address;
 		}
 		
-		void set_value(T* address) {
+		void bind_value(T* address) {
 			if (address != nullptr) {
 				this->value = address;
 			} else {
@@ -39,6 +44,16 @@ namespace WarGrey::STEM {
 
 	public:
 		int update(uint64_t count, uint32_t interval, uint64_t uptime) override {
+			this->update_value_now();
+			return 0;
+		}
+		
+	protected:
+		virtual void on_value_changed(SDL_Renderer* renderer, T value) {}
+		virtual T guarded_value() { return *(this->value); }
+
+	private:
+		void update_value_now() {
 			T cur_value = this->guarded_value();
 
 			if (last_value != cur_value) {
@@ -47,13 +62,7 @@ namespace WarGrey::STEM {
 				this->on_value_changed(this->master_renderer(), cur_value);
 				this->notify_updated();
 			}
-
-			return 0;
 		}
-		
-	protected:
-		virtual void on_value_changed(SDL_Renderer* renderer, T value) {}
-		virtual T guarded_value() { return *(this->value); }
 
 	private:
 		MatterAnchor anchor = WarGrey::STEM::MatterAnchor::LT;
