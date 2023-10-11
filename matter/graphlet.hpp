@@ -17,9 +17,12 @@ namespace WarGrey::STEM {
 			return this->guarded_value();
 		}
 
-		void set_value(T value0) {
-			*(this->value) = value0;
-			this->update_value_now();
+		void set_value(T value, bool update_now = false) {
+			*(this->value) = value;
+
+			if (update_now) {
+				this->update_value_now();
+			}
 		}
 
 		void bind_value(T& address) {
