@@ -221,6 +221,9 @@ namespace WarGrey::STEM {
 
 	public:
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+
+    public:
+        int get_side_count() { return this->n; }
 	    
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;

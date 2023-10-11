@@ -14,37 +14,54 @@ namespace WarGrey::STEM {
 	class __lambda__ IValuelet : public virtual WarGrey::STEM::IGraphlet {
     public:
 		T get_value() {
-			return this->value;
+			return this->guarded_value();
+		}
+
+		void set_value(T value0) {
+			*(this->value) = value0;
 		}
 		
-		void set_value(T value0, bool force_update = false) {
-			this->set_value(value0, WarGrey::STEM::MatterAnchor::LT, force_update);
+		void set_value(T* address) {
+			if (address != nullptr) {
+				this->value = address;
+			} else {
+				this->value = &this->shadow;
+			}
 		}
 
-		void set_value(T value0, WarGrey::STEM::MatterAnchor anchor, bool force_update = false) {
-			T value = this->guarded_value(value0);
+		void set_value_anchor(WarGrey::STEM::MatterAnchor anchor) {
+			this->anchor = anchor;
+		}
 
-			if ((this->value != value) || force_update) {
-				if (this->info == nullptr) {
-					// NOTE: It is recommand that `set_value()`ing after the graphlet is inserted into a planet
-					this->value = value;
-				} else {
-					this->moor(anchor);
-					this->value = value;
-					this->on_value_changed(this->master_renderer(), value);
-					this->notify_updated();
-				}
+		WarGrey::STEM::MatterAnchor get_value_anchor() {
+			return this->anchor;
+		}
+
+	public:
+		int update(uint64_t count, uint32_t interval, uint64_t uptime) override {
+			T cur_value = this->guarded_value();
+
+			if (last_value != cur_value) {
+				last_value = cur_value;
+				this->moor(this->anchor);
+				this->on_value_changed(this->master_renderer(), cur_value);
+				this->notify_updated();
 			}
+
+			return 0;
 		}
 		
 	protected:
 		virtual void on_value_changed(SDL_Renderer* renderer, T value) {}
-
-	protected:
-		virtual T guarded_value(T value) { return flsafe(value, this->value); }
+		virtual T guarded_value() { return *(this->value); }
 
 	private:
-		T value = T();
+		MatterAnchor anchor = WarGrey::STEM::MatterAnchor::LT;
+		T shadow = T();
+
+	private:
+		T last_value = T();
+		T* value = &this->shadow;
 	};
 
     template<typename T>
@@ -61,11 +78,7 @@ namespace WarGrey::STEM {
 		}
 
 	public:
-		void set_range(T vmin, T vmax, bool force_update = false) {
-			this->set_range(vmin, vmax, WarGrey::STEM::MatterAnchor::LT, force_update);
-		}
-
-		void set_range(T vmin, T vmax, WarGrey::STEM::MatterAnchor anchor, bool force_update = false) {
+		void set_range(T vmin, T vmax) {
 			if (this->can_change_range()) {
 				bool changed = false;
 
@@ -83,8 +96,8 @@ namespace WarGrey::STEM {
 					}
 				}
 
-				if (force_update || changed) {
-					this->moor(anchor);
+				if (changed) {
+					this->moor(this->get_value_anchor());
 					this->on_range_changed(this->master_renderer(), this->vmin, this->vmax);
 					this->notify_updated();
 				}
@@ -113,8 +126,16 @@ namespace WarGrey::STEM {
 	protected:
 		virtual bool can_change_range() { return false; }
 
-		T guarded_value(T v) override {
-			return flsafe(v, this->vmin, this->vmax);
+		T guarded_value() override {
+			T cur_value = IValuelet<T>::guarded_value();
+
+			if (cur_value < this->vmin) {
+				cur_value = this->vmin;
+			} else if (cur_value > this->vmax) {
+				cur_value = this->vmax;
+			}
+
+			return cur_value;
 		}
 
 	protected:

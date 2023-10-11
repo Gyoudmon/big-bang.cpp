@@ -87,8 +87,8 @@ namespace WarGrey::STEM {
         void on_value_changed(SDL_Renderer* ds, float value) override;
 
     private:
-        void feed_subextent(int n, float* w = nullptr, float* h = nullptr);
-        void update_drawing_box(int idx, float minimize_width, shared_font_t font, float leading_space);
+        void feed_subextent(size_t n, float* w = nullptr, float* h = nullptr);
+        void update_drawing_box(size_t idx, float minimize_width, shared_font_t font, float leading_space);
         void update_number_texture(SDL_Renderer* ds, float value, WarGrey::STEM::DimensionStyle& style);
         void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor);
 

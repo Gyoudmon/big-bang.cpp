@@ -129,9 +129,9 @@ WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle&
 }
 
 void WarGrey::STEM::Dimensionlet::feed_extent(float x, float y, float* w, float* h) {
-    size_t n = sizeof(this->textures) / sizeof(SDL_Texture*);
-    
-    this->feed_subextent(int(n), w, h);
+    size_t n = sizeof(this->textures) / sizeof(shared_texture_t);
+
+    this->feed_subextent(n, w, h);
 }
 
 void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor) {
@@ -225,7 +225,7 @@ void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, 
         static_cast<uint32_t>(style.number_color), 0)));
 }
 
-void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, shared_font_t font, float leading_space) {
+void WarGrey::STEM::Dimensionlet::update_drawing_box(size_t idx, float min_width, shared_font_t font, float leading_space) {
     shared_texture_t self = this->textures[idx];
     SDL_FRect* sbox = &this->boxes[idx];
     int width, height;
@@ -246,11 +246,11 @@ void WarGrey::STEM::Dimensionlet::update_drawing_box(int idx, float min_width, s
     }
 }
 
-void WarGrey::STEM::Dimensionlet::feed_subextent(int n, float* w, float* h) {
+void WarGrey::STEM::Dimensionlet::feed_subextent(size_t n, float* w, float* h) {
     float flw = 0.0F;
     float flh = 0.0F;
 
-    for (int idx = 0; idx < n; idx ++) {
+    for (size_t idx = 0; idx < n; idx ++) {
         flw = this->boxes[idx].x + this->boxes[idx].w;
         flh = flmax(this->boxes[idx].h, flh);
     }
