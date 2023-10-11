@@ -91,8 +91,8 @@ namespace WarGrey::STEM {
         virtual bool can_interactive_move(IMatter* m, float local_x, float local_y) { return false; }
         virtual bool can_select(IMatter* m) { return false; }
         virtual bool can_select_multiple() { return false; }
-        virtual void before_select(IMatter* m, bool on_or_off) {}
-        virtual void after_select(IMatter* m, bool on_or_off) {}
+        virtual void on_select(IMatter* m, bool on_or_off) {} // the plane should be locked for writing when invoking this method
+        virtual void after_select(IMatter* m, bool on_or_off) {} // use this method if you want to modify the plane
         
     public:
         virtual WarGrey::STEM::IMatter* get_focused_matter() = 0;

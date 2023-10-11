@@ -258,7 +258,7 @@ static void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float* x, flo
 }
 
 static inline void unsafe_add_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info, bool selected) {
-    master->before_select(m, selected);
+    master->on_select(m, selected);
     info->selected = selected;
     master->after_select(m, selected);
     master->notify_updated();
@@ -867,10 +867,7 @@ void WarGrey::STEM::Plane::no_selected_except(IMatter* m) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (info->selected && (child != m)) {
-                this->before_select(child, false);
-                info->selected = false;
-                this->after_select(child, false);
-                this->notify_updated();
+                unsafe_add_selected(this, child, info, false);
             }
 
             child = info->next;
