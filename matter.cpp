@@ -61,6 +61,27 @@ void WarGrey::STEM::IMatter::feed_original_margin(float x, float y, float* top, 
     SET_VALUES(left, 0.0F, right, 0.0F);
 }
 
+bool WarGrey::STEM::IMatter::is_colliding_with_mouse(float lx, float ly) {
+    float t, b, l, r, w, h;
+    bool okay = true;
+
+    this->feed_margin(0.0F, 0.0F, &t, &r, &b, &l);
+
+    if ((t > 0.0F) || (l > 0.0F) || (r > 0.0F) || (b > 0.0F)) {
+        if ((lx < l) || (ly < t)) {
+            okay = false;
+        } else {
+            this->feed_extent(0.0F, 0.0F, &w, &h);
+
+            if ((lx > (w - r)) || (ly > (h - b))) {
+                okay = false;
+            }
+        }
+    }
+
+    return okay;
+}
+
 void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio, MatterAnchor anchor) {
     if (this->can_resize) {
         if ((x_ratio != 1.0F) || (y_ratio != 1.0F)) {

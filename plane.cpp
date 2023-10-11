@@ -257,17 +257,17 @@ static void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float* x, flo
     (*y) = info->y;
 }
 
-static inline void unsafe_add_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info) {
-    master->before_select(m, true);
-    info->selected = true;
-    master->after_select(m, true);
+static inline void unsafe_add_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info, bool selected) {
+    master->before_select(m, selected);
+    info->selected = selected;
+    master->after_select(m, selected);
     master->notify_updated();
 }
 
 static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info) {
     master->begin_update_sequence();
-    master->no_selected();
-    unsafe_add_selected(master, m, info);
+    unsafe_add_selected(master, m, info, true);
+    master->no_selected_except(m);
     master->end_update_sequence();
 }
 
@@ -833,9 +833,17 @@ void WarGrey::STEM::Plane::add_selected(IMatter* m) {
 
         if ((info != nullptr) && (!info->selected)) {
             if (this->can_select(m)) {
-                unsafe_add_selected(this, m, info);
+                unsafe_add_selected(this, m, info, true);
             }
         }
+    }
+}
+
+void WarGrey::STEM::Plane::remove_selected(IMatter* m) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if ((info != nullptr) && (!info->selected)) {
+        unsafe_add_selected(this, m, info, false);
     }
 }
 
@@ -849,7 +857,7 @@ void WarGrey::STEM::Plane::set_selected(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::no_selected() {
+void WarGrey::STEM::Plane::no_selected_except(IMatter* m) {
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
 
@@ -858,7 +866,7 @@ void WarGrey::STEM::Plane::no_selected() {
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (info->selected) {
+            if (info->selected && (child != m)) {
                 this->before_select(child, false);
                 info->selected = false;
                 this->after_select(child, false);
@@ -953,13 +961,13 @@ void WarGrey::STEM::Plane::on_editing_text(const char* text, int pos, int span) 
 }
 
 void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
-    if (m != nullptr) {
-        MatterInfo* info = MATTER_INFO(m);
+    MatterInfo* info = plane_matter_info(this, m);
 
+    if (info != nullptr) {
         if (!info->selected) {
             if (this->can_select(m)) {
                 if (this->can_select_multiple()) {
-                    unsafe_add_selected(this, m, info);
+                    unsafe_add_selected(this, m, info, true);
                 } else {
                     unsafe_set_selected(this, m, info);
                     this->set_caret_owner(m);
@@ -972,6 +980,16 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
             } else if (!this->can_select_multiple()) {
                 this->no_selected();
             }
+        }
+    }
+}
+
+void WarGrey::STEM::Plane::on_tap_selected(IMatter* m, float local_x, float local_y) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        if (this->can_select_multiple()) {
+            unsafe_add_selected(this, m, info, false);
         }
     }
 }
@@ -1894,6 +1912,19 @@ bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target, MatterAnch
     matter_anchor_fraction(a, &fx, &fy);
     
     return this->is_colliding(m, target, fx, fy);
+}
+
+bool WarGrey::STEM::IPlane::is_colliding_with_mouse(IMatter* m) {
+    float slx, sty, sw, sh, mx, my;
+    bool mokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
+
+    if (mokay) {
+        feed_current_mouse_location(&mx, &my);
+        mokay = rectangle_contain(slx, sty, slx + sw, sty + sh, mx, my)
+                && m->is_colliding_with_mouse(mx - slx, my - sty);
+    }
+    
+    return mokay;
 }
 
 bool WarGrey::STEM::IPlane::feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a) {

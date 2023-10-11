@@ -81,8 +81,9 @@ namespace WarGrey::STEM {
     public:
         virtual IMatter* find_next_selected_matter(IMatter* start) = 0;
         virtual void add_selected(IMatter* m) = 0;
+        virtual void remove_selected(IMatter* m) = 0;
         virtual void set_selected(IMatter* m) = 0;
-        virtual void no_selected() = 0;
+        virtual void no_selected_except(IMatter* m) = 0;
         virtual size_t count_selected() = 0;
         virtual bool is_selected(IMatter* m) = 0;
 
@@ -92,7 +93,7 @@ namespace WarGrey::STEM {
         virtual bool can_select_multiple() { return false; }
         virtual void before_select(IMatter* m, bool on_or_off) {}
         virtual void after_select(IMatter* m, bool on_or_off) {}
-    
+        
     public:
         virtual WarGrey::STEM::IMatter* get_focused_matter() = 0;
         virtual void set_caret_owner(IMatter* m) = 0;
@@ -110,6 +111,7 @@ namespace WarGrey::STEM {
         bool is_colliding(IMatter* m, IMatter* target);
         bool is_colliding(IMatter* m, IMatter* target, float fx, float fy);
         bool is_colliding(IMatter* m, IMatter* target, MatterAnchor a);
+        bool is_colliding_with_mouse(IMatter* m);
         bool feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a);
         void insert_at(IMatter* m, float x, float y, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void move(IMatter* m, float length, bool ignore_gliding = false) { this->move(m, double(length), ignore_gliding); }
@@ -126,6 +128,7 @@ namespace WarGrey::STEM {
         void glide_to(double sec, IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void glide_to_random_location(double sec, IMatter* m);
         void glide_to_mouse(double sec, IMatter* m, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
+        void no_selected() { this->no_selected_except(nullptr); }
         
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
@@ -291,8 +294,9 @@ namespace WarGrey::STEM {
     public:
         IMatter* find_next_selected_matter(IMatter* start = nullptr) override;
         void add_selected(IMatter* m) override;
+        void remove_selected(IMatter* m) override;
         void set_selected(IMatter* m) override;
-        void no_selected() override;
+        void no_selected_except(IMatter* m) override;
         size_t count_selected() override;
         bool is_selected(IMatter* m) override;
         bool can_select(IMatter* m) override;
@@ -322,6 +326,7 @@ namespace WarGrey::STEM {
         void on_text(const char* text, size_t size, bool entire) override;
         void on_editing_text(const char* text, int pos, int span) override;
         void on_tap(WarGrey::STEM::IMatter* m, float x, float y) override;
+        void on_tap_selected(WarGrey::STEM::IMatter* m, float x, float y) override;
 
     protected:
         void on_enter(WarGrey::STEM::IPlane* from) override;
