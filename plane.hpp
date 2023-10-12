@@ -83,7 +83,7 @@ namespace WarGrey::STEM {
         virtual void add_selected(IMatter* m) = 0;
         virtual void remove_selected(IMatter* m) = 0;
         virtual void set_selected(IMatter* m) = 0;
-        virtual void no_selected_except(IMatter* m) = 0;
+        virtual void no_selected() = 0;
         virtual size_t count_selected() = 0;
         virtual bool is_selected(IMatter* m) = 0;
 
@@ -128,7 +128,6 @@ namespace WarGrey::STEM {
         void glide_to(double sec, IMatter* m, IMatter* xtm, float xfx, IMatter* ytm, float yfy, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
         void glide_to_random_location(double sec, IMatter* m);
         void glide_to_mouse(double sec, IMatter* m, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
-        void no_selected() { this->no_selected_except(nullptr); }
         
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
@@ -296,7 +295,7 @@ namespace WarGrey::STEM {
         void add_selected(IMatter* m) override;
         void remove_selected(IMatter* m) override;
         void set_selected(IMatter* m) override;
-        void no_selected_except(IMatter* m) override;
+        void no_selected() override;
         size_t count_selected() override;
         bool is_selected(IMatter* m) override;
         bool can_select(IMatter* m) override;
@@ -355,6 +354,7 @@ namespace WarGrey::STEM {
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
         WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y, WarGrey::STEM::IMatter* after);
         void place_tooltip(WarGrey::STEM::IMatter* target);
+        void no_selected_except(IMatter* m);
 
     private:
         float matters_left;

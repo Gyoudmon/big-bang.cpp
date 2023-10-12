@@ -266,8 +266,8 @@ static inline void unsafe_add_selected(WarGrey::STEM::IPlane* master, IMatter* m
 
 static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info) {
     master->begin_update_sequence();
+    master->no_selected();
     unsafe_add_selected(master, m, info, true);
-    master->no_selected_except(m);
     master->end_update_sequence();
 }
 
@@ -855,6 +855,10 @@ void WarGrey::STEM::Plane::set_selected(IMatter* m) {
             unsafe_set_selected(this, m, info);
         }
     }
+}
+
+void WarGrey::STEM::Plane::no_selected() {
+    this->no_selected_except(nullptr);
 }
 
 void WarGrey::STEM::Plane::no_selected_except(IMatter* m) {
