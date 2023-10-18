@@ -32,17 +32,6 @@ using namespace WarGrey::STEM;
 namespace WarGrey::STEM {
     enum class MotionActionType { Motion, TrackReset, TrackDrawing, PenColor, PenWidth, Heading, Rotation, Stamp };
     
-    struct AsyncInfo {
-        double second;
-        float x0;
-        float y0;
-        float fx0;
-        float fy0;
-        float dx0;
-        float dy0;
-        bool heading;
-    };
-
     struct GMTarget {
         float x;
         float y;
@@ -80,7 +69,7 @@ namespace WarGrey::STEM {
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
         MatterInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {}
-        ~MatterInfo() { if (this->async != nullptr) delete this->async; }
+        virtual ~MatterInfo() {}
 
         float x = 0.0F;
         float y = 0.0F;
@@ -114,9 +103,6 @@ namespace WarGrey::STEM {
         // progressbar
         double current_step = 1.0;
         double progress_total = 1.0;
-
-        // for asynchronously loaded matters
-        AsyncInfo* async = nullptr;
 
         IMatter* next = nullptr;
         IMatter* prev = nullptr;
@@ -305,28 +291,11 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        if (info->async != nullptr) {
-            this->size_cache_invalid();
-            this->begin_update_sequence();
-
-            this->glide_matter_via_info(m, info,
-                info->async->second,
-                info->async->x0, info->async->y0,
-                info->async->fx0, info->async->fy0,
-                info->async->dx0, info->async->dy0,
-                info->async->heading);
-
-            if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
-                this->do_resize(m, info, info->async->fx0, info->async->fy0, this->scale_x, this->scale_y);
-            }
-
-            delete info->async;
-            info->async = nullptr;
-
-            this->notify_updated();
-            this->on_matter_ready(m);
-            this->end_update_sequence();
-        }
+        this->size_cache_invalid();
+        this->begin_update_sequence();
+        this->notify_updated();
+        this->on_matter_ready(m);
+        this->end_update_sequence();
     }
 }
 
@@ -1564,27 +1533,13 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
 }
 
 bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading) {
+    float sx, sy, sw, sh;
     float ax = 0.0F;
     float ay = 0.0F;
-    
-    if (m->ready()) {
-        float sx, sy, sw, sh;
         
-        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-        ax = (sw * fx);
-        ay = (sh * fy);
-    } else {
-        info->async = new AsyncInfo();
-
-        info->async->second = sec;
-        info->async->x0 = x;
-        info->async->y0 = y;
-        info->async->fx0 = fx;
-        info->async->fy0 = fy;
-        info->async->dx0 = dx;
-        info->async->dy0 = dy;
-        info->async->heading = heading;
-    }
+    unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
+    ax = (sw * fx);
+    ay = (sh * fy);
     
     return this->glide_matter_via_info(m, info, sec, x - ax + dx, y - ay + dy, true, heading);
 }
