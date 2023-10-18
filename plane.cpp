@@ -84,8 +84,12 @@ namespace WarGrey::STEM {
 
         float x = 0.0F;
         float y = 0.0F;
-        bool selected = false;
 
+        // for mouse selection
+        bool selected = false;
+        uint32_t selection_hit = 0;
+
+        // for animation
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 0U;
         uint32_t local_elapse = 0U;
@@ -691,7 +695,7 @@ void WarGrey::STEM::Plane::clear_motion_actions(IMatter* m) {
     }
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, float y, IMatter* after) {
+IMatter* WarGrey::STEM::Plane::find_matter(float x, float y, IMatter* after) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
@@ -702,19 +706,10 @@ IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, f
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (child->visible()) {
-                float sx, sy, sw, sh;
-
-                unsafe_feed_matter_bound(child, info, &sx, &sy, &sw, &sh);
-
-                sx += (this->translate_x * this->scale_x);
-                sy += (this->translate_y * this->scale_y);
-
-                if (flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))) {
-                    if (child->is_colliding_with_mouse(x - sx, y - sy)) {
-                        found = child;
-                        break;
-                    }
+            if (child->visible() && !child->concealled()) {
+                if (this->is_matter_found(child, info, x, y)) {
+                    found = child;
+                    break;
                 }
             }
 
@@ -725,10 +720,66 @@ IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, f
     return found;
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter(float x, float y, IMatter* after) {
-    IMatter* found = this->find_matter_including_camouflaged_ones(x, y, after);
+IMatter* WarGrey::STEM::Plane::find_least_recent_matter(float x, float y) {
+    IMatter* found = nullptr;
+    uint32_t found_hit = 0xFFFFFFFFU;
 
-    return ((found == nullptr) || found->concealled()) ? nullptr : found;
+    if (this->head_matter != nullptr) {
+        MatterInfo* head_info = MATTER_INFO(this->head_matter);
+        IMatter* child = head_info->prev;
+
+        do {
+            MatterInfo* info = MATTER_INFO(child);
+
+            if (child->visible() && !child->concealled()) {
+                if (this->is_matter_found(child, info, x, y)) {
+                    if (info->selection_hit < found_hit) {
+                        found = child;
+                        found_hit = info->selection_hit;
+                    }
+                } else {
+                    info->selection_hit = 0U;
+                }
+            } else {
+                info->selection_hit = 0U;
+            }
+
+            child = info->prev;
+        } while (child != head_info->prev);
+    }
+
+    if (found != nullptr) {
+        MATTER_INFO(found)->selection_hit ++;
+    }
+
+    return found;
+}
+
+/**
+ * TODO: if we need to check selected matters first? 
+ */
+IMatter* WarGrey::STEM::Plane::find_matter_for_tooltip(float x, float y) {
+    IMatter* found = nullptr;
+
+    if (this->head_matter != nullptr) {
+        MatterInfo* head_info = MATTER_INFO(this->head_matter);
+        IMatter* child = head_info->prev;
+
+        do {
+            MatterInfo* info = MATTER_INFO(child);
+
+            if (child->visible()) {
+                if (this->is_matter_found(child, info, x, y)) {
+                    found = child;
+                    break;
+                }
+            }
+
+            child = info->prev;
+        } while (child != head_info->prev);
+    }
+
+    return found;
 }
 
 IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
@@ -842,7 +893,7 @@ void WarGrey::STEM::Plane::add_selected(IMatter* m) {
 void WarGrey::STEM::Plane::remove_selected(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
-    if ((info != nullptr) && (!info->selected)) {
+    if ((info != nullptr) && (info->selected)) {
         unsafe_add_selected(this, m, info, false);
     }
 }
@@ -989,9 +1040,7 @@ void WarGrey::STEM::Plane::on_tap_selected(IMatter* m, float local_x, float loca
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        if (this->can_select_multiple()) {
-            unsafe_add_selected(this, m, info, false);
-        }
+        unsafe_add_selected(this, m, info, false);
     }
 }
 
@@ -999,30 +1048,23 @@ bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, 
     bool handled = false;
 
     switch (button) {
-        case SDL_BUTTON_LEFT: {
-            IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
+    case SDL_BUTTON_LEFT: {
+        IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
 
-            if (self_matter != nullptr) {
+        if (self_matter != nullptr) {
+            if (self_matter->low_level_events_allowed()) {
                 MatterInfo* info = MATTER_INFO(self_matter);
 
-                if (!info->selected) {
-                    if (!this->can_select_multiple()) {
-                        this->set_caret_owner(self_matter);
-                        this->no_selected();
-                    }
-                }
-                
-                if (self_matter->low_level_events_allowed()) {
-                    float local_x = x - info->x;
-                    float local_y = y - info->y;
+                float local_x = x - info->x;
+                float local_y = y - info->y;
 
-                    handled = self_matter->on_pointer_pressed(button, local_x, local_y, clicks);
-                }
-            } else {
-                this->set_caret_owner(nullptr);
-                this->no_selected();
+                handled = self_matter->on_pointer_pressed(button, local_x, local_y, clicks);
             }
-        }; break;
+        } else {
+            this->set_caret_owner(nullptr);
+            this->no_selected();
+        }
+    }; break;
     }
 
     return handled;
@@ -1032,7 +1074,7 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
     bool handled = false;
 
     if (state == 0) {
-        IMatter* self_matter = this->find_matter_including_camouflaged_ones(x, y, static_cast<IMatter*>(nullptr));
+        IMatter* self_matter = this->find_matter_for_tooltip(x, y);
 
         if ((self_matter == nullptr) || (self_matter != this->hovering_matter)) {
             if ((self_matter != nullptr) && !self_matter->concealled()) {
@@ -1087,39 +1129,41 @@ bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y,
     bool handled = false;
 
     switch (button) {
-        case SDL_BUTTON_LEFT: {
-            IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
+    case SDL_BUTTON_LEFT: {
+        IMatter* self_matter = this->find_least_recent_matter(x, y);
 
-            if (self_matter != nullptr) {
-                MatterInfo* info = MATTER_INFO(self_matter);
-                float local_x = x - info->x;
-                float local_y = y - info->y;
+        if (self_matter != nullptr) {
+            MatterInfo* info = MATTER_INFO(self_matter);
+            float local_x = x - info->x;
+            float local_y = y - info->y;
 
-                if (self_matter->events_allowed()) {
-                    if (clicks == 1) {
-                        self_matter->on_tap(local_x, local_y);
-                    }
-
-                    if (self_matter->low_level_events_allowed()) {
-                        self_matter->on_pointer_released(button, local_x, local_y, clicks);
-                    }
+            if (self_matter->events_allowed()) {
+                if (clicks == 1) {
+                    self_matter->on_tap(local_x, local_y);
+                } else if (clicks == 2) {
+                    self_matter->on_double_tap(local_x, local_y);
                 }
 
-                if (clicks == 1) {
-                    if (info->selected) {
-                        this->on_tap_selected(self_matter, local_x, local_y);
-                    } else {
-                        this->on_tap(self_matter, local_x, local_y);
-                    }
-
-                    handled = info->selected;
-                } else {
-                    if ((self_matter == this->sentry) && (this->can_select(self_matter))) {
-                        this->on_double_tap_sentry_sprite(this->sentry);
-                    }
+                if (self_matter->low_level_events_allowed()) {
+                    self_matter->on_pointer_released(button, local_x, local_y, clicks);
                 }
             }
-        }; break;
+
+            if (self_matter != this->sentry) {
+                if (info->selected) {
+                    this->on_tap_selected(self_matter, local_x, local_y);
+                    handled = !info->selected;
+                } else {
+                    this->on_tap(self_matter, local_x, local_y);
+                    handled = info->selected;
+                }
+            } else {
+                if ((clicks == 2) && (this->can_select(self_matter))) {
+                    this->on_double_tap_sentry_sprite(this->sentry);
+                }
+            }
+        }
+    }; break;
     }
 
     return handled;
@@ -1665,6 +1709,17 @@ bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, doubl
     return this->glide_matter_via_info(m, info, sec, float(x), float(y), false, true);
 }
 
+bool WarGrey::STEM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x, float y) {
+    float sx, sy, sw, sh;
+    
+    unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
+
+    sx += (this->translate_x * this->scale_x);
+    sy += (this->translate_y * this->scale_y);
+
+    return flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))
+        && m->is_colliding_with_mouse(x - sx, y - sy);
+}
 
 /*************************************************************************************************/
 void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, MatterAnchor anchor, bool shared) {

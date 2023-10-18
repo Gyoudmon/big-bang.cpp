@@ -352,8 +352,10 @@ namespace WarGrey::STEM {
         void do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F);
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
-        WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y, WarGrey::STEM::IMatter* after);
-        void place_tooltip(WarGrey::STEM::IMatter* target);
+        bool is_matter_found(IMatter* m, MatterInfo* info, float x, float y);
+        WarGrey::STEM::IMatter* find_matter_for_tooltip(float x, float y);
+        WarGrey::STEM::IMatter* find_least_recent_matter(float x, float y);
+        void place_tooltip(IMatter* target);
         void no_selected_except(IMatter* m);
 
     private:

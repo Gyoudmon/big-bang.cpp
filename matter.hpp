@@ -60,6 +60,7 @@ namespace WarGrey::STEM {
         virtual bool on_editing_text(const char* text, int pos, int span) { return false; }
         virtual bool on_hover(float local_x, float local_y) { return false; }
         virtual bool on_tap(float local_x, float local_y) { return false; }
+        virtual bool on_double_tap(float local_x, float local_y) { return false; }
         virtual bool on_goodbye(float local_x, float local_y) { return false; }
 
     public: // low-level events
