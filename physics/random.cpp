@@ -34,13 +34,13 @@ unsigned int WarGrey::STEM::random_uniform(unsigned int min, unsigned int max) {
 }
 
 float WarGrey::STEM::random_uniform(float min, float max) {
-    std::uniform_int_distribution<float> random_dist(min, max);
+    std::uniform_real_distribution<float> random_dist(min, max);
 
     return random_dist(random_generator);
 }
 
 double WarGrey::STEM::random_uniform(double min, double max) {
-    std::uniform_int_distribution<double> random_dist(min, max);
+    std::uniform_real_distribution<double> random_dist(min, max);
 
     return random_dist(random_generator);
 }

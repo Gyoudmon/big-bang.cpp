@@ -48,11 +48,13 @@ namespace WarGrey::STEM {
         float y;
     };
 
+    union GMTargetU {
+        double length;
+        GMTarget dot;
+    };
+
     struct GlidingMotion {
-        union {
-            double length;
-            GMTarget dot;      
-        } target;
+        GMTargetU target;
         
         double second;
         double sec_delta; // 0.0 means the target is based on current heading
@@ -65,17 +67,18 @@ namespace WarGrey::STEM {
         double alpha;
     };
 
+    union MotionActionArguments {
+        bool drawing;
+        double direction;
+        double theta;
+        uint8_t pen_width;
+        PenColor color;
+        GlidingMotion motion;
+    };
+
     struct MotionAction {
         MotionActionType type;
-        
-        union {
-            bool drawing;
-            double direction;
-            double theta;
-            uint8_t pen_width;
-            PenColor color;
-            GlidingMotion motion;
-        } argv;
+        MotionActionArguments argv;
     };
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
@@ -1466,7 +1469,7 @@ bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, fl
         MotionAction action;
 
         action.type = MotionActionType::Motion;
-        action.argv.motion = { .target.dot = { x, y }, 0.0F, 0.0F, absolute, heading };
+        action.argv.motion = { { x, y }, 0.0F, 0.0F, absolute, heading };
 
         info->motion_actions.push_back(action);
     }
