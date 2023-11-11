@@ -336,24 +336,27 @@ namespace WarGrey::STEM {
         void on_matter_ready(IMatter* m) override {}
 
     private:
+        void deal_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding, bool heading);
-        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
+        bool move_matter_to_location_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute, bool heading);
-        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading);
+        bool glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading);
         bool do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_track, bool heading);
         bool do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, double sec, double sec_delta, bool absolute, bool ignore_track);
+        bool do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading);
         bool do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec);
-        void do_motion_moving(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         
     private:
         IMatter* do_draw(SDL_Renderer* renderer, IMatter* self, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
         void do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x = 1.0F, float prev_scale_y = 1.0F);
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
-        WarGrey::STEM::IMatter* find_matter_including_camouflaged_ones(float x, float y, WarGrey::STEM::IMatter* after);
-        void place_tooltip(WarGrey::STEM::IMatter* target);
+        bool is_matter_found(IMatter* m, MatterInfo* info, float x, float y);
+        WarGrey::STEM::IMatter* find_matter_for_tooltip(float x, float y);
+        WarGrey::STEM::IMatter* find_least_recent_matter(float x, float y);
+        void place_tooltip(IMatter* target);
         void no_selected_except(IMatter* m);
 
     private:

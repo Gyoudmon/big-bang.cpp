@@ -30,31 +30,32 @@ using namespace WarGrey::STEM;
 #define MATTER_INFO(m) (static_cast<MatterInfo*>(m->info))
 
 namespace WarGrey::STEM {
+    enum class MotionTargetType { Vector, Location, Anchor };
     enum class MotionActionType { Motion, TrackReset, TrackDrawing, PenColor, PenWidth, Heading, Rotation, Stamp };
     
-    struct AsyncInfo {
-        double second;
-        float x0;
-        float y0;
-        float fx0;
-        float fy0;
-        float dx0;
-        float dy0;
-        bool heading;
-    };
-
-    struct GMTarget {
+    struct MTLocation {
         float x;
         float y;
     };
+    
+    struct MTAnchor {
+        IMatter* matter;
+        float fx;
+        float fy;
+    };
 
-    union GMTargetU {
+    union GMTargetBody {
         double length;
-        GMTarget dot;
+        MTLocation dot;
+    };
+
+    struct GMTarget {
+        MotionTargetType type;
+        GMTargetBody body;
     };
 
     struct GlidingMotion {
-        GMTargetU target;
+        GMTarget target;
         
         double second;
         double sec_delta; // 0.0 means the target is based on current heading
@@ -67,7 +68,7 @@ namespace WarGrey::STEM {
         double alpha;
     };
 
-    union MotionActionArguments {
+    union MotionActionBody {
         bool drawing;
         double direction;
         double theta;
@@ -78,17 +79,21 @@ namespace WarGrey::STEM {
 
     struct MotionAction {
         MotionActionType type;
-        MotionActionArguments argv;
+        MotionActionBody body;
     };
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
         MatterInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {}
-        ~MatterInfo() { if (this->async != nullptr) delete this->async; }
+        virtual ~MatterInfo() {}
 
         float x = 0.0F;
         float y = 0.0F;
-        bool selected = false;
 
+        // for mouse selection
+        bool selected = false;
+        uint32_t selection_hit = 0;
+
+        // for animation
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 0U;
         uint32_t local_elapse = 0U;
@@ -113,9 +118,6 @@ namespace WarGrey::STEM {
         // progressbar
         double current_step = 1.0;
         double progress_total = 1.0;
-
-        // for asynchronously loaded matters
-        AsyncInfo* async = nullptr;
 
         IMatter* next = nullptr;
         IMatter* prev = nullptr;
@@ -176,14 +178,14 @@ static inline void unsafe_canvas_sync_settings(MatterInfo* info) {
 static void unsafe_canvas_info_do_setting(IPlane* self, IMatter* m, MatterInfo* info, const MotionAction& op) {
     switch (op.type) {
     case MotionActionType::PenColor: {
-        info->draw_color = op.argv.color.hex;
-        info->draw_alpha = op.argv.color.alpha;
+        info->draw_color = op.body.color.hex;
+        info->draw_alpha = op.body.color.alpha;
     }; break;
-    case MotionActionType::TrackDrawing: info->is_drawing = op.argv.drawing; break;
-    case MotionActionType::PenWidth: info->draw_width = op.argv.pen_width; break;
+    case MotionActionType::TrackDrawing: info->is_drawing = op.body.drawing; break;
+    case MotionActionType::PenWidth: info->draw_width = op.body.pen_width; break;
     case MotionActionType::TrackReset: unsafe_canvas_info_reset(info); break;
-    case MotionActionType::Rotation: m->add_heading(op.argv.theta, true); break;
-    case MotionActionType::Heading: m->set_heading(op.argv.direction, true); break;
+    case MotionActionType::Rotation: m->add_heading(op.body.theta, true); break;
+    case MotionActionType::Heading: m->set_heading(op.body.direction, true); break;
     case MotionActionType::Stamp: {
         float x, y;
 
@@ -304,28 +306,11 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        if (info->async != nullptr) {
-            this->size_cache_invalid();
-            this->begin_update_sequence();
-
-            this->glide_matter_via_info(m, info,
-                info->async->second,
-                info->async->x0, info->async->y0,
-                info->async->fx0, info->async->fy0,
-                info->async->dx0, info->async->dy0,
-                info->async->heading);
-
-            if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
-                this->do_resize(m, info, info->async->fx0, info->async->fy0, this->scale_x, this->scale_y);
-            }
-
-            delete info->async;
-            info->async = nullptr;
-
-            this->notify_updated();
-            this->on_matter_ready(m);
-            this->end_update_sequence();
-        }
+        this->size_cache_invalid();
+        this->begin_update_sequence();
+        this->notify_updated();
+        this->on_matter_ready(m);
+        this->end_update_sequence();
     }
 }
 
@@ -439,7 +424,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
 
         this->begin_update_sequence();
         m->construct(master_renderer);
-        this->move_matter_via_info(m, info, x, y, fx, fy, dx, dy);
+        this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy);
 
         if (m->ready()) {
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
@@ -560,7 +545,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        if (this->move_matter_via_info(m, info, x, y, fx, fy, dx, dy)) {
+        if (this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy)) {
             this->notify_updated();
         }
     }
@@ -648,7 +633,7 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, float x, float y, fl
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        this->glide_matter_via_info(m, info, sec, x, y, fx, fy, dx, dy, true);
+        this->glide_matter_to_location_via_info(m, info, sec, x, y, fx, fy, dx, dy, true);
     }
 }
 
@@ -694,7 +679,7 @@ void WarGrey::STEM::Plane::clear_motion_actions(IMatter* m) {
     }
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, float y, IMatter* after) {
+IMatter* WarGrey::STEM::Plane::find_matter(float x, float y, IMatter* after) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
@@ -705,19 +690,10 @@ IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, f
         do {
             MatterInfo* info = MATTER_INFO(child);
 
-            if (child->visible()) {
-                float sx, sy, sw, sh;
-
-                unsafe_feed_matter_bound(child, info, &sx, &sy, &sw, &sh);
-
-                sx += (this->translate_x * this->scale_x);
-                sy += (this->translate_y * this->scale_y);
-
-                if (flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))) {
-                    if (child->is_colliding_with_mouse(x - sx, y - sy)) {
-                        found = child;
-                        break;
-                    }
+            if (child->visible() && !child->concealled()) {
+                if (this->is_matter_found(child, info, x, y)) {
+                    found = child;
+                    break;
                 }
             }
 
@@ -728,10 +704,66 @@ IMatter* WarGrey::STEM::Plane::find_matter_including_camouflaged_ones(float x, f
     return found;
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter(float x, float y, IMatter* after) {
-    IMatter* found = this->find_matter_including_camouflaged_ones(x, y, after);
+IMatter* WarGrey::STEM::Plane::find_least_recent_matter(float x, float y) {
+    IMatter* found = nullptr;
+    uint32_t found_hit = 0xFFFFFFFFU;
 
-    return ((found == nullptr) || found->concealled()) ? nullptr : found;
+    if (this->head_matter != nullptr) {
+        MatterInfo* head_info = MATTER_INFO(this->head_matter);
+        IMatter* child = head_info->prev;
+
+        do {
+            MatterInfo* info = MATTER_INFO(child);
+
+            if (child->visible() && !child->concealled()) {
+                if (this->is_matter_found(child, info, x, y)) {
+                    if (info->selection_hit < found_hit) {
+                        found = child;
+                        found_hit = info->selection_hit;
+                    }
+                } else {
+                    info->selection_hit = 0U;
+                }
+            } else {
+                info->selection_hit = 0U;
+            }
+
+            child = info->prev;
+        } while (child != head_info->prev);
+    }
+
+    if (found != nullptr) {
+        MATTER_INFO(found)->selection_hit ++;
+    }
+
+    return found;
+}
+
+/**
+ * TODO: if we need to check selected matters first? 
+ */
+IMatter* WarGrey::STEM::Plane::find_matter_for_tooltip(float x, float y) {
+    IMatter* found = nullptr;
+
+    if (this->head_matter != nullptr) {
+        MatterInfo* head_info = MATTER_INFO(this->head_matter);
+        IMatter* child = head_info->prev;
+
+        do {
+            MatterInfo* info = MATTER_INFO(child);
+
+            if (child->visible()) {
+                if (this->is_matter_found(child, info, x, y)) {
+                    found = child;
+                    break;
+                }
+            }
+
+            child = info->prev;
+        } while (child != head_info->prev);
+    }
+
+    return found;
 }
 
 IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
@@ -845,7 +877,7 @@ void WarGrey::STEM::Plane::add_selected(IMatter* m) {
 void WarGrey::STEM::Plane::remove_selected(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
-    if ((info != nullptr) && (!info->selected)) {
+    if ((info != nullptr) && (info->selected)) {
         unsafe_add_selected(this, m, info, false);
     }
 }
@@ -992,9 +1024,7 @@ void WarGrey::STEM::Plane::on_tap_selected(IMatter* m, float local_x, float loca
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        if (this->can_select_multiple()) {
-            unsafe_add_selected(this, m, info, false);
-        }
+        unsafe_add_selected(this, m, info, false);
     }
 }
 
@@ -1002,30 +1032,23 @@ bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, 
     bool handled = false;
 
     switch (button) {
-        case SDL_BUTTON_LEFT: {
-            IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
+    case SDL_BUTTON_LEFT: {
+        IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
 
-            if (self_matter != nullptr) {
+        if (self_matter != nullptr) {
+            if (self_matter->low_level_events_allowed()) {
                 MatterInfo* info = MATTER_INFO(self_matter);
 
-                if (!info->selected) {
-                    if (!this->can_select_multiple()) {
-                        this->set_caret_owner(self_matter);
-                        this->no_selected();
-                    }
-                }
-                
-                if (self_matter->low_level_events_allowed()) {
-                    float local_x = x - info->x;
-                    float local_y = y - info->y;
+                float local_x = x - info->x;
+                float local_y = y - info->y;
 
-                    handled = self_matter->on_pointer_pressed(button, local_x, local_y, clicks);
-                }
-            } else {
-                this->set_caret_owner(nullptr);
-                this->no_selected();
+                handled = self_matter->on_pointer_pressed(button, local_x, local_y, clicks);
             }
-        }; break;
+        } else {
+            this->set_caret_owner(nullptr);
+            this->no_selected();
+        }
+    }; break;
     }
 
     return handled;
@@ -1035,7 +1058,7 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
     bool handled = false;
 
     if (state == 0) {
-        IMatter* self_matter = this->find_matter_including_camouflaged_ones(x, y, static_cast<IMatter*>(nullptr));
+        IMatter* self_matter = this->find_matter_for_tooltip(x, y);
 
         if ((self_matter == nullptr) || (self_matter != this->hovering_matter)) {
             if ((self_matter != nullptr) && !self_matter->concealled()) {
@@ -1090,39 +1113,41 @@ bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y,
     bool handled = false;
 
     switch (button) {
-        case SDL_BUTTON_LEFT: {
-            IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
+    case SDL_BUTTON_LEFT: {
+        IMatter* self_matter = this->find_least_recent_matter(x, y);
 
-            if (self_matter != nullptr) {
-                MatterInfo* info = MATTER_INFO(self_matter);
-                float local_x = x - info->x;
-                float local_y = y - info->y;
+        if (self_matter != nullptr) {
+            MatterInfo* info = MATTER_INFO(self_matter);
+            float local_x = x - info->x;
+            float local_y = y - info->y;
 
-                if (self_matter->events_allowed()) {
-                    if (clicks == 1) {
-                        self_matter->on_tap(local_x, local_y);
-                    }
-
-                    if (self_matter->low_level_events_allowed()) {
-                        self_matter->on_pointer_released(button, local_x, local_y, clicks);
-                    }
+            if (self_matter->events_allowed()) {
+                if (clicks == 1) {
+                    self_matter->on_tap(local_x, local_y);
+                } else if (clicks == 2) {
+                    self_matter->on_double_tap(local_x, local_y);
                 }
 
-                if (clicks == 1) {
-                    if (info->selected) {
-                        this->on_tap_selected(self_matter, local_x, local_y);
-                    } else {
-                        this->on_tap(self_matter, local_x, local_y);
-                    }
-
-                    handled = info->selected;
-                } else {
-                    if ((self_matter == this->sentry) && (this->can_select(self_matter))) {
-                        this->on_double_tap_sentry_sprite(this->sentry);
-                    }
+                if (self_matter->low_level_events_allowed()) {
+                    self_matter->on_pointer_released(button, local_x, local_y, clicks);
                 }
             }
-        }; break;
+
+            if (self_matter != this->sentry) {
+                if (info->selected) {
+                    this->on_tap_selected(self_matter, local_x, local_y);
+                    handled = !info->selected;
+                } else {
+                    this->on_tap(self_matter, local_x, local_y);
+                    handled = info->selected;
+                }
+            } else {
+                if ((clicks == 2) && (this->can_select(self_matter))) {
+                    this->on_double_tap_sentry_sprite(this->sentry);
+                }
+            }
+        }
+    }; break;
     }
 
     return handled;
@@ -1270,7 +1295,7 @@ void WarGrey::STEM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t
             }
 
             /* controlling motion via global timeline makes it more smooth */
-            this->do_motion_moving(child, info, dwidth, dheight);
+            this->deal_queued_motion(child, info, dwidth, dheight);
 
             child = info->next;
         } while (child != this->head_matter);
@@ -1451,11 +1476,19 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, flo
 }
 
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading) {
-    double x, y;
+    bool moved = false;
 
-    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    if ((!info->gliding) || ignore_gliding) {
+        moved = this->do_vector_moving(m, info, length, heading);
+    } else {
+        double x, y;
+
+        orthogonal_decomposition(length, m->get_heading(), &x, &y);
     
-    return this->move_matter_via_info(m, info, float(x), float(y), false, ignore_gliding, heading);
+        return this->move_matter_via_info(m, info, float(x), float(y), false, ignore_gliding, heading);
+    }
+
+    return moved;
 }
 
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding, bool heading) {
@@ -1466,10 +1499,14 @@ bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, fl
     } else if (m == this->tooltip) {
         moved = this->do_moving_via_info(m, info, x, y, absolute, true, heading);
     } else {
+        GMTarget target;
         MotionAction action;
 
+        target.type = MotionTargetType::Location;
+        target.body.dot = { x, y };
+
         action.type = MotionActionType::Motion;
-        action.argv.motion = { { x, y }, 0.0F, 0.0F, absolute, heading };
+        action.body.motion = { target, 0.0F, 0.0F, absolute, heading };
 
         info->motion_actions.push_back(action);
     }
@@ -1483,10 +1520,14 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     if (!info->gliding) {
         this->do_vector_gliding(m, info, length, sec);
     } else {
+        GMTarget target;
         MotionAction action;
 
+        target.type = MotionTargetType::Vector;
+        target.body.length = length;
+
         action.type = MotionActionType::Motion;
-        action.argv.motion = { .target.length = length, sec, 0.0F, false, true };
+        action.body.motion = { target, sec, 0.0F, false, true };
 
         info->motion_actions.push_back(action);   
     }
@@ -1509,10 +1550,14 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
             if (!info->gliding) {
                 moved = this->do_gliding_via_info(m, info, x, y, sec, sec_delta, absolute, false);
             } else {
+                GMTarget target;
                 MotionAction action;
+
+                target.type = MotionTargetType::Location;
+                target.body.dot = { x, y };
                 
                 action.type = MotionActionType::Motion;
-                action.argv.motion = { .target.dot = { x, y }, sec, sec_delta, absolute, heading };
+                action.body.motion = { target, sec, sec_delta, absolute, heading };
 
                 info->motion_actions.push_back(action);
             }
@@ -1522,37 +1567,23 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading) {
+bool WarGrey::STEM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading) {
+    float sx, sy, sw, sh;
     float ax = 0.0F;
     float ay = 0.0F;
-    
-    if (m->ready()) {
-        float sx, sy, sw, sh;
         
-        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-        ax = (sw * fx);
-        ay = (sh * fy);
-    } else {
-        info->async = new AsyncInfo();
-
-        info->async->second = sec;
-        info->async->x0 = x;
-        info->async->y0 = y;
-        info->async->fx0 = fx;
-        info->async->fy0 = fy;
-        info->async->dx0 = dx;
-        info->async->dy0 = dy;
-        info->async->heading = heading;
-    }
+    unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
+    ax = (sw * fx);
+    ay = (sh * fy);
     
     return this->glide_matter_via_info(m, info, sec, x - ax + dx, y - ay + dy, true, heading);
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
-    return this->glide_matter_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy, false);
+bool WarGrey::STEM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
+    return this->glide_matter_to_location_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy, false);
 }
 
-void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
+void WarGrey::STEM::Plane::deal_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
     if (!m->motion_stopped()) {
         float cwidth, cheight, hdist, vdist;
         double xspd = m->x_speed();
@@ -1632,21 +1663,21 @@ void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float 
             info->motion_actions.pop_front();
 
             if (next_move.type == MotionActionType::Motion) {
-                GlidingMotion gm = next_move.argv.motion;
+                GlidingMotion gm = next_move.body.motion;
 
                 if (gm.second > 0.0) {
                     if (gm.sec_delta > 0.0) {
-                        if (this->do_gliding_via_info(m, info, gm.target.dot.x, gm.target.dot.y, gm.second, gm.sec_delta, gm.absolute, false)) {
+                        if (this->do_gliding_via_info(m, info, gm.target.body.dot.x, gm.target.body.dot.y, gm.second, gm.sec_delta, gm.absolute, false)) {
                             this->notify_updated();
                             break;
                         }
                     } else {
-                        if (this->do_vector_gliding(m, info, gm.target.length, gm.second)) {
+                        if (this->do_vector_gliding(m, info, gm.target.body.length, gm.second)) {
                             this->notify_updated();
                             break;
                         }
                     }
-                } else if (this->do_moving_via_info(m, info, gm.target.dot.x, gm.target.dot.y, gm.absolute, false, gm.heading)) {
+                } else if (this->do_moving_via_info(m, info, gm.target.body.dot.x, gm.target.body.dot.y, gm.absolute, false, gm.heading)) {
                     this->notify_updated();
                 }
             } else {
@@ -1660,6 +1691,14 @@ void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float 
     }
 }
 
+bool WarGrey::STEM::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading) {
+    double x, y;
+
+    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    
+    return this->move_matter_via_info(m, info, float(x), float(y), false, true, heading);
+}
+
 bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec) {
     double x, y;
 
@@ -1668,6 +1707,17 @@ bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, doubl
     return this->glide_matter_via_info(m, info, sec, float(x), float(y), false, true);
 }
 
+bool WarGrey::STEM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x, float y) {
+    float sx, sy, sw, sh;
+    
+    unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
+
+    sx += (this->translate_x * this->scale_x);
+    sy += (this->translate_y * this->scale_y);
+
+    return flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))
+        && m->is_colliding_with_mouse(x - sx, y - sy);
+}
 
 /*************************************************************************************************/
 void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, MatterAnchor anchor, bool shared) {
@@ -1721,7 +1771,7 @@ void WarGrey::STEM::Plane::set_drawing(IMatter* m, bool yes_or_no) {
         MotionAction action;
 
         action.type = MotionActionType::TrackDrawing;
-        action.argv.drawing = yes_or_no;
+        action.body.drawing = yes_or_no;
         unsafe_do_canvas_setting(this, m, info, action);
     }
 }
@@ -1733,7 +1783,7 @@ void WarGrey::STEM::Plane::set_pen_width(IMatter* m, uint8_t width) {
         MotionAction action;
 
         action.type = MotionActionType::PenWidth;
-        action.argv.pen_width = width;
+        action.body.pen_width = width;
         unsafe_do_canvas_setting(this, m, info, action);
     }
 }
@@ -1745,7 +1795,7 @@ void WarGrey::STEM::Plane::set_pen_color(IMatter* m, uint32_t hex, double alpha)
         MotionAction action;
 
         action.type = MotionActionType::PenColor;
-        action.argv.color = { hex, alpha };
+        action.body.color = { hex, alpha };
         unsafe_do_canvas_setting(this, m, info, action);
     }
 }
@@ -1757,7 +1807,7 @@ void WarGrey::STEM::Plane::set_heading(IMatter* m, double direction, bool is_rad
         MotionAction action;
 
         action.type = MotionActionType::Heading;
-        action.argv.direction = (is_radian ? direction : degrees_to_radians(direction));
+        action.body.direction = (is_radian ? direction : degrees_to_radians(direction));
         unsafe_do_canvas_setting(this, m, info, action);
     }
 }
@@ -1769,7 +1819,7 @@ void WarGrey::STEM::Plane::turn(IMatter* m, double theta, bool is_radian) {
         MotionAction action;
 
         action.type = MotionActionType::Rotation;
-        action.argv.theta = (is_radian ? theta : degrees_to_radians(theta));
+        action.body.theta = (is_radian ? theta : degrees_to_radians(theta));
         unsafe_do_canvas_setting(this, m, info, action);
     }
 }
