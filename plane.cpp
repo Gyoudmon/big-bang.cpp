@@ -30,17 +30,27 @@ using namespace WarGrey::STEM;
 #define MATTER_INFO(m) (static_cast<MatterInfo*>(m->info))
 
 namespace WarGrey::STEM {
+    enum class MotionTargetType { Vector, Location, Anchor };
     enum class MotionActionType { Motion, TrackReset, TrackDrawing, PenColor, PenWidth, Heading, Rotation, Stamp };
     
-    struct GMTarget {
+    struct MTLocation {
         float x;
         float y;
     };
 
+    struct MTAnchor {
+        IMatter* matter;
+        float fx;
+        float fy;
+    };
+
     struct GlidingMotion {
+        MotionTargetType type;
+
         union {
             double length;
-            GMTarget dot;      
+            MTLocation dot;
+            MTAnchor matter;
         } target;
         
         double second;
@@ -409,7 +419,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
 
         this->begin_update_sequence();
         m->construct(master_renderer);
-        this->move_matter_via_info(m, info, x, y, fx, fy, dx, dy);
+        this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy);
 
         if (m->ready()) {
             if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
@@ -530,7 +540,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        if (this->move_matter_via_info(m, info, x, y, fx, fy, dx, dy)) {
+        if (this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy)) {
             this->notify_updated();
         }
     }
@@ -618,7 +628,7 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, float x, float y, fl
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        this->glide_matter_via_info(m, info, sec, x, y, fx, fy, dx, dy, true);
+        this->glide_matter_to_location_via_info(m, info, sec, x, y, fx, fy, dx, dy, true);
     }
 }
 
@@ -1280,7 +1290,7 @@ void WarGrey::STEM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t
             }
 
             /* controlling motion via global timeline makes it more smooth */
-            this->do_motion_moving(child, info, dwidth, dheight);
+            this->deal_queued_motion(child, info, dwidth, dheight);
 
             child = info->next;
         } while (child != this->head_matter);
@@ -1461,11 +1471,19 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, flo
 }
 
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading) {
-    double x, y;
+    bool moved = false;
 
-    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    if ((!info->gliding) || ignore_gliding) {
+        moved = this->do_vector_moving(m, info, length, heading);
+    } else {
+        double x, y;
+
+        orthogonal_decomposition(length, m->get_heading(), &x, &y);
     
-    return this->move_matter_via_info(m, info, float(x), float(y), false, ignore_gliding, heading);
+        return this->move_matter_via_info(m, info, float(x), float(y), false, ignore_gliding, heading);
+    }
+
+    return moved;
 }
 
 bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding, bool heading) {
@@ -1479,7 +1497,7 @@ bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, fl
         MotionAction action;
 
         action.type = MotionActionType::Motion;
-        action.argv.motion = { .target.dot = { x, y }, 0.0F, 0.0F, absolute, heading };
+        action.argv.motion = { MotionTargetType::Location, .target.dot = { x, y }, 0.0F, 0.0F, absolute, heading };
 
         info->motion_actions.push_back(action);
     }
@@ -1496,7 +1514,7 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
         MotionAction action;
 
         action.type = MotionActionType::Motion;
-        action.argv.motion = { .target.length = length, sec, 0.0F, false, true };
+        action.argv.motion = { MotionTargetType::Vector, .target.length = length, sec, 0.0F, false, true };
 
         info->motion_actions.push_back(action);   
     }
@@ -1522,7 +1540,7 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
                 MotionAction action;
                 
                 action.type = MotionActionType::Motion;
-                action.argv.motion = { .target.dot = { x, y }, sec, sec_delta, absolute, heading };
+                action.argv.motion = { MotionTargetType::Location, .target.dot = { x, y }, sec, sec_delta, absolute, heading };
 
                 info->motion_actions.push_back(action);
             }
@@ -1532,7 +1550,7 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading) {
+bool WarGrey::STEM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading) {
     float sx, sy, sw, sh;
     float ax = 0.0F;
     float ay = 0.0F;
@@ -1544,11 +1562,11 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return this->glide_matter_via_info(m, info, sec, x - ax + dx, y - ay + dy, true, heading);
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
-    return this->glide_matter_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy, false);
+bool WarGrey::STEM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
+    return this->glide_matter_to_location_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy, false);
 }
 
-void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
+void WarGrey::STEM::Plane::deal_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
     if (!m->motion_stopped()) {
         float cwidth, cheight, hdist, vdist;
         double xspd = m->x_speed();
@@ -1654,6 +1672,14 @@ void WarGrey::STEM::Plane::do_motion_moving(IMatter* m, MatterInfo* info, float 
             }
         }
     }
+}
+
+bool WarGrey::STEM::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading) {
+    double x, y;
+
+    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    
+    return this->move_matter_via_info(m, info, float(x), float(y), false, true, heading);
 }
 
 bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec) {
