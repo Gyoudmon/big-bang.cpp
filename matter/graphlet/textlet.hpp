@@ -34,6 +34,7 @@ namespace WarGrey::STEM {
         void set_border_color(uint32_t border_hex, double alpha = 1.0);
         uint32_t get_border_color() { return this->bg_color; }
         double get_border_alpha() { return this->bg_alpha; }
+        void set_corner_radius(float radius);
 
     public:
         void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
@@ -57,6 +58,7 @@ namespace WarGrey::STEM {
         double bg_alpha = 0.0;
         uint32_t border_color;
         double border_alpha = 0.0;
+        float corner_radius = 0.0F;
 
     private:
         std::string raw;
@@ -74,7 +76,12 @@ namespace WarGrey::STEM {
 
     /*********************************************************************************************/
     __lambda__ Labellet* make_label_for_tooltip(shared_font_t font,
-        uint32_t fg_color = BLACK,
         uint32_t bg_color = SNOW,
-        uint32_t border_color = GOLD);
+        uint32_t border_color = GOLD,
+        uint32_t fg_color = BLACK);
+
+    __lambda__ Labellet* make_label_for_balloon(shared_font_t font,
+        uint32_t bg_color = GHOSTWHITE,
+        uint32_t border_color = GAINSBORO,
+        uint32_t fg_color = BLACK);
 }

@@ -7,6 +7,8 @@
 #include "../datum/fixnum.hpp"
 #include "../datum/box.hpp"
 
+#include <SDL2/SDL2_gfxPrimitives.h>
+
 using namespace WarGrey::STEM;
 
 /**************************************************************************************************/
@@ -418,6 +420,38 @@ void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, int x, int y, int wid
     game_fill_rect(renderer, &box, hue, saturation, value, alpha);
 }
 
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, uint32_t rgb, double alpha) {
+    game_draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, double hue, double saturation, double value, double alpha) {
+    game_draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, uint32_t rgb, double alpha) {
+    game_fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, double hue, double saturation, double value, double alpha) {
+    game_fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, uint32_t rgb, double alpha) {
+    game_draw_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, rgb, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, double hue, double saturation, double value, double alpha) {
+    game_draw_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, uint32_t rgb, double alpha) {
+    game_fill_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, rgb, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, double hue, double saturation, double value, double alpha) {
+    game_fill_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
+}
+
 void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha) {
     game_draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rgb, alpha);
 }
@@ -432,6 +466,22 @@ void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, int cx, int cy, int
 
 void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation, double value, double alpha) {
     game_fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, uint32_t rgb, double alpha) {
+    game_draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, double hue, double saturation, double value, double alpha) {
+    game_draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, uint32_t rgb, double alpha) {
+    game_fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, double hue, double saturation, double value, double alpha) {
+    game_fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, hue, saturation, value, alpha);
 }
 
 void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha) {
@@ -596,13 +646,16 @@ void WarGrey::STEM::game_draw_point(SDL_Renderer* renderer, float x, float y, do
 }
 
 void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
-    SDL_RenderDrawLineF(renderer, x1, y1, x2, y2);
+    uint8_t a = color_component_clamp_to_byte(alpha);
+    uint8_t r, g, b;
+    
+    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+    aalineRGBA(renderer, fl2fx<int16_t>(x1), fl2fx<int16_t>(y1), fl2fx<int16_t>(x2), fl2fx<int16_t>(y2),
+                r, g, b, a);
 }
 
 void WarGrey::STEM::game_draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawLineF(renderer, x1, y1, x2, y2);
+    game_draw_line(renderer, x1, y1, x2, y2, Hexadecimal_From_HSV(hue, saturation, value), alpha);
 }
 
 void WarGrey::STEM::game_draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, uint32_t rgb, double alpha) {
@@ -673,6 +726,66 @@ void WarGrey::STEM::game_fill_rect(SDL_Renderer* renderer, float x, float y, flo
     game_fill_rect(renderer, &box, hue, saturation, value, alpha);
 }
 
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, uint32_t rgb, double alpha) {
+    game_draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, double hue, double saturation, double value, double alpha) {
+    game_draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, uint32_t rgb, double alpha) {
+    game_fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, double hue, double saturation, double value, double alpha) {
+    game_fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, uint32_t rgb, double alpha) {
+    int16_t X1 = fl2fx<int16_t>(x);
+    int16_t Y1 = fl2fx<int16_t>(y);
+    int16_t X2 = fl2fx<int16_t>(x + width);
+    int16_t Y2 = fl2fx<int16_t>(y + height);
+    uint8_t a = color_component_clamp_to_byte(alpha);
+    uint8_t r, g, b;
+    int16_t rad;
+
+    if (radius < 0.0) {
+        radius = fxmin(width, height) * (-radius);
+    }
+
+    rad = fl2fx<int16_t>(flmin(radius, height * 0.5F));
+    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+    roundedRectangleRGBA(renderer, X1, Y1, X2, Y2, rad, r, g, b, a);
+}
+
+void WarGrey::STEM::game_draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, double hue, double saturation, double value, double alpha) {
+    game_draw_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, uint32_t rgb, double alpha) {
+    int16_t X1 = fl2fx<int16_t>(x);
+    int16_t Y1 = fl2fx<int16_t>(y);
+    int16_t X2 = fl2fx<int16_t>(x + width);
+    int16_t Y2 = fl2fx<int16_t>(y + height);
+    uint8_t a = color_component_clamp_to_byte(alpha);
+    uint8_t r, g, b;
+    int16_t rad;
+
+    if (radius < 0.0) {
+        radius = fxmin(width, height) * (-radius);
+    }
+
+    rad = fl2fx<int16_t>(flmin(radius, height * 0.5F));
+    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+    roundedBoxRGBA(renderer, X1, Y1, X2, Y2, rad, r, g, b, a);
+}
+
+void WarGrey::STEM::game_fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, double hue, double saturation, double value, double alpha) {
+    game_fill_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
+}
+
 void WarGrey::STEM::game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha) {
     game_draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rgb, alpha);
 }
@@ -689,44 +802,95 @@ void WarGrey::STEM::game_fill_square(SDL_Renderer* renderer, float cx, float cy,
     game_fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, hue, saturation, value, alpha);
 }
 
+void WarGrey::STEM::game_draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, uint32_t rgb, double alpha) {
+    game_draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, double hue, double saturation, double value, double alpha) {
+    game_draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, hue, saturation, value, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, uint32_t rgb, double alpha) {
+    game_fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, rgb, alpha);
+}
+
+void WarGrey::STEM::game_fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, double hue, double saturation, double value, double alpha) {
+    game_fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, hue, saturation, value, alpha);
+}
+
 void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
-    draw_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
+    int16_t CX = fl2fx<int16_t>(cx);
+    int16_t CY = fl2fx<int16_t>(cy);
+    int16_t R = fl2fx<int16_t>(radius);
+    uint8_t a = color_component_clamp_to_byte(alpha);
+    uint8_t r, g, b;
+    
+    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+    aacircleRGBA(renderer, CX, CY, R, r, g, b, a);
 }
 
 void WarGrey::STEM::game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    draw_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
+    game_draw_circle(renderer, cx, cy, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
 }
 
 void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
-    draw_filled_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
+    int16_t CX = fl2fx<int16_t>(cx);
+    int16_t CY = fl2fx<int16_t>(cy);
+    int16_t R = fl2fx<int16_t>(radius);
+    uint8_t a = color_component_clamp_to_byte(alpha);
+    uint8_t r, g, b;
+    
+    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+    filledCircleRGBA(renderer, CX, CY, R, r, g, b, a);
+    aacircleRGBA(renderer, CX, CY, R, r, g, b, a);
 }
 
 void WarGrey::STEM::game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    draw_filled_circle(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(radius));
+    game_fill_circle(renderer, cx, cy, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
 }
 
 void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
-    draw_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
+    int16_t CX = fl2fx<int16_t>(cx);
+    int16_t CY = fl2fx<int16_t>(cy);
+    int16_t AR = fl2fx<int16_t>(ar);
+    int16_t BR = fl2fx<int16_t>(br);
+    uint8_t a = color_component_clamp_to_byte(alpha);
+    uint8_t r, g, b;
+    
+    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+
+    if (AR == BR) {
+        aacircleRGBA(renderer, CX, CY, AR, r, g, b, a);
+    } else {
+        aaellipseRGBA(renderer, CX, CY, AR, BR, r, g, b, a);
+    }
 }
 
 void WarGrey::STEM::game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    draw_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
+    game_draw_ellipse(renderer, cx, cy, ar, br, Hexadecimal_From_HSV(hue, saturation, value), alpha);
 }
 
 void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
-    draw_filled_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
+    int16_t CX = fl2fx<int16_t>(cx);
+    int16_t CY = fl2fx<int16_t>(cy);
+    int16_t AR = fl2fx<int16_t>(ar);
+    int16_t BR = fl2fx<int16_t>(br);
+    uint8_t a = color_component_clamp_to_byte(alpha);
+    uint8_t r, g, b;
+    
+    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+    
+    if (AR == BR) {
+        filledCircleRGBA(renderer, CX, CY, AR, r, g, b, a);
+        aacircleRGBA(renderer, CX, CY, BR, r, g, b, a);
+    } else {
+        filledEllipseRGBA(renderer, CX, CY, AR, BR, r, g, b, a);
+        aaellipseRGBA(renderer, CX, CY, AR, BR, r, g, b, a);
+    }
 }
 
 void WarGrey::STEM::game_fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    draw_filled_ellipse(renderer, fl2fxi(cx), fl2fxi(cy), fl2fxi(ar), fl2fxi(br));
+    game_fill_ellipse(renderer, cx, cy, ar, br, Hexadecimal_From_HSV(hue, saturation, value), alpha);
 }
 
 void WarGrey::STEM::game_draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, double alpha) {

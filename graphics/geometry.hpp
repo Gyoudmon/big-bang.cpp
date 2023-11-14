@@ -41,10 +41,24 @@ namespace WarGrey::STEM {
     __lambda__ void game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+
     __lambda__ void game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
     __lambda__ void game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+
+    __lambda__ void game_draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
     __lambda__ void game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
@@ -95,6 +109,15 @@ namespace WarGrey::STEM {
     __lambda__ void game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+
     __lambda__ void game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
     __lambda__ void game_fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha = 1.0);
@@ -104,6 +127,11 @@ namespace WarGrey::STEM {
     __lambda__ void game_draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
     __lambda__ void game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+
+    __lambda__ void game_draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, uint32_t rgb, double alpha = 1.0);
+    __lambda__ void game_fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);
 
     __lambda__ void game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, uint32_t rgb, double alpha = 1.0);
     __lambda__ void game_draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float aradius, float bradius, double hue, double saturation = 1.0, double value = 1.0, double alpha = 1.0);

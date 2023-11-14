@@ -8,16 +8,31 @@
 #include "../../datum/string.hpp"
 #include "../../datum/box.hpp"
 
+#include <SDL2/SDL2_gfxPrimitives.h>
+
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-Labellet* WarGrey::STEM::make_label_for_tooltip(shared_font_t font, uint32_t fg_color, uint32_t bg_color, uint32_t border_color) {
+static Labellet* make_styled_label(shared_font_t font, uint32_t bg_color, uint32_t border_color, uint32_t fg_color, float cr) {
     Labellet* tooltip = new Labellet(font, fg_color, "");
 
     tooltip->set_background_color(bg_color);
     tooltip->set_border_color(border_color);
+    
+    if (cr != 0.0F) {
+        tooltip->set_corner_radius(cr);
+    }
 
     return tooltip;
+}
+
+/*************************************************************************************************/
+Labellet* WarGrey::STEM::make_label_for_tooltip(shared_font_t font, uint32_t bg_color, uint32_t border_color, uint32_t fg_color) {
+    return make_styled_label(font, bg_color, border_color, fg_color, 0.0F);
+}
+
+Labellet* WarGrey::STEM::make_label_for_balloon(shared_font_t font, uint32_t bg_color, uint32_t border_color, uint32_t fg_color) {
+    return make_styled_label(font, bg_color, border_color, fg_color, -0.25F);
 }
 
 /*************************************************************************************************/
@@ -56,6 +71,13 @@ void WarGrey::STEM::ITextlet::set_border_color(uint32_t border_hex, double alpha
     if ((this->border_color != border_hex) || (this->border_alpha != alpha)) {
         this->border_color = border_hex;
         this->border_alpha = alpha;
+        this->notify_updated();
+    }
+}
+
+void WarGrey::STEM::ITextlet::set_corner_radius(float radius) {
+    if (this->corner_radius != radius) {
+        this->corner_radius = radius;
         this->notify_updated();
     }
 }
@@ -110,12 +132,36 @@ void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) 
 
 void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if ((this->texture.use_count() > 0) && this->texture->okay()) {
-        if (this->bg_alpha > 0.0F) {
-            game_fill_rect(renderer, x, y, Width, Height, this->bg_color, this->bg_alpha);
-        }
+        if (this->corner_radius == 0.0F) {
+            float pos_off = 0.0F;
+            float sizeoff = 0.5F;
 
-        if (this->border_alpha > 0.0F) {
-            game_draw_rect(renderer, x + 0.5F, y + 0.5F, Width - 1.0F, Height - 1.0F, this->border_color, this->border_alpha);
+            if (this->bg_alpha > 0.0F) {
+                game_fill_rect(renderer, x + pos_off, y + pos_off,
+                                        Width - sizeoff, Height - sizeoff,
+                                        this->bg_color, this->bg_alpha);
+            }
+
+            if (this->border_alpha > 0.0F) {
+                game_draw_rect(renderer, x + pos_off, y + pos_off,
+                                        Width - sizeoff, Height - sizeoff,
+                                        this->border_color, this->border_alpha);
+            }
+        } else {
+            float pos_off = 0.5F;
+            float sizeoff = 2.0F;
+
+            if (this->bg_alpha > 0.0F) {
+                game_fill_rounded_rect(renderer, x + pos_off, y + pos_off,
+                                        Width - sizeoff, Height - sizeoff,
+                                        this->corner_radius, this->bg_color, this->bg_alpha);
+            }
+
+            if (this->border_alpha > 0.0F) {
+                game_draw_rounded_rect(renderer, x + pos_off, y + pos_off,
+                                        Width - sizeoff, Height - sizeoff,
+                                        this->corner_radius, this->border_color, this->border_alpha);
+            }
         }
 
         game_render_texture(renderer, this->texture->self(), x, y);

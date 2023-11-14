@@ -239,6 +239,7 @@ namespace WarGrey::STEM {
     public:
         bool has_mission_completed() override;
         void set_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->sentry = sentry; }
+        void set_balloon_color(uint32_t border, uint32_t background) { this->balloon_border = border; this->balloon_color = background; }
         void set_tooltip_matter(WarGrey::STEM::IMatter* m, float dx = 0.0F, float dy = 0.0F);
 
     public:
@@ -289,6 +290,20 @@ namespace WarGrey::STEM {
         void set_pen_color(IMatter* m, double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
         void set_heading(IMatter* m, double direction, bool is_radian = false);
         void turn(IMatter* m, double theta, bool is_radian = false);
+
+    public:
+        void say(IMatter* m, const char* sentence, uint32_t color);
+        void say(IMatter* m, const std::string& sentence, uint32_t color);
+        void say(IMatter* m, uint32_t color, const char* fmt, ...);
+        void say(IMatter* m, double sec, const char* sentence, uint32_t color);
+        void say(IMatter* m, double sec, const std::string& sentence, uint32_t color);
+        void say(IMatter* m, double sec, uint32_t color, const char* fmt, ...);
+        void think(IMatter* m, const char* sentence, uint32_t color);
+        void think(IMatter* m, const std::string& sentence, uint32_t color);
+        void think(IMatter* m, uint32_t color, const char* fmt, ...);
+        void think(IMatter* m, double sec, const char* sentence, uint32_t color);
+        void think(IMatter* m, double sec, const std::string& sentence, uint32_t color);
+        void think(IMatter* m, double sec, uint32_t color, const char* fmt, ...);
 
     public:
         IMatter* find_next_selected_matter(IMatter* start = nullptr) override;
@@ -391,5 +406,9 @@ namespace WarGrey::STEM {
         WarGrey::STEM::IMatter* tooltip = nullptr;
         float tooltip_dx = 0.0F;
         float tooltip_dy = 0.0F;
+
+    private:
+        uint32_t balloon_border = 0xF5F5F5U;
+        uint32_t balloon_color = 0xF8F8FFU;
     };
 }
