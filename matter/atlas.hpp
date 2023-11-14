@@ -28,7 +28,8 @@ namespace WarGrey::STEM {
         
     public:
         size_t logic_tile_count();
-        void create_logic_grid(int row, int col, float top = 0.0F, float right = 0.0F, float bottom = 0.0F, float left = 0.0F);
+        void create_logic_grid(int row, int col, float top, float right, float bottom, float left = 0.0F);
+        void create_logic_grid(int row, int col, float hinset = 0.0F, float vinset = 0.0F);
         int logic_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
         void feed_logic_tile_extent(float* width = nullptr, float* height = nullptr);

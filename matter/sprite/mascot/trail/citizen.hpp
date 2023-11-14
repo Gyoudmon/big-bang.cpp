@@ -5,6 +5,8 @@
 
 #include "../../../../physics/motion/map2d.hpp"
 
+#include "../creature.hpp"
+
 #include <vector>
 
 /* Protagonists in the RPG 空の軌跡 */
@@ -14,7 +16,7 @@ namespace WarGrey::STEM {
     #define TRAIL_STUDENTS_PATH "trail/Students"
     #define TRAIL_SPECIALS_PATH "trail/Specials"
 
-    class __lambda__ Citizen : public WarGrey::STEM::Sprite, protected WarGrey::STEM::I8WayMotion {
+    class __lambda__ Citizen : public WarGrey::STEM::Sprite, public WarGrey::STEM::ICreature, protected WarGrey::STEM::I8WayMotion {
     public:
         static size_t special_name_count();
         static std::vector<std::string> list_special_names();

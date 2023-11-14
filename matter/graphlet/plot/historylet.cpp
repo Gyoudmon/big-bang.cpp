@@ -1,10 +1,10 @@
 #include "historylet.hpp"
 
-#include "../../datum/box.hpp"
-#include "../../datum/flonum.hpp"
+#include "../../../datum/box.hpp"
+#include "../../../datum/flonum.hpp"
 
-#include "../../graphics/image.hpp"
-#include "../../graphics/geometry.hpp"
+#include "../../../graphics/image.hpp"
+#include "../../../graphics/geometry.hpp"
 
 using namespace WarGrey::STEM;
 

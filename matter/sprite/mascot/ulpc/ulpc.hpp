@@ -3,13 +3,16 @@
 #include "../../sheet.hpp"
 #include "../../../../physics/motion/map2d.hpp"
 
+#include "../creature.hpp"
+
 /* For the Universe LPC Spritesheet Generator */
 /* https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/index.html */
-/* https://opengameart.org/content/lpc-santa */
 /* https://lpc.opengameart.org/static/LPC-Style-Guide/build/index.html */
 
 namespace WarGrey::STEM {
-    class SpriteULPCSheet : public WarGrey::STEM::SpriteGridSheet, protected WarGrey::STEM::I4WayMotion {
+    class SpriteULPCSheet : public WarGrey::STEM::SpriteGridSheet
+        , public WarGrey::STEM::ICreature
+        , protected WarGrey::STEM::I4WayMotion {
     public:
         SpriteULPCSheet(const std::string& pathname);
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../graphlet.hpp"
-#include "../../graphics/texture.hpp"
+#include "../../graphlet.hpp"
+#include "../../../graphics/texture.hpp"
 
 #include <vector>
 

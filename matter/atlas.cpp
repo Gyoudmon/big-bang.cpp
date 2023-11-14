@@ -162,6 +162,10 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
 }
 
 /*************************************************************************************************/
+void WarGrey::STEM::IAtlas::create_logic_grid(int row, int col, float hinset, float vinset) {
+    this->create_logic_grid(row, col, vinset, hinset, vinset, hinset);
+}
+
 void WarGrey::STEM::IAtlas::create_logic_grid(int row, int col, float top, float right, float bottom, float left) {
     float map_width, map_height;
 

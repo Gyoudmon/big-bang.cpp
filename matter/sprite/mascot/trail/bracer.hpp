@@ -48,8 +48,11 @@ namespace WarGrey::STEM {
     class __lambda__ Estelle : public WarGrey::STEM::Bracer {
     public:
         Estelle() : Bracer("Estelle") {}
-        const char* name() override { return "Estelle Bright"; }
         virtual ~Estelle() {}
+
+    public:
+        const char* name() override { return "Estelle Bright"; }
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
 
     protected:
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;
@@ -58,8 +61,11 @@ namespace WarGrey::STEM {
     class __lambda__ Joshua : public WarGrey::STEM::Bracer {
     public:
         Joshua() : Bracer("Joshua") {}
-        const char* name() override { return "Joshua Bright"; }
         virtual ~Joshua() {}
+
+    public:
+        const char* name() override { return "Joshua Bright"; }
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
     };
 
     class __lambda__ Scherazard : public WarGrey::STEM::Bracer {
@@ -67,34 +73,49 @@ namespace WarGrey::STEM {
         Scherazard() : Bracer("Scherazard") {}
         const char* name() override { return "Scherazard Harvey"; }
         virtual ~Scherazard() {}
+
+    public:
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
     };
 
     class __lambda__ Olivier : public WarGrey::STEM::Bracer {
     public:
         Olivier() : Bracer("Olivier") {}
-        const char* name() override { return "Olivier Lenheim"; }
         virtual ~Olivier() {}
+
+    public:
+        const char* name() override { return "Olivier Lenheim"; }
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
     };
 
     class __lambda__ Klose : public WarGrey::STEM::Bracer {
     public:
         Klose() : Bracer("Klose") {}
-        const char* name() override { return "Klose Rinz"; /* Klaudia von Auslese */ }
         virtual ~Klose() {}
+
+    public:
+        const char* name() override { return "Klose Rinz"; /* Klaudia von Auslese */ }
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
     };
 
     class __lambda__ Agate : public WarGrey::STEM::Bracer {
     public:
         Agate() : Bracer("Agate") {}
-        const char* name() override { return "Agate Crosner"; }
         virtual ~Agate() {}
+
+    public:
+        const char* name() override { return "Agate Crosner"; }
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
     };
 
     class __lambda__ Tita : public WarGrey::STEM::Bracer {
     public:
         Tita() : Bracer("Tita") {}
-        const char* name() override { return "Tita Russell"; }
         virtual ~Tita() {}
+
+    public:
+        const char* name() override { return "Tita Russell"; }
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
 
     protected:
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;
@@ -103,8 +124,11 @@ namespace WarGrey::STEM {
     class __lambda__ Zin : public WarGrey::STEM::Bracer {
     public:
         Zin() : Bracer("Zin") {}
-        const char* name() override { return "Zin Vathek"; }
         virtual ~Zin() {}
+
+    public:
+        const char* name() override { return "Zin Vathek"; }
+        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
 
     protected:
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;

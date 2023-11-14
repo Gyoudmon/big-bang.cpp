@@ -5,10 +5,14 @@
 
 #include "../../../physics/motion/platformer.hpp"
 
+#include "creature.hpp"
+
 /* https://github.com/SuperTux/supertux */
 
 namespace WarGrey::STEM {
-    class __lambda__ Tuxmon : public WarGrey::STEM::Sprite, protected virtual WarGrey::STEM::IPlatformMotion {
+    class __lambda__ Tuxmon : public WarGrey::STEM::Sprite
+        , public virtual WarGrey::STEM::ICreature
+        , protected virtual WarGrey::STEM::IPlatformMotion {
     public:
         Tuxmon(bool walk_only = false);
         virtual ~Tuxmon() {}

@@ -45,7 +45,8 @@
 #include "matter/graphlet/shapelet.hpp"
 #include "matter/graphlet/tracklet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
-#include "matter/graphlet/historylet.hpp"
+#include "matter/graphlet/plot/historylet.hpp"
+#include "matter/graphlet/sketch/conveyerlet.hpp"
 
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"
