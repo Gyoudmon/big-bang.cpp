@@ -7,7 +7,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ ICreature {
     public:
-        void give_nickname(const char* name) { this->_nickname = name; }
+        void give_nickname(const char* name) { this->_nickname = (name == nullptr) ? "" : name; }
         void give_nickname(const std::string& name) { this->_nickname = name; }
 
     public:
