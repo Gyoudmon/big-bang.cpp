@@ -2,6 +2,7 @@
 
 #include "forward.hpp"
 #include "physics/motion.hpp"
+#include "graphics/named_colors.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -76,8 +77,17 @@ namespace WarGrey::STEM {
         void scale_to(float x_ratio, float y_ratio, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
         void resize(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->resize(size, size, anchor); }
         void resize(float width, float height, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
-        void resize_by_width(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->scale_by_size(size, true, anchor); }
-        void resize_by_height(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC) { this->scale_by_size(size, false, anchor); }
+        void resize_by_width(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
+        void resize_by_height(float size, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::CC);
+
+        void scale(float ratio, float afx, float afy) { this->scale(ratio, ratio, afx, afy); }
+        void scale(float x_ratio, float y_ratio, float afx, float afy);
+        void scale_to(float ratio, float afx, float afy) { this->scale_to(ratio, ratio, afx, afy); }
+        void scale_to(float x_ratio, float y_ratio, float afx, float afy);
+        void resize(float size, float afx, float afy) { this->resize(size, size, afx, afy); }
+        void resize(float width, float height, float afx, float afy);
+        void resize_by_width(float size, float afx, float afy) { this->scale_by_size(size, true, afx, afy); }
+        void resize_by_height(float size, float afx, float afy) { this->scale_by_size(size, false, afx, afy); }
         
     public:
         bool events_allowed() { return this->deal_with_events; }
@@ -86,6 +96,7 @@ namespace WarGrey::STEM {
     public:
         bool has_caret();
         void moor(WarGrey::STEM::MatterAnchor anchor);
+        void moor(float afx, float afy);
         void clear_moor(); /* the notify_updated() will clear the moor,
                               but the notification is not always guaranteed to be done,
                               use this method to do it manually. */
@@ -100,20 +111,21 @@ namespace WarGrey::STEM {
         void notify_updated();
         void notify_timeline_restart(uint32_t count0 = 0, int duration = 0);
         void feed_location(float* x, float* y, WarGrey::STEM::MatterAnchor a = MatterAnchor::LT);
+        void feed_location(float* x, float* y, float fx, float fy);
         void log_message(int fgc, const char* fmt, ...);
         void log_message(int fgc, const std::string& msg);
         void log_message(const char* fmt, ...);
 
     public:
-        IMatterInfo* info = nullptr;
-
-    private:
-        void scale_by_size(float size, bool given_width, WarGrey::STEM::MatterAnchor anchor);
+        IMatterInfo* info = nullptr;    
 
     protected:
         void enable_events(bool yes = true, bool low_level = false) { this->deal_with_events = yes; this->deal_with_low_level_events = low_level; }
         void enable_resize(bool yes = true) { this->can_resize = yes; }
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
+
+    private:
+        void scale_by_size(float size, bool given_width, float afx, float afy);
 
     private:
         bool findable = true;
@@ -124,7 +136,8 @@ namespace WarGrey::STEM {
         // bool wheel_translation = true;
     
     private:
-        WarGrey::STEM::MatterAnchor anchor = WarGrey::STEM::MatterAnchor::LT;
+        float anchor_fx = 0.0F;
+        float anchor_fy = 0.0F;
         float anchor_x = 0.0F;
         float anchor_y = 0.0F;
 

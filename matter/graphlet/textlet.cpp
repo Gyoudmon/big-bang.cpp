@@ -31,10 +31,6 @@ Labellet* WarGrey::STEM::make_label_for_tooltip(shared_font_t font, uint32_t bg_
     return make_styled_label(font, bg_color, border_color, fg_color, 0.0F);
 }
 
-Labellet* WarGrey::STEM::make_label_for_balloon(shared_font_t font, uint32_t bg_color, uint32_t border_color, uint32_t fg_color) {
-    return make_styled_label(font, bg_color, border_color, fg_color, -0.25F);
-}
-
 /*************************************************************************************************/
 WarGrey::STEM::ITextlet::ITextlet() {
     this->set_text_color();

@@ -17,6 +17,7 @@ namespace WarGrey::STEM {
         virtual ~ITextlet() noexcept {}
 
         void construct(SDL_Renderer* render) override;
+        const char* name() override { return this->c_str(); }
 
     public:
         void set_text(const char* fmt, ...);
@@ -78,10 +79,5 @@ namespace WarGrey::STEM {
     __lambda__ Labellet* make_label_for_tooltip(shared_font_t font,
         uint32_t bg_color = SNOW,
         uint32_t border_color = GOLD,
-        uint32_t fg_color = BLACK);
-
-    __lambda__ Labellet* make_label_for_balloon(shared_font_t font,
-        uint32_t bg_color = GHOSTWHITE,
-        uint32_t border_color = GAINSBORO,
         uint32_t fg_color = BLACK);
 }

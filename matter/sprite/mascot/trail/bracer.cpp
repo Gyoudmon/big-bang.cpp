@@ -5,8 +5,8 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-WarGrey::STEM::Bracer::Bracer(const char* name)
-    : Citizen(digimon_mascot_path(name, "", "trail/Bracers")) {}
+WarGrey::STEM::Bracer::Bracer(const char* name, const char* nickname)
+    : Citizen(digimon_mascot_path(name, "", "trail/Bracers"), nickname) {}
 
 void WarGrey::STEM::Bracer::on_costumes_load() {
     Citizen::on_costumes_load();

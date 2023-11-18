@@ -109,14 +109,15 @@ TrailStudent* WarGrey::STEM::TrailStudent::randomly_create() {
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Citizen::Citizen(const std::string& fullpath) : Sprite(fullpath) {
+WarGrey::STEM::Citizen::Citizen(const std::string& fullpath, const char* nickname) : Sprite(fullpath) {
     citizen_default_virtual_canvas(this);
+    this->give_nickname(nickname);
 }
 
-WarGrey::STEM::Citizen::Citizen(size_t seq, const char* rootdir)
-    : Citizen(citizen_name_ref(rootdir, seq).c_str(), rootdir) {}
+WarGrey::STEM::Citizen::Citizen(size_t seq, const char* rootdir, const char* nickname)
+    : Citizen(citizen_name_ref(rootdir, seq).c_str(), rootdir, nickname) {}
 
-WarGrey::STEM::Citizen::Citizen(const char* name, const char* rootdir) : Sprite(digimon_mascot_path(name, "", rootdir)) {
+WarGrey::STEM::Citizen::Citizen(const char* name, const char* rootdir, const char* nickname) : Sprite(digimon_mascot_path(name, "", rootdir)) {
     if (rootdir == TRAIL_KIDS_PATH) {
         kid_set_virtual_canvas(this);
     } else if (rootdir == TRAIL_STUDENTS_PATH) {
@@ -124,19 +125,25 @@ WarGrey::STEM::Citizen::Citizen(const char* name, const char* rootdir) : Sprite(
     } else {
         citizen_default_virtual_canvas(this);
     }
+
+    this->give_nickname(nickname);
 }
 
-WarGrey::STEM::TrailKid::TrailKid(const char* name) : Citizen(digimon_mascot_path(name, "", TRAIL_KIDS_PATH)) {
+WarGrey::STEM::TrailKid::TrailKid(const char* name, const char* nickname)
+    : Citizen(digimon_mascot_path(name, "", TRAIL_KIDS_PATH), nickname) {
     kid_set_virtual_canvas(this);
 }
 
-WarGrey::STEM::TrailKid::TrailKid(size_t idx) : TrailKid(citizen_name_ref(TRAIL_KIDS_PATH, idx).c_str()) {}
+WarGrey::STEM::TrailKid::TrailKid(size_t idx, const char* nickname)
+    : TrailKid(citizen_name_ref(TRAIL_KIDS_PATH, idx).c_str(), nickname) {}
 
-WarGrey::STEM::TrailStudent::TrailStudent(const char* name) : Citizen(digimon_mascot_path(name, "", TRAIL_STUDENTS_PATH)) {
+WarGrey::STEM::TrailStudent::TrailStudent(const char* name, const char* nickname)
+    : Citizen(digimon_mascot_path(name, "", TRAIL_STUDENTS_PATH), nickname) {
     student_set_virtual_canvas(this);
 }
 
-WarGrey::STEM::TrailStudent::TrailStudent(size_t idx) : TrailStudent(citizen_name_ref(TRAIL_STUDENTS_PATH, idx).c_str()) {}
+WarGrey::STEM::TrailStudent::TrailStudent(size_t idx, const char* nickname)
+    : TrailStudent(citizen_name_ref(TRAIL_STUDENTS_PATH, idx).c_str(), nickname) {}
 
 /*************************************************************************************************/
 void WarGrey::STEM::Citizen::on_costumes_load() {

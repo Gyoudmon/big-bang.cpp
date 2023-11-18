@@ -7,7 +7,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Bracer : public WarGrey::STEM::Citizen {
     public:
-        Bracer(const char* name);
+        Bracer(const char* name, const char* nickname = nullptr);
         virtual ~Bracer() {}
 
     public:
@@ -47,7 +47,7 @@ namespace WarGrey::STEM {
     /*********************************************************************************************/
     class __lambda__ Estelle : public WarGrey::STEM::Bracer {
     public:
-        Estelle() : Bracer("Estelle") {}
+        Estelle(const char* nickname = nullptr) : Bracer("Estelle", nickname) {}
         virtual ~Estelle() {}
 
     public:
@@ -60,7 +60,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Joshua : public WarGrey::STEM::Bracer {
     public:
-        Joshua() : Bracer("Joshua") {}
+        Joshua(const char* nickname = nullptr) : Bracer("Joshua", nickname) {}
         virtual ~Joshua() {}
 
     public:
@@ -70,7 +70,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Scherazard : public WarGrey::STEM::Bracer {
     public:
-        Scherazard() : Bracer("Scherazard") {}
+        Scherazard(const char* nickname = nullptr) : Bracer("Scherazard", nickname) {}
         const char* name() override { return "Scherazard Harvey"; }
         virtual ~Scherazard() {}
 
@@ -80,7 +80,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Olivier : public WarGrey::STEM::Bracer {
     public:
-        Olivier() : Bracer("Olivier") {}
+        Olivier(const char* nickname = nullptr) : Bracer("Olivier", nickname) {}
         virtual ~Olivier() {}
 
     public:
@@ -90,7 +90,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Klose : public WarGrey::STEM::Bracer {
     public:
-        Klose() : Bracer("Klose") {}
+        Klose(const char* nickname = nullptr) : Bracer("Klose", nickname) {}
         virtual ~Klose() {}
 
     public:
@@ -100,7 +100,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Agate : public WarGrey::STEM::Bracer {
     public:
-        Agate() : Bracer("Agate") {}
+        Agate(const char* nickname = nullptr) : Bracer("Agate", nickname) {}
         virtual ~Agate() {}
 
     public:
@@ -110,7 +110,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Tita : public WarGrey::STEM::Bracer {
     public:
-        Tita() : Bracer("Tita") {}
+        Tita(const char* nickname = nullptr) : Bracer("Tita", nickname) {}
         virtual ~Tita() {}
 
     public:
@@ -123,7 +123,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Zin : public WarGrey::STEM::Bracer {
     public:
-        Zin() : Bracer("Zin") {}
+        Zin(const char* nickname = nullptr) : Bracer("Zin", nickname) {}
         virtual ~Zin() {}
 
     public:

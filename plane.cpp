@@ -7,6 +7,7 @@
 #include "graphics/colorspace.hpp"
 
 #include "matter/sprite.hpp"
+#include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/tracklet.hpp"
 
 #include "physics/mathematics.hpp"
@@ -28,6 +29,7 @@ using namespace WarGrey::STEM;
  *   `reinterpret_cast` might be harmful for multi-inheritances.
  */
 #define MATTER_INFO(m) (static_cast<MatterInfo*>(m->info))
+#define SPEECH_INFO(m) (static_cast<SpeechInfo*>(m->info))
 
 namespace WarGrey::STEM {
     enum class MotionTargetType { Vector, Location, Anchor };
@@ -84,7 +86,7 @@ namespace WarGrey::STEM {
 
     struct MatterInfo : public WarGrey::STEM::IMatterInfo {
         MatterInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {}
-        virtual ~MatterInfo() {}
+        virtual ~MatterInfo() noexcept;
 
         float x = 0.0F;
         float y = 0.0F;
@@ -93,11 +95,22 @@ namespace WarGrey::STEM {
         bool selected = false;
         uint32_t selection_hit = 0;
 
+        // for speech bubble
+        IMatter* bubble = nullptr;
+        SpeechBubble bubble_type = SpeechBubble::Default;
+        long long bubble_expiration_time = 0;
+        
         // for animation
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 0U;
         uint32_t local_elapse = 0U;
         int duration = 0;
+
+        // for queued motions
+        bool gliding = false;
+        float gliding_tx = 0.0F;
+        float gliding_ty = 0.0F;
+        std::deque<MotionAction> motion_actions;
 
         // for track
         Tracklet* canvas = nullptr;
@@ -109,19 +122,52 @@ namespace WarGrey::STEM {
         double draw_alpha = 1.0;
         uint8_t draw_width = 1U;
 
-        // for queued motions
-        bool gliding = false;
-        float gliding_tx = 0.0F;
-        float gliding_ty = 0.0F;
-        std::deque<MotionAction> motion_actions;
-
-        // progressbar
+        // gliding progressbar
         double current_step = 1.0;
         double progress_total = 1.0;
 
+        // as linked list
         IMatter* next = nullptr;
         IMatter* prev = nullptr;
     };
+
+    class SpeechInfo : public WarGrey::STEM::IMatterInfo {
+    public:
+        SpeechInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {}
+        virtual ~SpeechInfo() {}
+
+    public:
+        void counter_increase() {
+            this->refcount ++;
+        }
+
+        void counter_decrease(IMatter* master) {
+            this->refcount --;
+
+            if (this->refcount <= 0) {
+                delete master;
+            }
+        }
+
+    public:
+        // as linked list
+        IMatter* next = nullptr;
+
+    private:
+        uint32_t refcount = 0;
+    };
+
+    WarGrey::STEM::MatterInfo::~MatterInfo() noexcept {
+        if (this->bubble != nullptr) {
+            auto speech_info = dynamic_cast<SpeechInfo*>(this->bubble->info);
+
+            if (speech_info != nullptr) {
+                speech_info->counter_decrease(this->bubble);
+            }
+
+            this->bubble = nullptr;
+        }
+    }
 }
 
 static inline bool over_stepped(float tx, float cx, double spd) {
@@ -243,6 +289,15 @@ static inline MatterInfo* bind_matter_owership(IPlane* master, IMatter* m) {
     return info;
 }
 
+static inline SpeechInfo* bind_speech_owership(IPlane* master, IMatter* m) {
+    auto info = new SpeechInfo(master);
+
+    info->counter_increase();
+    m->info = info;
+
+    return info;
+}
+
 static inline MatterInfo* plane_matter_info(IPlane* master, IMatter* m) {
     MatterInfo* info = nullptr;
 
@@ -255,7 +310,36 @@ static inline MatterInfo* plane_matter_info(IPlane* master, IMatter* m) {
     return info;
 }
 
-static void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float* x, float* y, float* width, float* height) {
+static inline void bubble_start(ISprite* m, MatterInfo* info, double sec, SpeechBubble type, double default_duration) {
+    double duration = (sec > 0.0) ? sec : default_duration;
+
+    info->bubble_type = type;            
+    info->bubble_expiration_time = current_milliseconds() + fl2fx<long long>(duration * 1000.0);
+    
+    if (type == SpeechBubble::Default) {
+        m->play_speaking(1);
+    } else {
+        m->play_thinking(1);
+    }
+}
+
+static inline void bubble_expire(IMatter* m, MatterInfo* info) {
+    info->bubble_expiration_time = 0LL;
+}
+
+static inline bool is_matter_bubble_showing(IMatter* m, MatterInfo* info) {
+    bool yes = false;
+
+    if (info->bubble != nullptr) {
+        if (info->bubble_expiration_time > 0LL) {
+            yes = true;
+        }
+    }
+
+    return yes;
+}
+
+static inline void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float* x, float* y, float* width, float* height) {
     m->feed_extent(info->x, info->y, width, height);
 
     (*x) = info->x;
@@ -295,8 +379,11 @@ static IMatter* do_search_selected_matter(IMatter* start, IMatter* terminator) {
 }
 
 /*************************************************************************************************/
-Plane::Plane(const char* name) : IPlane(name), head_matter(nullptr) {}
 Plane::Plane(const std::string& name) : Plane(name.c_str()) {}
+Plane::Plane(const char* name) : IPlane(name), head_matter(nullptr) {
+    this->bubble_font = GameFont::Tooltip(FontSize::medium);
+    this->set_bubble_duration();
+}
 
 Plane::~Plane() {
     this->erase();
@@ -406,8 +493,7 @@ void WarGrey::STEM::Plane::send_backward(IMatter* m, int n) {
 void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
     if (m->info == nullptr) {
         MatterInfo* info = bind_matter_owership(this, m);
-        SDL_Renderer* master_renderer = this->master_renderer();
-
+        
         if (this->head_matter == nullptr) {
             this->head_matter = m;
             info->prev = this->head_matter;
@@ -422,22 +508,40 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
             head_info->prev = m;
         }
 
-        this->begin_update_sequence();
-        m->construct(master_renderer);
-        this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy);
-
-        if (m->ready()) {
-            if ((this->scale_x != 1.0F) || (this->scale_y != 1.0F)) {
-                this->do_resize(m, info, fx, fy, this->scale_x, this->scale_y);
-            }
-
-            this->notify_updated();
-            this->on_matter_ready(m);
-        } else {
-            this->notify_updated(); // is it necessary?
-        }
-        this->end_update_sequence();
+        this->handle_new_matter(m, info, x, y, fx, fy, dx, dy);
     }
+}
+
+void WarGrey::STEM::Plane::insert_as_speech_bubble(IMatter* m) {
+    if (m->info == nullptr) {
+        SpeechInfo* info = bind_speech_owership(this, m);
+
+        info->next = this->head_speech;
+        this->head_speech = m;
+
+        this->handle_new_matter(m, info);
+    }
+}
+
+void WarGrey::STEM::Plane::handle_new_matter(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
+    this->begin_update_sequence();
+    m->construct(this->master_renderer());
+    this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy);
+    
+    if (m->ready()) {
+        this->on_matter_ready(m);
+    }
+    
+    this->notify_updated();
+    this->end_update_sequence();
+}
+
+
+void WarGrey::STEM::Plane::handle_new_matter(IMatter* m, SpeechInfo* info) {
+    this->begin_update_sequence();
+    m->construct(this->master_renderer());
+    this->notify_updated();
+    this->end_update_sequence();
 }
 
 void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
@@ -460,7 +564,7 @@ void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
         }
         
         if (needs_delete) {
-            delete m; // m's destructor will delete the associated info object
+            this->delete_matter(m);
         }
 
         this->notify_updated();
@@ -469,8 +573,9 @@ void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
 }
 
 void WarGrey::STEM::Plane::erase() {
+    IMatter* temp_head = this->head_matter;
+        
     if (this->head_matter != nullptr) {
-        IMatter* temp_head = this->head_matter;
         MatterInfo* temp_info = MATTER_INFO(temp_head);
         MatterInfo* prev_info = MATTER_INFO(temp_info->prev);
 
@@ -481,11 +586,16 @@ void WarGrey::STEM::Plane::erase() {
             IMatter* child = temp_head;
 
             temp_head = MATTER_INFO(temp_head)->next;
-
-            delete child; // child's destructor will delete the associated info object
+            this->delete_matter(child);
         } while (temp_head != nullptr);
 
         this->size_cache_invalid();
+    }
+
+    while (this->head_speech != nullptr) {
+        temp_head = this->head_speech;
+        this->head_speech = SPEECH_INFO(this->head_speech)->next;
+        this->delete_matter(temp_head);
     }
 }
 
@@ -1186,7 +1296,7 @@ void WarGrey::STEM::Plane::on_enter(IPlane* from) {
     this->mission_done = false;
 
     if (this->sentry != nullptr) {
-        this->sentry->greetings(1);
+        this->sentry->play_greeting(1);
     }
 
     IPlane::on_enter(from);
@@ -1194,7 +1304,7 @@ void WarGrey::STEM::Plane::on_enter(IPlane* from) {
 
 void WarGrey::STEM::Plane::mission_complete() {
     if (this->sentry != nullptr) {
-        this->sentry->goodbye(1);
+        this->sentry->play_goodbye(1);
         this->sentry->stop(1);
     }
 
@@ -1295,7 +1405,14 @@ void WarGrey::STEM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t
             }
 
             /* controlling motion via global timeline makes it more smooth */
-            this->deal_queued_motion(child, info, dwidth, dheight);
+            this->handle_queued_motion(child, info, dwidth, dheight);
+
+            if (is_matter_bubble_showing(child, info)) {
+                if (current_milliseconds() >= info->bubble_expiration_time) {
+                    bubble_expire(child, info);
+                    this->notify_updated(child);
+                }
+            }
 
             child = info->next;
         } while (child != this->head_matter);
@@ -1334,18 +1451,41 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     }
 
     if (this->head_matter != nullptr) {
+        IMatter* speech_head = nullptr;
+        IMatter* speech_nil = nullptr;
         IMatter* child = this->head_matter;
+        MatterInfo* info = nullptr;
         
         do {
+            info = MATTER_INFO(child);
+
             if (this->tooltip != child) {
-                child = this->do_draw(renderer, child, X, Y, dsX, dsY, dsWidth, dsHeight);
-            } else {
-                child = MATTER_INFO(child)->next;
+                if (info->bubble != nullptr) {
+                    if (speech_head == nullptr) {
+                        speech_head = child;
+                    }
+
+                    speech_nil = info->next;
+                }
+
+                this->draw_matter(renderer, child, info, X, Y, dsX, dsY, dsWidth, dsHeight);
             }
+
+            child = info->next;
         } while (child != this->head_matter);
 
+        if (speech_head != nullptr) {
+            child = speech_head;
+
+            do {
+                info = MATTER_INFO(child);
+                this->draw_speech(renderer, child, info, Width, Height, X, Y, dsX, dsY, dsWidth, dsHeight);
+                child = info->next;
+            } while (child != speech_nil);
+        }
+
         if (this->tooltip != nullptr) {
-            this->do_draw(renderer, this->tooltip, X, Y, dsX, dsY, dsWidth, dsHeight);
+            this->draw_matter(renderer, this->tooltip, MATTER_INFO(this->tooltip), X, Y, dsX, dsY, dsWidth, dsHeight);
         }
 
         SDL_RenderSetClipRect(renderer, nullptr);
@@ -1356,16 +1496,15 @@ void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float 
     game_draw_rect(renderer, x, y, width, height, 0x00FFFFU);
 }
 
-IMatter* WarGrey::STEM::Plane::do_draw(SDL_Renderer* renderer, IMatter* child, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
-    MatterInfo* info = MATTER_INFO(child);
+void WarGrey::STEM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
     float mx, my, mwidth, mheight;
     SDL_Rect clip;
     
     if (child->visible()) {
         child->feed_extent(info->x, info->y, &mwidth, &mheight);
 
-        mx = (info->x + this->translate_x) * this->scale_x + X;
-        my = (info->y + this->translate_y) * this->scale_y + Y;
+        mx = (info->x + this->translate_x) + X;
+        my = (info->y + this->translate_y) + Y;
                 
         if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
             clip.x = fl2fxi(flfloor(mx));
@@ -1387,24 +1526,51 @@ IMatter* WarGrey::STEM::Plane::do_draw(SDL_Renderer* renderer, IMatter* child, f
             }
         }
     }
-
-    return info->next;
 }
 
-void WarGrey::STEM::Plane::do_resize(IMatter* m, MatterInfo* info, float fx, float fy, float scale_x, float scale_y, float prev_scale_x, float prev_scale_y) {
-    // TODO: the theory or implementation seems incorrect.
-    if (m->resizable()) {
-        float sx, sy, sw, sh, nx, ny, nw, nh;
+void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
+    if (is_matter_bubble_showing(child, info)) {
+        float ix, iy, iwidth, iheight, bx, by, bwidth, bheight;
+        float bfx, bfy, mfx, mfy, dx, dy;
+        float mwidth, mheight;
+        SDL_Rect clip;
+    
+        child->feed_extent(info->x, info->y, &mwidth, &mheight);
+        info->bubble->feed_extent(0.0F, 0.0F, &iwidth, &iheight);
 
-        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
+        bwidth =  iwidth +  (this->bubble_left_margin + this->bubble_right_margin);
+        bheight = iheight + (this->bubble_top_margin + this->bubble_bottom_margin);
+        this->place_speech_bubble(child, bwidth, bheight, Width, Height, &mfx, &mfy, &bfx, &bfy, &dx, &dy);
+        bx = info->x + mwidth  * mfx - bwidth  * bfx + dx;
+        by = info->y + mheight * mfy - bheight * bfy + dy;
+        bx = (bx + this->translate_x) + X;
+        by = (by + this->translate_y) + Y;
 
-        m->resize((sw / prev_scale_x) * scale_x, (sh / prev_scale_y) * scale_y);
-        m->feed_extent(sx, sy, &nw, &nh);
+        if (rectangle_overlay(bx, by, bx + bwidth, by + bheight, dsX, dsY, dsWidth, dsHeight)) {
+            bx = flmax(bx, this->bubble_left_margin + X);
+            by = flmax(by, this->bubble_top_margin  + Y);
 
-        nx = sx + (sw - nw) * fx;
-        ny = sy + (sh - nh) * fy;
+            ix = bx + this->bubble_left_margin;
+            iy = by + this->bubble_top_margin;
+        
+            clip.x = fl2fxi(flfloor(ix));
+            clip.y = fl2fxi(flfloor(iy));
+            clip.w = fl2fxi(flceiling(iwidth));
+            clip.h = fl2fxi(flceiling(iheight));
 
-        this->do_moving_via_info(m, info, nx, ny, true, true, false);
+            SDL_RenderSetClipRect(renderer, nullptr);
+
+            game_fill_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_color, this->bubble_alpha);
+            game_draw_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_border, this->bubble_alpha);
+
+            SDL_RenderSetClipRect(renderer, &clip);
+            
+            if (info->bubble->ready()) {
+                info->bubble->draw(renderer, ix, iy, iwidth, iheight);
+            } else {
+                info->bubble->draw_in_progress(renderer, ix, iy, iwidth, iheight);
+            }
+        }
     }
 }
 
@@ -1583,7 +1749,7 @@ bool WarGrey::STEM::Plane::move_matter_to_location_via_info(IMatter* m, MatterIn
     return this->glide_matter_to_location_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy, false);
 }
 
-void WarGrey::STEM::Plane::deal_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
+void WarGrey::STEM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
     if (!m->motion_stopped()) {
         float cwidth, cheight, hdist, vdist;
         double xspd = m->x_speed();
@@ -1712,8 +1878,8 @@ bool WarGrey::STEM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x
     
     unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
 
-    sx += (this->translate_x * this->scale_x);
-    sy += (this->translate_y * this->scale_y);
+    sx += this->translate_x;
+    sy += this->translate_y;
 
     return flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))
         && m->is_colliding_with_mouse(x - sx, y - sy);
@@ -1829,6 +1995,133 @@ void WarGrey::STEM::Plane::set_pen_color(IMatter* m, double hue, double saturati
 }
 
 /*************************************************************************************************/
+void WarGrey::STEM::Plane::log_message(int fgc, const std::string& msg) {
+    if (this->sentry != nullptr) {
+        this->sentry->say(2.0, msg, uint32_t(fgc));
+    } else {
+        IPlane::log_message(fgc, msg);
+    }
+}
+
+void WarGrey::STEM::Plane::say(ISprite* m, double sec, IMatter* message, SpeechBubble type) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        if (message == nullptr) {
+            this->shh(m);
+        } else {
+            if ((info->bubble == nullptr) || (info->bubble != message)) {
+                if (message->info == nullptr) {
+                    this->handle_new_matter(message, bind_speech_owership(this, message));
+                } else {
+                    auto sinfo = dynamic_cast<SpeechInfo*>(message->info);
+
+                    if (sinfo != nullptr) {
+                        sinfo->counter_increase();
+                    }
+                }
+
+                if (info->bubble != nullptr) {
+                    auto sinfo = dynamic_cast<SpeechInfo*>(info->bubble->info);
+
+                    if (sinfo != nullptr) {
+                        sinfo->counter_decrease(info->bubble);
+                    }
+                }
+        
+                info->bubble = message;
+            }
+
+            bubble_start(m, info, sec, type, this->bubble_second);
+        }
+    }
+}
+
+void WarGrey::STEM::Plane::say(ISprite* m, double sec, const std::string& message, uint32_t color, SpeechBubble type) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        if (message.empty()) {
+            this->shh(m);
+        } else if (this->merge_bubble_text(info->bubble, message, color, 1.0)) {
+            bubble_start(m, info, sec, type, this->bubble_second);
+        } else {
+            this->say(m, sec, this->make_bubble_text(message, color, 1.0), type);
+        }
+    }
+}
+
+void WarGrey::STEM::Plane::shh(ISprite* m) {
+    MatterInfo* info = plane_matter_info(this, m);
+
+    if (info != nullptr) {
+        if (this->in_speech(m)) {
+            bubble_expire(m, info);
+        }
+    }
+}
+
+IMatter* WarGrey::STEM::Plane::make_bubble_text(const std::string& message, uint32_t color, double alpha) {
+    return new Labellet(this->bubble_font, color, alpha, "%s", message.c_str());
+}
+
+bool WarGrey::STEM::Plane::merge_bubble_text(IMatter* bubble, const std::string& message, uint32_t color, double alpha) {
+    auto bmsg = dynamic_cast<ITextlet*>(bubble);
+    bool okay = (bmsg != nullptr);
+
+    if (okay) {
+        bmsg->set_text_color(color);
+        bmsg->set_text(message);
+    }
+
+    return okay;
+}
+
+bool WarGrey::STEM::Plane::is_bubble_showing(IMatter* m, SpeechBubble* type) {
+    MatterInfo* info = plane_matter_info(this, m);
+    bool yes = is_matter_bubble_showing(m, info);
+
+    if (yes) {
+        SET_BOX(type, info->bubble_type);
+    }
+
+    return yes;
+}
+
+void WarGrey::STEM::Plane::place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height
+        , float* mfx, float* mfy, float* bfx, float* bfy, float* dx, float* dy) {
+    SET_BOXES(mfx, mfy, 0.0F);
+    SET_VALUES(bfx, 0.618F, bfy, 1.0);
+    SET_BOXES(dx, dy, 0.0F);
+}
+
+void WarGrey::STEM::Plane::set_bubble_duration(double second) {
+    if (second <= 0.0) {
+        this->set_bubble_duration();
+    } else {
+        this->bubble_second = second;
+    }
+}
+
+void WarGrey::STEM::Plane::set_bubble_margin(float top, float right, float bottom, float left) {
+    this->bubble_top_margin = top;
+    this->bubble_right_margin = right;
+    this->bubble_bottom_margin = bottom;
+    this->bubble_left_margin = left;
+}
+
+void WarGrey::STEM::Plane::set_bubble_color(uint32_t border, uint32_t background, double alpha) {
+    this->bubble_border = border;
+    this->bubble_color = background;
+    this->bubble_alpha = alpha;
+}
+
+void WarGrey::STEM::Plane::delete_matter(IMatter* m) {
+    // m's destructor will delete the associated info object
+    delete m;
+}
+
+/*************************************************************************************************/
 WarGrey::STEM::IPlane::IPlane(const char* name) : caption(name) {}
 WarGrey::STEM::IPlane::IPlane(const std::string& name) : IPlane(name.c_str()) {}
 
@@ -1865,7 +2158,6 @@ SDL_Renderer* WarGrey::STEM::IPlane::master_renderer() {
 }
 
 void WarGrey::STEM::IPlane::on_enter(IPlane* from) {
-    /* It's good to tell the mission the size of the stage */
     float width, height;
 
     this->master()->feed_client_extent(&width, &height);
@@ -2328,4 +2620,107 @@ void WarGrey::STEM::IPlane::glide_to_grid(double sec, IMatter* m, int row, int c
 
     this->feed_grid_cell_location(row, col, &x, &y, a);
     this->glide_to(sec, m, x, y, a, dx, dy);
+}
+
+/*************************************************************************************************/
+bool WarGrey::STEM::IPlane::in_speech(ISprite* m) {
+    return this->is_bubble_showing(m, nullptr);
+}
+
+bool WarGrey::STEM::IPlane::is_speaking(ISprite* m) {
+    SpeechBubble type;
+    bool showing = this->is_bubble_showing(m, &type);
+
+    return showing && (type == SpeechBubble::Default);
+}
+
+bool WarGrey::STEM::IPlane::is_thinking(ISprite* m) {
+    SpeechBubble type;
+    bool showing = this->is_bubble_showing(m, &type);
+
+    return showing && (type == SpeechBubble::Thought);
+}
+
+void WarGrey::STEM::IPlane::say(ISprite* m, const char* sentence, uint32_t color) {
+    if (sentence == nullptr) {
+        this->shh(m);
+    } else {
+        this->say(m, std::string(sentence), color);
+    }
+}
+
+void WarGrey::STEM::IPlane::say(ISprite* m, const std::string& sentence, uint32_t color) {
+    if (sentence.empty()) {
+        this->shh(m);
+    } else {
+        this->say(m, 0.0, sentence, color, SpeechBubble::Default);
+    }
+}
+
+void WarGrey::STEM::IPlane::say(ISprite* m, uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->say(m, sentence, color);
+}
+
+void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const char* sentence, uint32_t color) {
+    if (sentence == nullptr) {
+        this->shh(m);
+    } else {
+        this->say(m, sec, std::string(sentence), color);
+    }
+}
+
+void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const std::string& sentence, uint32_t color) {
+    if (sentence.empty()) {
+        this->shh(m);
+    } else {
+        this->say(m, sec, sentence, color, SpeechBubble::Default);
+    }
+}
+
+void WarGrey::STEM::IPlane::say(ISprite* m, double sec, uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->say(m, sec, sentence, color);
+}
+
+void WarGrey::STEM::IPlane::think(ISprite* m, const char* sentence, uint32_t color) {
+    if (sentence == nullptr) {
+        this->shh(m);
+    } else {
+        this->think(m, std::string(sentence), color);
+    }
+}
+
+void WarGrey::STEM::IPlane::think(ISprite* m, const std::string& sentence, uint32_t color) {
+    if (sentence.empty()) {
+        this->shh(m);
+    } else {
+        this->say(m, 0.0, sentence, color, SpeechBubble::Thought);
+    }
+}
+
+void WarGrey::STEM::IPlane::think(ISprite* m, uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->think(m, sentence, color);
+}
+
+void WarGrey::STEM::IPlane::think(ISprite* m, double sec, const char* sentence, uint32_t color) {
+    if (sentence == nullptr) {
+        this->shh(m);
+    } else {
+        this->think(m, sec, std::string(sentence), color);
+    }
+}
+
+void WarGrey::STEM::IPlane::think(ISprite* m, double sec, const std::string& sentence, uint32_t color) {
+    if (sentence.empty()) {
+        this->shh(m);
+    } else {
+        this->say(m, sec, sentence, color, SpeechBubble::Thought);
+    }
+}
+
+void WarGrey::STEM::IPlane::think(ISprite* m, double sec, uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->think(m, sec, sentence, color);
 }

@@ -29,6 +29,7 @@ namespace WarGrey::STEM {
 
     public:
         virtual size_t costume_count() = 0;
+        virtual void flip(bool horizontal = true, bool vertical = false);
         
     public:
         void set_virtual_canvas(float width, float height);
@@ -54,9 +55,33 @@ namespace WarGrey::STEM {
         void stop(int rest = 0);
 
     public:
-        virtual void flip(bool horizontal = true, bool vertical = false);
-        virtual void greetings(int repeat = 1) {} 
-        virtual void goodbye(int repeat = 1) {}
+        void shh();
+        bool is_speaking();
+        bool is_thinking();
+        bool in_speech();
+        void say(double sec, IMatter* message) { this->say(message, sec); }
+        void think(double sec, IMatter* message) { this->say(message, sec); }
+        void say(IMatter* message, double sec) { this->say(message, sec, SpeechBubble::Default); }
+        void think(IMatter* message, double sec) { this->say(message, sec, SpeechBubble::Thought); }
+        
+        void say(const char* sentence, uint32_t color = BLACK);
+        void say(const std::string& sentence, uint32_t color = BLACK);
+        void say(uint32_t color, const char* fmt, ...);
+        void say(double sec, const char* sentence, uint32_t color = BLACK);
+        void say(double sec, const std::string& sentence, uint32_t color = BLACK);
+        void say(double sec, uint32_t color, const char* fmt, ...);
+        void think(const char* sentence, uint32_t color = DIMGRAY);
+        void think(const std::string& sentence, uint32_t color = DIMGRAY);
+        void think(uint32_t color, const char* fmt, ...);
+        void think(double sec, const char* sentence, uint32_t color = DIMGRAY);
+        void think(double sec, const std::string& sentence, uint32_t color = DIMGRAY);
+        void think(double sec, uint32_t color, const char* fmt, ...);
+
+    public:
+        virtual void play_speaking(int repeat = 1) {}
+        virtual void play_thinking(int repeat = 1) {}
+        virtual void play_greeting(int repeat = 1) {} 
+        virtual void play_goodbye(int repeat = 1) {}
 
     protected:
         virtual uint64_t preferred_idle_duration();
@@ -78,6 +103,9 @@ namespace WarGrey::STEM {
         SDL_RendererFlip current_flip_status();
         float get_horizontal_scale();
         float get_vertical_scale();
+
+    private:
+        void say(IMatter* message, double sec, SpeechBubble type);
 
     protected:
         std::string current_action_name;

@@ -8,12 +8,11 @@ namespace WarGrey::STEM {
         Linkmon();
 
     public:
-        void goodbye(int repeat = 1) override { this->play_goodbye(repeat); }
-        void greetings(int repeat = 1) override { this->play_greeting(repeat); }
-        
-    public:
-        void play_goodbye(int repeat = 1) { this->play("GoodBye", repeat); }
-        void play_greeting(int repeat = 1) { this->play("Greeting", repeat); }
+        void play_goodbye(int repeat = 1) override { this->play("GoodBye", repeat); }
+        void play_greeting(int repeat = 1) override { this->play("Greeting", repeat); }
+        void play_speaking(int repeat = 1) override { this->play_explain(repeat); }
+        void play_thinking(int repeat = 1) override { this->play("Thinking", repeat); }
+
         void play_show(int repeat = 1) { this->play("Show", repeat); }
         void play_hide(int repeat = 1) { this->play("Hide", repeat); }
         
@@ -28,7 +27,6 @@ namespace WarGrey::STEM {
         void play_wave(int repeat = 1) { this->play("Wave", repeat); }
         void play_explain(int repeat = 1) { this->play("Explain", repeat); }
         void play_congratulate(int repeat = 1) { this->play("Congratulate", repeat); }
-        void play_thinking(int repeat = 1) { this->play("Thinking", repeat); }
         void play_processing(int repeat = 1) { this->play("Processing", repeat); }
         void play_alert(int repeat = 1) { this->play("Alert", repeat); }
         

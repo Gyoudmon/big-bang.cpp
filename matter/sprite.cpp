@@ -1,5 +1,7 @@
 #include "sprite.hpp"
 
+#include "../plane.hpp"
+
 #include "../datum/box.hpp"
 #include "../datum/fixnum.hpp"
 #include "../datum/flonum.hpp"
@@ -371,4 +373,115 @@ float WarGrey::STEM::ISprite::get_horizontal_scale() {
 
 float WarGrey::STEM::ISprite::get_vertical_scale() {
     return flabs(this->yscale);
+}
+
+/**************************************************************************************************/
+void WarGrey::STEM::ISprite::shh() {
+    if (this->info != nullptr) {
+        this->info->master->shh(this);
+    }
+}
+
+void WarGrey::STEM::ISprite::say(IMatter* message, double sec, SpeechBubble type) {
+    if (this->info != nullptr) {
+        this->info->master->say(this, sec, message, type);
+    }
+}
+
+void WarGrey::STEM::ISprite::say(const char* sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->say(this, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::say(const std::string& sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->say(this, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::say(uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->say(sentence, color);
+}
+
+void WarGrey::STEM::ISprite::say(double sec, const char* sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->say(this, sec, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::say(double sec, const std::string& sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->say(this, sec, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::say(double sec, uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->say(sec, sentence, color);
+}
+
+void WarGrey::STEM::ISprite::think(const char* sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->think(this, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::think(const std::string& sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->think(this, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::think(uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->think(sentence, color);
+}
+
+void WarGrey::STEM::ISprite::think(double sec, const char* sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->think(this, sec, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::think(double sec, const std::string& sentence, uint32_t color) {
+    if (this->info != nullptr) {
+        this->info->master->think(this, sentence, color);
+    }
+}
+
+void WarGrey::STEM::ISprite::think(double sec, uint32_t color, const char* fmt, ...) {
+    VSNPRINT(sentence, fmt);
+    this->think(sec, sentence, color);
+}
+
+bool WarGrey::STEM::ISprite::is_speaking() {
+    bool yes = false;
+
+    if (this->info != nullptr) {
+        yes = this->info->master->is_speaking(this);
+    }
+
+    return yes;
+}
+
+bool WarGrey::STEM::ISprite::is_thinking() {
+    bool yes = false;
+
+    if (this->info != nullptr) {
+        yes = this->info->master->is_thinking(this);
+    }
+
+    return yes;
+}
+
+bool WarGrey::STEM::ISprite::in_speech() {
+    bool yes = false;
+    
+    if (this->info != nullptr) {
+        yes = this->info->master->in_speech(this);
+    }
+
+    return yes;
 }
