@@ -5,7 +5,7 @@
 #include "../../datum/string.hpp"
 #include "../../datum/flonum.hpp"
 
-#include "../../graphics/pen.hpp"
+#include "../../graphics/brush.hpp"
 
 #include <filesystem>
 
@@ -64,14 +64,14 @@ void WarGrey::STEM::Sprite::feed_costume_extent(size_t idx, float* width, float*
 }
 
 void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
-    Pen::stamp(renderer, this->costumes[idx].second->self(), src, &argv->dst, argv->flip);
+    Brush::stamp(renderer, this->costumes[idx].second->self(), src, &argv->dst, argv->flip);
 
     if (this->current_decorate.size() > 0) {
         std::string c_name = this->costumes[idx].first;
         auto decorate = this->decorates[this->current_decorate];
 
         if (decorate.find(c_name) != decorate.end()) {
-            Pen::stamp(renderer, decorate[c_name]->self(), src, &argv->dst, argv->flip);
+            Brush::stamp(renderer, decorate[c_name]->self(), src, &argv->dst, argv->flip);
         }
     }
 }

@@ -3,7 +3,7 @@
 #include "../../graphics/font.hpp"
 #include "../../graphics/text.hpp"
 #include "../../graphics/colorspace.hpp"
-#include "../../graphics/pen.hpp"
+#include "../../graphics/brush.hpp"
 
 #include "../../datum/string.hpp"
 #include "../../datum/box.hpp"
@@ -133,13 +133,13 @@ void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, flo
             float sizeoff = 0.5F;
 
             if (this->bg_alpha > 0.0F) {
-                Pen::fill_rect(renderer, x + pos_off, y + pos_off,
+                Brush::fill_rect(renderer, x + pos_off, y + pos_off,
                                         Width - sizeoff, Height - sizeoff,
                                         this->bg_color, this->bg_alpha);
             }
 
             if (this->border_alpha > 0.0F) {
-                Pen::draw_rect(renderer, x + pos_off, y + pos_off,
+                Brush::draw_rect(renderer, x + pos_off, y + pos_off,
                                         Width - sizeoff, Height - sizeoff,
                                         this->border_color, this->border_alpha);
             }
@@ -148,19 +148,19 @@ void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, flo
             float sizeoff = 2.0F;
 
             if (this->bg_alpha > 0.0F) {
-                Pen::fill_rounded_rect(renderer, x + pos_off, y + pos_off,
+                Brush::fill_rounded_rect(renderer, x + pos_off, y + pos_off,
                                         Width - sizeoff, Height - sizeoff,
                                         this->corner_radius, this->bg_color, this->bg_alpha);
             }
 
             if (this->border_alpha > 0.0F) {
-                Pen::draw_rounded_rect(renderer, x + pos_off, y + pos_off,
+                Brush::draw_rounded_rect(renderer, x + pos_off, y + pos_off,
                                         Width - sizeoff, Height - sizeoff,
                                         this->corner_radius, this->border_color, this->border_alpha);
             }
         }
 
-        Pen::stamp(renderer, this->texture->self(), x, y);
+        Brush::stamp(renderer, this->texture->self(), x, y);
     }
 }
 

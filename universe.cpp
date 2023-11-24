@@ -1,7 +1,7 @@
 #include "universe.hpp"
 #include "misc.hpp"
 
-#include "graphics/pen.hpp"
+#include "graphics/brush.hpp"
 #include "graphics/colorspace.hpp"
 #include "graphics/text.hpp"
 #include "graphics/image.hpp"
@@ -413,17 +413,17 @@ void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, i
 }
 
 void WarGrey::STEM::IUniverse::draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height) {
-    Pen::draw_line(renderer, x, y, width, y, 0x888888U);
+    Brush::draw_line(renderer, x, y, width, y, 0x888888U);
 }
 
 bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
     bool updated = (this->echo.h > 0);
 
     if (updated) {
-        Pen::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
+        Brush::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
 
         if (!this->message.empty()) {
-            game_draw_blended_text(this->echo_font, renderer, this->_mfgc,
+            Pen::draw_blended_text(this->echo_font, renderer, this->_mfgc,
                     this->echo.x, this->cmdline_message_yposition(), this->message, this->echo.w);
         }
     } else {
@@ -442,14 +442,14 @@ bool WarGrey::STEM::IUniverse::display_usr_input_and_caret(SDL_Renderer* rendere
     bool updated = false;
 
     if (this->echo.h > 0) {
-        Pen::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
+        Brush::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
 
         if (yes) {
             if (this->prompt.empty()) {
-                game_draw_blended_text(this->echo_font, renderer, this->_ifgc,
+                Pen::draw_blended_text(this->echo_font, renderer, this->_ifgc,
                         this->echo.x, this->cmdline_message_yposition(), this->usrin + "_", this->echo.w);
             } else {
-                game_draw_blended_text(this->echo_font, renderer, this->_ifgc,
+                Pen::draw_blended_text(this->echo_font, renderer, this->_ifgc,
                         this->echo.x, this->cmdline_message_yposition(), this->prompt + this->usrin + "_", this->echo.w);
             }
         }
@@ -655,7 +655,7 @@ SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
 void WarGrey::STEM::IUniverse::take_snapshot() {
     const char* basename = SDL_GetWindowTitle(this->window);
     path snapshot_png = (this->snapshot_rootdir.empty() ? current_path() : path(this->snapshot_rootdir))
-        / path(game_create_string("%s-%s.png", basename, make_now_timestamp_utc(true).c_str()));
+        / path(make_nstring("%s-%s.png", basename, make_now_timestamp_utc(true).c_str()));
 
     if (this->save_snapshot(snapshot_png.string().c_str())) { // stupid windows as it requires `string()`
         this->log_message(this->_fgc, "A snapshot has been saved as '%s'.", snapshot_png.string().c_str());
@@ -680,9 +680,9 @@ void WarGrey::STEM::IUniverse::save_file(bool is_save_as) {
         const char* basename = SDL_GetWindowTitle(this->window);
     
         if (!is_save_as) {
-            data_path /= path(game_create_string("%s%s", basename, ext));
+            data_path /= path(make_nstring("%s%s", basename, ext));
         } else {
-            data_path /= path(game_create_string("%s-%s%s", basename, make_now_timestamp_utc(true).c_str(), ext));
+            data_path /= path(make_nstring("%s-%s%s", basename, make_now_timestamp_utc(true).c_str(), ext));
         }
 
         try {

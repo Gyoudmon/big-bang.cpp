@@ -6,7 +6,7 @@
 #include "../datum/fixnum.hpp"
 
 #include "text.hpp"
-#include "pen.hpp"
+#include "brush.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -108,12 +108,12 @@ static void draw_hthatch(SDL_Renderer* renderer, float x0, float y0
 	float short_length = height * (((step % 2 == 1) || no_short) ? 0.0F : 0.382F);
 	
 	metrics->hatch_width = interval * step;
-	Pen::draw_hline(renderer, x, y, metrics->hatch_width, color);
+	Brush::draw_hline(renderer, x, y, metrics->hatch_width, color);
 	
 	for (unsigned int i = 0; i <= step; i++) {
 		float xthis = interval * float(i) + x;
 
-		Pen::draw_vline(renderer, xthis, y, - ((i % 2 == 0) ? height : short_length), color);
+		Brush::draw_vline(renderer, xthis, y, - ((i % 2 == 0) ? height : short_length), color);
 	}
 }
 
@@ -125,12 +125,12 @@ static void draw_hbhatch(SDL_Renderer* renderer, float x0, float y0
 	float short_length = height * (((step % 2 == 1) || no_short) ? 0.0F : 0.382F);
 	
 	metrics->hatch_width = interval * step;
-	Pen::draw_hline(renderer, x, y, metrics->hatch_width, color);
+	Brush::draw_hline(renderer, x, y, metrics->hatch_width, color);
 	
 	for (unsigned int i = 0; i <= step; i++) {
 		float xthis = interval * float(i) + x;
 
-		Pen::draw_vline(renderer, xthis, y, ((i % 2 == 0) ? height : short_length), color);
+		Brush::draw_vline(renderer, xthis, y, ((i % 2 == 0) ? height : short_length), color);
 	}
 }
 
@@ -143,12 +143,12 @@ static void draw_vlhatch(SDL_Renderer* renderer, float x0, float y0
 	
 	metrics->hatch_height = interval * step;
 	x += width - 1.0F /* thickness */;
-	Pen::draw_vline(renderer, x, y, metrics->hatch_height, color);
+	Brush::draw_vline(renderer, x, y, metrics->hatch_height, color);
 
 	for (uint32_t i = 0; i <= step; i++) {
 		float ythis = y + interval * float(i);
 
-		Pen::draw_hline(renderer, x, ythis, -((i % 2 == 0) ? width : short_length), color);
+		Brush::draw_hline(renderer, x, ythis, -((i % 2 == 0) ? width : short_length), color);
 	}
 }
 
@@ -160,12 +160,12 @@ static void draw_vrhatch(SDL_Renderer* renderer, float x0, float y0
 	float short_length = width * (((step % 2 == 1) || no_short) ? 0.0F : 0.382F);
 	
 	metrics->hatch_height = interval * step;
-	Pen::draw_vline(renderer, x, y, metrics->hatch_height, color);
+	Brush::draw_vline(renderer, x, y, metrics->hatch_height, color);
 
 	for (uint32_t i = 0; i <= step; i++) {
 		float ythis = y + interval * float(i);
 
-		Pen::draw_hline(renderer, x, ythis, (i % 2 == 0) ? width : short_length, color);
+		Brush::draw_hline(renderer, x, ythis, (i % 2 == 0) ? width : short_length, color);
 	}
 }
 
@@ -226,7 +226,7 @@ void WarGrey::STEM::Ruler::draw_ht_hatchmark(shared_font_t font
 		auto pmark = game_blended_text_texture(renderer, mark, font, color);
 		float tx = x + metrics.hatch_x + interval * float(i) - float(font->width(mark)) * 0.5F;
 
-		Pen::stamp(renderer, pmark, tx, mark_ty);
+		Brush::stamp(renderer, pmark, tx, mark_ty);
 	}
 
 	SET_BOX(maybe_metrics, metrics);
@@ -250,7 +250,7 @@ void WarGrey::STEM::Ruler::draw_hb_hatchmark(shared_font_t font
 		auto pmark = game_blended_text_texture(renderer, mark, font, color);
 		float tx = x + metrics.hatch_x + interval * float(i) - float(font->width(mark)) * 0.5F;
 		
-		Pen::stamp(renderer, pmark, tx, mark_ty);
+		Brush::stamp(renderer, pmark, tx, mark_ty);
 	}
 
 	SET_BOX(maybe_metrics, metrics);
@@ -315,7 +315,7 @@ void WarGrey::STEM::Ruler::draw_vl_hatchmark(shared_font_t font
 		float tx = x + mark_span_off * metrics.ch;
 		float ty = y + interval * float(i);
 
-		Pen::stamp(renderer, pmark, tx, ty);
+		Brush::stamp(renderer, pmark, tx, ty);
 	}
 
 	SET_BOX(maybe_metrics, metrics);
@@ -339,7 +339,7 @@ void WarGrey::STEM::Ruler::draw_vr_hatchmark(shared_font_t font
 		auto pmark = game_blended_text_texture(renderer, mark, font, color);
 		float ty = y + interval * float(i);
 
-		Pen::stamp(renderer, pmark, mark_tx, ty);
+		Brush::stamp(renderer, pmark, mark_tx, ty);
 	}
 
 	SET_BOX(maybe_metrics, metrics);

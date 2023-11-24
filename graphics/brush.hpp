@@ -7,7 +7,7 @@
 #include <string>
 
 namespace WarGrey::STEM {
-    class __lambda__ Pen {
+    class __lambda__ Brush {
     public:
         static void clear(SDL_Renderer* renderer, uint32_t rgb = 0U, double alpha = 0.0);
         static void clear(SDL_Renderer* renderer, double hue, double saturation = 1.0 , double value = 1.0, double alpha = 1.0);

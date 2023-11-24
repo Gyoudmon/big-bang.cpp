@@ -3,7 +3,7 @@
 #include "../../graphics/font.hpp"
 #include "../../graphics/text.hpp"
 #include "../../graphics/colorspace.hpp"
-#include "../../graphics/pen.hpp"
+#include "../../graphics/brush.hpp"
 
 #include "../../datum/string.hpp"
 #include "../../datum/box.hpp"
@@ -146,18 +146,18 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
         self->y = bottom - self->h;
         
         if (bgcolor >= 0) {
-            Pen::fill_rect(ds, self, static_cast<uint32_t>(bgcolor));
+            Brush::fill_rect(ds, self, static_cast<uint32_t>(bgcolor));
         }
 
         if (bcolor >= 0) {
-            Pen::draw_rect(ds, self, static_cast<uint32_t>(bcolor));
+            Brush::draw_rect(ds, self, static_cast<uint32_t>(bcolor));
         }
 
         if (texture.use_count() > 0) {
             int width, height;
 
             texture->feed_extent(&width, &height);
-            Pen::stamp(ds, texture->self(), self->x + (self->w - width) * xfraction, bottom - height);
+            Brush::stamp(ds, texture->self(), self->x + (self->w - width) * xfraction, bottom - height);
         }
 
         self->x -= x;

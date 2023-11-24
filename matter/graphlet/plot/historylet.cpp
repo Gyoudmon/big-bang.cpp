@@ -4,7 +4,7 @@
 #include "../../../datum/flonum.hpp"
 
 #include "../../../graphics/image.hpp"
-#include "../../../graphics/pen.hpp"
+#include "../../../graphics/brush.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -56,8 +56,8 @@ void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fl
 
                 SDL_SetRenderTarget(renderer, this->diagram->self());
 
-                Pen::clear(renderer, 0U, 0.0);
-                Pen::draw_lines(renderer, dots.data(), int(n), this->color, this->alpha);
+                Brush::clear(renderer, 0U, 0.0);
+                Brush::draw_lines(renderer, dots.data(), int(n), this->color, this->alpha);
 
                 SDL_SetRenderTarget(renderer, origin);
             }
@@ -65,7 +65,7 @@ void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fl
             this->needs_refresh_diagram = false;
         }
 
-        Pen::stamp(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
+        Brush::stamp(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
     } else {
         fprintf(stderr, "无法绘制历史曲线：%s\n", SDL_GetError());
     }

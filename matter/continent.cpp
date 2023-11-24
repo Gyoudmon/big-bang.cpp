@@ -2,7 +2,7 @@
 
 #include "../plane.hpp"
 #include "../datum/box.hpp"
-#include "../graphics/pen.hpp"
+#include "../graphics/brush.hpp"
 
 #include "../virtualization/screen/pasteboard.hpp"
 
@@ -100,11 +100,11 @@ int WarGrey::STEM::Continent::update(uint64_t count, uint32_t interval, uint64_t
 
 void WarGrey::STEM::Continent::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
 	if (this->bg_alpha > 0.0F) {
-        Pen::fill_rect(renderer, x, y, Width, Height, this->background, this->bg_alpha);
+        Brush::fill_rect(renderer, x, y, Width, Height, this->background, this->bg_alpha);
     }
 
 	if (this->bd_alpha > 0.0F) {
-        Pen::draw_rect(renderer, x, y, Width, Height, this->border_color, this->bd_alpha);
+        Brush::draw_rect(renderer, x, y, Width, Height, this->border_color, this->bd_alpha);
     }
 
 	this->plane->draw(renderer, x, y, Width, Height);

@@ -1,6 +1,6 @@
 #include "shapelet.hpp"
 
-#include "../../graphics/pen.hpp"
+#include "../../graphics/brush.hpp"
 #include "../../graphics/image.hpp"
 #include "../../physics/mathematics.hpp"
 
@@ -136,7 +136,7 @@ void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float flx, float fly
     }
 
     if (this->geometry->okay()) {
-        Pen::stamp(renderer, this->geometry->self(), flx, fly, flwidth, flheight);
+        Brush::stamp(renderer, this->geometry->self(), flx, fly, flwidth, flheight);
     }
 }
 

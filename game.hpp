@@ -25,7 +25,7 @@
 #include "graphics/font.hpp"
 #include "graphics/text.hpp"
 #include "graphics/texture.hpp"
-#include "graphics/pen.hpp"
+#include "graphics/brush.hpp"
 #include "graphics/ruler.hpp"
 
 #include "matter/atlas.hpp"
@@ -47,7 +47,6 @@
 #include "matter/graphlet/tracklet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
 #include "matter/graphlet/plot/historylet.hpp"
-// #include "matter/graphlet/sketch/conveyerlet.hpp"
 
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"

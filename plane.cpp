@@ -2,7 +2,7 @@
 #include "matter.hpp"
 #include "misc.hpp"
 
-#include "graphics/pen.hpp"
+#include "graphics/brush.hpp"
 #include "graphics/ruler.hpp"
 #include "graphics/colorspace.hpp"
 
@@ -1441,16 +1441,16 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     float dsHeight = Y + Height;
     
     if (this->bg_alpha > 0.0F) {
-        Pen::fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background, this->bg_alpha);
+        Brush::fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background, this->bg_alpha);
     }
 
     if ((this->grid_alpha > 0.0F)
             && (this->column > 0) && (this->row > 0)
             && (this->cell_width > 0.0F) && (this->cell_height > 0.0F)) {
         RGB_SetRenderDrawColor(renderer, this->grid_color, this->grid_alpha);
-        Pen::draw_grid(renderer, this->row, this->column,
-                        this->cell_width, this->cell_height,
-                        this->grid_x, this->grid_y);
+        Brush::draw_grid(renderer, this->row, this->column,
+                            this->cell_width, this->cell_height,
+                            this->grid_x, this->grid_y);
     }
 
     if (this->head_matter != nullptr) {
@@ -1496,7 +1496,7 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
 }
 
 void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
-    Pen::draw_rect(renderer, x, y, width, height, 0x00FFFFU);
+    Brush::draw_rect(renderer, x, y, width, height, 0x00FFFFU);
 }
 
 void WarGrey::STEM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
@@ -1563,8 +1563,8 @@ void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, M
 
             SDL_RenderSetClipRect(renderer, nullptr);
 
-            Pen::fill_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_color, this->bubble_alpha);
-            Pen::draw_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_border, this->bubble_alpha);
+            Brush::fill_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_color, this->bubble_alpha);
+            Brush::draw_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_border, this->bubble_alpha);
 
             SDL_RenderSetClipRect(renderer, &clip);
             
