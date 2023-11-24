@@ -1493,9 +1493,6 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
 
         SDL_RenderSetClipRect(renderer, nullptr);
     }
-
-    // Ruler::draw_ht_hatchmark(renderer, 300.0F, 300.0F, 150.0F, 0.0, 100.0, 10, ROYALBLUE);
-    // Ruler::draw_hb_hatchmark(renderer, 300.0F, 300.0F, 150.0F, 0.0, 100.0, 10, CRIMSON);
 }
 
 void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
