@@ -22,10 +22,11 @@
 
 #include "graphics/colorspace.hpp"
 #include "graphics/named_colors.hpp"
-#include "graphics/geometry.hpp"
 #include "graphics/font.hpp"
 #include "graphics/text.hpp"
 #include "graphics/texture.hpp"
+#include "graphics/pen.hpp"
+#include "graphics/ruler.hpp"
 
 #include "matter/atlas.hpp"
 #include "matter/continent.hpp"
@@ -46,7 +47,7 @@
 #include "matter/graphlet/tracklet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
 #include "matter/graphlet/plot/historylet.hpp"
-#include "matter/graphlet/sketch/conveyerlet.hpp"
+// #include "matter/graphlet/sketch/conveyerlet.hpp"
 
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"

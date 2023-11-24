@@ -1,12 +1,8 @@
 #include <SDL2/SDL.h>                 // 放最前面以兼容 macOS
+#include <filesystem>
 
 #include "image.hpp"
-#include "geometry.hpp"
-#include "colorspace.hpp"
-
 #include "../datum/flonum.hpp"
-
-#include <filesystem>
 
 using namespace WarGrey::STEM;
 
@@ -62,74 +58,6 @@ void WarGrey::STEM::game_clear_image(SDL_Renderer* renderer, SDL_Texture* image)
 
 void WarGrey::STEM::game_unload_image(SDL_Texture* image) {
     SDL_DestroyTexture(image);
-}
-    
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, SDL_RendererFlip flip, double angle) {
-    game_draw_image(renderer, file.c_str(), x, y, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image(renderer, file);
-
-    if (image != nullptr) {
-        game_render_texture(renderer, image, x, y, flip, angle);
-        game_unload_image(image);
-    }
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, int x, int y, SDL_RendererFlip flip, double angle) {
-    game_render_texture(renderer, image, x, y, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
-    game_render_texture(renderer, image, x, y, width, height, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
-    game_draw_image(renderer, file.c_str(), x, y, width, height, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image(renderer, file);
-
-    if (image != nullptr) {
-        game_render_texture(renderer, image, x, y, width, height, flip, angle);
-        game_unload_image(image);
-    }
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, float x, float y, SDL_RendererFlip flip, double angle) {
-    game_render_texture(renderer, image, x, y, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, SDL_RendererFlip flip, double angle) {
-    game_draw_image(renderer, file.c_str(), x, y, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image(renderer, file);
-
-    if (image != nullptr) {
-        game_render_texture(renderer, image, x, y, flip, angle);
-        game_unload_image(image);
-    }
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, SDL_Texture* image, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
-    game_render_texture(renderer, image, x, y, width, height, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const std::string& file, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
-    game_draw_image(renderer, file.c_str(), x, y, width, height, flip, angle);
-}
-
-void WarGrey::STEM::game_draw_image(SDL_Renderer* renderer, const char* file, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
-    SDL_Texture* image = game_load_image(renderer, file);
-
-    if (image != nullptr) {
-        game_render_texture(renderer, image, x, y, width, height, flip, angle);
-        game_unload_image(image);
-    }
 }
 
 /*************************************************************************************************/

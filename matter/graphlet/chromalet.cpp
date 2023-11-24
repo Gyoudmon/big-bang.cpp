@@ -4,7 +4,7 @@
 #include "../../datum/flonum.hpp"
 
 #include "../../graphics/image.hpp"
-#include "../../graphics/geometry.hpp"
+#include "../../graphics/pen.hpp"
 #include "../../graphics/named_colors.hpp"
 
 #include "../../physics/mathematics.hpp"
@@ -283,11 +283,11 @@ void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly
     }
 
     RGB_SetRenderDrawColor(renderer, DIMGREY);
-    game_draw_grid(renderer, 10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, flx, fly);
+    Pen::draw_grid(renderer, 10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, flx, fly);
     SDL_RenderDrawLineF(renderer, flx, fly, flx + flwidth, fly + flheight);
 
     if (this->diagram->okay()) {
-        game_render_texture(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
+        Pen::stamp(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
     } else {
         this->draw_chromaticity(renderer, imaginary_width, imaginary_height, flx, fly);
     }
@@ -518,9 +518,9 @@ void WarGrey::STEM::Chromalet::fix_render_location(double* x, double* y) {
 }
 
 void WarGrey::STEM::Chromalet::render_special_dot(SDL_Renderer* renderer, uint32_t c, float x, float y) {
-    game_fill_circle(renderer, x, y, triangle_vertice_radius, c);
-    game_draw_circle(renderer, x, y, triangle_vertice_radius, GHOSTWHITE);
-    game_draw_circle(renderer, x, y, triangle_vertice_radius + 1.0F, GHOSTWHITE);
+    Pen::fill_circle(renderer, x, y, triangle_vertice_radius, c);
+    Pen::draw_circle(renderer, x, y, triangle_vertice_radius, GHOSTWHITE);
+    Pen::draw_circle(renderer, x, y, triangle_vertice_radius + 1.0F, GHOSTWHITE);
 }
 
 void WarGrey::STEM::Chromalet::render_dot(SDL_Renderer* renderer, double x, double y, double width, double height, double R, double G, double B, double dx, double dy, double A) {

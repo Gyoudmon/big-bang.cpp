@@ -7,6 +7,7 @@
 #include "../datum/fixnum.hpp"
 
 #include "../plane.hpp"
+#include "../graphics/pen.hpp"
 #include "../graphics/geometry.hpp"
 #include "../graphics/colorspace.hpp"
 
@@ -149,13 +150,13 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
                 dest.y = y + Height - dest.y * sy - dest.h;
             }
 
-            game_render_texture(renderer, tilemap, &src, &dest, flip);
+            Pen::stamp(renderer, tilemap, &src, &dest, flip);
         }
     }
 
     if ((this->logic_grid_alpha > 0.0F) && (this->logic_col > 0) && (this->logic_row > 0)) {
         RGB_SetRenderDrawColor(renderer, this->logic_grid_color, this->logic_grid_alpha);
-        game_draw_grid(renderer, this->logic_row, this->logic_col,
+        Pen::draw_grid(renderer, this->logic_row, this->logic_col,
             this->logic_tile_width * sx, this->logic_tile_height * sy,
             x + this->logic_left * sx, y + this->logic_top * sy);
     }

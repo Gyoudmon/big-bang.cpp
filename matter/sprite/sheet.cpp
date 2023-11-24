@@ -5,7 +5,7 @@
 #include "../../datum/fixnum.hpp"
 #include "../../datum/flonum.hpp"
 
-#include "../../graphics/geometry.hpp"
+#include "../../graphics/pen.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -50,7 +50,7 @@ void WarGrey::STEM::ISpriteSheet::draw_costume(SDL_Renderer* renderer, size_t id
         src->y += this->costume_region.y;
     }
 
-    game_render_texture(renderer, this->sprite_sheet->self(), src, &argv->dst, argv->flip);
+    Pen::stamp(renderer, this->sprite_sheet->self(), src, &argv->dst, argv->flip);
 }
 
 /*************************************************************************************************/

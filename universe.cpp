@@ -1,7 +1,7 @@
 #include "universe.hpp"
 #include "misc.hpp"
 
-#include "graphics/geometry.hpp"
+#include "graphics/pen.hpp"
 #include "graphics/colorspace.hpp"
 #include "graphics/text.hpp"
 #include "graphics/image.hpp"
@@ -413,14 +413,14 @@ void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, i
 }
 
 void WarGrey::STEM::IUniverse::draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height) {
-    game_draw_line(renderer, x, y, width, y, 0x888888U);
+    Pen::draw_line(renderer, x, y, width, y, 0x888888U);
 }
 
 bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
     bool updated = (this->echo.h > 0);
 
     if (updated) {
-        game_fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
+        Pen::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
 
         if (!this->message.empty()) {
             game_draw_blended_text(this->echo_font, renderer, this->_mfgc,
@@ -442,7 +442,7 @@ bool WarGrey::STEM::IUniverse::display_usr_input_and_caret(SDL_Renderer* rendere
     bool updated = false;
 
     if (this->echo.h > 0) {
-        game_fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
+        Pen::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
 
         if (yes) {
             if (this->prompt.empty()) {

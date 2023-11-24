@@ -10,6 +10,17 @@ namespace WarGrey::STEM {
     enum class FontSize { xx_small, x_small, small, medium, large, x_large, xx_large };
     enum class FontFamily { sans_serif, serif, cursive, fantasy, math, monospace, fangsong, _ };
 
+    struct __lambda__ TextMetrics {
+		float width;
+		float height;
+		float ascent;
+		float descent;
+		float tspace;
+		float rspace;
+		float bspace;
+		float lspace;
+	};
+
     class __lambda__ GameFont {
     public:
         static void fontsize(int fontsize = 16);
@@ -46,9 +57,13 @@ namespace WarGrey::STEM {
     public:
         const char* basename();
         void feed_text_extent(const char* unicode, int* width = nullptr, int* height = nullptr);
+        WarGrey::STEM::TextMetrics get_text_metrics(const std::string& unicode) { return this->get_text_metrics(unicode.c_str()); }
+        WarGrey::STEM::TextMetrics get_text_metrics(const char* unicode);
 
         bool is_suitable(const std::string& text);
+        int width(const std::string& unicode) { return this->width(unicode.c_str()); }
         int width(const char* unicode);
+        int width(uint16_t ch, int* offset = nullptr);
         int height();
         int ascent();
         int descent();

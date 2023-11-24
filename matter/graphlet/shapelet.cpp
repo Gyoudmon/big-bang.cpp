@@ -1,7 +1,7 @@
 #include "shapelet.hpp"
 
+#include "../../graphics/pen.hpp"
 #include "../../graphics/image.hpp"
-#include "../../graphics/geometry.hpp"
 #include "../../physics/mathematics.hpp"
 
 #include "../../datum/box.hpp"
@@ -136,7 +136,7 @@ void WarGrey::STEM::IShapelet::draw(SDL_Renderer* renderer, float flx, float fly
     }
 
     if (this->geometry->okay()) {
-        game_render_texture(renderer, this->geometry->self(), flx, fly, flwidth, flheight);
+        Pen::stamp(renderer, this->geometry->self(), flx, fly, flwidth, flheight);
     }
 }
 

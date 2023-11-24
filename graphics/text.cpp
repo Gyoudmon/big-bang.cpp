@@ -2,7 +2,7 @@
 
 #include "text.hpp"
 #include "font.hpp"
-#include "geometry.hpp"
+#include "pen.hpp"
 #include "colorspace.hpp"
 
 #include "../datum/string.hpp"
@@ -32,7 +32,7 @@ static inline void safe_render_text_surface(SDL_Renderer* target, SDL_Surface* m
     /** TODO: Cache the textures of text **/
 
     if (message != nullptr) {
-        game_render_surface(target, message, x, y);
+        Pen::stamp(target, message, x, y);
         SDL_FreeSurface(message);
     }
 }

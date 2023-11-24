@@ -2,8 +2,8 @@
 #include "matter.hpp"
 #include "misc.hpp"
 
-#include "graphics/image.hpp"
-#include "graphics/geometry.hpp"
+#include "graphics/pen.hpp"
+#include "graphics/ruler.hpp"
 #include "graphics/colorspace.hpp"
 
 #include "matter/sprite.hpp"
@@ -315,6 +315,9 @@ static inline void bubble_start(ISprite* m, MatterInfo* info, double sec, Speech
 
     info->bubble_type = type;            
     info->bubble_expiration_time = current_milliseconds() + fl2fx<long long>(duration * 1000.0);
+
+    printf("bubble start\n");
+    fflush(stdout);
     
     if (type == SpeechBubble::Default) {
         m->play_speaking(1);
@@ -1438,14 +1441,14 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     float dsHeight = Y + Height;
     
     if (this->bg_alpha > 0.0F) {
-        game_fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background, this->bg_alpha);
+        Pen::fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background, this->bg_alpha);
     }
 
     if ((this->grid_alpha > 0.0F)
             && (this->column > 0) && (this->row > 0)
             && (this->cell_width > 0.0F) && (this->cell_height > 0.0F)) {
         RGB_SetRenderDrawColor(renderer, this->grid_color, this->grid_alpha);
-        game_draw_grid(renderer, this->row, this->column,
+        Pen::draw_grid(renderer, this->row, this->column,
                         this->cell_width, this->cell_height,
                         this->grid_x, this->grid_y);
     }
@@ -1490,10 +1493,13 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
 
         SDL_RenderSetClipRect(renderer, nullptr);
     }
+
+    // Ruler::draw_ht_hatchmark(renderer, 300.0F, 300.0F, 150.0F, 0.0, 100.0, 10, ROYALBLUE);
+    // Ruler::draw_hb_hatchmark(renderer, 300.0F, 300.0F, 150.0F, 0.0, 100.0, 10, CRIMSON);
 }
 
 void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
-    game_draw_rect(renderer, x, y, width, height, 0x00FFFFU);
+    Pen::draw_rect(renderer, x, y, width, height, 0x00FFFFU);
 }
 
 void WarGrey::STEM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
@@ -1560,8 +1566,8 @@ void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, M
 
             SDL_RenderSetClipRect(renderer, nullptr);
 
-            game_fill_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_color, this->bubble_alpha);
-            game_draw_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_border, this->bubble_alpha);
+            Pen::fill_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_color, this->bubble_alpha);
+            Pen::draw_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_border, this->bubble_alpha);
 
             SDL_RenderSetClipRect(renderer, &clip);
             

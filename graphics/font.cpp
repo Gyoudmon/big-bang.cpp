@@ -6,6 +6,7 @@
 #include "../datum/flonum.hpp"
 #include "../datum/string.hpp"
 #include "../datum/hash.hpp"
+#include "../datum/box.hpp"
 
 using namespace WarGrey::STEM;
 using namespace std::filesystem;
@@ -340,6 +341,41 @@ void WarGrey::STEM::GameFont::feed_text_extent(const char* unicode, int* width, 
     }
 }
 
+TextMetrics WarGrey::STEM::GameFont::get_text_metrics(const char* unicode) {
+    TextMetrics metrics;
+
+    if (this->okay()) {
+        size_t char_size = strlen(unicode);
+        size_t utf8_size = string_utf8_length(unicode);
+        int width, height, xmin, xmax, advance;
+        int yminf, ymaxf, yminl, ymaxl;
+
+        TTF_SizeUTF8(this->font, unicode, &width, &height);
+        metrics.width = float(width);
+        metrics.height = float(height);
+        metrics.ascent = float(TTF_FontAscent(this->font));
+        metrics.descent = -float(TTF_FontDescent(this->font));
+
+        if (char_size > 0) {
+            if (char_size == utf8_size) {
+                TTF_GlyphMetrics(this->font, unicode[0], &xmin, nullptr, &yminf, &ymaxf, nullptr);
+                TTF_GlyphMetrics(this->font, unicode[char_size - 1], nullptr, &xmax, &yminl, &ymaxl, &advance);
+                metrics.lspace = float(xmin);
+                metrics.rspace = float(advance - xmax);
+                metrics.tspace = metrics.ascent - flmax(float(ymaxf), float(ymaxl));
+                metrics.tspace = metrics.descent + flmin(float(yminf), float(yminl));
+            }
+            // TODO: deal with Unicode text
+        } else {
+            metrics.lspace = metrics.rspace = 0.0F;
+            metrics.tspace = metrics.ascent;
+            metrics.bspace = metrics.descent;
+        }
+    }
+
+    return metrics;
+}
+
 bool WarGrey::STEM::GameFont::is_suitable(const std::string& text) {
     bool okay = true;
     
@@ -355,10 +391,7 @@ bool WarGrey::STEM::GameFont::is_suitable(const std::string& text) {
 #else
             uint32_t utf8_ch = string_utf8_ref(text, int(idx));
 
-            /** TODO
-             * Upgrade the windows version of TTF_Font
-             */
-
+            // TODO: Upgrade the windows version of TTF_Font
             if (utf8_ch > 0xFFU) {
                 okay = false;
                 break;
@@ -385,6 +418,17 @@ int WarGrey::STEM::GameFont::width(const char* unicode) {
     return width;
 }
 
+int WarGrey::STEM::GameFont::width(uint16_t ch, int* offset) {
+    int xmin, advance = 0;
+
+    if (this->okay()) {
+        TTF_GlyphMetrics(this->font, ch, &xmin, nullptr, nullptr, nullptr, &advance);
+        SET_BOX(offset, xmin);
+    }
+
+    return advance;
+}
+
 int WarGrey::STEM::GameFont::height() {
     return this->okay() ? TTF_FontHeight(this->font) : 0;
 }
@@ -394,5 +438,5 @@ int WarGrey::STEM::GameFont::ascent() {
 }
 
 int WarGrey::STEM::GameFont::descent() {
-    return this->okay() ? TTF_FontDescent(this->font) : 0;
+    return this->okay() ? -TTF_FontDescent(this->font) : 0;
 }

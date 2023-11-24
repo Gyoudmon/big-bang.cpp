@@ -4,7 +4,7 @@
 #include "../../datum/flonum.hpp"
 
 #include "../../graphics/image.hpp"
-#include "../../graphics/geometry.hpp"
+#include "../../graphics/pen.hpp"
 #include "../../graphics/colorspace.hpp"
 
 // https://www.ferzkopp.net/Software/SDL2_gfx/Docs/html/index.html
@@ -38,7 +38,7 @@ void WarGrey::STEM::Tracklet::feed_extent(float x, float y, float* w, float* h) 
 
 void WarGrey::STEM::Tracklet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
     if (this->diagram->okay()) {
-        game_render_texture(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
+        Pen::stamp(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
     }
 }
 
