@@ -34,12 +34,13 @@
 #include "matter/sprite/folder.hpp"
 #include "matter/sprite/sheet.hpp"
 
-#include "matter/sprite/mascot/atlas/mario.hpp"
-#include "matter/sprite/mascot/atlas/planetcute.hpp"
-#include "matter/sprite/mascot/agent/linkmon.hpp"
 #include "matter/sprite/mascot/tuxmon.hpp"
 #include "matter/sprite/mascot/coinlet.hpp"
 #include "matter/sprite/mascot/character.hpp"
+#include "matter/sprite/mascot/creature.hpp"
+#include "matter/sprite/mascot/atlas/mario.hpp"
+#include "matter/sprite/mascot/atlas/planetcute.hpp"
+#include "matter/sprite/mascot/agent/linkmon.hpp"
 
 #include "matter/graphlet.hpp"
 #include "matter/graphlet/textlet.hpp"
