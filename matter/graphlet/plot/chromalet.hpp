@@ -1,18 +1,15 @@
 #pragma once
 
-#include "../graphlet.hpp"
-#include "../../graphics/texture.hpp"
-#include "../../graphics/colorspace.hpp"
+#include "../../canvaslet.hpp"
+#include "../../../graphics/colorspace.hpp"
 
 namespace WarGrey::STEM {
-    class __lambda__ Chromalet : public WarGrey::STEM::IGraphlet {
+    class __lambda__ Chromalet : public WarGrey::STEM::ICanvaslet {
     public:
         Chromalet(float width, float height = 0.0F, WarGrey::STEM::CIE_Standard std = CIE_Standard::Primary, double Y = 1.0);
-        virtual ~Chromalet() { this->invalidate_geometry(); }
-
+        
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
         bool is_colliding_with_mouse(float x, float y) override;
 
     public:
@@ -35,6 +32,13 @@ namespace WarGrey::STEM {
         
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
+        
+    protected:
+        void draw_before_canvas(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+        void draw_on_canvas(SDL_Renderer* renderer, float Width, float Height) override;
+        void draw_after_canvas(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+        void on_canvas_invalidated() override;
+        void on_canvas_error(const char* message) override;
     
     private:
         void draw_color_triangle(SDL_Renderer* renderer, double dx = 0.0, double dy = 0.0);
@@ -51,12 +55,9 @@ namespace WarGrey::STEM {
                             double R, double G, double B, double dx, double dy, double A = 1.0);
 
     private:
-        void invalidate_geometry();
-        void invalidate_diagram();
         void invalidate_locus();
 
     private:
-        shared_texture_t diagram = nullptr;
         float width;
         float height;
 

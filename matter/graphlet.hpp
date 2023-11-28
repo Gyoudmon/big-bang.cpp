@@ -7,7 +7,7 @@
 
 namespace WarGrey::STEM {
     class __lambda__ IGraphlet : public WarGrey::STEM::IMatter {
-        // Yes, Meanwhile it's empty
+		// Yes, meanwhile it's empty
     };
 
     template<typename T>

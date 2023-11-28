@@ -43,10 +43,13 @@
 #include "matter/sprite/mascot/agent/linkmon.hpp"
 
 #include "matter/graphlet.hpp"
+#include "matter/canvaslet.hpp"
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/shapelet.hpp"
 #include "matter/graphlet/tracklet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
+
+#include "matter/graphlet/plot/chromalet.hpp"
 #include "matter/graphlet/plot/historylet.hpp"
 
 #include "physics/random.hpp"

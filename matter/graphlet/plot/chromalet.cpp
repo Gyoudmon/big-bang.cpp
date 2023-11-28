@@ -1,13 +1,13 @@
 #include "chromalet.hpp"
 
-#include "../../datum/box.hpp"
-#include "../../datum/flonum.hpp"
+#include "../../../datum/box.hpp"
+#include "../../../datum/flonum.hpp"
 
-#include "../../graphics/image.hpp"
-#include "../../graphics/brush.hpp"
-#include "../../graphics/named_colors.hpp"
+#include "../../../graphics/image.hpp"
+#include "../../../graphics/brush.hpp"
+#include "../../../graphics/named_colors.hpp"
 
-#include "../../physics/mathematics.hpp"
+#include "../../../physics/mathematics.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -232,12 +232,6 @@ static const double wavelength_zbars [] = {
 };
 
 /*************************************************************************************************/
-static void inline fix_imaginary_size(float w, float h, double* width, double* height) {
-    (*width) = flabs(double(w)) * 1.0;
-    (*height) = flabs(double(h)) * 1.0;
-}
-
-/*************************************************************************************************/
 WarGrey::STEM::Chromalet::Chromalet(float width, float height, CIE_Standard std, double Y)
         : width(width), height(height), standard(std), luminance(Y), pseudo_primary_triangle_color(GRAY) {
     if (this->height == 0.0) {
@@ -245,7 +239,6 @@ WarGrey::STEM::Chromalet::Chromalet(float width, float height, CIE_Standard std,
     }
 
     this->recalculate_primary_colors();
-    this->enable_resize(true);
 }
 
 void WarGrey::STEM::Chromalet::feed_extent(float x, float y, float* w, float* h) {
@@ -253,45 +246,28 @@ void WarGrey::STEM::Chromalet::feed_extent(float x, float y, float* w, float* h)
 }
 
 void WarGrey::STEM::Chromalet::on_resize(float w, float h, float width, float height) {
+    ICanvaslet::on_resize(w, h, width, height);
+
     this->width = w;
     this->height = h;
-    this->invalidate_geometry();
 }
 
-void WarGrey::STEM::Chromalet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
-    double imaginary_width, imaginary_height;
-
-    fix_imaginary_size(flwidth, flheight, &imaginary_width, &imaginary_height);
-
-    if (this->diagram.use_count() == 0) {
-        // doubling the size doesn't make it more smooth, and causes other problems
-        this->diagram = std::make_shared<Texture>(game_blank_image(renderer, fl2fxi(imaginary_width) + 1, fl2fxi(imaginary_height) + 1));
-
-        if (this->diagram->okay()) {
-            SDL_Texture* origin = SDL_GetRenderTarget(renderer);
-
-            SDL_SetRenderTarget(renderer, this->diagram->self());
-
-            // this->draw_color_map(renderer, imaginary_width, imaginary_height);
-            this->draw_spectral_locus(renderer, imaginary_width, imaginary_height);
-            this->draw_chromaticity(renderer, imaginary_width, imaginary_height);
-
-            SDL_SetRenderTarget(renderer, origin);
-        } else {
-            fprintf(stderr, "无法绘制色度图：%s\n", SDL_GetError());
-        }
-    }
-
+void WarGrey::STEM::Chromalet::draw_before_canvas(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
     RGB_SetRenderDrawColor(renderer, DIMGREY);
     Brush::draw_grid(renderer, 10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, flx, fly);
     SDL_RenderDrawLineF(renderer, flx, fly, flx + flwidth, fly + flheight);
+}
 
-    if (this->diagram->okay()) {
-        Brush::stamp(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
-    } else {
-        this->draw_chromaticity(renderer, imaginary_width, imaginary_height, flx, fly);
-    }
+void WarGrey::STEM::Chromalet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
+    double imaginary_width = abs(this->width);
+    double imaginary_height = abs(this->height);
+ 
+    // this->draw_color_map(renderer, imaginary_width, imaginary_height);
+    this->draw_spectral_locus(renderer, imaginary_width, imaginary_height);
+    this->draw_chromaticity(renderer, imaginary_width, imaginary_height);
+}
 
+void WarGrey::STEM::Chromalet::draw_after_canvas(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
     if (this->pseudo_primary_triangle_alpha > 0) {
         this->draw_color_triangle(renderer, flx, fly);
     }
@@ -303,10 +279,9 @@ bool WarGrey::STEM::Chromalet::is_colliding_with_mouse(float x, float y) {
 
 /*************************************************************************************************/
 uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after_special) {
-    double imaginary_width, imaginary_height;
+    double imaginary_width = abs(this->width);
+    double imaginary_height = abs(this->height);
     uint32_t hex = 0U;
-
-    fix_imaginary_size(this->width, this->height, &imaginary_width, &imaginary_height);
 
     if (after_special) {
         double pcxs[PseudoPrimaryColorCount + 1];
@@ -387,10 +362,9 @@ void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, float* x, float *
 void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, double* x, double *y, double* fx, double* fy) {
     if (c > 0U) {
         double X, Y, Z, co_x, co_y;
-        double imaginary_width, imaginary_height;
+        double imaginary_width = abs(this->width);
+        double imaginary_height = abs(this->height);
     
-        fix_imaginary_size(this->width, this->height, &imaginary_width, &imaginary_height);
-
         CIE_RGB_to_XYZ(this->standard, c, &X, &Y, &Z);
         CIE_XYZ_to_xyY(X, Y, Z, &co_x, &co_y);   
         SET_VALUES(fx, co_x, fy, co_y);
@@ -573,11 +547,10 @@ void WarGrey::STEM::Chromalet::make_locus_polygon(double flwidth, double flheigh
 }
 
 bool WarGrey::STEM::Chromalet::is_point_inside_the_spectrum(double mx, double my) {
-    double imaginary_width, imaginary_height;
+    double imaginary_width = abs(this->width);
+    double imaginary_height = abs(this->height);
     bool inside = false;
     
-    fix_imaginary_size(this->width, this->height, &imaginary_width, &imaginary_height);
-
     if (this->locus_xs == nullptr) {
         this->make_locus_polygon(imaginary_width, imaginary_height);
     }
@@ -617,13 +590,12 @@ void WarGrey::STEM::Chromalet::spectrum_intersection_vpoints(double mx, double f
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Chromalet::invalidate_geometry() {
-    this->invalidate_diagram();
+void WarGrey::STEM::Chromalet::on_canvas_invalidated() {
     this->invalidate_locus();
 }
 
-void WarGrey::STEM::Chromalet::invalidate_diagram() {
-    this->diagram.reset();
+void WarGrey::STEM::Chromalet::on_canvas_error(const char* message) {
+    fprintf(stderr, "failed to draw the chromaticity: %s\n", message);
 }
 
 void WarGrey::STEM::Chromalet::invalidate_locus() {
@@ -639,16 +611,14 @@ void WarGrey::STEM::Chromalet::invalidate_locus() {
 void WarGrey::STEM::Chromalet::set_luminance(double Y) {
     if (this->luminance != Y) {
         this->luminance = Y;
-        this->notify_updated();
-        this->invalidate_diagram();
+        this->dirty_canvas();
     }
 }
 
 void WarGrey::STEM::Chromalet::set_standard(CIE_Standard std) {
     if (this->standard != std) {
         this->standard = std;
-        this->notify_updated();
-        this->invalidate_diagram();
+        this->dirty_canvas();
     }    
 }
 
