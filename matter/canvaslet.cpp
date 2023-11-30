@@ -21,7 +21,7 @@ void WarGrey::STEM::ICanvaslet::draw(SDL_Renderer* renderer, float flx, float fl
         this->canvas = std::make_shared<Texture>(game_blank_image(renderer, width, height));
 
         if (!this->canvas->okay()) {
-            this->on_canvas_error(SDL_GetError());
+            fprintf(stderr, "failed to refresh the canvas of %s: %s\n", this->name(), SDL_GetError());
         }
     }
 
@@ -59,27 +59,14 @@ void WarGrey::STEM::ICanvaslet::invalidate_canvas() {
     this->on_canvas_invalidated();
 }
 
-void WarGrey::STEM::ICanvaslet::dirty_canvas() {
-    this->canvas_background_alpha = -1.0;
-
-    if (!this->needs_refresh_canvas) {
-        this->needs_refresh_canvas = true;
-        this->notify_updated();
-    }
-}
-
 void WarGrey::STEM::ICanvaslet::dirty_canvas(uint32_t color, double alpha) {
-    this->canvas_background_color = int64_t(color);
+    this->canvas_background_color = color;
     this->canvas_background_alpha = alpha;
     
     if (!this->needs_refresh_canvas) {
         this->needs_refresh_canvas = true;
         this->notify_updated();
     }
-}
-
-void WarGrey::STEM::ICanvaslet::on_canvas_error(const char* message) {
-    fprintf(stderr, "failed to refresh the canvas: %s\n", message);
 }
 
 /*************************************************************************************************/

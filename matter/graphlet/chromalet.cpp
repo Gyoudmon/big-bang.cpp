@@ -1,13 +1,13 @@
 #include "chromalet.hpp"
 
-#include "../../../datum/box.hpp"
-#include "../../../datum/flonum.hpp"
+#include "../../datum/box.hpp"
+#include "../../datum/flonum.hpp"
 
-#include "../../../graphics/image.hpp"
-#include "../../../graphics/brush.hpp"
-#include "../../../graphics/named_colors.hpp"
+#include "../../graphics/image.hpp"
+#include "../../graphics/brush.hpp"
+#include "../../graphics/named_colors.hpp"
 
-#include "../../../physics/mathematics.hpp"
+#include "../../physics/mathematics.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -592,10 +592,6 @@ void WarGrey::STEM::Chromalet::spectrum_intersection_vpoints(double mx, double f
 /*************************************************************************************************/
 void WarGrey::STEM::Chromalet::on_canvas_invalidated() {
     this->invalidate_locus();
-}
-
-void WarGrey::STEM::Chromalet::on_canvas_error(const char* message) {
-    fprintf(stderr, "failed to draw the chromaticity: %s\n", message);
 }
 
 void WarGrey::STEM::Chromalet::invalidate_locus() {

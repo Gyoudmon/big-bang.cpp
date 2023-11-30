@@ -38,10 +38,6 @@ void WarGrey::STEM::IShapelet::draw_on_canvas(SDL_Renderer* renderer, float flwi
     }
 }
 
-void WarGrey::STEM::IShapelet::on_canvas_error(const char* message) {
-    fprintf(stderr, "failed to draw shape: %s\n", message);
-}
-
 /*************************************************************************************************/
 WarGrey::STEM::Linelet::Linelet(float ex, float ey, int64_t color) : IShapelet(color, -1), epx(ex), epy(ey) {}
 WarGrey::STEM::Linelet::Linelet(float ex, float ey, uint32_t color) : Linelet(ex, ey, static_cast<int64_t>(color)) {}

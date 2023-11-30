@@ -15,8 +15,7 @@ namespace WarGrey::STEM {
 		void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
 
 	public:
-		void dirty_canvas();
-		void dirty_canvas(uint32_t bg_color, double bg_alpha = 0.0);
+		void dirty_canvas(uint32_t bg_color = 0U, double bg_alpha = 0.0);
     
 	    void set_color_mixture(WarGrey::STEM::ColorMixture mixture);
         void set_alpha(uint8_t alpha) { this->set_alpha(double(alpha) / 255.0); }
@@ -50,7 +49,6 @@ namespace WarGrey::STEM {
 		virtual void draw_after_canvas(SDL_Renderer* ds, float x, float y, float Width, float Height) {}
 		virtual void invalidate_canvas();
 		virtual void on_canvas_invalidated() {}
-		virtual void on_canvas_error(const char* message);
 
     protected:
 		shared_texture_t canvas = nullptr;

@@ -12,9 +12,6 @@ namespace WarGrey::STEM {
         void draw_on_canvas(SDL_Renderer* renderer, float Width, float Height) override;
 
     protected:
-        void on_canvas_error(const char* message) override;
-
-    protected:
         virtual void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
         virtual void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
     };

@@ -48,8 +48,8 @@
 #include "matter/graphlet/shapelet.hpp"
 #include "matter/graphlet/tracklet.hpp"
 #include "matter/graphlet/dimensionlet.hpp"
+#include "matter/graphlet/chromalet.hpp"
 
-#include "matter/graphlet/plot/chromalet.hpp"
 #include "matter/graphlet/plot/historylet.hpp"
 
 #include "physics/random.hpp"

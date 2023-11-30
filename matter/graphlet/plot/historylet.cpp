@@ -10,14 +10,14 @@ using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
 WarGrey::STEM::Historylet::Historylet(float width, float height, uint32_t hex, double alpha)
-        : width(flabs(width)), height(flabs(height)), color(hex), alpha(alpha) {
+        : width(flabs(width)), height(flabs(height)) {
     if (this->height == 0.0F) {
         this->height = this->width;
     }
 
     this->capacity = 0;
     this->clear();
-    this->enable_resize(true);
+    this->set_pen_color(hex, alpha);
 }
 
 void WarGrey::STEM::Historylet::feed_extent(float x, float y, float* w, float* h) {
@@ -25,82 +25,45 @@ void WarGrey::STEM::Historylet::feed_extent(float x, float y, float* w, float* h
 }
 
 void WarGrey::STEM::Historylet::on_resize(float w, float h, float width, float height) {
+    ICanvaslet::on_resize(w, h, width, height);
+
     this->width = flabs(w);
     this->height = flabs(h);
-    this->invalidate_geometry();
 }
 
-void WarGrey::STEM::Historylet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
-    if (this->diagram.use_count() == 0) {
-        this->diagram = std::make_shared<Texture>(game_blank_image(renderer, fl2fxi(this->width) + 1, fl2fxi(this->height) + 1));
-    }
+void WarGrey::STEM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
+    size_t n = this->raw_dots.size();
+    float xrange = flmax(this->xmax - this->xmin, flwidth);
+    float yrange = flmax(this->ymax - this->ymin, flheight);
 
-    if (this->diagram->okay()) {
-        if (this->needs_refresh_diagram) {
-            SDL_Texture* origin = SDL_GetRenderTarget(renderer);
-            size_t n = this->raw_dots.size();
-            float xrange = flmax(this->xmax - this->xmin, flwidth);
-            float yrange = flmax(this->ymax - this->ymin, flheight);
+    if (n > 1) {
+        float xratio = flwidth / xrange;
+        float yratio = flheight / yrange;
+        std::vector<SDL_FPoint> dots(n);
+        int64_t color = this->get_pen_color();
+        double alpha = this->get_pen_alpha();
 
-            if (n > 1) {
-                float xratio = flwidth / xrange;
-                float yratio = flheight / yrange;
-                std::vector<SDL_FPoint> dots(n);
-
-                for (size_t idx = 0; idx < n; idx ++) {
-                    float X = this->raw_dots[idx].first;
-                    float Y = this->raw_dots[idx].second;
+        for (size_t idx = 0; idx < n; idx ++) {
+            float X = this->raw_dots[idx].first;
+            float Y = this->raw_dots[idx].second;
                     
-                    dots[idx] = { (X - this->xmin) * xratio, flheight - (Y - this->ymin) * yratio };
-                }
-
-                SDL_SetRenderTarget(renderer, this->diagram->self());
-
-                Brush::clear(renderer, 0U, 0.0);
-                Brush::draw_lines(renderer, dots.data(), int(n), this->color, this->alpha);
-
-                SDL_SetRenderTarget(renderer, origin);
-            }
-
-            this->needs_refresh_diagram = false;
+            dots[idx] = { (X - this->xmin) * xratio, flheight - (Y - this->ymin) * yratio };
         }
 
-        Brush::stamp(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
-    } else {
-        fprintf(stderr, "无法绘制历史曲线：%s\n", SDL_GetError());
+        if (color >= 0) {
+            Brush::draw_lines(renderer, dots.data(), int(n), static_cast<uint32_t>(color), alpha);
+        }
     }
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Historylet::invalidate_geometry() {
-    if (this->diagram.use_count() > 0) {
-        this->diagram.reset();
-        this->clear_geometry();
-    }
-}
-
-void WarGrey::STEM::Historylet::clear_geometry() {
-    this->needs_refresh_diagram = true;
-}
-
 void WarGrey::STEM::Historylet::clear() {
     this->xmax = this->ymax = -infinity;
     this->xmin = this->ymin = +infinity;
 
     if (!this->raw_dots.empty()) {
         this->raw_dots.clear();
-        this->clear_geometry();
-        
-        this->notify_updated();
-    }
-}
-
-void WarGrey::STEM::Historylet::set_color(uint32_t hex, double alpha) {
-    if ((this->color != hex) || (this->alpha != alpha)) {
-        this->color = hex;
-        this->alpha = alpha;
-        this->clear_geometry();
-        this->notify_updated();
+        this->dirty_canvas();
     }
 }
 
@@ -112,8 +75,7 @@ void WarGrey::STEM::Historylet::set_capacity(size_t n) {
             this->raw_dots.erase(this->raw_dots.begin(), this->raw_dots.end() - this->capacity);
         }
 
-        this->clear_geometry();
-        this->notify_updated();
+        this->dirty_canvas();
     }
 }
 
@@ -134,7 +96,6 @@ void WarGrey::STEM::Historylet::push_back_datum(float x, float y) {
         if (y < this->ymin) this->ymin = y;
         if (y > this->ymax) this->ymax = y;
 
-        this->clear_geometry();
-        this->notify_updated();
+        this->dirty_canvas();
     }
 }

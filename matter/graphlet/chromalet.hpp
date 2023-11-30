@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../canvaslet.hpp"
-#include "../../../graphics/colorspace.hpp"
+#include "../canvaslet.hpp"
+#include "../../graphics/colorspace.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ Chromalet : public WarGrey::STEM::ICanvaslet {
@@ -38,7 +38,6 @@ namespace WarGrey::STEM {
         void draw_on_canvas(SDL_Renderer* renderer, float Width, float Height) override;
         void draw_after_canvas(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
         void on_canvas_invalidated() override;
-        void on_canvas_error(const char* message) override;
     
     private:
         void draw_color_triangle(SDL_Renderer* renderer, double dx = 0.0, double dy = 0.0);
