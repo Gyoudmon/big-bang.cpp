@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../canvaslet.hpp"
+#include "../../graphics/geometry.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ IShapelet : public WarGrey::STEM::ICanvaslet {
@@ -16,7 +17,7 @@ namespace WarGrey::STEM {
         virtual void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
     };
 
-    /**********************************************************************************************/
+    /*********************************************************************************************/
     class __lambda__ Linelet : public WarGrey::STEM::IShapelet {
     public:
 	    Linelet(float ex, float ey, int64_t color);
@@ -50,7 +51,7 @@ namespace WarGrey::STEM {
 	    VLinelet(float height, double hue, double saturation = 1.0, double brightness = 1.0) : Linelet(0.0F, height, hue, saturation, brightness) {}
     };
 
-    /**********************************************************************************************/
+    /*********************************************************************************************/
     class __lambda__ Rectanglet : public WarGrey::STEM::IShapelet {
     public:
 	    Rectanglet(float edge_size, int64_t color, int64_t border_color = -1);
@@ -154,6 +155,8 @@ namespace WarGrey::STEM {
             : Ellipselet(radius, radius, hue, saturation, brightness, border_color) {}
     };
     
+
+    /*********************************************************************************************/
     class __lambda__ Trianglet : public WarGrey::STEM::IShapelet {
     public:
 	    Trianglet(float x2, float y2, float x3, float y3, int64_t color, int64_t border_color = -1);
@@ -175,37 +178,31 @@ namespace WarGrey::STEM {
         float y3;
     };
 
-    class __lambda__ RegularPolygonlet : public WarGrey::STEM::IShapelet {
+    /*********************************************************************************************/
+    class __lambda__ Polygonlet : public WarGrey::STEM::IShapelet {
     public:
-	    RegularPolygonlet(int n, float radius, int64_t color, int64_t border_color = -1);
-	    RegularPolygonlet(int n, float radius, uint32_t color, int64_t border_color = -1);
-	    RegularPolygonlet(int n, float radius, double hue, double saturation = 1.0, double brightness = 1.0, int64_t border_color = -1);
-        RegularPolygonlet(int n, float radius, float rotation, int64_t color, int64_t border_color = -1);
-	    RegularPolygonlet(int n, float radius, float rotation, uint32_t color, int64_t border_color = -1);
-	    RegularPolygonlet(int n, float radius, float rotation, double hue, double saturation = 1.0, double brightness = 1.0, int64_t border_color = -1);
-        virtual ~RegularPolygonlet();
+	    Polygonlet(const WarGrey::STEM::polygon_vertices& vertices, int64_t color, int64_t border_color = -1);
+	    Polygonlet(const WarGrey::STEM::polygon_vertices& vertices, uint32_t color, int64_t border_color = -1);
+	    Polygonlet(const WarGrey::STEM::polygon_vertices& vertices, double hue, double saturation = 1.0, double brightness = 1.0, int64_t border_color = -1);
+        virtual ~Polygonlet();
 
 	public:
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
 
     public:
-        int get_side_count() { return this->n; }
+        size_t get_side_count() { return this->n; }
 	    
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void on_canvas_invalidated() override;
         void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
         void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
     private:
-        void initialize_vertice();
+        void initialize_vertices(float xscale, float yscale);
 
 	private:
-        int n;
-	    float aradius;
-        float bradius;
-        float rotation;
-        float* xs = nullptr;
+        size_t n;
+	    float* xs = nullptr;
         float* ys = nullptr;
         short* txs = nullptr;
         short* tys = nullptr;
@@ -216,4 +213,21 @@ namespace WarGrey::STEM {
         float rx;
         float by;
     };
+
+    class __lambda__ RegularPolygonlet : public WarGrey::STEM::Polygonlet {
+    public:
+	    RegularPolygonlet(size_t n, float radius, int64_t color, int64_t border_color = -1);
+	    RegularPolygonlet(size_t n, float radius, uint32_t color, int64_t border_color = -1);
+	    RegularPolygonlet(size_t n, float radius, double hue, double saturation = 1.0, double brightness = 1.0, int64_t border_color = -1);
+        RegularPolygonlet(size_t n, float radius, float rotation, int64_t color, int64_t border_color = -1);
+	    RegularPolygonlet(size_t n, float radius, float rotation, uint32_t color, int64_t border_color = -1);
+	    RegularPolygonlet(size_t n, float radius, float rotation, double hue, double saturation = 1.0, double brightness = 1.0, int64_t border_color = -1);
+        virtual ~RegularPolygonlet() noexcept {}
+
+    public:
+        float get_radius() { return this->radius; }
+
+    private:
+        float radius;
+	};
 }

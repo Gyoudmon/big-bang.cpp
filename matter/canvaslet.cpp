@@ -22,6 +22,7 @@ void WarGrey::STEM::ICanvaslet::draw(SDL_Renderer* renderer, float flx, float fl
 
         if (!this->canvas->okay()) {
             fprintf(stderr, "failed to refresh the canvas of %s: %s\n", this->name(), SDL_GetError());
+            fflush(stderr);
         }
     }
 

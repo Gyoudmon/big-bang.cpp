@@ -267,27 +267,31 @@ void WarGrey::STEM::Trianglet::fill_shape(SDL_Renderer* renderer, int width, int
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, int64_t color, int64_t border_color)
-	: RegularPolygonlet(n, radius, 0.0F, color, border_color) {}
+WarGrey::STEM::Polygonlet::Polygonlet(const polygon_vertices& vertices, uint32_t color, int64_t border_color)
+	: Polygonlet(vertices, static_cast<int64_t>(color), border_color) {}
 
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, uint32_t color, int64_t border_color)
-	: RegularPolygonlet(n, radius, static_cast<int64_t>(color), border_color) {}
+WarGrey::STEM::Polygonlet::Polygonlet(const polygon_vertices& vertices, double hue, double saturation, double brightness, int64_t border_color)
+    : Polygonlet(vertices, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
 
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, double hue, double saturation, double brightness, int64_t border_color)
-    : RegularPolygonlet(n, radius, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+WarGrey::STEM::Polygonlet::Polygonlet(const polygon_vertices& vertices, int64_t color, int64_t border_color) : IShapelet(color, border_color) {
+    this->n = vertices.size();
 
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float rotation, int64_t color, int64_t border_color)
-	: IShapelet(color, border_color), n(n), aradius(radius), bradius(radius), rotation(rotation) {
-    this->initialize_vertice();
+    if (this->n > 0) {
+        this->xs = new float[this->n];
+        this->ys = new float[this->n];
+        this->txs = new short[this->n];
+        this->tys = new short[this->n];
+
+        for (size_t idx = 0; idx < this->n; idx++) {
+            this->xs[idx] = vertices[idx].first;
+            this->ys[idx] = vertices[idx].second;
+        }
+
+        this->initialize_vertices(1.0F, 1.0F);
+    }
 }
 
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float rotation, uint32_t color, int64_t border_color)
-	: RegularPolygonlet(n, radius, rotation, static_cast<int64_t>(color), border_color) {}
-
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(int n, float radius, float rotation, double hue, double saturation, double brightness, int64_t border_color)
-    : RegularPolygonlet(n, radius, rotation, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
-
-WarGrey::STEM::RegularPolygonlet::~RegularPolygonlet() {
+WarGrey::STEM::Polygonlet::~Polygonlet() {
     if (this->xs != nullptr) {
         delete [] this->xs;
         delete [] this->txs;
@@ -299,68 +303,75 @@ WarGrey::STEM::RegularPolygonlet::~RegularPolygonlet() {
     }
 }
 
-void WarGrey::STEM::RegularPolygonlet::initialize_vertice() {
-    // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
-    float start = degrees_to_radians(this->rotation);
-    float delta = 2.0F * pi_f / float(this->n);
+void WarGrey::STEM::Polygonlet::initialize_vertices(float xscale, float yscale) {
+    if (this->n > 0) {
+        this->lx = infinity_f;
+        this->ty = infinity_f;
+        this->rx = -infinity_f;
+        this->by = -infinity_f;
     
-    if (this->xs == nullptr) {
-        this->xs = new float[this->n];
-        this->ys = new float[this->n];
-        this->txs = new short[this->n];
-        this->tys = new short[this->n];
-    }
-    
-    this->lx = this->aradius;
-    this->ty = this->bradius;
-    this->rx = -this->lx;
-    this->by = -this->ty;
+        for (size_t idx = 0; idx < this->n; idx++) {
+            float px = this->xs[idx] * xscale;
+            float py = this->ys[idx] * yscale;
 
-    for (int idx = 0; idx < this->n; idx++) {
-        float theta = start + delta * float(idx);
-        
-        this->xs[idx] = this->aradius * flcos(theta);
-        this->ys[idx] = this->bradius * flsin(theta);
+            if (this->lx > px) this->lx = px;
+            if (this->rx < px) this->rx = px;
 
-        if (this->rx < this->xs[idx]) {
-            this->rx = this->xs[idx];
-        } else if (this->lx > this->xs[idx]) {
-            this->lx = this->xs[idx];
+            if (this->ty > py) this->ty = py;
+            if (this->by < py) this->by = py;
         }
 
-        if (this->by < this->ys[idx]) {
-            this->by = this->ys[idx];
-        } else if (this->ty > this->ys[idx]) {
-            this->ty = this->ys[idx];
+        for (size_t idx = 0; idx < this->n; idx ++) {
+            this->txs[idx] = fl2fx<short>(this->xs[idx] * xscale - this->lx);
+            this->tys[idx] = fl2fx<short>(this->ys[idx] * yscale - this->ty);
         }
-    }
-
-    for (int idx = 0; idx < this->n; idx ++) {
-        this->txs[idx] = fl2fx<short>(this->xs[idx] - this->lx);
-        this->tys[idx] = fl2fx<short>(this->ys[idx] - this->ty);
     }
 }
 
-void WarGrey::STEM::RegularPolygonlet::on_resize(float w, float h, float width, float height) {
+void WarGrey::STEM::Polygonlet::on_resize(float w, float h, float width, float height) {
     IShapelet::on_resize(w, h, width, height);
-    
-    this->aradius *= (w / width);
-    this->bradius *= (h / height);
+    this->initialize_vertices((w / width), (h / height));
 }
 
-void WarGrey::STEM::RegularPolygonlet::on_canvas_invalidated() {
-    this->initialize_vertice();
+void WarGrey::STEM::Polygonlet::feed_extent(float x, float y, float* w, float* h) {
+    SET_BOX(w, flfloor(this->rx - this->lx) + 1.0F);
+    SET_BOX(h, flfloor(this->by - this->ty) + 1.0F);
 }
 
-void WarGrey::STEM::RegularPolygonlet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, this->rx - this->lx + 1.0F, h, this->by - this->ty + 1.0F);
+void WarGrey::STEM::Polygonlet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (this->n > 2) {
+        aapolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
+    } else {
+        // line and dot have no borders
+    }
 }
 
-void WarGrey::STEM::RegularPolygonlet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    aapolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
+void WarGrey::STEM::Polygonlet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (this->n > 2) {
+        filledPolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
+        aapolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
+    } else if (this->n == 2) {
+        aalineRGBA(renderer, this->txs[0], this->tys[0], this->txs[1], this->tys[1], r, g, b, a);
+    } else if (this->n == 1) {
+        pixelRGBA(renderer, this->txs[0], this->tys[0], r, g, b, a);
+    }
 }
 
-void WarGrey::STEM::RegularPolygonlet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    filledPolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
-    aapolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
-}
+/*************************************************************************************************/
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, int64_t color, int64_t border_color)
+	: RegularPolygonlet(n, radius, 0.0F, color, border_color) {}
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, uint32_t color, int64_t border_color)
+	: RegularPolygonlet(n, radius, static_cast<int64_t>(color), border_color) {}
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, double hue, double saturation, double brightness, int64_t border_color)
+    : RegularPolygonlet(n, radius, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, float rotation, uint32_t color, int64_t border_color)
+	: RegularPolygonlet(n, radius, rotation, static_cast<int64_t>(color), border_color) {}
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, float rotation, double hue, double saturation, double brightness, int64_t border_color)
+    : RegularPolygonlet(n, radius, rotation, Hexadecimal_From_HSV(hue, saturation, brightness), border_color) {}
+
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, float rotation, int64_t color, int64_t border_color)
+	: Polygonlet(regular_polygon_vertices(n, radius, rotation), color, border_color), radius(radius) {}

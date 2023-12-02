@@ -2,7 +2,28 @@
 
 #include "../datum/box.hpp"
 
+#include "../physics/mathematics.hpp"
+
 using namespace WarGrey::STEM;
+
+
+/*************************************************************************************************/
+WarGrey::STEM::polygon_vertices WarGrey::STEM::regular_polygon_vertices(size_t n, float radius, float rotation) {
+    // for inscribed regular polygon, the radius should be `Rcos(pi/n)`
+    float start = degrees_to_radians(rotation);
+    float delta = 2.0F * pi_f / float(n);
+    polygon_vertices pvs;
+    
+    for (size_t idx = 0; idx < n; idx++) {
+        float theta = start + delta * float(idx);
+        float px = radius * flcos(theta);
+        float py = radius * flsin(theta);
+        
+        pvs.push_back(std::pair<float, float>(px, py));
+    }
+
+    return pvs;
+}
 
 /*************************************************************************************************/
 SDL_RendererFlip WarGrey::STEM::game_scales_to_flip(float x_scale, float y_scale) {
