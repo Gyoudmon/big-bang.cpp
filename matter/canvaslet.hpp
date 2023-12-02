@@ -15,29 +15,36 @@ namespace WarGrey::STEM {
 		void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
 
 	public:
-		void dirty_canvas(uint32_t bg_color = 0U, double bg_alpha = 0.0);
+		void dirty_canvas();
+		void dirty_canvas(uint32_t bg_color, double bg_alpha);
     
 	    void set_color_mixture(WarGrey::STEM::ColorMixture mixture);
-        void set_alpha(uint8_t alpha) { this->set_alpha(double(alpha) / 255.0); }
-        void set_alpha(double alpha);
-        double get_alpha() { return this->canvas_background_alpha; }
+        void set_canvas_alpha(uint8_t alpha) { this->set_canvas_alpha(double(alpha) / 255.0); }
+        void set_canvas_alpha(double alpha);
+		uint16_t get_canvas_color() { return this->canvas_background_color; }
+		double get_canvas_alpha() { return this->canvas_background_alpha; }
+        double get_canvas_alpha(uint8_t* a);
 
-        void set_fill_color(int64_t color, uint8_t alpha) { this->set_fill_color(color, double(alpha) / 255.0); }
-        void set_fill_color(int64_t color, double alpha = 1.0);
+		bool fill_okay() { return (this->fill_alpha > 0.0) && (this->fill_alpha <= 1.0); }
+        void set_fill_color(uint32_t color, uint8_t alpha) { this->set_fill_color(color, double(alpha) / 255.0); }
+        void set_fill_color(uint32_t color, double alpha = 1.0);
         void set_fill_color_hsv(double hue, double saturation, double value);
         void set_fill_color_hsl(double hue, double saturation, double lightness);
         void set_fill_color_hsi(double hue, double saturation, double intensity);
-        int64_t get_fill_color() { return this->fill_color; }
+        uint32_t get_fill_color() { return this->fill_color; }
 		double get_fill_alpha() { return this->fill_alpha; }
+		double get_fill_alpha(uint8_t* a);
         double get_fill_hue();
 
-        void set_pen_color(int64_t color, uint8_t alpha) { this->set_pen_color(color, double(alpha) / 255.0); }
-        void set_pen_color(int64_t color, double alpha = 1.0);
+		bool pen_okay() { return (this->pen_alpha > 0.0) && (this->pen_alpha <= 1.0); }
+        void set_pen_color(uint32_t color, uint8_t alpha) { this->set_pen_color(color, double(alpha) / 255.0); }
+        void set_pen_color(uint32_t color, double alpha = 1.0);
         void set_pen_color_hsv(double hue, double saturation, double value);
         void set_pen_color_hsl(double hue, double saturation, double lightness);
         void set_pen_color_hsi(double hue, double saturation, double intensity);
-        int64_t get_pen_color() { return this->pen_color; }
+        uint32_t get_pen_color() { return this->pen_color; }
 		double get_pen_alpha() { return this->pen_alpha; }
+		double get_pen_alpha(uint8_t* a);
         double get_pen_hue();
 
 	protected:
@@ -60,9 +67,9 @@ namespace WarGrey::STEM {
 
 	private:
 		ColorMixture mixture = ColorMixture::Alpha;
-		int64_t fill_color = -1;
-		double fill_alpha = 1.0F;
-        int64_t pen_color = -1;
-		double pen_alpha = 1.0F;
+		uint32_t fill_color;
+		double fill_alpha = 0.0F;
+        uint32_t pen_color;
+		double pen_alpha = 0.0F;
 	};
 }

@@ -40,16 +40,12 @@ void WarGrey::STEM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
                 short fy1 = fl2fx<short>(y1);
                 short fx2 = fl2fx<short>(x2);
                 short fy2 = fl2fx<short>(y2);
-                int64_t pcolor = get_pen_color();
-                uint8_t a = color_component_to_byte(this->get_pen_alpha());
-                uint8_t r, g, b;
+                uint8_t r, g, b, a;
 
                 SDL_SetRenderTarget(master, this->canvas->self());
-
-                if (pcolor >= 0) {
-                    RGB_From_Hexadecimal(static_cast<uint32_t>(pcolor), &r, &g, &b);
-                }
-
+                RGB_From_Hexadecimal(this->get_pen_color(), &r, &g, &b);
+                this->get_pen_alpha(&a);
+                
                 if (this->line_width <= 1) {
                     aalineRGBA(master, fx1, fy1, fx2, fy2, r, g, b, a);
                 } else {

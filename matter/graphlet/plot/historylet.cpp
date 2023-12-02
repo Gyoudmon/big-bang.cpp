@@ -40,8 +40,6 @@ void WarGrey::STEM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flw
         float xratio = flwidth / xrange;
         float yratio = flheight / yrange;
         std::vector<SDL_FPoint> dots(n);
-        int64_t color = this->get_pen_color();
-        double alpha = this->get_pen_alpha();
 
         for (size_t idx = 0; idx < n; idx ++) {
             float X = this->raw_dots[idx].first;
@@ -50,8 +48,8 @@ void WarGrey::STEM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flw
             dots[idx] = { (X - this->xmin) * xratio, flheight - (Y - this->ymin) * yratio };
         }
 
-        if (color >= 0) {
-            Brush::draw_lines(renderer, dots.data(), int(n), static_cast<uint32_t>(color), alpha);
+        if (this->pen_okay()) {
+            Brush::draw_lines(renderer, dots.data(), int(n), this->get_pen_color(), this->get_pen_alpha());
         }
     }
 }

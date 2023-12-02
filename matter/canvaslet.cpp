@@ -60,10 +60,17 @@ void WarGrey::STEM::ICanvaslet::invalidate_canvas() {
     this->on_canvas_invalidated();
 }
 
+void WarGrey::STEM::ICanvaslet::dirty_canvas() {
+    this->dirty_canvas(this->canvas_background_color, this->canvas_background_alpha);
+}
+
 void WarGrey::STEM::ICanvaslet::dirty_canvas(uint32_t color, double alpha) {
-    this->canvas_background_color = color;
-    this->canvas_background_alpha = alpha;
-    
+    if ((this->canvas_background_color != color) || (this->canvas_background_alpha != alpha)) {
+        this->canvas_background_color = color;
+        this->canvas_background_alpha = alpha;
+        this->dirty_canvas();
+    }
+
     if (!this->needs_refresh_canvas) {
         this->needs_refresh_canvas = true;
         this->notify_updated();
@@ -78,14 +85,20 @@ void WarGrey::STEM::ICanvaslet::set_color_mixture(ColorMixture mixture) {
     }
 }
 
-void WarGrey::STEM::ICanvaslet::set_alpha(double a) {
-    if (this->canvas_background_alpha != a) {
-        this->canvas_background_alpha = a;
+void WarGrey::STEM::ICanvaslet::set_canvas_alpha(double alpha) {
+    if (this->canvas_background_alpha != alpha) {
+        this->fill_alpha = alpha;
         this->dirty_canvas();
     }
 }
 
-void WarGrey::STEM::ICanvaslet::set_pen_color(int64_t color, double alpha) {
+double WarGrey::STEM::ICanvaslet::get_canvas_alpha(uint8_t* a) {
+    SET_BOX(a, color_component_clamp_to_byte(this->canvas_background_alpha));
+
+    return this->canvas_background_alpha;
+}
+
+void WarGrey::STEM::ICanvaslet::set_pen_color(uint32_t color, double alpha) {
     if ((this->pen_color != color) || (this->pen_alpha != alpha)) {
         this->pen_color = color;
         this->pen_alpha = alpha;
@@ -115,7 +128,13 @@ double WarGrey::STEM::ICanvaslet::get_pen_hue() {
     return hue;
 }
 
-void WarGrey::STEM::ICanvaslet::set_fill_color(int64_t color, double alpha) {
+double WarGrey::STEM::ICanvaslet::get_pen_alpha(uint8_t* a) {
+    SET_BOX(a, color_component_clamp_to_byte(this->pen_alpha));
+
+    return this->pen_alpha;
+}
+
+void WarGrey::STEM::ICanvaslet::set_fill_color(uint32_t color, double alpha) {
     if ((this->fill_color != color) || (this->fill_alpha != alpha)) {
         this->fill_color = color;
         this->fill_alpha = alpha;
@@ -143,4 +162,10 @@ double WarGrey::STEM::ICanvaslet::get_fill_hue() {
     }
 
     return hue;
+}
+
+double WarGrey::STEM::ICanvaslet::get_fill_alpha(uint8_t* a) {
+    SET_BOX(a, color_component_clamp_to_byte(this->fill_alpha));
+
+    return this->fill_alpha;
 }
