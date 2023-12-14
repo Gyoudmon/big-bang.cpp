@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../matter.hpp"
+#include "../graphics/color.hpp"
 #include "../virtualization/filesystem/imgdb.hpp"
 
 namespace WarGrey::STEM {
@@ -37,7 +38,7 @@ namespace WarGrey::STEM {
         void feed_logic_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
         void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
         void feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
-        void set_logic_grid_color(uint32_t color, float a = 1.0F) { this->logic_grid_color = color; this->logic_grid_alpha = a; }
+        void set_logic_grid_color(const WarGrey::STEM::RGBA& color) { this->logic_grid_color = color; }
 
     public:
         void move_to_logic_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
@@ -74,6 +75,7 @@ namespace WarGrey::STEM {
         float map_height = 0.0F;
 
     private:
+        WarGrey::STEM::RGBA logic_grid_color;
         int logic_row = 0;
         int logic_col = 0;
         float logic_top = 0.0F;
@@ -82,8 +84,6 @@ namespace WarGrey::STEM {
         float logic_left = 0.0F;
         float logic_tile_width = 0.0F;
         float logic_tile_height = 0.0F;
-        uint32_t logic_grid_color = 0U;
-        float logic_grid_alpha = 0.0F;
 
     private:
         std::string _pathname;

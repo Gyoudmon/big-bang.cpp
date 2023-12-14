@@ -5,6 +5,7 @@
 
 #include "../../graphics/image.hpp"
 #include "../../graphics/brush.hpp"
+#include "../../graphics/color.hpp"
 #include "../../graphics/named_colors.hpp"
 
 #include "../../physics/mathematics.hpp"
@@ -12,7 +13,7 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-#define PseudoPrimaryColorCount sizeof(this->pseudo_primaries) / sizeof(uint32_t)
+#define PseudoPrimaryColorCount sizeof(this->pseudo_primaries) / sizeof(RGBA)
 static const float triangle_vertice_radius = 3.0F;
 
 static const double red_wavelength = 700.0;
@@ -252,9 +253,8 @@ void WarGrey::STEM::Chromalet::on_resize(float w, float h, float width, float he
     this->height = h;
 }
 
-void WarGrey::STEM::Chromalet::draw_before_canvas(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
-    RGB_SetRenderDrawColor(renderer, DIMGREY);
-    Brush::draw_grid(renderer, 10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, flx, fly);
+void WarGrey::STEM::Chromalet::draw_before_canvas(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) { 
+    Brush::draw_grid(renderer, 10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, DIMGRAY, flx, fly);
     SDL_RenderDrawLineF(renderer, flx, fly, flx + flwidth, fly + flheight);
 }
 
@@ -278,10 +278,10 @@ bool WarGrey::STEM::Chromalet::is_colliding_with_mouse(float x, float y) {
 }
 
 /*************************************************************************************************/
-uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after_special) {
+RGBA WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after_special) {
     double imaginary_width = abs(this->width);
     double imaginary_height = abs(this->height);
-    uint32_t hex = 0U;
+    RGBA c = 0U;
 
     if (after_special) {
         double pcxs[PseudoPrimaryColorCount + 1];
@@ -291,12 +291,12 @@ uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after
             this->feed_color_location(this->pseudo_primaries[idx], &pcxs[idx], &pcys[idx]);
 
             if (point_distance(pcxs[idx], pcys[idx], mx, my) <= triangle_vertice_radius) {
-                hex = this->get_color_at(pcxs[idx], pcys[idx]);
+                c = this->get_color_at(pcxs[idx], pcys[idx]);
                 break;
             }
         }
 
-        if (hex == 0U) { // check midpoints
+        if (c.is_black()) { // check midpoints
             pcxs[PseudoPrimaryColorCount] = pcxs[0];
             pcys[PseudoPrimaryColorCount] = pcys[0];
 
@@ -305,23 +305,23 @@ uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after
 
                 line_point(pcxs[idx], pcys[idx], pcxs[idx + 1], pcys[idx + 1], 0.5, &pcmx, &pcmy);
                 if (point_distance(pcmx, pcmy, mx, my) <= triangle_vertice_radius) {
-                    hex = this->get_color_at(pcmx, pcmy, false);
+                    c = this->get_color_at(pcmx, pcmy, false);
                     break;
                 }
             }
         }
 
-        if (hex == 0U) { // check the white point
+        if (c.is_black()) { // check the white point
             double wx, wy;
 
             this->feed_color_location(0xFFFFFFU, &wx, &wy);
             if (point_distance(wx, wy, mx, my) <= triangle_vertice_radius) {
-                hex = 0xFFFFFFU;
+                c = 0xFFFFFFU;
             }
         }
     }
 
-    if (hex == 0U) {
+    if (c.is_black()) {
         double x = mx / imaginary_width;
         double y = 1.0 - my / imaginary_height;
         double X, Y, Z, R, G, B;
@@ -331,14 +331,14 @@ uint32_t WarGrey::STEM::Chromalet::get_color_at(double mx, double my, bool after
             CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
 
             if ((R >= 0.0) && (G >= 0.0) && (B >= 0.0)) {
-                hex = Hexadecimal_From_RGB(R, G, B);
+                c = RGBA(R, G, B);
             } else if (this->is_point_inside_the_spectrum(mx, my)) {
-                hex = Hexadecimal_From_RGB(R, G, B);
+                c = RGBA(R, G, B);
             }
         }
     }
 
-    return hex;
+    return c;
 }
 
 void WarGrey::STEM::Chromalet::feed_pseudo_primary_color_location(size_t idx, float* x, float* y, float* fx, float* fy) {
@@ -351,7 +351,7 @@ void WarGrey::STEM::Chromalet::feed_pseudo_primary_color_location(size_t idx, do
     this->feed_color_location(this->pseudo_primaries[idx], x, y, fx, fy);
 }
 
-void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, float* x, float *y, float* fx, float* fy) {
+void WarGrey::STEM::Chromalet::feed_color_location(const RGBA& c, float* x, float *y, float* fx, float* fy) {
     double flx, fly, co_x, co_y;
 
     this->feed_color_location(c, &flx, &fly, &co_x, &co_y);
@@ -359,13 +359,13 @@ void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, float* x, float *
     SET_VALUES(fx, float(co_x), fy, float(co_y));
 }
 
-void WarGrey::STEM::Chromalet::feed_color_location(uint32_t c, double* x, double *y, double* fx, double* fy) {
-    if (c > 0U) {
+void WarGrey::STEM::Chromalet::feed_color_location(const RGBA& c, double* x, double *y, double* fx, double* fy) {
+    if (!c.is_black()) {
         double X, Y, Z, co_x, co_y;
         double imaginary_width = abs(this->width);
         double imaginary_height = abs(this->height);
     
-        CIE_RGB_to_XYZ(this->standard, c, &X, &Y, &Z);
+        CIE_RGB_to_XYZ(this->standard, c.red(), c.green(), c.blue(), &X, &Y, &Z);
         CIE_XYZ_to_xyY(X, Y, Z, &co_x, &co_y);   
         SET_VALUES(fx, co_x, fy, co_y);
 
@@ -395,7 +395,7 @@ void WarGrey::STEM::Chromalet::recalculate_primary_colors(int idx) {
         }
     
         CIE_XYZ_to_RGB(this->standard, wavelength_xbars[bar_idx], wavelength_ybars[bar_idx], wavelength_zbars[bar_idx], &R, &G, &B, true);
-        this->pseudo_primaries[idx] = Hexadecimal_From_RGB(R, G, B);
+        this->pseudo_primaries[idx] = RGBA(R, G, B);
     }
 }
 
@@ -493,21 +493,15 @@ void WarGrey::STEM::Chromalet::fix_render_location(double* x, double* y) {
     if (this->height > 0.0F) { (*y) = 1.0 - (*y); }
 }
 
-void WarGrey::STEM::Chromalet::render_special_dot(SDL_Renderer* renderer, uint32_t c, float x, float y) {
+void WarGrey::STEM::Chromalet::render_special_dot(SDL_Renderer* renderer, const RGBA& c, float x, float y) {
     Brush::fill_circle(renderer, x, y, triangle_vertice_radius, c);
     Brush::draw_circle(renderer, x, y, triangle_vertice_radius, GHOSTWHITE);
     Brush::draw_circle(renderer, x, y, triangle_vertice_radius + 1.0F, GHOSTWHITE);
 }
 
 void WarGrey::STEM::Chromalet::render_dot(SDL_Renderer* renderer, double x, double y, double width, double height, double R, double G, double B, double dx, double dy, double A) {
-    SDL_SetRenderDrawColor(renderer,
-        color_component_clamp_to_byte(R),
-        color_component_clamp_to_byte(G),
-        color_component_clamp_to_byte(B),
-        color_component_clamp_to_byte(A));
-
     this->fix_render_location(&x, &y);
-    SDL_RenderDrawPointF(renderer, float(x * width + dx), float(y * height + dy));
+    Brush::draw_point(renderer, float(x * width + dx), float(y * height + dy), RGBA(R, G, B, A));
 }
 
 void WarGrey::STEM::Chromalet::make_locus_polygon(double flwidth, double flheight) {
@@ -620,7 +614,7 @@ void WarGrey::STEM::Chromalet::set_standard(CIE_Standard std) {
     }    
 }
 
-void WarGrey::STEM::Chromalet::set_pseudo_primary_color(uint32_t color, size_t idx) {
+void WarGrey::STEM::Chromalet::set_pseudo_primary_color(const RGBA& color, size_t idx) {
     idx %= PseudoPrimaryColorCount;
 
     if (this->pseudo_primaries[idx] != color) {

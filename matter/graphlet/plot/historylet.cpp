@@ -9,7 +9,7 @@
 using namespace WarGrey::STEM;
 
 /*************************************************************************************************/
-WarGrey::STEM::Historylet::Historylet(float width, float height, uint32_t hex, double alpha)
+WarGrey::STEM::Historylet::Historylet(float width, float height, const RGBA& line_color)
         : width(flabs(width)), height(flabs(height)) {
     if (this->height == 0.0F) {
         this->height = this->width;
@@ -17,7 +17,7 @@ WarGrey::STEM::Historylet::Historylet(float width, float height, uint32_t hex, d
 
     this->capacity = 0;
     this->clear();
-    this->set_pen_color(hex, alpha);
+    this->set_pen_color(line_color);
 }
 
 void WarGrey::STEM::Historylet::feed_extent(float x, float y, float* w, float* h) {

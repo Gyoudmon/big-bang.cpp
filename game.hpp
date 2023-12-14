@@ -21,7 +21,7 @@
 #include "misc.hpp"
 
 #include "graphics/color.hpp"
-#include "graphics/colorspace.hpp"
+#include "graphics/blend.hpp"
 #include "graphics/named_colors.hpp"
 #include "graphics/font.hpp"
 #include "graphics/text.hpp"
@@ -53,6 +53,7 @@
 
 #include "matter/graphlet/plot/historylet.hpp"
 
+#include "physics/CIE.hpp"
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"
 #include "physics/motion/platformer.hpp"

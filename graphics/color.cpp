@@ -129,6 +129,17 @@ static inline void hsl_to_rgb(double hue, double saturation, double lightness, d
     feed_rgb_from_hue(hue, chroma, m, r, g, b);
 }
 
+static void rgb_to_hsl(double red, double green, double blue, double* h, double* s, double* l) {
+    double M, m, chroma;
+    double hue = rgb_to_hue(red, green, blue, &M, &m, &chroma);
+    double lightness = (M + m) * 0.5;
+    double abs_2L_1 = flabs(2.0 * lightness - 1.0);
+
+    SET_BOX(h, hue);
+    SET_BOX(s, (abs_2L_1 == 1.0) ? 0.0 : chroma / (1.0 - abs_2L_1));
+    SET_BOX(l, lightness);
+}
+
 static inline void hsi_to_rgb(double hue, double saturation, double intensity, double* r, double* g, double* b) {
     if ((saturation == 0.0f) || flisnan(hue)) {
         SET_TRIPLETS(r, intensity, g, intensity, b, intensity);
@@ -169,6 +180,7 @@ RGBA WarGrey::STEM::RGBA::HSI(double hue, double saturation, double intensity, d
     return c;
 }
 
+/*************************************************************************************************/
 WarGrey::STEM::RGBA::RGBA(uint32_t hex, double alpha) {
     this->a = flmax(flmin(alpha, 1.0), 0.0);
     hexadecimal_to_rgb(hex, &this->r, &this->g, &this->b);
@@ -181,11 +193,18 @@ WarGrey::STEM::RGBA::RGBA(uint8_t r, uint8_t g, uint8_t b, double alpha) {
     this->b = GAMUT(b);
 }
 
-WarGrey::STEM::RGBA::RGBA(double r, double g, double b, double alpha) {
+WarGrey::STEM::RGBA::RGBA(double r, double g, double b, double alpha, bool allow_negative) {
     this->a = flmax(flmin(alpha, 1.0), 0.0);
-    this->r = flmax(flmin(r, 1.0), 0.0);
-    this->g = flmax(flmin(g, 1.0), 0.0);
-    this->b = flmax(flmin(b, 1.0), 0.0);
+
+    if (allow_negative) {
+        this->r = r;
+        this->g = g;
+        this->b = b;
+    } else {
+        this->r = flmax(flmin(r, 1.0), 0.0);
+        this->g = flmax(flmin(g, 1.0), 0.0);
+        this->b = flmax(flmin(b, 1.0), 0.0);
+    }
 }
 
 WarGrey::STEM::RGBA::RGBA(const RGBA& c, double alpha) {
@@ -210,8 +229,8 @@ WarGrey::STEM::RGBA::RGBA(uint32_t hex, int alpha) {
 WarGrey::STEM::RGBA::RGBA(uint8_t r, uint8_t g, uint8_t b, int alpha)
     : RGBA(r, g, b, GAMUT(alpha)) {}
 
-WarGrey::STEM::RGBA::RGBA(double r, double g, double b, int alpha)
-    : RGBA(r, g, b, GAMUT(alpha)) {}
+WarGrey::STEM::RGBA::RGBA(double r, double g, double b, int alpha,  bool allow_negative)
+    : RGBA(r, g, b, GAMUT(alpha), allow_negative) {}
 
 WarGrey::STEM::RGBA::RGBA(const RGBA& c, int alpha)
     : RGBA(c, GAMUT(alpha)) {}
@@ -270,6 +289,17 @@ bool WarGrey::STEM::RGBA::compare(const RGBA& rhs) const {
             && (this->a == rhs.a);
 }
 
+bool WarGrey::STEM::RGBA::compare(uint32_t rhs, double alpha) const {
+    double r, g, b;
+
+    hexadecimal_to_rgb(rhs, &r, &g, &b);
+
+    return (this->r == r)
+            && (this->g == g)
+            && (this->b == b)
+            && (this->a == alpha);
+}
+
 /*************************************************************************************************/
 uint32_t WarGrey::STEM::RGBA::rgb() const {
     return rgb_to_hexadecimal(this->r, this->g, this->b);
@@ -299,6 +329,30 @@ double WarGrey::STEM::RGBA::brightness() const {
     return v;
 }
 
+/*************************************************************************************************/
+RGBA WarGrey::STEM::RGBA::contrast() const {
+    double h, s, v;
+    
+    rgb_to_hsv(this->r, this->g, this->b, &h, &s, &v);
+
+    if (flisnan(h)) {
+        return this->contrast_for_background();
+    } else {
+        return RGBA::HSV(h + 180.0, s, v, this->a);
+    }
+}
+
+RGBA WarGrey::STEM::RGBA::contrast_for_background() const {
+    double perceptive_luminance;
+
+    perceptive_luminance = 1.0 - (double(r) * 0.299 + double(g) * 0.587 + double(b) * 0.114);
+
+	if (perceptive_luminance < 0.5) {
+		return 0x000000U;
+	} else {
+		return 0xFFFFFFU;
+	}
+}
 
 /*************************************************************************************************/
 std::string WarGrey::STEM::RGBA::hexstring(bool needs_alpha, const char* fmt) const {

@@ -7,8 +7,8 @@
 namespace WarGrey::STEM {
     class __lambda__ Historylet : public WarGrey::STEM::ICanvaslet {
     public:
-        Historylet(float size, uint32_t hex, double alpha = 1.0) : Historylet(size, size, hex, alpha) {}
-        Historylet(float width, float height, uint32_t hex, double alpha = 1.0);
+        Historylet(float size, const WarGrey::STEM::RGBA& line_color) : Historylet(size, size, line_color) {}
+        Historylet(float width, float height, const WarGrey::STEM::RGBA& line_color);
 
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;

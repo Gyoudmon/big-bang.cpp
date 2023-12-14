@@ -5,7 +5,6 @@
 
 #include "../../graphics/image.hpp"
 #include "../../graphics/brush.hpp"
-#include "../../graphics/colorspace.hpp"
 
 // https://www.ferzkopp.net/Software/SDL2_gfx/Docs/html/index.html
 #include <SDL2/SDL2_gfxPrimitives.h>
@@ -20,7 +19,7 @@ WarGrey::STEM::Tracklet::Tracklet(float width, float height, uint32_t hex, doubl
     }
 
     this->erase();
-    this->set_pen_color(0U, 1.0);
+    this->set_pen_color(0U);
     this->enable_resize(false);
     this->camouflage(true);
 }

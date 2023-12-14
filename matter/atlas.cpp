@@ -9,7 +9,6 @@
 #include "../plane.hpp"
 #include "../graphics/brush.hpp"
 #include "../graphics/geometry.hpp"
-#include "../graphics/colorspace.hpp"
 
 #include "../physics/mathematics.hpp"
 
@@ -154,10 +153,10 @@ void WarGrey::STEM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float
         }
     }
 
-    if ((this->logic_grid_alpha > 0.0F) && (this->logic_col > 0) && (this->logic_row > 0)) {
-        RGB_SetRenderDrawColor(renderer, this->logic_grid_color, this->logic_grid_alpha);
+    if (this->logic_grid_color.is_opacity() && (this->logic_col > 0) && (this->logic_row > 0)) {
         Brush::draw_grid(renderer, this->logic_row, this->logic_col,
             this->logic_tile_width * sx, this->logic_tile_height * sy,
+            this->logic_grid_color,
             x + this->logic_left * sx, y + this->logic_top * sy);
     }
 }

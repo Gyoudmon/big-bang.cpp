@@ -13,13 +13,13 @@ namespace WarGrey::STEM {
     public:
         static void clear(SDL_Renderer* renderer, const WarGrey::STEM::RGBA& color);
 
-        static void draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height);
-        static void draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, int xoff = 0, int yoff = 0);
-        static void fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, int xoff = 0, int yoff = 0);
+        static void draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height, const WarGrey::STEM::RGBA& color);
+        static void draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, const WarGrey::STEM::RGBA& color, int xoff = 0, int yoff = 0);
+        static void fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, const WarGrey::STEM::RGBA& color, int xoff = 0, int yoff = 0);
 
-        static void draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height);
-        static void draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, float xoff = 0.0F, float yoff = 0.0F);
-        static void fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_width, float cell_height, float xoff = 0.0F, float yoff = 0.0F);
+        static void draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height, const WarGrey::STEM::RGBA& color);
+        static void draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, const WarGrey::STEM::RGBA& color, float xoff = 0.0F, float yoff = 0.0F);
+        static void fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_width, float cell_height, const WarGrey::STEM::RGBA& color, float xoff = 0.0F, float yoff = 0.0F);
 
         static void stamp(SDL_Renderer* target, SDL_Surface* surface, int x, int y, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);
         static void stamp(SDL_Renderer* target, SDL_Surface* surface, int x, int y, int widht, int height, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0);

@@ -1,5 +1,4 @@
 #include "brush.hpp"
-#include "colorspace.hpp"
 
 #include "../physics/mathematics.hpp"
 
@@ -216,21 +215,24 @@ static void pen_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, fl
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height) {
-    SDL_Rect box;
-
-    FILL_BOX(box, x - 1, y - 1, width + 3, height + 3);
-    SDL_RenderDrawRect(renderer, &box);
-}
-
 void WarGrey::STEM::Brush::clear(SDL_Renderer* renderer, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderClear(renderer);
 }
 
-void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, int xoff, int yoff) {
+void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
+    SDL_Rect box;
+
+    FILL_BOX(box, x - 1, y - 1, width + 3, height + 3);
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
+    SDL_RenderDrawRect(renderer, &box);
+}
+
+void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, const RGBA& color, int xoff, int yoff) {
     int xend = xoff + col * cell_width;
     int yend = yoff + row * cell_height;
+
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
 
     for (int c = 0; c <= col; c++) {
         int x = xoff + c * cell_width;
@@ -245,11 +247,13 @@ void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, i
     }
 }
 
-void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, int xoff, int yoff) {
+void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, const RGBA& color, int xoff, int yoff) {
     SDL_Rect cell_self;
 
     cell_self.w = cell_width;
     cell_self.h = cell_height;
+
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
 
     for (int c = 0; c < col; c++) {
         for (int r = 0; r < row; r++) {
@@ -420,16 +424,19 @@ void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, i
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height) {
+void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
     SDL_FRect box;
 
     FILL_BOX(box, x - 1.0F, y - 1.0F, width + 3.0F, height + 3.0F);
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawRectF(renderer, &box);
 }
 
-void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, float xoff, float yoff) {
+void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, const RGBA& color, float xoff, float yoff) {
     float xend = xoff + col * cell_width;
     float yend = yoff + row * cell_height;
+
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
 
     for (int c = 0; c <= col; c++) {
         float x = xoff + float(c) * cell_width;
@@ -444,11 +451,13 @@ void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, f
     }
 }
 
-void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_width, float cell_height, float xoff, float yoff) {
+void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_width, float cell_height, const RGBA& color, float xoff, float yoff) {
     SDL_FRect cell_self;
 
     cell_self.w = cell_width;
     cell_self.h = cell_height;
+
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
 
     for (int c = 0; c < col; c++) {
         for (int r = 0; r < row; r++) {

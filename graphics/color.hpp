@@ -8,6 +8,8 @@
 #include "../forward.hpp"
 
 namespace WarGrey::STEM {
+    /** NOTE: the HSB and HSV are identical **/
+
     class __lambda__ RGBA {
     public:
         static WarGrey::STEM::RGBA HSV(double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
@@ -19,11 +21,11 @@ namespace WarGrey::STEM {
 
         RGBA(uint32_t hex, int alpha);
         RGBA(uint8_t red, uint8_t green, uint8_t blue, int alpha);
-        RGBA(double red, double green, double blue, int alpha);
+        RGBA(double red, double green, double blue, int alpha, bool allow_negative = false);
         
         RGBA(uint32_t hex, double alpha = 1.0);
         RGBA(uint8_t red, uint8_t green, uint8_t blue, double alpha = 1.0);
-        RGBA(double red, double green, double blue, double alpha = 1.0);
+        RGBA(double red, double green, double blue, double alpha = 1.0, bool allow_negative = false);
 
         RGBA(const RGBA& c);
         RGBA(const RGBA& c, int alpha);
@@ -37,9 +39,19 @@ namespace WarGrey::STEM {
         friend inline WarGrey::STEM::RGBA operator+(RGBA lhs, uint32_t rhs) { return lhs += rhs; }
 		friend inline WarGrey::STEM::RGBA operator+(uint32_t lhs, RGBA rhs) { return rhs += lhs; }
 
-        bool compare(const RGBA& rhs) const; // C++20 has the `operator<=>`
+        // C++20 has the `operator<=>`
+        bool compare(const RGBA& rhs) const;
+        bool compare(uint32_t rhs, double alpha = 1.0) const;
         friend inline bool operator==(const RGBA& lhs, const RGBA& rhs) { return lhs.compare(rhs); }
+        friend inline bool operator==(const RGBA& lhs, uint32_t rhs) { return lhs.compare(rhs); }
+        friend inline bool operator==(uint32_t lhs, const RGBA& rhs) { return rhs.compare(lhs); }
         friend inline bool operator!=(const RGBA& lhs, const RGBA& rhs) { return !lhs.compare(rhs); }
+        friend inline bool operator!=(const RGBA& lhs, uint32_t rhs) { return !lhs.compare(rhs); }
+        friend inline bool operator!=(uint32_t lhs, const RGBA& rhs) { return !rhs.compare(lhs); }
+
+    public:
+        WarGrey::STEM::RGBA contrast() const;
+        WarGrey::STEM::RGBA contrast_for_background() const;
 
     public:
         void unbox(uint8_t* r = nullptr, uint8_t* g = nullptr, uint8_t* b = nullptr, uint8_t* a = nullptr) const;
@@ -66,6 +78,7 @@ namespace WarGrey::STEM {
         bool is_grayscale() const { return (this->r == this->g) && (this->g == this->b); }
         bool is_grayscale(double gray) const { return this->is_grayscale() && (this->r == gray); }
         bool is_grayscale(uint8_t gray) const { return this->is_grayscale() && (this->R() == gray); }
+        bool is_grayscale(int gray) const { return this->is_grayscale(uint8_t(gray)); }
         bool is_black() const { return this->is_grayscale(0.0); }
         bool is_white() const { return this->is_grayscale(1.0); }
 

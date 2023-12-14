@@ -1442,11 +1442,9 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     if (this->grid_color.is_opacity()
             && (this->column > 0) && (this->row > 0)
             && (this->cell_width > 0.0F) && (this->cell_height > 0.0F)) {
-        SDL_SetRenderDrawColor(renderer,
-                                this->grid_color.R(), this->grid_color.G(), this->grid_color.B(),
-                                this->grid_color.A());
         Brush::draw_grid(renderer, this->row, this->column,
                             this->cell_width, this->cell_height,
+                            this->grid_color,
                             this->grid_x, this->grid_y);
     }
 

@@ -4,7 +4,7 @@
 
 #include "../graphics/color.hpp"
 #include "../graphics/texture.hpp"
-#include "../graphics/colorspace.hpp"
+#include "../graphics/blend.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ ICanvaslet : public WarGrey::STEM::IGraphlet {
@@ -28,16 +28,12 @@ namespace WarGrey::STEM {
 		bool brush_okay(uint8_t* r = nullptr, uint8_t* g = nullptr, uint8_t* b = nullptr, uint8_t* a = nullptr);
 		WarGrey::STEM::RGBA get_brush_color() { return this->brush_color; }
 		void set_brush_color(const RGBA& c);
-        void set_brush_color(uint32_t color, uint8_t alpha) { this->set_brush_color(RGBA(color, int(alpha))); }
-        void set_brush_color(uint32_t color, double alpha = 1.0) { this->set_brush_color(RGBA(color, alpha)); }
         void set_brush_alpha(uint8_t alpha) { this->set_brush_alpha(double(alpha) / 255.0); }
 		void set_brush_alpha(double alpha);
         
 		bool pen_okay(uint8_t* r = nullptr, uint8_t* g = nullptr, uint8_t* b = nullptr, uint8_t* a = nullptr);
         WarGrey::STEM::RGBA get_pen_color() { return this->pen_color; }
 		void set_pen_color(const RGBA& c);
-        void set_pen_color(uint32_t color, uint8_t alpha) { this->set_pen_color(RGBA(color, int(alpha))); }
-        void set_pen_color(uint32_t color, double alpha = 1.0) { this->set_pen_color(RGBA(color, alpha)); }
         void set_pen_alpha(uint8_t alpha) { this->set_pen_alpha(double(alpha) / 255.0); }
 		void set_pen_alpha(double alpha);
         

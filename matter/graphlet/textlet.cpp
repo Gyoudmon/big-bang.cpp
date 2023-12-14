@@ -2,7 +2,6 @@
 
 #include "../../graphics/font.hpp"
 #include "../../graphics/text.hpp"
-#include "../../graphics/colorspace.hpp"
 #include "../../graphics/brush.hpp"
 
 #include "../../datum/string.hpp"
