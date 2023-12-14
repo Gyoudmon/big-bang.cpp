@@ -9,7 +9,6 @@
 
 namespace WarGrey::STEM {
     /** NOTE: the HSB and HSV are identical **/
-
     class __lambda__ RGBA {
     public:
         static WarGrey::STEM::RGBA HSV(double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
@@ -39,15 +38,19 @@ namespace WarGrey::STEM {
         friend inline WarGrey::STEM::RGBA operator+(RGBA lhs, uint32_t rhs) { return lhs += rhs; }
 		friend inline WarGrey::STEM::RGBA operator+(uint32_t lhs, RGBA rhs) { return rhs += lhs; }
 
+		friend inline WarGrey::STEM::RGBA operator*(RGBA lhs, const RGBA& rhs) { return lhs *= rhs; }
+        friend inline WarGrey::STEM::RGBA operator*(RGBA lhs, uint32_t rhs) { return lhs *= rhs; }
+		friend inline WarGrey::STEM::RGBA operator*(uint32_t lhs, RGBA rhs) { return rhs *= lhs; }
+
         // C++20 has the `operator<=>`
-        bool compare(const RGBA& rhs) const;
-        bool compare(uint32_t rhs, double alpha = 1.0) const;
-        friend inline bool operator==(const RGBA& lhs, const RGBA& rhs) { return lhs.compare(rhs); }
-        friend inline bool operator==(const RGBA& lhs, uint32_t rhs) { return lhs.compare(rhs); }
-        friend inline bool operator==(uint32_t lhs, const RGBA& rhs) { return rhs.compare(lhs); }
-        friend inline bool operator!=(const RGBA& lhs, const RGBA& rhs) { return !lhs.compare(rhs); }
-        friend inline bool operator!=(const RGBA& lhs, uint32_t rhs) { return !lhs.compare(rhs); }
-        friend inline bool operator!=(uint32_t lhs, const RGBA& rhs) { return !rhs.compare(lhs); }
+        bool equal(const RGBA& rhs) const;
+        bool equal(uint32_t rhs, double alpha = 1.0) const;
+        friend inline bool operator==(const RGBA& lhs, const RGBA& rhs) { return lhs.equal(rhs); }
+        friend inline bool operator==(const RGBA& lhs, uint32_t rhs) { return lhs.equal(rhs); }
+        friend inline bool operator==(uint32_t lhs, const RGBA& rhs) { return rhs.equal(lhs); }
+        friend inline bool operator!=(const RGBA& lhs, const RGBA& rhs) { return !lhs.equal(rhs); }
+        friend inline bool operator!=(const RGBA& lhs, uint32_t rhs) { return !lhs.equal(rhs); }
+        friend inline bool operator!=(uint32_t lhs, const RGBA& rhs) { return !rhs.equal(lhs); }
 
     public:
         WarGrey::STEM::RGBA contrast() const;
@@ -89,6 +92,9 @@ namespace WarGrey::STEM {
     private:
         WarGrey::STEM::RGBA& operator+=(const RGBA& rhs);
 		WarGrey::STEM::RGBA& operator+=(uint32_t rhs);
+
+        WarGrey::STEM::RGBA& operator*=(const RGBA& rhs);
+		WarGrey::STEM::RGBA& operator*=(uint32_t rhs);
 
     private:
         double r;

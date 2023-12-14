@@ -13,16 +13,25 @@ using namespace WarGrey::STEM;
 #define UCHAR(v) static_cast<uint8_t>(flround(v * 255.0))
 #define GAMUT(v) (double(v) / 255.0)
 
-static inline void rgb_add(double lr, double lg, double lb, double la, double rr, double rg, double rb, double ra, double& r, double& g, double& b, double& a) {
-    double A = 1.0 - (1.0 - la) * (1.0 - ra);
-    double R = lr * la / A + rr * ra * (1.0 - A) / A;
-    double G = lg * la / A + rg * rg * (1.0 - A) / A;
-    double B = lb * la / A + rb * ra * (1.0 - A) / A;
+static inline void rgb_add(double dstR, double dstG, double dstB, double srcR, double srcG, double srcB, double srcA, double& r, double& g, double& b) {
+    double R = dstR + srcR * srcA;
+    double G = dstG + srcG * srcA;
+    double B = dstB + srcB * srcA;
 
     r = R;
     g = G;
     b = B;
-    a = A;
+}
+
+static inline void rgb_mul(double dstR, double dstG, double dstB, double dstA, double srcR, double srcG, double srcB, double srcA, double& r, double& g, double& b, double& a) {
+    double R = srcR * dstR + dstR * (1.0 - srcA);
+    double G = srcG * dstG + dstG * (1.0 - srcA);
+    double B = srcB * dstB + dstB * (1.0 - srcA);
+
+    r = R;
+    g = G;
+    b = B;
+    a = srcA * dstA + dstA * (1.0 - srcA);
 }
 
 static inline void hexadecimal_to_rgb(uint32_t hex, double* r, double* g, double* b) {
@@ -129,6 +138,7 @@ static inline void hsl_to_rgb(double hue, double saturation, double lightness, d
     feed_rgb_from_hue(hue, chroma, m, r, g, b);
 }
 
+/*
 static void rgb_to_hsl(double red, double green, double blue, double* h, double* s, double* l) {
     double M, m, chroma;
     double hue = rgb_to_hue(red, green, blue, &M, &m, &chroma);
@@ -139,6 +149,7 @@ static void rgb_to_hsl(double red, double green, double blue, double* h, double*
     SET_BOX(s, (abs_2L_1 == 1.0) ? 0.0 : chroma / (1.0 - abs_2L_1));
     SET_BOX(l, lightness);
 }
+*/
 
 static inline void hsi_to_rgb(double hue, double saturation, double intensity, double* r, double* g, double* b) {
     if ((saturation == 0.0f) || flisnan(hue)) {
@@ -254,9 +265,9 @@ RGBA& WarGrey::STEM::RGBA::operator=(uint32_t hex) {
 }
 
 WarGrey::STEM::RGBA& WarGrey::STEM::RGBA::operator+=(const RGBA& rhs) {
-    rgb_add(this->r, this->g, this->b, this->a,
-                rhs.a, rhs.g, rhs.b, rhs.a,
-                this->r, this->g, this->b, this->a);
+    rgb_add(this->r, this->g, this->b,
+                rhs.r, rhs.g, rhs.b, rhs.a,
+                this->r, this->g, this->b);
 
     return (*this);
 }
@@ -265,7 +276,26 @@ WarGrey::STEM::RGBA& WarGrey::STEM::RGBA::operator+=(uint32_t rhs) {
     double rr, rg, rb;
 
     hexadecimal_to_rgb(rhs, &rr, &rg, &rb);
-    rgb_add(this->r, this->g, this->b, this->a,
+    rgb_add(this->r, this->g, this->b,
+                rr, rg, rb, 1.0,
+                this->r, this->g, this->b);
+
+    return (*this);
+}
+
+WarGrey::STEM::RGBA& WarGrey::STEM::RGBA::operator*=(const RGBA& rhs) {
+    rgb_mul(this->r, this->g, this->b, this->a,
+                rhs.r, rhs.g, rhs.b, rhs.a,
+                this->r, this->g, this->b, this->a);
+
+    return (*this);
+}
+
+WarGrey::STEM::RGBA& WarGrey::STEM::RGBA::operator*=(uint32_t rhs) {
+    double rr, rg, rb;
+
+    hexadecimal_to_rgb(rhs, &rr, &rg, &rb);
+    rgb_mul(this->r, this->g, this->b, this->a,
                 rr, rg, rb, 1.0,
                 this->r, this->g, this->b, this->a);
 
@@ -282,14 +312,14 @@ double WarGrey::STEM::RGBA::operator[](size_t i) const {
     }
 }
 
-bool WarGrey::STEM::RGBA::compare(const RGBA& rhs) const {
+bool WarGrey::STEM::RGBA::equal(const RGBA& rhs) const {
     return (this->r == rhs.r)
             && (this->g == rhs.g)
             && (this->b == rhs.b)
             && (this->a == rhs.a);
 }
 
-bool WarGrey::STEM::RGBA::compare(uint32_t rhs, double alpha) const {
+bool WarGrey::STEM::RGBA::equal(uint32_t rhs, double alpha) const {
     double r, g, b;
 
     hexadecimal_to_rgb(rhs, &r, &g, &b);
@@ -359,9 +389,9 @@ std::string WarGrey::STEM::RGBA::hexstring(bool needs_alpha, const char* fmt) co
     std::string representation;
 
     if (needs_alpha) {
-        representation = hexnumber(this->rgba());
+        representation = hexnumber(this->rgba(), 4UL);
     } else {
-        representation = hexnumber(this->rgb());
+        representation = hexnumber(this->rgb(), 3UL);
     }
 
     if (fmt != nullptr) {
