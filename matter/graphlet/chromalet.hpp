@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../canvaslet.hpp"
-#include "../../graphics/colorspace.hpp"
+#include "../../graphics/color.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ Chromalet : public WarGrey::STEM::ICanvaslet {
@@ -19,9 +19,10 @@ namespace WarGrey::STEM {
 
     public:
         void recalculate_primary_colors(int idx = -1);
-        void set_pseudo_primary_triangle_color(uint32_t color, double alpha = 1.0);
+        void set_pseudo_primary_triangle_color(const WarGrey::STEM::RGBA& color);
         void set_pseudo_primary_triangle_alpha(double alpha);
-        void set_pseudo_primary_color(uint32_t hex, size_t idx);
+        void set_pseudo_primary_color(const WarGrey::STEM::RGBA& color, size_t idx) { return this->set_pseudo_primary_color(color.rgb(), idx); }
+        void set_pseudo_primary_color(uint32_t color, size_t idx);
         void feed_pseudo_primary_color_location(size_t idx, float* x, float* y, float* fx = nullptr, float* fy = nullptr);
         void feed_pseudo_primary_color_location(size_t idx, double* x, double* y, double* fx = nullptr, double* fy = nullptr);
         void feed_color_location(uint32_t color, float* x, float* y, float* fx = nullptr, float* fy = nullptr);
@@ -62,11 +63,10 @@ namespace WarGrey::STEM {
 
     private:
         WarGrey::STEM::CIE_Standard standard;
+        WarGrey::STEM::RGBA pseudo_primary_triangle_color;
+        uint32_t pseudo_primaries[3];
         double luminance;
-        uint32_t pseudo_primaries[3] = {};
-        uint32_t pseudo_primary_triangle_color;
-        unsigned char pseudo_primary_triangle_alpha = 0;
-
+        
     private:
         double* locus_xs = nullptr;
         double* locus_ys = nullptr;

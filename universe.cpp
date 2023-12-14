@@ -2,7 +2,8 @@
 #include "misc.hpp"
 
 #include "graphics/brush.hpp"
-#include "graphics/colorspace.hpp"
+#include "graphics/color.hpp"
+#include "graphics/named_colors.hpp"
 #include "graphics/text.hpp"
 #include "graphics/image.hpp"
 
@@ -161,17 +162,15 @@ static void game_create_world(int width, int height, SDL_Window** window, SDL_Re
         "SDL 窗体和渲染器创建失败: ", SDL_GetError);
 }
 
-static inline void game_world_reset(SDL_Renderer* renderer, uint32_t fgc, uint32_t bgc) {
-    unsigned char r, g, b;
-    RGB_From_Hexadecimal(bgc, &r, &g, &b);
-    SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF); // the `alpha` does not affect the window
-    SDL_RenderClear(renderer);
+static inline void game_world_reset(SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc) {
+    // the `alpha` might not affect the window
 
-    RGB_From_Hexadecimal(fgc, &r, &g, &b);
-    SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
+    SDL_SetRenderDrawColor(renderer, bgc.R(), bgc.G(), bgc.B(), bgc.A());
+    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(renderer, fgc.R(), fgc.G(), fgc.B(), fgc.A());
 }
 
-static inline void game_world_reset(SDL_Renderer* renderer, SDL_Texture* texture, uint32_t fgc, uint32_t bgc) {
+static inline void game_world_reset(SDL_Renderer* renderer, SDL_Texture* texture, const RGBA& fgc, const RGBA& bgc) {
     SDL_SetRenderTarget(renderer, texture);
     game_world_reset(renderer, fgc, bgc);
 }
@@ -184,7 +183,7 @@ static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* textu
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IUniverse::IUniverse(uint32_t fps, uint32_t fgc, uint32_t bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
+WarGrey::STEM::IUniverse::IUniverse(uint32_t fps, const RGBA& fgc, const RGBA& bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     game_create_world(1, 0, &this->window, &this->renderer);
@@ -273,7 +272,7 @@ void WarGrey::STEM::IUniverse::big_bang() {
    
             this->end_update_sequence();
         } else {
-            this->log_message(0xFF0000, "failed to pop the event: %s", SDL_GetError());
+            this->log_message(Log::Error, make_nstring("failed to pop the event: %s", SDL_GetError()));
         }
     }
 }
@@ -420,7 +419,7 @@ bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
     bool updated = (this->echo.h > 0);
 
     if (updated) {
-        Brush::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
+        Brush::fill_rect(renderer, &this->echo, this->_ibgc);
 
         if (!this->message.empty()) {
             Pen::draw_blended_text(this->echo_font, renderer, this->_mfgc,
@@ -442,7 +441,7 @@ bool WarGrey::STEM::IUniverse::display_usr_input_and_caret(SDL_Renderer* rendere
     bool updated = false;
 
     if (this->echo.h > 0) {
-        Brush::fill_rect(renderer, &this->echo, this->_ibgc, 0xFF);
+        Brush::fill_rect(renderer, &this->echo, this->_ibgc);
 
         if (yes) {
             if (this->prompt.empty()) {
@@ -577,12 +576,17 @@ void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int 
     SDL_SetTextInputRect(&this->echo);
 }
 
-void WarGrey::STEM::IUniverse::log_message(int fgc, const std::string& msg) {
+void WarGrey::STEM::IUniverse::log_message(Log level, const std::string& msg) {
     this->needs_termio_if_no_echo = true;
     this->message = msg;
     
-    if (fgc >= 0) {
-        this->_mfgc = fgc;
+    switch (level) {
+    case Log::Fatal: this->_mfgc = CRIMSON; break;
+    case Log::Error: this->_mfgc = RED; break;
+    case Log::Warning: this->_mfgc = YELLOW; break;
+    case Log::Info: this->_mfgc = GREEN; break;
+    case Log::Debug: this->_mfgc = SILVER; break;
+    default: this->_mfgc = transparent; break;
     }
 
     if (this->display_usr_message(this->renderer)){
@@ -645,7 +649,7 @@ SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
 
     if (photograph != nullptr) {
         if (SDL_RenderReadPixels(this->renderer, NULL, format, photograph->pixels, photograph->pitch) < 0) {
-            this->log_message(0xFF0000, "failed to take snapshot: %s", SDL_GetError());
+            this->log_message(Log::Error, make_nstring("failed to take snapshot: %s", SDL_GetError()));
         }
     }
 
@@ -658,9 +662,9 @@ void WarGrey::STEM::IUniverse::take_snapshot() {
         / path(make_nstring("%s-%s.png", basename, make_now_timestamp_utc(true).c_str()));
 
     if (this->save_snapshot(snapshot_png.string().c_str())) { // stupid windows as it requires `string()`
-        this->log_message(this->_fgc, "A snapshot has been saved as '%s'.", snapshot_png.string().c_str());
+        this->log_message(Log::Info, make_nstring("A snapshot has been saved as '%s'.", snapshot_png.string().c_str()));
     } else {
-        this->log_message(0xFF0000, "failed to save snapshot: %s", SDL_GetError());
+        this->log_message(Log::Error, make_nstring("failed to save snapshot: %s", SDL_GetError()));
     }
 }
 
@@ -693,9 +697,9 @@ void WarGrey::STEM::IUniverse::save_file(bool is_save_as) {
             this->on_save(data_path.string(), dev_datout);
             dev_datout.close();
 
-            this->log_message(this->_fgc, "The user data have been saved as '%s'.", data_path.string().c_str());
+            this->log_message(Log::Info, make_nstring("The user data have been saved as '%s'.", data_path.string().c_str()));
         } catch (const std::ofstream::failure &e) {
-            this->log_message(0xFF0000, "failed to save user data: %s", e.what());
+            this->log_message(Log::Error, make_nstring("failed to save user data: %s", e.what()));
         }
     }
 }
@@ -710,7 +714,7 @@ void WarGrey::STEM::IUniverse::set_usrdata_folder(const std::string& dir) {
 
 /*************************************************************************************************/
 WarGrey::STEM::Universe::Universe() : Universe("The Big Bang!") {}
-WarGrey::STEM::Universe::Universe(const char *title, uint32_t fps, uint32_t fgc, uint32_t bgc) : IUniverse(fps, fgc, bgc) {
+WarGrey::STEM::Universe::Universe(const char *title, uint32_t fps, const RGBA& fgc, const RGBA& bgc) : IUniverse(fps, fgc, bgc) {
     this->set_window_title("%s", title);
 }
 

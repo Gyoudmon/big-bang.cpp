@@ -42,24 +42,26 @@ void WarGrey::STEM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
                 short fy2 = fl2fx<short>(y2);
                 uint8_t r, g, b, a;
 
-                SDL_SetRenderTarget(master, this->canvas->self());
-                RGB_From_Hexadecimal(this->get_pen_color(), &r, &g, &b);
-                this->get_pen_alpha(&a);
+                if (this->pen_okay(&r, &g, &b, &a)) {
+                    SDL_SetRenderTarget(master, this->canvas->self());
                 
-                if (this->line_width <= 1) {
-                    aalineRGBA(master, fx1, fy1, fx2, fy2, r, g, b, a);
-                } else {
-                    int radius = this->line_width / 2;
+                    if (this->line_width <= 1) {
+                        aalineRGBA(master, fx1, fy1, fx2, fy2, r, g, b, a);
+                    } else {
+                        int radius = this->line_width / 2;
 
-                    filledCircleRGBA(master, fx1, fy1, radius, r, g, b, a);
-                    filledCircleRGBA(master, fx2, fy2, radius, r, g, b, a);
-                    thickLineRGBA(master, fx1, fy1, fx2, fy2, this->line_width, r, g, b, a);
+                        filledCircleRGBA(master, fx1, fy1, radius, r, g, b, a);
+                        filledCircleRGBA(master, fx2, fy2, radius, r, g, b, a);
+                        thickLineRGBA(master, fx1, fy1, fx2, fy2, this->line_width, r, g, b, a);
+                    }
+
+                    SDL_SetRenderTarget(master, origin);
+
+                    this->resolve_boundary(x1, y1);
+                    this->resolve_boundary(x2, y2);
+
+                    this->dirty_canvas(0U, -1.0);
                 }
-
-                SDL_SetRenderTarget(master, origin);
-
-                this->resolve_boundary(x1, y1);
-                this->resolve_boundary(x2, y2);
             }
         }
     }
@@ -82,6 +84,8 @@ void WarGrey::STEM::Tracklet::stamp(WarGrey::STEM::IMatter* matter, float x, flo
 
             this->resolve_boundary(x, y);
             this->resolve_boundary(x + mwidth, mheight);
+
+            this->dirty_canvas(0U, -1.0);
         }
     }
 }

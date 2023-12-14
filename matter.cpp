@@ -1,9 +1,7 @@
 #include "matter.hpp"
 #include "plane.hpp"
 
-#include "datum/string.hpp"
 #include "datum/box.hpp"
-
 #include "graphics/image.hpp"
 
 #include <typeinfo>
@@ -246,23 +244,9 @@ void WarGrey::STEM::IMatter::feed_location(float* x, float* y, float fx, float f
     }
 }
 
-void WarGrey::STEM::IMatter::log_message(const char* fmt, ...) {
+void WarGrey::STEM::IMatter::log_message(Log level, const std::string& msg) {
     if (this->info != nullptr) {
-        VSNPRINT(text, fmt);
-        this->log_message(-1, text);
-    }
-}
-
-void WarGrey::STEM::IMatter::log_message(int fgc, const char* fmt, ...) {
-    if (this->info != nullptr) {
-        VSNPRINT(text, fmt);
-        this->log_message(fgc, text);
-    }
-}
-
-void WarGrey::STEM::IMatter::log_message(int fgc, const std::string& msg) {
-    if (this->info != nullptr) {
-        this->info->master->log_message(fgc, msg);
+        this->info->master->log_message(level, msg);
     }
 }
 

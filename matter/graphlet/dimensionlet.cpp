@@ -2,7 +2,6 @@
 
 #include "../../graphics/font.hpp"
 #include "../../graphics/text.hpp"
-#include "../../graphics/colorspace.hpp"
 #include "../../graphics/brush.hpp"
 
 #include "../../datum/string.hpp"
@@ -44,7 +43,7 @@ DimensionStyle WarGrey::STEM::make_plain_dimension_style(int nfsize, unsigned in
 	return ds;
 }
 
-DimensionStyle WarGrey::STEM::make_setting_dimension_style(int nfsize, unsigned int min_number, int precision, uint32_t color) {
+DimensionStyle WarGrey::STEM::make_setting_dimension_style(int nfsize, unsigned int min_number, int precision, const RGBA& color) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize, nfsize, precision);
 	
     ds.minimize_number_width = ds.number_font->width('0') * float(min_number);
@@ -55,23 +54,25 @@ DimensionStyle WarGrey::STEM::make_setting_dimension_style(int nfsize, unsigned 
 	return ds;
 }
 
-DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_number, int precision, uint32_t number_bgcolor, uint32_t label_bgcolor, uint32_t color) {
+DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_number, int precision
+        , const RGBA& number_bgcolor, const RGBA& label_bgcolor, const RGBA& color) {
 	return make_highlight_dimension_style(nfsize, 0U, min_number, precision, number_bgcolor, label_bgcolor, color);
 }
 
-DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_label, unsigned int min_number, int precision, uint32_t number_bgcolor, uint32_t label_bgcolor, uint32_t color) {
+DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_label, unsigned int min_number, int precision
+        , const RGBA& number_bgcolor, const RGBA& label_bgcolor, const RGBA& color) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, fl2fxi(nfsize * 1.2F), nfsize, precision);
 
     ds.minimize_label_width = ((min_label == 0) ? ds.label_font->height() : (ds.label_font->width('0') * float(min_label)));
 	ds.label_xfraction = 0.5F;
 	ds.minimize_number_width = ds.number_font->width('0') * float(min_number);
 	ds.number_leading_space = 2.0F;
+	ds.precision = precision;
 	ds.number_background_color = number_bgcolor;
 	ds.number_color = color;
 	ds.label_background_color = label_bgcolor;
 	ds.label_color = color;
-	ds.precision = precision;
-	
+    
 	return ds;
 }
 
@@ -134,7 +135,7 @@ void WarGrey::STEM::Dimensionlet::feed_extent(float x, float y, float* w, float*
     this->feed_subextent(n, w, h);
 }
 
-void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor) {
+void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, const std::optional<RGBA>& bgcolor, const std::optional<RGBA>& bcolor) {
     SDL_FRect* self = &this->boxes[idx];
     
     if ((self->w > 0.0F) && (self->h > 0.0F)) {
@@ -145,12 +146,12 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
         self->h = Height;
         self->y = bottom - self->h;
         
-        if (bgcolor >= 0) {
-            Brush::fill_rect(ds, self, static_cast<uint32_t>(bgcolor));
+        if (bgcolor.has_value()) {
+            Brush::fill_rect(ds, self, bgcolor.value());
         }
 
-        if (bcolor >= 0) {
-            Brush::draw_rect(ds, self, static_cast<uint32_t>(bcolor));
+        if (bcolor.has_value()) {
+            Brush::draw_rect(ds, self, bcolor.value());
         }
 
         if (texture.use_count() > 0) {
@@ -177,9 +178,9 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 	CAS_SLOT(style.unit_font, GameFont::monospace());
 	CAS_SLOT(style.label_font, GameFont::Default());
 
-	ICAS_SLOT(style.number_color, default_math_color);
-	ICAS_SLOT(style.unit_color, default_unit_color);
-	ICAS_SLOT(style.label_color, default_text_color);
+	OptCAS_SLOT(style.number_color, default_math_color);
+	OptCAS_SLOT(style.unit_color, default_unit_color);
+	OptCAS_SLOT(style.label_color, default_text_color);
 
 	FLCAS_SLOT(style.minimize_label_width, 0.0F);
 	FLCAS_SLOT(style.label_xfraction, 1.0F);
@@ -199,15 +200,17 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 
 void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
     if (!this->label.empty()) {
-        this->textures[label_idx].reset(new Texture(game_blended_text_texture(renderer, this->label, style.label_font,
-            static_cast<uint32_t>(style.label_color), 0)));
+        this->textures[label_idx].reset(
+            new Texture(game_blended_text_texture(renderer, this->label, style.label_font,
+                            style.label_color.value(), 0)));
     }
 
     this->update_number_texture(renderer, this->get_value(), style);
 
     if (!this->unit.empty()) {
-        this->textures[unit_idx].reset(new Texture(game_blended_text_texture(renderer, this->unit, style.unit_font,
-            static_cast<uint32_t>(style.unit_color), 0)));
+        this->textures[unit_idx].reset(
+            new Texture(game_blended_text_texture(renderer, this->unit, style.unit_font,
+                            style.unit_color.value(), 0)));
     }
 	
     this->update_drawing_box(label_idx, style.minimize_label_width, style.label_font, 0.0F);
@@ -220,9 +223,10 @@ void WarGrey::STEM::Dimensionlet::on_value_changed(SDL_Renderer* ds, double valu
 }
 
 void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, double value, DimensionStyle& style) {
-    this->textures[datum_idx].reset(new Texture(game_blended_text_texture(renderer,
-        flstring(value, style.precision), style.number_font,
-        static_cast<uint32_t>(style.number_color), 0)));
+    this->textures[datum_idx].reset(
+        new Texture(game_blended_text_texture(renderer,
+                        flstring(value, style.precision), style.number_font,
+                        style.number_color.value(), 0)));
 }
 
 void WarGrey::STEM::Dimensionlet::update_drawing_box(size_t idx, float min_width, shared_font_t font, float leading_space) {

@@ -20,6 +20,7 @@
 #include "matter.hpp"
 #include "misc.hpp"
 
+#include "graphics/color.hpp"
 #include "graphics/colorspace.hpp"
 #include "graphics/named_colors.hpp"
 #include "graphics/font.hpp"

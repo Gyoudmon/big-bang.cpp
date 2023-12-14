@@ -24,7 +24,7 @@ namespace WarGrey::STEM {
         void notify_updated() override { this->_display->notify_updated(); }
 
     public:
-        void log_message(int fgc, const std::string& message) override { this->_display->log_message(fgc, message); }
+        void log_message(WarGrey::STEM::Log level, const std::string& message) override { this->_display->log_message(level, message); }
         void start_input_text(const std::string& prompt) override { this->_display->start_input_text(prompt); }
 
     private:

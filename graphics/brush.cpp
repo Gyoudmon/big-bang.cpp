@@ -223,13 +223,8 @@ void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, int x, int y, int 
     SDL_RenderDrawRect(renderer, &box);
 }
 
-void WarGrey::STEM::Brush::clear(SDL_Renderer* renderer, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
-    SDL_RenderClear(renderer);
-}
-
-void WarGrey::STEM::Brush::clear(SDL_Renderer* renderer, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::clear(SDL_Renderer* renderer, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderClear(renderer);
 }
 
@@ -320,212 +315,108 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, int x, int y, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, int x, int y, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, int x, int y, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawPoint(renderer, x, y);
-}
-
-void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
-void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
-}
-
-void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, int x, int y, int length, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, int x, int y, int length, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLine(renderer, x, y, x + length, y);
 }
 
-void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, int x, int y, int length, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawLine(renderer, x, y, x + length, y);
-}
-
-void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, int x, int y, int length, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, int x, int y, int length, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLine(renderer, x, y, x, y + length);
 }
 
-void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, int x, int y, int length, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawLine(renderer, x, y, x, y + length);
-}
-
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_Rect* box, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawRect(renderer, box);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_Rect* box, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawRect(renderer, box);
-}
-
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_Rect* box, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_Rect* box, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderFillRect(renderer, box);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_Rect* box, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderFillRect(renderer, box);
-}
-
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
-    Brush::draw_rect(renderer, &box, rgb, alpha);
+    Brush::draw_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, double hue, double saturation, double value, double alpha) {
+void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
-    Brush::draw_rect(renderer, &box, hue, saturation, value, alpha);
+    Brush::fill_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, uint32_t rgb, double alpha) {
-    SDL_Rect box;
-
-    FILL_BOX(box, x, y, width, height);
-    Brush::fill_rect(renderer, &box, rgb, alpha);
+void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, const RGBA& color) {
+    Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, double hue, double saturation, double value, double alpha) {
-    SDL_Rect box;
-
-    FILL_BOX(box, x, y, width, height);
-    Brush::fill_rect(renderer, &box, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, const RGBA& color) {
+    Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, uint32_t rgb, double alpha) {
-    Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
+void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, const RGBA& color) {
+    Brush::draw_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, const RGBA& color) {
+    Brush::fill_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, uint32_t rgb, double alpha) {
-    Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
+void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, const RGBA& color) {
+    Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, const RGBA& color) {
+    Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, uint32_t rgb, double alpha) {
-    Brush::draw_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, rgb, alpha);
+void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, const RGBA& color) {
+    Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
+void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, const RGBA& color) {
+    Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, uint32_t rgb, double alpha) {
-    Brush::fill_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
-}
-
-void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha) {
-    Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, uint32_t rgb, double alpha) {
-    Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, uint32_t rgb, double alpha) {
-    Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, uint32_t rgb, double alpha) {
-    Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    pen_draw_circle(renderer, cx, cy, radius);
-}
-
-void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_filled_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    pen_draw_filled_circle(renderer, cx, cy, radius);
-}
-
-void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    pen_draw_ellipse(renderer, cx, cy, ar, br);
-}
-
-void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_filled_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    pen_draw_filled_ellipse(renderer, cx, cy, ar, br);
+void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, const RGBA& color) {
+    Brush::draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, color);
 }
 
-void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, double alpha) {
-    Brush::draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, double hue, double saturation, double value, double alpha) {
-    Brush::draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, uint32_t rgb, double alpha) {
-    Brush::fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, double hue, double saturation, double value, double alpha) {
-    Brush::fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, const RGBA& color) {
+    Brush::fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, color);
 }
 
 /*************************************************************************************************/
@@ -623,136 +514,71 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, float x, float y, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, float x, float y, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawPointF(renderer, x, y);
 }
 
-void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, float x, float y, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawPointF(renderer, x, y);
-}
-
-void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, uint32_t rgb, double alpha) {
-    uint8_t a = color_component_clamp_to_byte(alpha);
-    uint8_t r, g, b;
-    
-    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, const RGBA& color) {
     aalineRGBA(renderer, fl2fx<int16_t>(x1), fl2fx<int16_t>(y1), fl2fx<int16_t>(x2), fl2fx<int16_t>(y2),
-                r, g, b, a);
+                color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, double hue, double saturation, double value, double alpha) {
-    Brush::draw_line(renderer, x1, y1, x2, y2, Hexadecimal_From_HSV(hue, saturation, value), alpha);
+void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, float x, float y, float length, const RGBA& color) {
+    Brush::draw_hline(renderer, fl2fx<int>(x), fl2fx<int>(y), fl2fx<int>(length), color);
 }
 
-void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, float x, float y, float length, uint32_t rgb, double alpha) {
-    Brush::draw_hline(renderer, fl2fx<int>(x), fl2fx<int>(y), fl2fx<int>(length), rgb, alpha);
+void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, float x, float y, float length, const RGBA& color) {
+    Brush::draw_vline(renderer, fl2fx<int>(x), fl2fx<int>(y), fl2fx<int>(length), color);
 }
 
-void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, float x, float y, float length, double hue, double saturation, double value, double alpha) {
-    Brush::draw_hline(renderer, fl2fxi(x), fl2fxi(y), fl2fxi(length), hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, float x, float y, float length, uint32_t rgb, double alpha) {
-    Brush::draw_vline(renderer, fl2fx<int>(x), fl2fx<int>(y), fl2fx<int>(length), rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, float x, float y, float length, double hue, double saturation, double value, double alpha) {
-    Brush::draw_line(renderer, fl2fxi(x), fl2fxi(y), fl2fxi(length), hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawPointsF(renderer, pts, size);
 }
 
-void WarGrey::STEM::Brush::draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawPointsF(renderer, pts, size);
-}
-
-void WarGrey::STEM::Brush::draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLinesF(renderer, pts, size);
 }
 
-void WarGrey::STEM::Brush::draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawLinesF(renderer, pts, size);
-}
-
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_FRect* box, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawRectF(renderer, box);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_FRect* box, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderDrawRectF(renderer, box);
-}
-
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_FRect* box, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_FRect* box, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderFillRectF(renderer, box);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_FRect* box, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    SDL_RenderFillRectF(renderer, box);
-}
-
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
-    Brush::draw_rect(renderer, &box, rgb, alpha);
+    Brush::draw_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, double hue, double saturation, double value, double alpha) {
+void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
-    Brush::draw_rect(renderer, &box, hue, saturation, value, alpha);
+    Brush::fill_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, uint32_t rgb, double alpha) {
-    SDL_FRect box;
-
-    FILL_BOX(box, x, y, width, height);
-    Brush::fill_rect(renderer, &box, rgb, alpha);
+void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, const RGBA& color) {
+    Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, double hue, double saturation, double value, double alpha) {
-    SDL_FRect box;
-
-    FILL_BOX(box, x, y, width, height);
-    Brush::fill_rect(renderer, &box, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, const RGBA& color) {
+    Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, uint32_t rgb, double alpha) {
-    Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, uint32_t rgb, double alpha) {
-    Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, const RGBA& color) {
     int16_t X1 = fl2fx<int16_t>(x);
     int16_t Y1 = fl2fx<int16_t>(y);
     int16_t X2 = fl2fx<int16_t>(x + width);
     int16_t Y2 = fl2fx<int16_t>(y + height);
-    uint8_t a = color_component_clamp_to_byte(alpha);
-    uint8_t r, g, b;
     int16_t rad;
 
     if (radius < 0.0) {
@@ -760,21 +586,14 @@ void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, float x, fl
     }
 
     rad = fl2fx<int16_t>(flmin(radius, height * 0.5F));
-    RGB_From_Hexadecimal(rgb, &r, &g, &b);
-    roundedRectangleRGBA(renderer, X1, Y1, X2, Y2, rad, r, g, b, a);
+    roundedRectangleRGBA(renderer, X1, Y1, X2, Y2, rad, color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, const RGBA& color) {
     int16_t X1 = fl2fx<int16_t>(x);
     int16_t Y1 = fl2fx<int16_t>(y);
     int16_t X2 = fl2fx<int16_t>(x + width);
     int16_t Y2 = fl2fx<int16_t>(y + height);
-    uint8_t a = color_component_clamp_to_byte(alpha);
-    uint8_t r, g, b;
     int16_t rad;
 
     if (radius < 0.0) {
@@ -782,87 +601,56 @@ void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, float x, fl
     }
 
     rad = fl2fx<int16_t>(flmin(radius, height * 0.5F));
-    RGB_From_Hexadecimal(rgb, &r, &g, &b);
-    roundedBoxRGBA(renderer, X1, Y1, X2, Y2, rad, r, g, b, a);
+    roundedBoxRGBA(renderer, X1, Y1, X2, Y2, rad, color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rounded_rect(renderer, x, y, width, height, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
+void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, const RGBA& color) {
+    Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, color);
 }
 
-void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha) {
-    Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rgb, alpha);
+void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, const RGBA& color) {
+    Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, color);
 }
 
-void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, const RGBA& color) {
+    Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, uint32_t rgb, double alpha) {
-    Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rgb, alpha);
+void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, const RGBA& color) {
+    Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, uint32_t rgb, double alpha) {
-    Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, uint32_t rgb, double alpha) {
-    Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, rgb, alpha);
-}
-
-void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, double hue, double saturation, double value, double alpha) {
-    Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, hue, saturation, value, alpha);
-}
-
-void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t R = fl2fx<int16_t>(radius);
-    uint8_t a = color_component_clamp_to_byte(alpha);
-    uint8_t r, g, b;
     
-    RGB_From_Hexadecimal(rgb, &r, &g, &b);
-    aacircleRGBA(renderer, CX, CY, R, r, g, b, a);
+    aacircleRGBA(renderer, CX, CY, R, color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation, double value, double alpha) {
-    Brush::draw_circle(renderer, cx, cy, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
-}
-
-void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t R = fl2fx<int16_t>(radius);
-    uint8_t a = color_component_clamp_to_byte(alpha);
-    uint8_t r, g, b;
+    uint8_t r = color.R();
+    uint8_t g = color.G();
+    uint8_t b = color.B();
+    uint8_t a = color.A();
     
-    RGB_From_Hexadecimal(rgb, &r, &g, &b);
     filledCircleRGBA(renderer, CX, CY, R, r, g, b, a);
     aacircleRGBA(renderer, CX, CY, R, r, g, b, a);
 }
 
-void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, double hue, double saturation, double value, double alpha) {
-    Brush::fill_circle(renderer, cx, cy, radius, Hexadecimal_From_HSV(hue, saturation, value), alpha);
-}
-
-void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t AR = fl2fx<int16_t>(ar);
     int16_t BR = fl2fx<int16_t>(br);
-    uint8_t a = color_component_clamp_to_byte(alpha);
-    uint8_t r, g, b;
+    uint8_t r = color.R();
+    uint8_t g = color.G();
+    uint8_t b = color.B();
+    uint8_t a = color.A();
     
-    RGB_From_Hexadecimal(rgb, &r, &g, &b);
-
     if (AR == BR) {
         aacircleRGBA(renderer, CX, CY, AR, r, g, b, a);
     } else {
@@ -870,19 +658,15 @@ void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, float cx, float 
     }
 }
 
-void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, double hue, double saturation, double value, double alpha) {
-    Brush::draw_ellipse(renderer, cx, cy, ar, br, Hexadecimal_From_HSV(hue, saturation, value), alpha);
-}
-
-void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, uint32_t rgb, double alpha) {
+void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t AR = fl2fx<int16_t>(ar);
     int16_t BR = fl2fx<int16_t>(br);
-    uint8_t a = color_component_clamp_to_byte(alpha);
-    uint8_t r, g, b;
-    
-    RGB_From_Hexadecimal(rgb, &r, &g, &b);
+    uint8_t r = color.R();
+    uint8_t g = color.G();
+    uint8_t b = color.B();
+    uint8_t a = color.A();
     
     if (AR == BR) {
         filledCircleRGBA(renderer, CX, CY, AR, r, g, b, a);
@@ -893,26 +677,12 @@ void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, float cx, float 
     }
 }
 
-void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, double hue, double saturation, double value, double alpha) {
-    Brush::fill_ellipse(renderer, cx, cy, ar, br, Hexadecimal_From_HSV(hue, saturation, value), alpha);
-}
-
-void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
+void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
 
-void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
-    pen_draw_regular_polygon(renderer, n, cx, cy, radius, rotation);
-}
-
-void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, uint32_t rgb, double alpha) {
-    RGB_SetRenderDrawColor(renderer, rgb, alpha);
-    pen_fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
-}
-
-void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, double hue, double saturation, double value, double alpha) {
-    HSV_SetRenderDrawColor(renderer, hue, saturation, value, alpha);
+void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, const RGBA& color) {
+    SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }

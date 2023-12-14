@@ -1,8 +1,7 @@
 #pragma once
 
-#include "forward.hpp"
-
 #include "graphics/font.hpp"
+#include "graphics/color.hpp"
 #include "graphics/named_colors.hpp"
 
 #include "virtualization/screen.hpp"
@@ -98,7 +97,7 @@ namespace WarGrey::STEM {
     public:
         virtual void shh(ISprite* m) = 0;
         virtual void say(ISprite* m, double sec, IMatter* message, SpeechBubble type) = 0;
-        virtual void say(ISprite* m, double sec, const std::string& message, uint32_t color, SpeechBubble type) = 0;
+        virtual void say(ISprite* m, double sec, const std::string& message, const WarGrey::STEM::RGBA& color, SpeechBubble type) = 0;
         
     public:
         void begin_update_sequence();
@@ -108,14 +107,11 @@ namespace WarGrey::STEM {
         void notify_updated(IMatter* m = nullptr);
 
     public:
-        void set_background(uint32_t color, double a = 1.0) { this->background = color; this->bg_alpha = a; }
-        void set_background(double hue, double saturation = 1.0, double brightness = 1.0, double a = 1.0);
-        uint32_t get_background(double* alpha = nullptr);
+        void set_background(const WarGrey::STEM::RGBA& color) { this->background = color; }
+        WarGrey::STEM::RGBA get_background() { return this->background; }
         void start_input_text(const std::string& prompt);
         void start_input_text(const char* prompt, ...);
-        void log_message(int fgc, const char* fmt, ...);
-        void log_message(int fgc, const std::string& msg);
-        void log_message(const char* fmt, ...);
+        void log_message(WarGrey::STEM::Log log, const std::string& msg);
 
     public:
         bool is_colliding(IMatter* m, IMatter* target);
@@ -156,7 +152,7 @@ namespace WarGrey::STEM {
         void move_to_grid(IMatter* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
         void glide_to_grid(double sec, IMatter* m, int idx, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
         void glide_to_grid(double sec, IMatter* m, int row, int col, MatterAnchor a = MatterAnchor::CC, float dx = 0.0F, float dy = 0.0F);
-        void set_grid_color(uint32_t color, float a = 1.0F) { this->grid_color = color; this->grid_alpha = a; }
+        void set_grid_color(const WarGrey::STEM::RGBA& color) { this->grid_color = color; }
 
     public:
         void say(ISprite* m, IMatter* message) { this->say(m, 0.0, message, SpeechBubble::Default); }
@@ -164,19 +160,11 @@ namespace WarGrey::STEM {
         void think(ISprite* m, IMatter* message) { this->say(m, 0.0, message, SpeechBubble::Thought); }
         void think(ISprite* m, double sec, IMatter* message) { this->say(m, sec, message, SpeechBubble::Thought); }
     
-        void say(ISprite* m, const char* sentence, uint32_t color = BLACK);
-        void say(ISprite* m, const std::string& sentence, uint32_t color = BLACK);
-        void say(ISprite* m, uint32_t color, const char* fmt, ...);
-        void say(ISprite* m, double sec, const char* sentence, uint32_t color = BLACK);
-        void say(ISprite* m, double sec, const std::string& sentence, uint32_t color = BLACK);
-        void say(ISprite* m, double sec, uint32_t color, const char* fmt, ...);
-        void think(ISprite* m, const char* sentence, uint32_t color = DIMGRAY);
-        void think(ISprite* m, const std::string& sentence, uint32_t color = DIMGRAY);
-        void think(ISprite* m, uint32_t color, const char* fmt, ...);
-        void think(ISprite* m, double sec, const char* sentence, uint32_t color = DIMGRAY);
-        void think(ISprite* m, double sec, const std::string& sentence, uint32_t color = DIMGRAY);
-        void think(ISprite* m, double sec, uint32_t color, const char* fmt, ...);
-
+        void say(ISprite* m, const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
+        void say(ISprite* m, double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
+        void think(ISprite* m, const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
+        void think(ISprite* m, double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
+        
         bool in_speech(ISprite* m);
         bool is_speaking(ISprite* m);
         bool is_thinking(ISprite* m);
@@ -221,8 +209,8 @@ namespace WarGrey::STEM {
         virtual void draw_visible_selection(SDL_Renderer* renderer, float X, float Y, float width, float height) = 0;
 
     protected:
-        virtual IMatter* make_bubble_text(const std::string& message, uint32_t color, double alpha) = 0;
-        virtual bool merge_bubble_text(IMatter* bubble, const std::string& message, uint32_t color, double alpha) = 0;
+        virtual IMatter* make_bubble_text(const std::string& message, const WarGrey::STEM::RGBA& color) = 0;
+        virtual bool merge_bubble_text(IMatter* bubble, const std::string& message, const WarGrey::STEM::RGBA& color) = 0;
         virtual bool is_bubble_showing(IMatter* m, SpeechBubble* type) = 0;
 
     public:
@@ -258,8 +246,7 @@ namespace WarGrey::STEM {
         IPlaneInfo* info = nullptr;
 
     protected:
-        uint32_t background = 0U;
-        double bg_alpha = 0.0F;
+        WarGrey::STEM::RGBA background;
 
     protected:
         int column = 0;
@@ -268,8 +255,7 @@ namespace WarGrey::STEM {
         float grid_y = 0.0F;
         float cell_width = 0.0F;
         float cell_height = 0.0F;
-        uint32_t grid_color = 0U;
-        float grid_alpha = 0.0F;
+        WarGrey::STEM::RGBA grid_color;
         
     private:
         std::string caption;
@@ -285,7 +271,7 @@ namespace WarGrey::STEM {
         bool has_mission_completed() override;
         void set_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->sentry = sentry; }
         void set_tooltip_matter(WarGrey::STEM::IMatter* m, float dx = 0.0F, float dy = 0.0F);
-        void set_bubble_color(uint32_t border, uint32_t background, double alpha = 1.0);
+        void set_bubble_color(const WarGrey::STEM::RGBA& border, const WarGrey::STEM::RGBA& background);
         void set_bubble_font(shared_font_t font) { this->bubble_font = font; }
         void set_bubble_duration(double second = 3600.0);
         void set_bubble_margin(float margin) { this->set_bubble_margin(margin, margin); }
@@ -337,18 +323,16 @@ namespace WarGrey::STEM {
         void pen_up(IMatter* m) { this->set_drawing(m, false); }
         void set_drawing(IMatter* m, bool yes_or_no);
         void set_pen_width(IMatter* m, uint8_t width);
-        void set_pen_color(IMatter* m, uint32_t hex, double alpha = 1.0);
-        void set_pen_color(IMatter* m, double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
+        void set_pen_color(IMatter* m, const WarGrey::STEM::RGBA& color);
         void set_heading(IMatter* m, double direction, bool is_radian = false);
         void turn(IMatter* m, double theta, bool is_radian = false);
 
     public:
-        using WarGrey::STEM::IPlane::log_message;
-        void log_message(int fgc, const std::string& msg);
+        void log_message(WarGrey::STEM::Log level, const std::string& msg);
 
         void shh(ISprite* m) override;
         void say(ISprite* m, double sec, IMatter* message, WarGrey::STEM::SpeechBubble type) override;
-        void say(ISprite* m, double sec, const std::string& message, uint32_t color, WarGrey::STEM::SpeechBubble type) override;
+        void say(ISprite* m, double sec, const std::string& message, const WarGrey::STEM::RGBA& color, WarGrey::STEM::SpeechBubble type) override;
 
     public:
         IMatter* find_next_selected_matter(IMatter* start = nullptr) override;
@@ -376,8 +360,8 @@ namespace WarGrey::STEM {
         virtual void on_double_tap_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->mission_complete(); }
 
     protected:
-        IMatter* make_bubble_text(const std::string& message, uint32_t color, double alpha) override;
-        bool merge_bubble_text(IMatter* bubble, const std::string& message, uint32_t color, double alpha) override;
+        IMatter* make_bubble_text(const std::string& message, const WarGrey::STEM::RGBA& color) override;
+        bool merge_bubble_text(IMatter* bubble, const std::string& message, const WarGrey::STEM::RGBA& color) override;
         bool is_bubble_showing(IMatter* m, SpeechBubble* type) override;
         virtual void place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height,
                                             float* mfx, float* mfy, float* bfx, float* bfy, float* dx, float* dy);
@@ -463,10 +447,9 @@ namespace WarGrey::STEM {
         float tooltip_dy = 0.0F;
 
     private:
-        uint32_t bubble_border = GAINSBORO;
-        uint32_t bubble_color = GHOSTWHITE;
+        WarGrey::STEM::RGBA bubble_border = GAINSBORO;
+        WarGrey::STEM::RGBA bubble_color = GHOSTWHITE;
         double bubble_second = 0.0;
-        double bubble_alpha = 1.0;
         float bubble_top_margin = 0.0F;
         float bubble_right_margin = 0.0F;
         float bubble_bottom_margin = 0.0F;

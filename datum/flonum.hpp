@@ -12,8 +12,8 @@ namespace WarGrey::STEM {
 #define flnull_f static_cast<float*>(nullptr)
 
     static const float flnan_f = std::nanf("");
-    static const double flnan = std::nanf("");
-    static const long double flnan_t = std::nanf("");
+    static const double flnan = std::nan("");
+    static const long double flnan_t = std::nanl("");
 
     static const float pi_f       = 3.1415927f;
     static const double pi        = 3.141592653589793;

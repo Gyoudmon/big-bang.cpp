@@ -107,6 +107,10 @@ unsigned char WarGrey::STEM::color_component_clamp_to_byte(double com) {
     return UCHAR(flmin(flmax(com, 0.0), 1.0));
 }
 
+unsigned char WarGrey::STEM::color_component_clamp_to_byte(int com) {
+    return static_cast<uint8_t>(fxmin(fxmax(com, 0), 255));
+}
+
 /*************************************************************************************************/
 void WarGrey::STEM::RGB_FillColor(SDL_Color* c, unsigned int hex, double alpha) {
     RGB_FillColor(c, hex, UCHAR(alpha));

@@ -3,12 +3,10 @@
 #include "../canvaslet.hpp"
 #include "../../graphics/geometry.hpp"
 
-#include <optional>
-
 namespace WarGrey::STEM {
     class __lambda__ IShapelet : public WarGrey::STEM::ICanvaslet {
     public:
-        IShapelet(const std::optional<uint32_t>& color = {}, const std::optional<uint32_t>& border_color = {});
+        IShapelet(const WarGrey::STEM::RGBA& color = transparent, const WarGrey::STEM::RGBA& border_color = transparent);
         virtual ~IShapelet() noexcept {}
 
     public:
@@ -22,7 +20,7 @@ namespace WarGrey::STEM {
     /*********************************************************************************************/
     class __lambda__ Linelet : public WarGrey::STEM::IShapelet {
     public:
-	    Linelet(float ex, float ey, const std::optional<uint32_t>& color);
+	    Linelet(float ex, float ey, const WarGrey::STEM::RGBA& color);
 
 	public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -39,19 +37,19 @@ namespace WarGrey::STEM {
 
     class __lambda__ HLinelet : public WarGrey::STEM::Linelet {
     public:
-        HLinelet(float width, const std::optional<uint32_t>& color) : Linelet(width, 0.0F, color) {}
+        HLinelet(float width, const WarGrey::STEM::RGBA& color) : Linelet(width, 0.0F, color) {}
     };
 
     class __lambda__ VLinelet : public WarGrey::STEM::Linelet {
     public:
-        VLinelet(float height, const std::optional<uint32_t>& color) : Linelet(0.0F, height, color) {}
+        VLinelet(float height, const WarGrey::STEM::RGBA& color) : Linelet(0.0F, height, color) {}
     };
 
     /*********************************************************************************************/
     class __lambda__ Rectanglet : public WarGrey::STEM::IShapelet {
     public:
-	    Rectanglet(float edge_size, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
-	    Rectanglet(float width, float height, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
+	    Rectanglet(float edge_size, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
+	    Rectanglet(float width, float height, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
 	    
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -68,14 +66,14 @@ namespace WarGrey::STEM {
 
     class __lambda__ Squarelet : public WarGrey::STEM::Rectanglet {
     public:
-        Squarelet(float edge_size, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {})
+        Squarelet(float edge_size, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent)
             : Rectanglet(edge_size, color, border_color) {}
     };
 
     class __lambda__ RoundedRectanglet : public WarGrey::STEM::IShapelet {
     public:
-	    RoundedRectanglet(float edge_size, float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
-	    RoundedRectanglet(float width, float height, float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
+	    RoundedRectanglet(float edge_size, float radius, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
+	    RoundedRectanglet(float width, float height, float radius, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
 	    
 	public:
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -93,14 +91,14 @@ namespace WarGrey::STEM {
 
     class __lambda__ RoundedSquarelet : public WarGrey::STEM::RoundedRectanglet {
     public:
-        RoundedSquarelet(float edge_size, float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {})
+        RoundedSquarelet(float edge_size, float radius, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent)
             : RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
     };
 
     class __lambda__ Ellipselet : public WarGrey::STEM::IShapelet {
     public:
-	    Ellipselet(float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
-	    Ellipselet(float aradius, float bradius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
+	    Ellipselet(float radius, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
+	    Ellipselet(float aradius, float bradius, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
 
 	public:
 	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
@@ -117,14 +115,14 @@ namespace WarGrey::STEM {
     
     class __lambda__ Circlet : public WarGrey::STEM::Ellipselet {
     public:
-	    Circlet(float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {})
+	    Circlet(float radius, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent)
             : Ellipselet(radius, radius, color, border_color) {}
     };
     
     /*********************************************************************************************/
     class __lambda__ Polygonlet : public WarGrey::STEM::IShapelet {
     public:
-	    Polygonlet(const WarGrey::STEM::polygon_vertices& vertices, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
+	    Polygonlet(const WarGrey::STEM::polygon_vertices& vertices, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
 	    virtual ~Polygonlet();
 
 	public:
@@ -159,9 +157,8 @@ namespace WarGrey::STEM {
 
     class __lambda__ RegularPolygonlet : public WarGrey::STEM::Polygonlet {
     public:
-	    RegularPolygonlet(size_t n, float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
-	    RegularPolygonlet(size_t n, float radius, float rotation, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
-	    virtual ~RegularPolygonlet() noexcept {}
+	    RegularPolygonlet(size_t n, float radius, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
+	    RegularPolygonlet(size_t n, float radius, float rotation, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
 
     public:
         float radius() { return this->_radius; }
@@ -172,7 +169,7 @@ namespace WarGrey::STEM {
 
     class __lambda__ Trianglet : public WarGrey::STEM::RegularPolygonlet {
     public:
-	    Trianglet(float side_length, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
-	    Trianglet(float side_length, float rotation, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color = {});
+	    Trianglet(float side_length, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
+	    Trianglet(float side_length, float rotation, const WarGrey::STEM::RGBA& color, const WarGrey::STEM::RGBA& border_color = transparent);
     };
 }

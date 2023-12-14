@@ -8,6 +8,7 @@
 
 #include "../../graphics/font.hpp"
 #include "../../graphics/texture.hpp"
+#include "../../graphics/color.hpp"
 #include "../../graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
@@ -21,20 +22,18 @@ namespace WarGrey::STEM {
 
     public:
         void set_text(const char* fmt, ...);
-        void set_text(uint32_t color, const char* fmt, ...);
+        void set_text(const WarGrey::STEM::RGBA& color, const char* fmt, ...);
         void set_text(WarGrey::STEM::MatterAnchor anchor, const char* fmt, ...);
         void set_text(const std::string& content, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         
     public:
         void set_font(shared_font_t font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
-        void set_text_color(uint32_t color_hex = SILVER, double alpha = 1.0);
-        uint32_t get_text_color(double* alpha = nullptr);
-        void set_background_color(uint32_t bg_hex, double alpha = 1.0);
-        uint32_t get_background_color() { return this->bg_color; }
-        double get_background_alpha() { return this->bg_alpha; }
-        void set_border_color(uint32_t border_hex, double alpha = 1.0);
-        uint32_t get_border_color() { return this->bg_color; }
-        double get_border_alpha() { return this->bg_alpha; }
+        void set_text_color(const WarGrey::STEM::RGBA& color = SILVER);
+        WarGrey::STEM::RGBA get_text_color();
+        void set_background_color(const WarGrey::STEM::RGBA& color);
+        WarGrey::STEM::RGBA get_background_color() { return this->background_color; }
+        void set_border_color(const WarGrey::STEM::RGBA& color);
+        WarGrey::STEM::RGBA get_border_color() { return this->border_color; }
         void set_corner_radius(float radius);
 
     public:
@@ -52,13 +51,11 @@ namespace WarGrey::STEM {
         void update_texture();
 
     protected:
-        SDL_Color text_color;
         shared_font_t text_font = nullptr;
         shared_texture_t texture = nullptr;
-        uint32_t bg_color;
-        double bg_alpha = 0.0;
-        uint32_t border_color;
-        double border_alpha = 0.0;
+        WarGrey::STEM::RGBA foreground_color;
+        WarGrey::STEM::RGBA background_color;
+        WarGrey::STEM::RGBA border_color;
         float corner_radius = 0.0F;
 
     private:
@@ -69,15 +66,15 @@ namespace WarGrey::STEM {
     public:
         Labellet(const char* fmt, ...);
         Labellet(shared_font_t font, const char* fmt, ...);
-        Labellet(uint32_t color_hex, const char* fmt, ...);
-        Labellet(uint32_t color_hex, double alpha, const char* fmt, ...);
-        Labellet(shared_font_t font, uint32_t color_hex, const char* fmt, ...);
-        Labellet(shared_font_t font, uint32_t color_hex, double alpha, const char* fmt, ...);
+        Labellet(uint32_t hex, const char* fmt, ...);
+        Labellet(const WarGrey::STEM::RGBA& rgb, const char* fmt, ...);
+        Labellet(shared_font_t font, uint32_t hex, const char* fmt, ...);
+        Labellet(shared_font_t font, const WarGrey::STEM::RGBA& rgb, const char* fmt, ...);
     };
 
     /*********************************************************************************************/
     __lambda__ Labellet* make_label_for_tooltip(shared_font_t font,
-        uint32_t bg_color = SNOW,
-        uint32_t border_color = GOLD,
-        uint32_t fg_color = BLACK);
+        const WarGrey::STEM::RGBA& background_color = SNOW,
+        const WarGrey::STEM::RGBA& border_color = GOLD,
+        const WarGrey::STEM::RGBA& foreground_color = BLACK);
 }

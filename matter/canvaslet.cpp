@@ -32,8 +32,8 @@ void WarGrey::STEM::ICanvaslet::draw(SDL_Renderer* renderer, float flx, float fl
             
             SDL_SetRenderTarget(renderer, this->canvas->self());
 
-            if ((this->canvas_background_alpha >= 0.0) && (this->canvas_background_alpha <= 1.0)) {
-                Brush::clear(renderer, this->canvas_background_color, this->canvas_background_alpha);
+            if (!this->canvas_background_color.is_transparent()) {
+                Brush::clear(renderer, this->canvas_background_color);
             }
 
             this->draw_on_canvas(renderer, flwidth, flheight);
@@ -60,14 +60,9 @@ void WarGrey::STEM::ICanvaslet::invalidate_canvas() {
     this->on_canvas_invalidated();
 }
 
-void WarGrey::STEM::ICanvaslet::dirty_canvas() {
-    this->dirty_canvas(this->canvas_background_color, this->canvas_background_alpha);
-}
-
-void WarGrey::STEM::ICanvaslet::dirty_canvas(uint32_t color, double alpha) {
-    if ((this->canvas_background_color != color) || (this->canvas_background_alpha != alpha)) {
+void WarGrey::STEM::ICanvaslet::dirty_canvas(const RGBA& color) {
+    if (this->canvas_background_color != color) {
         this->canvas_background_color = color;
-        this->canvas_background_alpha = alpha;
         this->dirty_canvas();
     }
 
@@ -78,6 +73,18 @@ void WarGrey::STEM::ICanvaslet::dirty_canvas(uint32_t color, double alpha) {
 }
 
 /*************************************************************************************************/
+bool WarGrey::STEM::ICanvaslet::brush_okay(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
+    this->brush_color.unbox(r, g, b, a);
+
+    return !this->brush_color.is_transparent();
+}
+
+bool WarGrey::STEM::ICanvaslet::pen_okay(uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
+    this->pen_color.unbox(r, g, b, a);
+    
+    return !this->pen_color.is_transparent();
+}
+
 void WarGrey::STEM::ICanvaslet::set_color_mixture(ColorMixture mixture) {
     if (this->mixture != mixture) {
         this->mixture = mixture;
@@ -86,86 +93,36 @@ void WarGrey::STEM::ICanvaslet::set_color_mixture(ColorMixture mixture) {
 }
 
 void WarGrey::STEM::ICanvaslet::set_canvas_alpha(double alpha) {
-    if (this->canvas_background_alpha != alpha) {
-        this->fill_alpha = alpha;
+    if (this->canvas_background_color.alpha() != alpha) {
+        this->canvas_background_color = RGBA(this->canvas_background_color, alpha);
         this->dirty_canvas();
     }
 }
 
-double WarGrey::STEM::ICanvaslet::get_canvas_alpha(uint8_t* a) {
-    SET_BOX(a, color_component_clamp_to_byte(this->canvas_background_alpha));
-
-    return this->canvas_background_alpha;
-}
-
-void WarGrey::STEM::ICanvaslet::set_pen_color(uint32_t color, double alpha) {
-    if ((this->pen_color != color) || (this->pen_alpha != alpha)) {
-        this->pen_color = color;
-        this->pen_alpha = alpha;
+void WarGrey::STEM::ICanvaslet::set_pen_color(const RGBA& c) {
+    if (this->pen_color != c) {
+        this->pen_color = c;
         this->dirty_canvas();
     }
 }
 
-void WarGrey::STEM::ICanvaslet::set_pen_color_hsv(double hue, double saturation, double value) {
-    this->set_pen_color(Hexadecimal_From_HSV(hue, saturation, value));
-}
-
-void WarGrey::STEM::ICanvaslet::set_pen_color_hsl(double hue, double saturation, double lightness) {
-    this->set_pen_color(Hexadecimal_From_HSL(hue, saturation, lightness));
-}
-
-void WarGrey::STEM::ICanvaslet::set_pen_color_hsi(double hue, double saturation, double intensity) {
-    this->set_pen_color(Hexadecimal_From_HSI(hue, saturation, intensity));
-}
-
-double WarGrey::STEM::ICanvaslet::get_pen_hue() {
-    double hue = flnan;
-
-    if (this->pen_color >= 0) {
-        hue = HSB_Hue_From_Hexadecimal(static_cast<uint32_t>(this->pen_color));
-    }
-
-    return hue;
-}
-
-double WarGrey::STEM::ICanvaslet::get_pen_alpha(uint8_t* a) {
-    SET_BOX(a, color_component_clamp_to_byte(this->pen_alpha));
-
-    return this->pen_alpha;
-}
-
-void WarGrey::STEM::ICanvaslet::set_fill_color(uint32_t color, double alpha) {
-    if ((this->fill_color != color) || (this->fill_alpha != alpha)) {
-        this->fill_color = color;
-        this->fill_alpha = alpha;
+void WarGrey::STEM::ICanvaslet::set_pen_alpha(double alpha) {
+    if (this->pen_color.alpha() != alpha) {
+        this->pen_color = RGBA(this->pen_color, alpha);
         this->dirty_canvas();
     }
 }
 
-void WarGrey::STEM::ICanvaslet::set_fill_color_hsv(double hue, double saturation, double value) {
-    this->set_fill_color(Hexadecimal_From_HSV(hue, saturation, value));
-}
-
-void WarGrey::STEM::ICanvaslet::set_fill_color_hsl(double hue, double saturation, double lightness) {
-    this->set_fill_color(Hexadecimal_From_HSL(hue, saturation, lightness));
-}
-
-void WarGrey::STEM::ICanvaslet::set_fill_color_hsi(double hue, double saturation, double intensity) {
-    this->set_fill_color(Hexadecimal_From_HSI(hue, saturation, intensity));
-}
-
-double WarGrey::STEM::ICanvaslet::get_fill_hue() {
-    double hue = flnan;
-
-    if (this->fill_color >= 0) {
-        hue = HSB_Hue_From_Hexadecimal(static_cast<uint32_t>(this->fill_color));
+void WarGrey::STEM::ICanvaslet::set_brush_color(const RGBA& c) {
+    if (this->brush_color != c) {
+        this->brush_color = c;
+        this->dirty_canvas();
     }
-
-    return hue;
 }
 
-double WarGrey::STEM::ICanvaslet::get_fill_alpha(uint8_t* a) {
-    SET_BOX(a, color_component_clamp_to_byte(this->fill_alpha));
-
-    return this->fill_alpha;
+void WarGrey::STEM::ICanvaslet::set_brush_alpha(double alpha) {
+    if (this->brush_color.alpha() != alpha) {
+        this->brush_color = RGBA(this->brush_color, alpha);
+        this->dirty_canvas();
+    }
 }

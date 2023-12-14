@@ -49,7 +49,7 @@ void WarGrey::STEM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flw
         }
 
         if (this->pen_okay()) {
-            Brush::draw_lines(renderer, dots.data(), int(n), this->get_pen_color(), this->get_pen_alpha());
+            Brush::draw_lines(renderer, dots.data(), int(n), this->get_pen_color());
         }
     }
 }

@@ -3,6 +3,8 @@
 #include <SDL2/SDL.h>
 #include <string>
 
+#include "../forward.hpp"
+
 /**************************************************************************************************/
 namespace WarGrey::STEM {
     class __lambda__ IDisplay {
@@ -17,7 +19,7 @@ namespace WarGrey::STEM {
         virtual void refresh() = 0;
 
     public:
-        virtual void log_message(int fgc, const std::string& message) = 0;
+        virtual void log_message(WarGrey::STEM::Log level, const std::string& message) = 0;
         virtual void start_input_text(const std::string& prompt) = 0;
         virtual SDL_Surface* snapshot() = 0;
         virtual SDL_Renderer* master_renderer() = 0;
@@ -33,11 +35,6 @@ namespace WarGrey::STEM {
         bool save_snapshot(const std::string& path);
         bool save_snapshot(const char* path);
 
-    public:
-        void log_message(int fgc, const char* fmt, ...);
-        void log_message(const char* fmt, ...);
-        void log_message(const std::string& message);
-    
     private:
         int update_sequence_depth = 0;
         bool update_is_needed = false;

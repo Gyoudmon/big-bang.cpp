@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../matter.hpp"
+#include "../graphics/color.hpp"
 #include "../graphics/image.hpp"
 
 #include <vector>
@@ -64,19 +65,11 @@ namespace WarGrey::STEM {
         void say(IMatter* message, double sec) { this->say(message, sec, SpeechBubble::Default); }
         void think(IMatter* message, double sec) { this->say(message, sec, SpeechBubble::Thought); }
         
-        void say(const char* sentence, uint32_t color = BLACK);
-        void say(const std::string& sentence, uint32_t color = BLACK);
-        void say(uint32_t color, const char* fmt, ...);
-        void say(double sec, const char* sentence, uint32_t color = BLACK);
-        void say(double sec, const std::string& sentence, uint32_t color = BLACK);
-        void say(double sec, uint32_t color, const char* fmt, ...);
-        void think(const char* sentence, uint32_t color = DIMGRAY);
-        void think(const std::string& sentence, uint32_t color = DIMGRAY);
-        void think(uint32_t color, const char* fmt, ...);
-        void think(double sec, const char* sentence, uint32_t color = DIMGRAY);
-        void think(double sec, const std::string& sentence, uint32_t color = DIMGRAY);
-        void think(double sec, uint32_t color, const char* fmt, ...);
-
+        void say(const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
+        void say(double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
+        void think(const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
+        void think(double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
+        
     public:
         virtual void play_speaking(int repeat = 1) {}
         virtual void play_thinking(int repeat = 1) {}

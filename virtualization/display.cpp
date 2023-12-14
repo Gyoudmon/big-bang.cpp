@@ -41,18 +41,3 @@ void WarGrey::STEM::IDisplay::end_update_sequence() {
         }
     }
 }
-
-/*************************************************************************************************/
-void WarGrey::STEM::IDisplay::log_message(const char* fmt, ...) {
-    VSNPRINT(text, fmt);
-    this->log_message(text);
-}
-
-void WarGrey::STEM::IDisplay::log_message(const std::string& msg) {
-    this->log_message(-1, msg);
-}
-
-void WarGrey::STEM::IDisplay::log_message(int fgc, const char* fmt, ...) {
-    VSNPRINT(text, fmt);
-    this->log_message(fgc, text);
-}

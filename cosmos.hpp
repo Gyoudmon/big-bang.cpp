@@ -7,7 +7,7 @@
 namespace WarGrey::STEM {
     class __lambda__ Cosmos : public WarGrey::STEM::IUniverse {
     public:
-        Cosmos(uint32_t fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
+        Cosmos(uint32_t fps = 60, const WarGrey::STEM::RGBA& fgc = 0x000000U, const WarGrey::STEM::RGBA& bgc = 0xFFFFFFU);
         virtual ~Cosmos();
 
     public:

@@ -4,7 +4,7 @@
 
 #include "graphics/brush.hpp"
 #include "graphics/ruler.hpp"
-#include "graphics/colorspace.hpp"
+#include "graphics/color.hpp"
 
 #include "matter/sprite.hpp"
 #include "matter/graphlet/textlet.hpp"
@@ -75,7 +75,7 @@ namespace WarGrey::STEM {
         double direction;
         double theta;
         uint8_t pen_width;
-        PenColor color;
+        PenColor color;         // TODO: why cannot use the `RGBA` directly
         GlidingMotion motion;
     };
 
@@ -118,8 +118,7 @@ namespace WarGrey::STEM {
         bool is_drawing = false;
         float draw_fx = 0.5F;
         float draw_fy = 0.5F;
-        uint32_t draw_color = 0x0U;
-        double draw_alpha = 1.0;
+        RGBA draw_color = 0x0U;
         uint8_t draw_width = 1U;
 
         // gliding progressbar
@@ -211,22 +210,18 @@ static uint32_t local_timeline_elapse(uint32_t global_interval, uint32_t local_f
 static inline void unsafe_canvas_info_reset(MatterInfo* info) {
     info->is_drawing = false;
     info->draw_color = 0x0U;
-    info->draw_alpha = 1.0;
     info->draw_width = 1U;
 }
 
 static inline void unsafe_canvas_sync_settings(MatterInfo* info) {
     info->canvas->set_drawing(info->is_drawing);
     info->canvas->set_pen_width(info->draw_width);
-    info->canvas->set_pen_color(info->draw_color, info->draw_alpha);
+    info->canvas->set_pen_color(info->draw_color);
 }
 
 static void unsafe_canvas_info_do_setting(IPlane* self, IMatter* m, MatterInfo* info, const MotionAction& op) {
     switch (op.type) {
-    case MotionActionType::PenColor: {
-        info->draw_color = op.body.color.hex;
-        info->draw_alpha = op.body.color.alpha;
-    }; break;
+    case MotionActionType::PenColor: info->draw_color = RGBA(op.body.color.hex, op.body.color.alpha); break;
     case MotionActionType::TrackDrawing: info->is_drawing = op.body.drawing; break;
     case MotionActionType::PenWidth: info->draw_width = op.body.pen_width; break;
     case MotionActionType::TrackReset: unsafe_canvas_info_reset(info); break;
@@ -1440,14 +1435,16 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     float dsWidth = X + Width;
     float dsHeight = Y + Height;
     
-    if (this->bg_alpha > 0.0F) {
-        Brush::fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background, this->bg_alpha);
+    if (this->background.is_opacity()) {
+        Brush::fill_rect(renderer, dsX, dsY, dsWidth, dsHeight, this->background);
     }
 
-    if ((this->grid_alpha > 0.0F)
+    if (this->grid_color.is_opacity()
             && (this->column > 0) && (this->row > 0)
             && (this->cell_width > 0.0F) && (this->cell_height > 0.0F)) {
-        RGB_SetRenderDrawColor(renderer, this->grid_color, this->grid_alpha);
+        SDL_SetRenderDrawColor(renderer,
+                                this->grid_color.R(), this->grid_color.G(), this->grid_color.B(),
+                                this->grid_color.A());
         Brush::draw_grid(renderer, this->row, this->column,
                             this->cell_width, this->cell_height,
                             this->grid_x, this->grid_y);
@@ -1563,8 +1560,8 @@ void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, M
 
             SDL_RenderSetClipRect(renderer, nullptr);
 
-            Brush::fill_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_color, this->bubble_alpha);
-            Brush::draw_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_border, this->bubble_alpha);
+            Brush::fill_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_color);
+            Brush::draw_rounded_rect(renderer, bx, by, bwidth, bheight, -0.25F, this->bubble_border);
 
             SDL_RenderSetClipRect(renderer, &clip);
             
@@ -1957,14 +1954,15 @@ void WarGrey::STEM::Plane::set_pen_width(IMatter* m, uint8_t width) {
     }
 }
 
-void WarGrey::STEM::Plane::set_pen_color(IMatter* m, uint32_t hex, double alpha) {
+void WarGrey::STEM::Plane::set_pen_color(IMatter* m, const RGBA& color) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (info->master != nullptr)) {
         MotionAction action;
 
         action.type = MotionActionType::PenColor;
-        action.body.color = { hex, alpha };
+        action.body.color.hex = color.rgb();
+        action.body.color.alpha = color.alpha();
         unsafe_do_canvas_setting(this, m, info, action);
     }
 }
@@ -1993,16 +1991,23 @@ void WarGrey::STEM::Plane::turn(IMatter* m, double theta, bool is_radian) {
     }
 }
 
-void WarGrey::STEM::Plane::set_pen_color(IMatter* m, double hue, double saturation, double brightness, double alpha) {
-    this->set_pen_color(m, Hexadecimal_From_HSV(hue, saturation, brightness), alpha);
-}
-
 /*************************************************************************************************/
-void WarGrey::STEM::Plane::log_message(int fgc, const std::string& msg) {
+void WarGrey::STEM::Plane::log_message(Log level, const std::string& msg) {
     if (this->sentry != nullptr) {
-        this->sentry->say(2.0, msg, uint32_t(fgc));
+        RGBA color;
+
+        switch (level) {
+        case Log::Info: color = GREEN; break;
+        case Log::Warning: color = YELLOW; break;
+        case Log::Error: color = RED; break;
+        case Log::Fatal: color = CRIMSON; break;
+        case Log::Debug: color = SILVER; break;
+        default: color = transparent;
+        }
+
+        this->sentry->say(2.0, msg, color);
     } else {
-        IPlane::log_message(fgc, msg);
+        IPlane::log_message(level, msg);
     }
 }
 
@@ -2040,16 +2045,16 @@ void WarGrey::STEM::Plane::say(ISprite* m, double sec, IMatter* message, SpeechB
     }
 }
 
-void WarGrey::STEM::Plane::say(ISprite* m, double sec, const std::string& message, uint32_t color, SpeechBubble type) {
+void WarGrey::STEM::Plane::say(ISprite* m, double sec, const std::string& message, const RGBA& color, SpeechBubble type) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
         if (message.empty()) {
             this->shh(m);
-        } else if (this->merge_bubble_text(info->bubble, message, color, 1.0)) {
+        } else if (this->merge_bubble_text(info->bubble, message, color)) {
             bubble_start(m, info, sec, type, this->bubble_second);
         } else {
-            this->say(m, sec, this->make_bubble_text(message, color, 1.0), type);
+            this->say(m, sec, this->make_bubble_text(message, color), type);
         }
     }
 }
@@ -2064,11 +2069,11 @@ void WarGrey::STEM::Plane::shh(ISprite* m) {
     }
 }
 
-IMatter* WarGrey::STEM::Plane::make_bubble_text(const std::string& message, uint32_t color, double alpha) {
-    return new Labellet(this->bubble_font, color, alpha, "%s", message.c_str());
+IMatter* WarGrey::STEM::Plane::make_bubble_text(const std::string& message, const RGBA& color) {
+    return new Labellet(this->bubble_font, color, "%s", message.c_str());
 }
 
-bool WarGrey::STEM::Plane::merge_bubble_text(IMatter* bubble, const std::string& message, uint32_t color, double alpha) {
+bool WarGrey::STEM::Plane::merge_bubble_text(IMatter* bubble, const std::string& message, const RGBA& color) {
     auto bmsg = dynamic_cast<ITextlet*>(bubble);
     bool okay = (bmsg != nullptr);
 
@@ -2113,10 +2118,9 @@ void WarGrey::STEM::Plane::set_bubble_margin(float top, float right, float botto
     this->bubble_left_margin = left;
 }
 
-void WarGrey::STEM::Plane::set_bubble_color(uint32_t border, uint32_t background, double alpha) {
+void WarGrey::STEM::Plane::set_bubble_color(const RGBA& border, const RGBA& background) {
     this->bubble_border = border;
     this->bubble_color = background;
-    this->bubble_alpha = alpha;
 }
 
 void WarGrey::STEM::Plane::delete_matter(IMatter* m) {
@@ -2167,16 +2171,6 @@ void WarGrey::STEM::IPlane::on_enter(IPlane* from) {
     this->on_mission_start(width, height);
 }
 
-void WarGrey::STEM::IPlane::set_background(double hue, double saturation, double brightness, double alpha) {
-    this->set_background(Hexadecimal_From_HSV(hue, saturation, brightness), alpha);
-}
-
-uint32_t WarGrey::STEM::IPlane::get_background(double* alpha) {
-    SET_BOX(alpha, this->bg_alpha);
-    
-    return this->background;
-}
-
 void WarGrey::STEM::IPlane::start_input_text(const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(prompt, fmt);
@@ -2190,23 +2184,9 @@ void WarGrey::STEM::IPlane::start_input_text(const std::string& prompt) {
     }
 }
 
-void WarGrey::STEM::IPlane::log_message(const char* fmt, ...) {
+void WarGrey::STEM::IPlane::log_message(Log level, const std::string& msg) {
     if (this->info != nullptr) {
-        VSNPRINT(msg, fmt);
-        this->log_message(-1, msg);
-    }
-}
-
-void WarGrey::STEM::IPlane::log_message(int fgc, const char* fmt, ...) {
-    if (this->info != nullptr) {
-        VSNPRINT(msg, fmt);
-        this->log_message(fgc, msg);
-    }
-}
-
-void WarGrey::STEM::IPlane::log_message(int fgc, const std::string& msg) {
-    if (this->info != nullptr) {
-        this->info->master->log_message(fgc, msg);
+        this->info->master->log_message(level, msg);
     }
 }
 
@@ -2644,15 +2624,7 @@ bool WarGrey::STEM::IPlane::is_thinking(ISprite* m) {
     return showing && (type == SpeechBubble::Thought);
 }
 
-void WarGrey::STEM::IPlane::say(ISprite* m, const char* sentence, uint32_t color) {
-    if (sentence == nullptr) {
-        this->shh(m);
-    } else {
-        this->say(m, std::string(sentence), color);
-    }
-}
-
-void WarGrey::STEM::IPlane::say(ISprite* m, const std::string& sentence, uint32_t color) {
+void WarGrey::STEM::IPlane::say(ISprite* m, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {
@@ -2660,20 +2632,7 @@ void WarGrey::STEM::IPlane::say(ISprite* m, const std::string& sentence, uint32_
     }
 }
 
-void WarGrey::STEM::IPlane::say(ISprite* m, uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->say(m, sentence, color);
-}
-
-void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const char* sentence, uint32_t color) {
-    if (sentence == nullptr) {
-        this->shh(m);
-    } else {
-        this->say(m, sec, std::string(sentence), color);
-    }
-}
-
-void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const std::string& sentence, uint32_t color) {
+void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {
@@ -2681,20 +2640,7 @@ void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const std::string& sente
     }
 }
 
-void WarGrey::STEM::IPlane::say(ISprite* m, double sec, uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->say(m, sec, sentence, color);
-}
-
-void WarGrey::STEM::IPlane::think(ISprite* m, const char* sentence, uint32_t color) {
-    if (sentence == nullptr) {
-        this->shh(m);
-    } else {
-        this->think(m, std::string(sentence), color);
-    }
-}
-
-void WarGrey::STEM::IPlane::think(ISprite* m, const std::string& sentence, uint32_t color) {
+void WarGrey::STEM::IPlane::think(ISprite* m, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {
@@ -2702,28 +2648,10 @@ void WarGrey::STEM::IPlane::think(ISprite* m, const std::string& sentence, uint3
     }
 }
 
-void WarGrey::STEM::IPlane::think(ISprite* m, uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->think(m, sentence, color);
-}
-
-void WarGrey::STEM::IPlane::think(ISprite* m, double sec, const char* sentence, uint32_t color) {
-    if (sentence == nullptr) {
-        this->shh(m);
-    } else {
-        this->think(m, sec, std::string(sentence), color);
-    }
-}
-
-void WarGrey::STEM::IPlane::think(ISprite* m, double sec, const std::string& sentence, uint32_t color) {
+void WarGrey::STEM::IPlane::think(ISprite* m, double sec, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {
         this->say(m, sec, sentence, color, SpeechBubble::Thought);
     }
-}
-
-void WarGrey::STEM::IPlane::think(ISprite* m, double sec, uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->think(m, sec, sentence, color);
 }

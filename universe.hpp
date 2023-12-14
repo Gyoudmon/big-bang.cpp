@@ -6,13 +6,14 @@
 #include <fstream>
 
 #include "graphics/font.hpp"
+#include "graphics/color.hpp"
 #include "virtualization/display.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ IUniverse : public WarGrey::STEM::IDisplay {
     public:
         /* 构造函数，用以设置帧频, 窗口标题, 前景背景色, 和混色模式 */
-        IUniverse(uint32_t fps, uint32_t fgc, uint32_t bgc);
+        IUniverse(uint32_t fps, const WarGrey::STEM::RGBA& fgc, const WarGrey::STEM::RGBA& bgc);
         
         /* 析构函数，销毁旧对象时自动调用，默认销毁游戏宇宙 */
         virtual ~IUniverse();
@@ -52,8 +53,8 @@ namespace WarGrey::STEM {
         void set_window_fullscreen(bool yes);
         const char* get_renderer_name();
         uint32_t frame_rate() override { return this->_fps; }
-        uint32_t get_background_color() { return this->_bgc; }
-        uint32_t get_foreground_color() { return this->_fgc; }
+        WarGrey::STEM::RGBA get_background_color() { return this->_bgc; }
+        WarGrey::STEM::RGBA get_foreground_color() { return this->_fgc; }
 
     public: // 窗体相关方法
         void refresh() override;
@@ -67,8 +68,7 @@ namespace WarGrey::STEM {
         void start_input_text(const std::string& prompt) override;
         void stop_input_text();
         
-        using WarGrey::STEM::IDisplay::log_message;
-        void log_message(int fgc, const std::string& message) override;
+        void log_message(WarGrey::STEM::Log level, const std::string& message) override;
 
     protected: // 常规事件处理和分派函数
         virtual void on_click(int x, int y) {}                                               // 处理单击事件
@@ -125,8 +125,8 @@ namespace WarGrey::STEM {
         void popback_input_text();
 
     private:
-        uint32_t _fgc;                          // 窗体前景色
-        uint32_t _bgc;                          // 窗体背景色
+        WarGrey::STEM::RGBA _fgc;               // 窗体前景色
+        WarGrey::STEM::RGBA _bgc;               // 窗体背景色
         int window_width;                       // 窗体宽度
         int window_height;                      // 窗体高度
         SDL_Window* window = nullptr;           // 窗体对象
@@ -143,11 +143,11 @@ namespace WarGrey::STEM {
         std::string usrin;                      // 用户输入
         bool in_editing = false;                // 是否在输入期间
         SDL_Rect echo;                          // 输入回显区域
-        uint32_t _ifgc;                         // 回显区前景色
-        uint32_t _ibgc;                         // 回显区背景色
+        WarGrey::STEM::RGBA _ifgc;              // 回显区前景色
+        WarGrey::STEM::RGBA _ibgc;              // 回显区背景色
         shared_font_t echo_font;                // 回显字体
         std::string message;                    // 回显区消息
-        uint32_t _mfgc;                         // 消息颜色
+        WarGrey::STEM::RGBA _mfgc;              // 消息颜色
         bool needs_termio_if_no_echo;           // 消息是否需要输出
 
     private:
@@ -161,7 +161,7 @@ namespace WarGrey::STEM {
         Universe();
 
         /* 更有用一些的构造函数，创建新对象时根据参数自动选择 */
-        Universe(const char* title, uint32_t fps = 60, uint32_t fgc = 0x000000U, uint32_t bgc = 0xFFFFFFU);
+        Universe(const char* title, uint32_t fps = 60, const WarGrey::STEM::RGBA& fgc = 0x000000U, const WarGrey::STEM::RGBA& bgc = 0xFFFFFFU);
     
     public:
         /* 创建游戏世界，充当程序真正的 main 函数，默认什么都不做 */

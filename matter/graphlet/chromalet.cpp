@@ -233,7 +233,7 @@ static const double wavelength_zbars [] = {
 
 /*************************************************************************************************/
 WarGrey::STEM::Chromalet::Chromalet(float width, float height, CIE_Standard std, double Y)
-        : width(width), height(height), standard(std), luminance(Y), pseudo_primary_triangle_color(GRAY) {
+        : width(width), height(height), standard(std), pseudo_primary_triangle_color(GRAY), luminance(Y) {
     if (this->height == 0.0) {
         this->height = flabs(this->width);
     }
@@ -268,7 +268,7 @@ void WarGrey::STEM::Chromalet::draw_on_canvas(SDL_Renderer* renderer, float flwi
 }
 
 void WarGrey::STEM::Chromalet::draw_after_canvas(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
-    if (this->pseudo_primary_triangle_alpha > 0) {
+    if (this->pseudo_primary_triangle_color.is_opacity()) {
         this->draw_color_triangle(renderer, flx, fly);
     }
 }
@@ -413,7 +413,9 @@ void WarGrey::STEM::Chromalet::draw_color_triangle(SDL_Renderer* renderer, doubl
     }
 
     pts[vcount - 1] = pts[0];
-    RGB_SetRenderDrawColor(renderer, this->pseudo_primary_triangle_color, this->pseudo_primary_triangle_alpha);
+    SDL_SetRenderDrawColor(renderer,
+            this->pseudo_primary_triangle_color.R(), this->pseudo_primary_triangle_color.G(), this->pseudo_primary_triangle_color.B(),
+            this->pseudo_primary_triangle_color.A());
     SDL_RenderDrawLinesF(renderer, pts, vcount);
 
     for (int idx = 0; idx < PseudoPrimaryColorCount; idx ++) {
@@ -618,35 +620,30 @@ void WarGrey::STEM::Chromalet::set_standard(CIE_Standard std) {
     }    
 }
 
-void WarGrey::STEM::Chromalet::set_pseudo_primary_color(uint32_t hex, size_t idx) {
+void WarGrey::STEM::Chromalet::set_pseudo_primary_color(uint32_t color, size_t idx) {
     idx %= PseudoPrimaryColorCount;
 
-    if (this->pseudo_primaries[idx] != hex) {
-        if (hex == 0) {
+    if (this->pseudo_primaries[idx] != color) {
+        if (color == 0) {
             this->recalculate_primary_colors(int(idx));
         } else {
-            this->pseudo_primaries[idx] = hex;
+            this->pseudo_primaries[idx] = color;
         }
 
         this->notify_updated();
     }
 }
 
-void WarGrey::STEM::Chromalet::set_pseudo_primary_triangle_color(uint32_t color, double alpha) {
-    unsigned char a = color_component_clamp_to_byte(alpha);
-
-    if ((this->pseudo_primary_triangle_color != color) || (this->pseudo_primary_triangle_alpha != a)) {
+void WarGrey::STEM::Chromalet::set_pseudo_primary_triangle_color(const RGBA& color) {
+    if (this->pseudo_primary_triangle_color != color) {
         this->pseudo_primary_triangle_color = color;
-        this->pseudo_primary_triangle_alpha = a;
         this->notify_updated();
-    }    
+    }
 }
 
 void WarGrey::STEM::Chromalet::set_pseudo_primary_triangle_alpha(double alpha) {
-    unsigned char a = color_component_clamp_to_byte(alpha);
-
-    if (this->pseudo_primary_triangle_alpha != a) {
-        this->pseudo_primary_triangle_alpha = a;
+    if (this->pseudo_primary_triangle_color.alpha() != alpha) {
+        this->pseudo_primary_triangle_color = RGBA(this->pseudo_primary_triangle_color, alpha);
         this->notify_updated();
     }
 }

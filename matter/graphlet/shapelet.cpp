@@ -15,18 +15,9 @@ using namespace WarGrey::STEM;
 // WARNING: SDL_Surface needs special proceeding as it might cause weird distorted shapes
 
 /*************************************************************************************************/
-WarGrey::STEM::IShapelet::IShapelet(const std::optional<uint32_t>& color, const std::optional<uint32_t>& bcolor) {
-    if (color.has_value()) {
-        this->set_fill_color(color.value(), 1.0);
-    } else {
-        this->set_fill_color(0U, 0.0);
-    }
-
-    if (bcolor.has_value()) {
-        this->set_pen_color(bcolor.value(), 1.0);
-    } else {
-        this->set_pen_color(0U, 0.0);
-    }
+WarGrey::STEM::IShapelet::IShapelet(const RGBA& color, const RGBA& bcolor) {
+    this->set_brush_color(color);
+    this->set_pen_color(bcolor);
 }
 
 void WarGrey::STEM::IShapelet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
@@ -34,21 +25,17 @@ void WarGrey::STEM::IShapelet::draw_on_canvas(SDL_Renderer* renderer, float flwi
     int height = fl2fxi(flheight);
     uint8_t r, g, b, a;
 
-    if (this->fill_okay()) {
-        RGB_From_Hexadecimal(this->get_fill_color(), &r, &g, &b);
-        this->get_fill_alpha(&a);
+    if (this->brush_okay(&r, &g, &b, &a)) {
         this->fill_shape(renderer, width, height, r, g, b, a);
     }
 
-    if (this->pen_okay()) {
-        RGB_From_Hexadecimal(this->get_pen_color(), &r, &g, &b);
-        this->get_pen_alpha(&a);
+    if (this->pen_okay(&r, &g, &b, &a)) {
         this->draw_shape(renderer, width, height, r, g, b, a);
     }
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Linelet::Linelet(float ex, float ey, const std::optional<uint32_t>& color) : IShapelet(color, {}), epx(ex), epy(ey) {}
+WarGrey::STEM::Linelet::Linelet(float ex, float ey, const RGBA& color) : IShapelet(color), epx(ex), epy(ey) {}
 
 void WarGrey::STEM::Linelet::on_resize(float w, float h, float width, float height) { 
     IShapelet::on_resize(w, h, width, height);
@@ -80,10 +67,10 @@ void WarGrey::STEM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int h
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::Rectanglet::Rectanglet(float edge_size, const RGBA& color, const RGBA& border_color)
 	: Rectanglet(edge_size, edge_size, color, border_color) {}
 
-WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::Rectanglet::Rectanglet(float width, float height, const RGBA& color, const RGBA& border_color)
 	: IShapelet(color, border_color), width(width), height(height) {}
 
 void WarGrey::STEM::Rectanglet::on_resize(float w, float h, float width, float height) {
@@ -106,10 +93,10 @@ void WarGrey::STEM::Rectanglet::fill_shape(SDL_Renderer* renderer, int width, in
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float edge_size, float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float edge_size, float radius, const RGBA& color, const RGBA& border_color)
 	: RoundedRectanglet(edge_size, edge_size, radius, color, border_color) {}
 
-WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::RoundedRectanglet::RoundedRectanglet(float width, float height, float radius, const RGBA& color, const RGBA& border_color)
 	: IShapelet(color, border_color), width(width), height(height), radius(radius) {}
 
 void WarGrey::STEM::RoundedRectanglet::on_resize(float w, float h, float width, float height) {
@@ -144,10 +131,10 @@ void WarGrey::STEM::RoundedRectanglet::fill_shape(SDL_Renderer* renderer, int wi
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Ellipselet::Ellipselet(float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::Ellipselet::Ellipselet(float radius, const RGBA& color, const RGBA& border_color)
 	: Ellipselet(radius, radius, color, border_color) {}
 
-WarGrey::STEM::Ellipselet::Ellipselet(float a, float b, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::Ellipselet::Ellipselet(float a, float b, const RGBA& color, const RGBA& border_color)
 	: IShapelet(color, border_color), aradius(a), bradius(b) {}
 
 void WarGrey::STEM::Ellipselet::on_resize(float w, float h, float width, float height) {
@@ -190,7 +177,7 @@ void WarGrey::STEM::Ellipselet::fill_shape(SDL_Renderer* renderer, int width, in
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Polygonlet::Polygonlet(const polygon_vertices& vertices, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::Polygonlet::Polygonlet(const polygon_vertices& vertices, const RGBA& color, const RGBA& border_color)
     : IShapelet(color, border_color) {
     this->n = vertices.size();
 
@@ -276,14 +263,14 @@ void WarGrey::STEM::Polygonlet::fill_shape(SDL_Renderer* renderer, int width, in
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, const RGBA& color, const RGBA& border_color)
 	: RegularPolygonlet(n, radius, 0.0F, color, border_color) {}
 
-WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, float rotation, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::RegularPolygonlet::RegularPolygonlet(size_t n, float radius, float rotation, const RGBA& color, const RGBA& border_color)
 	: Polygonlet(regular_polygon_vertices(n, radius, rotation), color, border_color), _radius(radius) {}
 
-WarGrey::STEM::Trianglet::Trianglet(float side_length, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::Trianglet::Trianglet(float side_length, const RGBA& color, const RGBA& border_color)
 	: Trianglet(side_length, 0.0F, color, border_color) {}
 
-WarGrey::STEM::Trianglet::Trianglet(float side_length, float rotation, const std::optional<uint32_t>& color, const std::optional<uint32_t>& border_color)
+WarGrey::STEM::Trianglet::Trianglet(float side_length, float rotation, const RGBA& color, const RGBA& border_color)
 	: RegularPolygonlet(3, side_length / (2.0F * flsin(pi_f / 3.0F)), rotation, color, border_color) {}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../matter.hpp"
+#include "../graphics/color.hpp"
 #include "../virtualization/screen.hpp"
 #include "../forward.hpp"
 
@@ -9,8 +10,8 @@ namespace WarGrey::STEM {
 	public:
 		virtual ~Continent() noexcept;
 		
-		Continent(WarGrey::STEM::IPlane* planet, uint32_t background = 0U, double alpha = 0.0);
-		Continent(WarGrey::STEM::IPlane* planet, float width, float height = 0.0F, uint32_t background = 0U, double alpha = 0.0);
+		Continent(WarGrey::STEM::IPlane* planet, const WarGrey::STEM::RGBA& background = transparent);
+		Continent(WarGrey::STEM::IPlane* planet, float width, float height = 0.0F, const WarGrey::STEM::RGBA& background = transparent);
 
 		const char* name() override;
 
@@ -21,8 +22,8 @@ namespace WarGrey::STEM {
 		void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
 	public:
-		void set_background_color(uint32_t color, double alpha = 1.0);
-		void set_border_color(uint32_t color, double alpha = 1.0);
+		void set_background_color(const WarGrey::STEM::RGBA& color);
+		void set_border_color(const WarGrey::STEM::RGBA& color);
 
     public: // low-level events
         bool on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) override;
@@ -37,10 +38,8 @@ namespace WarGrey::STEM {
 
 	private:
 		WarGrey::STEM::IScreen* screen;
-		uint32_t background;
-		double bg_alpha;
-		uint32_t border_color;
-		double bd_alpha;
+		WarGrey::STEM::RGBA background;
+		WarGrey::STEM::RGBA border;
 		float width;
 		float height;
 	};

@@ -95,11 +95,11 @@ void WarGrey::STEM::Pasteboard::notify_updated() {
 	}
 }
 
-void WarGrey::STEM::Pasteboard::log_message(int fgc, const std::string& message) {
+void WarGrey::STEM::Pasteboard::log_message(Log level, const std::string& message) {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
-		display->log_message(fgc, message);
+		display->log_message(level, message);
 	};
 }
 

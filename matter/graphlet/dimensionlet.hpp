@@ -7,9 +7,11 @@
 #include <SDL2/SDL.h>
 
 #include <cstdint>
+#include <optional>
 
 #include "../graphlet.hpp"
 #include "../../graphics/font.hpp"
+#include "../../graphics/color.hpp"
 #include "../../graphics/texture.hpp"
 #include "../../graphics/named_colors.hpp"
 
@@ -23,19 +25,19 @@ namespace WarGrey::STEM {
 
     struct __lambda__ DimensionStyle {
 		shared_font_t label_font = nullptr;
-		long label_color = -1;
-		long label_border_color = -1;
-		long label_background_color = -1;
+		std::optional<WarGrey::STEM::RGBA> label_color = std::nullopt;
+		std::optional<WarGrey::STEM::RGBA> label_border_color = std::nullopt;
+		std::optional<WarGrey::STEM::RGBA> label_background_color = std::nullopt;
 
 		shared_font_t number_font = nullptr;
-		long number_color = -1;
-		long number_border_color = -1;
-		long number_background_color = -1;
+		std::optional<WarGrey::STEM::RGBA> number_color = std::nullopt;
+		std::optional<WarGrey::STEM::RGBA> number_border_color = std::nullopt;
+		std::optional<WarGrey::STEM::RGBA> number_background_color = std::nullopt;
 
 		shared_font_t unit_font = nullptr;
-		long unit_color = -1;
-		long unit_border_color = -1;
-		long unit_background_color = -1;
+		std::optional<WarGrey::STEM::RGBA> unit_color = std::nullopt;
+		std::optional<WarGrey::STEM::RGBA> unit_border_color = std::nullopt;
+		std::optional<WarGrey::STEM::RGBA> unit_background_color = std::nullopt;
 
 		float minimize_label_width = -1.0F;
 		float label_xfraction = -1.0F;
@@ -51,13 +53,16 @@ namespace WarGrey::STEM {
 
     __lambda__ WarGrey::STEM::DimensionStyle make_plain_dimension_style(int lfontsize, int nfontsize, int ufontsize, int precision = -1);
 	__lambda__ WarGrey::STEM::DimensionStyle make_plain_dimension_style(int nfontsize, unsigned int min_n, int precision = -1);
-	__lambda__ WarGrey::STEM::DimensionStyle make_setting_dimension_style(int nfontsize, unsigned int min_n, int precision = -1, uint32_t color = SILVER);
+	__lambda__ WarGrey::STEM::DimensionStyle make_setting_dimension_style(int nfontsize, unsigned int min_n, int precision = -1,
+            const WarGrey::STEM::RGBA& color = SILVER);
 
 	__lambda__ WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_n, int precision = -1,
-            uint32_t number_bgcolor = GOLDENROD, uint32_t label_bgcolor = FORESTGREEN, uint32_t color = GHOSTWHITE);
+            const WarGrey::STEM::RGBA& number_bgcolor = GOLDENROD, const WarGrey::STEM::RGBA& label_bgcolor = FORESTGREEN,
+            const WarGrey::STEM::RGBA& color = GHOSTWHITE);
     
 	__lambda__ WarGrey::STEM::DimensionStyle make_highlight_dimension_style(int nfontsize, unsigned int min_label, unsigned int min_n, int precision,
-            uint32_t number_bgcolor = GOLDENROD, uint32_t label_bgcolor = FORESTGREEN, uint32_t color = GHOSTWHITE);
+            const WarGrey::STEM::RGBA& number_bgcolor = GOLDENROD, const WarGrey::STEM::RGBA& label_bgcolor = FORESTGREEN,
+            const WarGrey::STEM::RGBA& color = GHOSTWHITE);
 
     /*********************************************************************************************/
     class __lambda__ Dimensionlet
@@ -90,7 +95,9 @@ namespace WarGrey::STEM {
         void feed_subextent(size_t n, float* w = nullptr, float* h = nullptr);
         void update_drawing_box(size_t idx, float minimize_width, shared_font_t font, float leading_space);
         void update_number_texture(SDL_Renderer* ds, double value, WarGrey::STEM::DimensionStyle& style);
-        void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, long bgcolor, long bcolor);
+        void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height,
+                const std::optional<WarGrey::STEM::RGBA>& bgcolor,
+                const std::optional<WarGrey::STEM::RGBA>& bcolor);
 
     private:
         shared_texture_t textures[3] = {};

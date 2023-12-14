@@ -1,13 +1,13 @@
 #pragma once
 
-#include "forward.hpp"
-#include "physics/motion.hpp"
-#include "graphics/named_colors.hpp"
-
 #include <SDL2/SDL.h>
 
 #include <cstdint>
 #include <string>
+
+#include "forward.hpp"
+#include "physics/motion.hpp"
+#include "graphics/named_colors.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ IMatterInfo {
@@ -112,10 +112,8 @@ namespace WarGrey::STEM {
         void notify_timeline_restart(uint32_t count0 = 0, int duration = 0);
         void feed_location(float* x, float* y, WarGrey::STEM::MatterAnchor a = MatterAnchor::LT);
         void feed_location(float* x, float* y, float fx, float fy);
-        void log_message(int fgc, const char* fmt, ...);
-        void log_message(int fgc, const std::string& msg);
-        void log_message(const char* fmt, ...);
-
+        void log_message(WarGrey::STEM::Log level, const std::string& msg);
+        
     public:
         IMatterInfo* info = nullptr;    
 

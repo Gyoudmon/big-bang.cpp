@@ -42,11 +42,11 @@ static void construct_subplane(IPlane* plane, float width, float height) {
 }
 
 /**************************************************************************************************/
-WarGrey::STEM::Continent::Continent(IPlane* plane, uint32_t background, double alpha)
-	: Continent(plane, 0.0F, 0.0F, background, alpha) {}
+WarGrey::STEM::Continent::Continent(IPlane* plane, const WarGrey::STEM::RGBA& background)
+	: Continent(plane, 0.0F, 0.0F, background) {}
 
-WarGrey::STEM::Continent::Continent(IPlane* plane, float width, float height, uint32_t background, double alpha)
-	: plane(plane), background(background), bg_alpha(alpha), bd_alpha(0.0), width(width), height(height) {
+WarGrey::STEM::Continent::Continent(IPlane* plane, float width, float height, const WarGrey::STEM::RGBA& background)
+		: plane(plane), background(background), border(transparent), width(width), height(height) {
 	if (this->plane == nullptr) {
 		this->plane = new PlaceholderPlane();
 	}
@@ -99,32 +99,30 @@ int WarGrey::STEM::Continent::update(uint64_t count, uint32_t interval, uint64_t
 }
 
 void WarGrey::STEM::Continent::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
-	if (this->bg_alpha > 0.0F) {
-        Brush::fill_rect(renderer, x, y, Width, Height, this->background, this->bg_alpha);
+	if (this->background.is_opacity()) {
+        Brush::fill_rect(renderer, x, y, Width, Height, this->background);
     }
 
-	if (this->bd_alpha > 0.0F) {
-        Brush::draw_rect(renderer, x, y, Width, Height, this->border_color, this->bd_alpha);
+	if (this->border.is_opacity()) {
+        Brush::draw_rect(renderer, x, y, Width, Height, this->border);
     }
 
 	this->plane->draw(renderer, x, y, Width, Height);
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::Continent::set_background_color(uint32_t color, double alpha) {
-	if ((this->background != color) || (this->bg_alpha != alpha)) {
+void WarGrey::STEM::Continent::set_background_color(const RGBA& color) {
+	if (this->background != color) {
 		this->background = color;
-		this->bg_alpha = alpha;
 		this->notify_updated();
-	} 
+	}
 }
 
-void WarGrey::STEM::Continent::set_border_color(uint32_t color, double alpha) {
-	if ((this->border_color != color) || (this->bd_alpha != alpha)) {
-		this->border_color = color;
-		this->bd_alpha = alpha;
+void WarGrey::STEM::Continent::set_border_color(const RGBA& color) {
+	if (this->border != color) {
+		this->border = color;
 		this->notify_updated();
-	} 
+	}
 }
 
 /**************************************************************************************************/

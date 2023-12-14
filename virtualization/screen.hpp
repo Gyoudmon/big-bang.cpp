@@ -1,6 +1,7 @@
 #pragma once
 
 #include "display.hpp"
+#include "../forward.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ IScreen {
@@ -25,7 +26,7 @@ namespace WarGrey::STEM {
         virtual void notify_updated() = 0;
 
     public:
-        virtual void log_message(int fgc, const std::string& message) = 0;
+        virtual void log_message(WarGrey::STEM::Log level, const std::string& message) = 0;
         virtual void start_input_text(const std::string& prompt) = 0;
     };
 }

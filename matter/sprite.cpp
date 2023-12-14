@@ -388,72 +388,28 @@ void WarGrey::STEM::ISprite::say(IMatter* message, double sec, SpeechBubble type
     }
 }
 
-void WarGrey::STEM::ISprite::say(const char* sentence, uint32_t color) {
+void WarGrey::STEM::ISprite::say(const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->say(this, sentence, color);
     }
 }
 
-void WarGrey::STEM::ISprite::say(const std::string& sentence, uint32_t color) {
-    if (this->info != nullptr) {
-        this->info->master->say(this, sentence, color);
-    }
-}
-
-void WarGrey::STEM::ISprite::say(uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->say(sentence, color);
-}
-
-void WarGrey::STEM::ISprite::say(double sec, const char* sentence, uint32_t color) {
+void WarGrey::STEM::ISprite::say(double sec, const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->say(this, sec, sentence, color);
     }
 }
 
-void WarGrey::STEM::ISprite::say(double sec, const std::string& sentence, uint32_t color) {
-    if (this->info != nullptr) {
-        this->info->master->say(this, sec, sentence, color);
-    }
-}
-
-void WarGrey::STEM::ISprite::say(double sec, uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->say(sec, sentence, color);
-}
-
-void WarGrey::STEM::ISprite::think(const char* sentence, uint32_t color) {
+void WarGrey::STEM::ISprite::think(const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->think(this, sentence, color);
     }
 }
 
-void WarGrey::STEM::ISprite::think(const std::string& sentence, uint32_t color) {
+void WarGrey::STEM::ISprite::think(double sec, const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->think(this, sentence, color);
     }
-}
-
-void WarGrey::STEM::ISprite::think(uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->think(sentence, color);
-}
-
-void WarGrey::STEM::ISprite::think(double sec, const char* sentence, uint32_t color) {
-    if (this->info != nullptr) {
-        this->info->master->think(this, sec, sentence, color);
-    }
-}
-
-void WarGrey::STEM::ISprite::think(double sec, const std::string& sentence, uint32_t color) {
-    if (this->info != nullptr) {
-        this->info->master->think(this, sentence, color);
-    }
-}
-
-void WarGrey::STEM::ISprite::think(double sec, uint32_t color, const char* fmt, ...) {
-    VSNPRINT(sentence, fmt);
-    this->think(sec, sentence, color);
 }
 
 bool WarGrey::STEM::ISprite::is_speaking() {
