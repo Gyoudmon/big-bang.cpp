@@ -29,7 +29,7 @@ namespace WarGrey::STEM {
     public:
         void set_font(shared_font_t font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         void set_text_color(const WarGrey::STEM::RGBA& color = SILVER);
-        WarGrey::STEM::RGBA get_text_color();
+        WarGrey::STEM::RGBA get_foreground_color() { return this->foreground_color; }
         void set_background_color(const WarGrey::STEM::RGBA& color);
         WarGrey::STEM::RGBA get_background_color() { return this->background_color; }
         void set_border_color(const WarGrey::STEM::RGBA& color);
