@@ -47,6 +47,14 @@ void WarGrey::STEM::ITextlet::set_text_color(const RGBA& fgc) {
     }
 }
 
+void WarGrey::STEM::ITextlet::set_text_alpha(double alpha) {
+    if (this->foreground_color.alpha() != alpha) {
+        this->foreground_color = RGBA(this->foreground_color, alpha);
+        this->update_texture();
+        this->notify_updated();
+    }
+}
+
 void WarGrey::STEM::ITextlet::set_background_color(const RGBA& bgc) {
     if (this->background_color != bgc) {
         this->background_color = bgc;
@@ -150,7 +158,9 @@ void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, flo
             }
         }
 
-        Brush::stamp(renderer, this->texture->self(), x, y);
+        if (this->foreground_color.is_opacity()) {
+            Brush::stamp(renderer, this->texture->self(), x, y);
+        }
     }
 }
 

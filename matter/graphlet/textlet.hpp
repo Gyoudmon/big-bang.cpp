@@ -29,6 +29,9 @@ namespace WarGrey::STEM {
     public:
         void set_font(shared_font_t font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
         void set_text_color(const WarGrey::STEM::RGBA& color = SILVER);
+        void set_foreground_color(const WarGrey::STEM::RGBA& color = SILVER) { this->set_text_color(color); }
+        void set_text_alpha(double alpha);
+        void set_foreground_alpha(double alpha) { this->set_text_alpha(alpha); }
         WarGrey::STEM::RGBA get_foreground_color() { return this->foreground_color; }
         void set_background_color(const WarGrey::STEM::RGBA& color);
         WarGrey::STEM::RGBA get_background_color() { return this->background_color; }

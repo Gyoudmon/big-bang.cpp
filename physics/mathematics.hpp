@@ -49,7 +49,7 @@ namespace WarGrey::STEM {
     }
 
     template<typename Fl>
-    Fl vector_direction(Fl x, Fl y, bool need_radian) {
+    Fl vector_direction(Fl x, Fl y, bool need_radian = true) {
         Fl rad = flatan(y, x);
 
         return need_radian ? rad : radians_to_degrees(rad);
@@ -139,6 +139,11 @@ namespace WarGrey::STEM {
     template<typename Fl>
     Fl point_distance(Fl x1, Fl y1, Fl x2, Fl y2) {
         return flsqrt(flsqr(x2 - x1) + flsqr(y2 - y1));
+    }
+
+    template<typename Fl>
+    Fl point_distance_squared(Fl x1, Fl y1, Fl x2, Fl y2) {
+        return flsqr(x2 - x1) + flsqr(y2 - y1);
     }
 
     template<typename Fl>
