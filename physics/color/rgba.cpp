@@ -1,11 +1,11 @@
-#include "color.hpp"
+#include "rgba.hpp"
 
-#include "../datum/box.hpp"
-#include "../datum/string.hpp"
-#include "../datum/fixnum.hpp"
-#include "../datum/flonum.hpp"
+#include "../../datum/box.hpp"
+#include "../../datum/string.hpp"
+#include "../../datum/fixnum.hpp"
+#include "../../datum/flonum.hpp"
 
-#include "../physics/mathematics.hpp"
+#include "../mathematics.hpp"
 
 using namespace WarGrey::STEM;
 
@@ -168,7 +168,7 @@ RGBA WarGrey::STEM::RGBA::HSV(double hue, double saturation, double brightness, 
     RGBA c;
 
     hsv_to_rgb(hue, saturation, brightness, &c.r, &c.g, &c.b);
-    c.a = flmax(flmin(alpha, 1.0), 0.0);
+    c.a = clamp(alpha, 0.0, 1.0);
 
     return c;
 }
@@ -176,7 +176,7 @@ RGBA WarGrey::STEM::RGBA::HSV(double hue, double saturation, double brightness, 
 RGBA WarGrey::STEM::RGBA::HSL(double hue, double saturation, double lightness, double alpha) {
     RGBA c;
 
-    c.a = flmax(flmin(alpha, 1.0), 0.0);
+    c.a = clamp(alpha, 0.0, 1.0);
     hsl_to_rgb(hue, saturation, lightness, &c.r, &c.g, &c.b);
 
     return c;
@@ -185,7 +185,7 @@ RGBA WarGrey::STEM::RGBA::HSL(double hue, double saturation, double lightness, d
 RGBA WarGrey::STEM::RGBA::HSI(double hue, double saturation, double intensity, double alpha) {
     RGBA c;
 
-    c.a = flmax(flmin(alpha, 1.0), 0.0);
+    c.a = clamp(alpha, 0.0, 1.0);
     hsi_to_rgb(hue, saturation, intensity, &c.r, &c.g, &c.b);
 
     return c;
@@ -193,33 +193,33 @@ RGBA WarGrey::STEM::RGBA::HSI(double hue, double saturation, double intensity, d
 
 /*************************************************************************************************/
 WarGrey::STEM::RGBA::RGBA(uint32_t hex, double alpha) {
-    this->a = flmax(flmin(alpha, 1.0), 0.0);
+    this->a = clamp(alpha, 0.0, 1.0);
     hexadecimal_to_rgb(hex, &this->r, &this->g, &this->b);
 }
 
 WarGrey::STEM::RGBA::RGBA(uint8_t r, uint8_t g, uint8_t b, double alpha) {
-    this->a = flmax(flmin(alpha, 1.0), 0.0);
+    this->a = clamp(alpha, 0.0, 1.0);
     this->r = GAMUT(r);
     this->g = GAMUT(g);
     this->b = GAMUT(b);
 }
 
 WarGrey::STEM::RGBA::RGBA(double r, double g, double b, double alpha, bool allow_negative) {
-    this->a = flmax(flmin(alpha, 1.0), 0.0);
+    this->a = clamp(alpha, 0.0, 1.0);
 
     if (allow_negative) {
         this->r = r;
         this->g = g;
         this->b = b;
     } else {
-        this->r = flmax(flmin(r, 1.0), 0.0);
-        this->g = flmax(flmin(g, 1.0), 0.0);
-        this->b = flmax(flmin(b, 1.0), 0.0);
+        this->r = clamp(r, 0.0, 1.0);
+        this->g = clamp(g, 0.0, 1.0);
+        this->b = clamp(b, 0.0, 1.0);
     }
 }
 
 WarGrey::STEM::RGBA::RGBA(const RGBA& c, double alpha) {
-    this->a = flmax(flmin(alpha, 1.0), 0.0);
+    this->a = clamp(alpha, 0.0, 1.0);
     this->r = c.r;
     this->g = c.g;
     this->b = c.b;
@@ -233,7 +233,7 @@ WarGrey::STEM::RGBA::RGBA(const RGBA& c) {
 }
 
 WarGrey::STEM::RGBA::RGBA(uint32_t hex, int alpha) {
-    this->a = flmax(flmin(alpha, 1.0), 0.0);
+    this->a = clamp(GAMUT(alpha), 0.0, 1.0);
     hexadecimal_to_rgb(hex, &this->r, &this->g, &this->b);
 }
 

@@ -2,10 +2,10 @@
 #include "misc.hpp"
 
 #include "graphics/brush.hpp"
-#include "graphics/color.hpp"
-#include "graphics/named_colors.hpp"
 #include "graphics/text.hpp"
 #include "graphics/image.hpp"
+#include "physics/color/rgba.hpp"
+#include "physics/color/names.hpp"
 
 #include "datum/string.hpp"
 #include "datum/box.hpp"

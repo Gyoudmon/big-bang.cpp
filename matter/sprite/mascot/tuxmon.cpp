@@ -1,6 +1,6 @@
 #include "tuxmon.hpp"
 
-#include "../../../graphics/geometry.hpp"
+#include "../../../graphics/renderer.hpp"
 
 using namespace WarGrey::STEM;
 

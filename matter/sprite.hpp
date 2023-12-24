@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../matter.hpp"
-#include "../graphics/color.hpp"
 #include "../graphics/image.hpp"
+#include "../physics/color/rgba.hpp"
 
 #include <vector>
 #include <string>

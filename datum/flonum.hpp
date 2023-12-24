@@ -67,6 +67,10 @@ namespace WarGrey::STEM {
     double inline flabs(double fl) { return std::abs(fl); }
     long double inline flabs(long double fl) { return std::abs(fl); }
 
+    float inline flmod(float a, float b) { return std::fmodf(a, b); }
+    double inline flmod(double a, double b) { return std::fmod(a, b); }
+    long double inline flmod(long double a, long double b) { return std::fmodl(a, b); }
+
     // WARNING: 0.0 is +0.0, hence, flsign(0.0) => 1.0
     float inline flsign(float f) { return std::copysignf(1.0f, f); }
     double inline flsign(double fl) { return std::copysign(1.0, fl); }

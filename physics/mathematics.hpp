@@ -5,12 +5,23 @@
 
 namespace WarGrey::STEM {
     template<typename Fl>
-    Fl radians_to_degrees(Fl radians) {
+    inline Fl clamp(Fl v, Fl min, Fl max) {
+        if (v > max) {
+            v = max;
+        } else if (v < min) {
+            v = min;
+        }
+
+        return v;
+    }
+
+    template<typename Fl>
+    inline Fl radians_to_degrees(Fl radians) {
         return (radians / Fl(pi)) * Fl(180.0);
     }
 
     template<typename Fl>
-    Fl degrees_to_radians(Fl degrees) {
+    inline Fl degrees_to_radians(Fl degrees) {
         return (degrees * Fl(pi)) / Fl(180.0);
     }
 
@@ -44,12 +55,12 @@ namespace WarGrey::STEM {
     }
 
     template<typename Fl>
-    Fl vector_magnitude(Fl x, Fl y) {
+    inline Fl vector_magnitude(Fl x, Fl y) {
         return flsqrt(x * x + y * y);
     }
 
     template<typename Fl>
-    Fl vector_direction(Fl x, Fl y, bool need_radian = true) {
+    inline Fl vector_direction(Fl x, Fl y, bool need_radian = true) {
         Fl rad = flatan(y, x);
 
         return need_radian ? rad : radians_to_degrees(rad);
@@ -68,35 +79,30 @@ namespace WarGrey::STEM {
     }
 
     template<typename Fl>
-    Fl vector_clamp(Fl v, Fl ceil) {
-        if (v > ceil) {
-            v = ceil;
-        } else if (v < -ceil) {
-            v = -ceil;
-        }
-
-        return v;
+    inline Fl vector_clamp(Fl v, Fl ceil) {
+        return clamp(v, -ceil, ceil);
     }
+
 
     /*********************************************************************************************/
     template<typename Fl>
-    bool point_inside(Fl px, Fl py, Fl x1, Fl y1, Fl x2, Fl y2) {
+    inline bool point_inside(Fl px, Fl py, Fl x1, Fl y1, Fl x2, Fl y2) {
         return (x1 <= x2 ? flin(x1, px, x2) : flin(x2, px, x1))
             && (y1 <= y2 ? flin(y1, py, y2) : flin(y2, py, y2));
     }
 
     template<typename Fl>
-    bool rectangle_inside(Fl tlx1, Fl tly1, Fl brx1, Fl bry1, Fl tlx2, Fl tly2, Fl brx2, Fl bry2) {
+    inline bool rectangle_inside(Fl tlx1, Fl tly1, Fl brx1, Fl bry1, Fl tlx2, Fl tly2, Fl brx2, Fl bry2) {
         return flin(tlx2, tlx1, brx2) && flin(tlx2, brx1, brx2) && (flin(tly2, tly1, bry2) && flin(tly2, bry1, bry2));
     }
 
     template<typename Fl>
-    bool rectangle_overlay(Fl tlx1, Fl tly1, Fl brx1, Fl bry1, Fl tlx2, Fl tly2, Fl brx2, Fl bry2) {
+    inline bool rectangle_overlay(Fl tlx1, Fl tly1, Fl brx1, Fl bry1, Fl tlx2, Fl tly2, Fl brx2, Fl bry2) {
         return !((brx1 < tlx2) || (tlx1 > brx2) || (bry1 < tly2) || (tly1 > bry2));
     }
 
     template<typename Fl>
-    bool rectangle_contain(Fl tlx, Fl tly, Fl brx, Fl bry, Fl x, Fl y) {
+    inline bool rectangle_contain(Fl tlx, Fl tly, Fl brx, Fl bry, Fl x, Fl y) {
         return flin(tlx, x, brx) && flin(tly, y, bry);
     }
 

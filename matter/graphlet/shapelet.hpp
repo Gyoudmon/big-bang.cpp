@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../canvaslet.hpp"
-#include "../../graphics/geometry.hpp"
+#include "../../physics/geometry/vertices.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ IShapelet : public WarGrey::STEM::ICanvaslet {

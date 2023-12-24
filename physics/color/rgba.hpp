@@ -5,7 +5,7 @@
 #include <string>
 #include <cmath>
 
-#include "../forward.hpp"
+#include "../../forward.hpp"
 
 namespace WarGrey::STEM {
     /** NOTE: the HSB and HSV are identical **/

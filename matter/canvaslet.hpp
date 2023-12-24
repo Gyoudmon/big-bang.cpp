@@ -2,9 +2,9 @@
 
 #include "graphlet.hpp"
 
-#include "../graphics/color.hpp"
 #include "../graphics/texture.hpp"
-#include "../graphics/blend.hpp"
+#include "../graphics/renderer.hpp"
+#include "../physics/color/rgba.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ ICanvaslet : public WarGrey::STEM::IGraphlet {

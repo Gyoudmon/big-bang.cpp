@@ -48,4 +48,12 @@ namespace WarGrey::STEM {
 
         return idx;
     }
+
+    template<typename I>
+    I inline fxmod(I a, I b) {
+        I r = a - (a/b) * b;
+
+        return (I)(r < 0 ? r + b : r);
+    }
+
 }

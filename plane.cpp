@@ -4,12 +4,12 @@
 
 #include "graphics/brush.hpp"
 #include "graphics/ruler.hpp"
-#include "graphics/color.hpp"
 
 #include "matter/sprite.hpp"
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/tracklet.hpp"
 
+#include "physics/color/rgba.hpp"
 #include "physics/mathematics.hpp"
 #include "physics/random.hpp"
 

@@ -2,7 +2,6 @@
 
 #include "../datum/box.hpp"
 
-#include "../graphics/geometry.hpp"
 #include "../physics/mathematics.hpp"
 
 using namespace WarGrey::STEM;

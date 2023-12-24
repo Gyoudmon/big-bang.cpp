@@ -1,9 +1,5 @@
 #pragma once
 
-#if defined(_MSC_VER)
-#pragma warning (disable: 4250)
-#endif
-
 #include <SDL2/SDL.h>
 
 #include <cstdint>
@@ -11,9 +7,9 @@
 
 #include "../graphlet.hpp"
 #include "../../graphics/font.hpp"
-#include "../../graphics/color.hpp"
 #include "../../graphics/texture.hpp"
-#include "../../graphics/named_colors.hpp"
+#include "../../physics/color/rgba.hpp"
+#include "../../physics/color/names.hpp"
 
 namespace WarGrey::STEM {
     /*********************************************************************************************/

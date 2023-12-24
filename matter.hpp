@@ -7,7 +7,7 @@
 
 #include "forward.hpp"
 #include "physics/motion.hpp"
-#include "graphics/named_colors.hpp"
+#include "physics/color/names.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ IMatterInfo {

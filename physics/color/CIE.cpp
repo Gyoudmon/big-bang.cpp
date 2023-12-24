@@ -1,8 +1,8 @@
 #include "CIE.hpp"
 
-#include "../datum/box.hpp"
+#include "../../datum/box.hpp"
 
-#include "../physics/mathematics.hpp"
+#include "../mathematics.hpp"
 
 using namespace WarGrey::STEM;
 

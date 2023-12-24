@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../matter.hpp"
-#include "../graphics/color.hpp"
+#include "../physics/color/rgba.hpp"
 #include "../virtualization/screen.hpp"
 #include "../forward.hpp"
 

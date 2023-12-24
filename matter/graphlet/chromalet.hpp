@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../canvaslet.hpp"
-#include "../../physics/CIE.hpp"
+#include "../../physics/color/CIE.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ Chromalet : public WarGrey::STEM::ICanvaslet {

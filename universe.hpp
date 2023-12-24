@@ -6,7 +6,7 @@
 #include <fstream>
 
 #include "graphics/font.hpp"
-#include "graphics/color.hpp"
+#include "physics/color/rgba.hpp"
 #include "virtualization/display.hpp"
 
 namespace WarGrey::STEM {

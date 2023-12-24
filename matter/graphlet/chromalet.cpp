@@ -5,8 +5,8 @@
 
 #include "../../graphics/image.hpp"
 #include "../../graphics/brush.hpp"
-#include "../../graphics/color.hpp"
-#include "../../graphics/named_colors.hpp"
+#include "../../physics/color/rgba.hpp"
+#include "../../physics/color/names.hpp"
 
 #include "../../physics/mathematics.hpp"
 

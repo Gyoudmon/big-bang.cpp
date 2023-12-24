@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <string>
 
-#include "color.hpp"
+#include "../physics/color/rgba.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ Brush {

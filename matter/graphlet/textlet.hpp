@@ -8,8 +8,8 @@
 
 #include "../../graphics/font.hpp"
 #include "../../graphics/texture.hpp"
-#include "../../graphics/color.hpp"
-#include "../../graphics/named_colors.hpp"
+#include "../../physics/color/rgba.hpp"
+#include "../../physics/color/names.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ ITextlet : public virtual WarGrey::STEM::IGraphlet {

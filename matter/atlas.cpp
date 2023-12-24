@@ -8,7 +8,7 @@
 
 #include "../plane.hpp"
 #include "../graphics/brush.hpp"
-#include "../graphics/geometry.hpp"
+#include "../graphics/renderer.hpp"
 
 #include "../physics/mathematics.hpp"
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "graphics/font.hpp"
-#include "graphics/color.hpp"
-#include "graphics/named_colors.hpp"
+#include "physics/color/rgba.hpp"
+#include "physics/color/names.hpp"
 
 #include "virtualization/screen.hpp"
 

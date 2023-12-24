@@ -7,7 +7,7 @@
 #include "../datum/flonum.hpp"
 #include "../datum/string.hpp"
 
-#include "../graphics/geometry.hpp"
+#include "../graphics/renderer.hpp"
 
 #include "../physics/random.hpp"
 #include "../physics/mathematics.hpp"

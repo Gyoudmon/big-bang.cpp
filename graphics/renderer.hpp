@@ -18,4 +18,9 @@ namespace WarGrey::STEM {
     /*********************************************************************************************/
     inline SDL_BlendMode color_mixture_to_blend_mode(WarGrey::STEM::ColorMixture mixture) { return static_cast<SDL_BlendMode>(mixture); }
     inline ColorMixture blend_mode_to_color_mixture(SDL_BlendMode mode) { return static_cast<ColorMixture>(mode); }
+
+    /*********************************************************************************************/
+    __lambda__ SDL_RendererFlip game_scales_to_flip(float x_scale, float y_scale);
+    __lambda__ void game_flip_to_signs(SDL_RendererFlip flip, float* hsgn = nullptr, float* vsgn = nullptr);
+    __lambda__ void game_flip_to_signs(SDL_RendererFlip flip, double* hsgn = nullptr, double* vsgn = nullptr);
 }

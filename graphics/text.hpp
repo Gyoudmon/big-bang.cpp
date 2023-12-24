@@ -6,7 +6,8 @@
 #include <cstdint>
 
 #include "font.hpp"
-#include "color.hpp"
+
+#include "../physics/color/rgba.hpp"
 
 namespace WarGrey::STEM {
     enum TextRenderMode { Solid, Shaded, Blender, LCD };

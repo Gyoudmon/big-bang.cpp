@@ -20,9 +20,7 @@
 #include "matter.hpp"
 #include "misc.hpp"
 
-#include "graphics/color.hpp"
-#include "graphics/blend.hpp"
-#include "graphics/named_colors.hpp"
+#include "graphics/renderer.hpp"
 #include "graphics/font.hpp"
 #include "graphics/text.hpp"
 #include "graphics/texture.hpp"
@@ -53,9 +51,11 @@
 
 #include "matter/graphlet/plot/historylet.hpp"
 
-#include "physics/CIE.hpp"
 #include "physics/random.hpp"
 #include "physics/mathematics.hpp"
+#include "physics/color/rgba.hpp"
+#include "physics/color/CIE.hpp"
+#include "physics/color/names.hpp"
 #include "physics/motion/platformer.hpp"
 #include "physics/motion/map2d.hpp"
 
