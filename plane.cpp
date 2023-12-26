@@ -116,8 +116,7 @@ namespace WarGrey::STEM {
         Tracklet* canvas = nullptr;
         bool shared_canvas = false;
         bool is_drawing = false;
-        float draw_fx = 0.5F;
-        float draw_fy = 0.5F;
+        Anchor draw_anchor = 0.5F;
         RGBA draw_color = 0x0U;
         uint8_t draw_width = 1U;
 
@@ -250,12 +249,12 @@ static void unsafe_do_canvas_setting(Plane* self, IMatter* m, MatterInfo* info, 
 }
 
 static void unsafe_canvas_do_drawing(IMatter* m, MatterInfo* info, float x1, float y1, float x2, float y2) {
-    if ((info->draw_fx != 0.0F) || (info->draw_fy != 0.0F)) {
+    if (!info->draw_anchor.is_zero()) {
         float dx, dy, mwidth, mheight;
         
         m->feed_extent(x1, y1, &mwidth, &mheight);
-        dx = info->draw_fx * mwidth;
-        dy = info->draw_fy * mheight;
+        dx = info->draw_anchor.fx * mwidth;
+        dy = info->draw_anchor.fy * mheight;
 
         info->canvas->add_line(x1 + dx, y1 + dy, x2 + dx, y2 + dy);
     } else {
@@ -488,7 +487,7 @@ void WarGrey::STEM::Plane::send_backward(IMatter* m, int n) {
     }
 }
 
-void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, const Anchor& a, float dx, float dy) {
     if (m->info == nullptr) {
         MatterInfo* info = bind_matter_owership(this, m);
         
@@ -506,7 +505,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, float x, float y, float fx, flo
             head_info->prev = m;
         }
 
-        this->handle_new_matter(m, info, x, y, fx, fy, dx, dy);
+        this->handle_new_matter(m, info, x, y, a, dx, dy);
     }
 }
 
@@ -521,10 +520,10 @@ void WarGrey::STEM::Plane::insert_as_speech_bubble(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::handle_new_matter(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::handle_new_matter(IMatter* m, MatterInfo* info, float x, float y, const Anchor& a, float dx, float dy) {
     this->begin_update_sequence();
     m->construct(this->master_renderer());
-    this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy);
+    this->move_matter_to_location_via_info(m, info, x, y, a, dx, dy);
     
     if (m->ready()) {
         this->on_matter_ready(m);
@@ -649,17 +648,17 @@ void WarGrey::STEM::Plane::move(IMatter* m, float x, float y, bool ignore_glidin
     }
 }
 
-void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::move_to(IMatter* m, float x, float y, const Anchor& a, float dx, float dy) {
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        if (this->move_matter_to_location_via_info(m, info, x, y, fx, fy, dx, dy)) {
+        if (this->move_matter_to_location_via_info(m, info, x, y, a, dx, dy)) {
             this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* target, const Anchor& ta, const Anchor& a, float dx, float dy) {
     MatterInfo* tinfo = plane_matter_info(this, target);
     float x = 0.0F;
     float y = 0.0F;
@@ -668,14 +667,14 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* target, float tfx, float
         float tsx, tsy, tsw, tsh;
 
         unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
-        x = tsx + tsw * tfx;
-        y = tsy + tsh * tfy;
+        x = tsx + tsw * ta.fx;
+        y = tsy + tsh * ta.fy;
     }
         
-    this->move_to(m, x, y, fx, fy, dx, dy);
+    this->move_to(m, x, y, a, dx, dy);
 }
 
-void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, const Anchor& xa, IMatter* ytarget, const Anchor& ya, const Anchor& a, float dx, float dy) {
     MatterInfo* xinfo = plane_matter_info(this, xtarget);
     MatterInfo* yinfo = plane_matter_info(this, ytarget);
     float x = 0.0F;
@@ -686,11 +685,11 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMat
 
         unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
         unsafe_feed_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
-        x = xsx + xsw * xfx;
-        y = ysy + ysh * yfy;
+        x = xsx + xsw * xa.fx;
+        y = ysy + ysh * ya.fy;
     }
 
-    this->move_to(m, x, y, fx, fy, dx, dy);
+    this->move_to(m, x, y, a, dx, dy);
 }
 
 void WarGrey::STEM::Plane::glide(double sec, IMatter* m, double length) {
@@ -737,15 +736,15 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, float x, float y) {
     }
 }
 
-void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, float x, float y, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, float x, float y, const Anchor& a, float dx, float dy) {
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        this->glide_matter_to_location_via_info(m, info, sec, x, y, fx, fy, dx, dy, true);
+        this->glide_matter_to_location_via_info(m, info, sec, x, y, a, dx, dy, true);
     }
 }
 
-void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* target, float tfx, float tfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* target, const Anchor& ta, const Anchor& a, float dx, float dy) {
     MatterInfo* tinfo = plane_matter_info(this, target);
     float x = 0.0F;
     float y = 0.0F;
@@ -754,14 +753,14 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* target, flo
         float tsx, tsy, tsw, tsh;
 
         unsafe_feed_matter_bound(target, tinfo, &tsx, &tsy, &tsw, &tsh);
-        x = tsx + tsw * tfx;
-        y = tsy + tsh * tfy;
+        x = tsx + tsw * ta.fx;
+        y = tsy + tsh * ta.fy;
     }
         
-    this->glide_to(sec, m, x, y, fx, fy, dx, dy);
+    this->glide_to(sec, m, x, y, a, dx, dy);
 }
 
-void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, float fx, float fy, float dx, float dy) {
+void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* xtarget, const Anchor& xa, IMatter* ytarget, const Anchor& ya, const Anchor& a, float dx, float dy) {
     MatterInfo* xinfo = plane_matter_info(this, xtarget);
     MatterInfo* yinfo = plane_matter_info(this, ytarget);
     float x = 0.0F;
@@ -772,11 +771,11 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, IMatter* xtarget, fl
 
         unsafe_feed_matter_bound(xtarget, xinfo, &xsx, &xsy, &xsw, &xsh);
         unsafe_feed_matter_bound(ytarget, yinfo, &ysx, &ysy, &ysw, &ysh);
-        x = xsx + xsw * xfx;
-        y = ysy + ysh * yfy;
+        x = xsx + xsw * xa.fx;
+        y = ysy + ysh * ya.fy;
     }
 
-    this->glide_to(sec, m, x, y, fx, fy, dx, dy);
+    this->glide_to(sec, m, x, y, a, dx, dy);
 }
 
 void WarGrey::STEM::Plane::clear_motion_actions(IMatter* m) {
@@ -892,7 +891,7 @@ IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
     return found;
 }
 
-bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, float fx, float fy) {
+bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, const Anchor& a) {
     MatterInfo* info = plane_matter_info(this, m);
     bool okay = false;
     
@@ -900,8 +899,8 @@ bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, 
         float sx, sy, sw, sh;
 
         unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-        if (x != nullptr) (*x) = sx + sw * fx;
-        if (y != nullptr) (*y) = sy + sh * fy;
+        if (x != nullptr) (*x) = sx + sw * a.fx;
+        if (y != nullptr) (*y) = sy + sh * a.fy;
 
         okay = true;
     }
@@ -1529,8 +1528,8 @@ void WarGrey::STEM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, M
 void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
     if (is_matter_bubble_showing(child, info)) {
         float ix, iy, iwidth, iheight, bx, by, bwidth, bheight;
-        float bfx, bfy, mfx, mfy, dx, dy;
-        float mwidth, mheight;
+        float dx, dy, mwidth, mheight;
+        Anchor ma, ba;
         SDL_Rect clip;
     
         child->feed_extent(info->x, info->y, &mwidth, &mheight);
@@ -1538,9 +1537,9 @@ void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, M
 
         bwidth =  iwidth +  (this->bubble_left_margin + this->bubble_right_margin);
         bheight = iheight + (this->bubble_top_margin + this->bubble_bottom_margin);
-        this->place_speech_bubble(child, bwidth, bheight, Width, Height, &mfx, &mfy, &bfx, &bfy, &dx, &dy);
-        bx = info->x + mwidth  * mfx - bwidth  * bfx + dx;
-        by = info->y + mheight * mfy - bheight * bfy + dy;
+        this->place_speech_bubble(child, bwidth, bheight, Width, Height, &ma, &ba, &dx, &dy);
+        bx = info->x + mwidth  * ma.fx - bwidth  * ba.fx + dx;
+        by = info->y + mheight * ma.fy - bheight * ba.fy + dy;
         bx = (bx + this->translate_x) + X;
         by = (by + this->translate_y) + Y;
 
@@ -1731,20 +1730,20 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, float fx, float fy, float dx, float dy, bool heading) {
+bool WarGrey::STEM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, const Anchor& a, float dx, float dy, bool heading) {
     float sx, sy, sw, sh;
     float ax = 0.0F;
     float ay = 0.0F;
         
     unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-    ax = (sw * fx);
-    ay = (sh * fy);
+    ax = (sw * a.fx);
+    ay = (sh * a.fy);
     
     return this->glide_matter_via_info(m, info, sec, x - ax + dx, y - ay + dy, true, heading);
 }
 
-bool WarGrey::STEM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info, float x, float y, float fx, float fy, float dx, float dy) {
-    return this->glide_matter_to_location_via_info(m, info, 0.0F, x, y, fx, fy, dx, dy, false);
+bool WarGrey::STEM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info, float x, float y, const Anchor& a, float dx, float dy) {
+    return this->glide_matter_to_location_via_info(m, info, 0.0F, x, y, a, dx, dy, false);
 }
 
 void WarGrey::STEM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
@@ -1884,21 +1883,13 @@ bool WarGrey::STEM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, MatterAnchor anchor, bool shared) {
-    float fx, fy;
-
-    matter_anchor_fraction(anchor, &fx, &fy);
-    this->bind_canvas(m, canvas, fx, fy, shared);
-}
-
-void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, float fx, float fy, bool shared) {
+void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, const Anchor& a, bool shared) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
         info->canvas = canvas;
         info->shared_canvas = shared;
-        info->draw_fx = fx;
-        info->draw_fy = fy;
+        info->draw_anchor = a;
 
         if (!info->shared_canvas) {
             unsafe_canvas_sync_settings(info);
@@ -2094,10 +2085,9 @@ bool WarGrey::STEM::Plane::is_bubble_showing(IMatter* m, SpeechBubble* type) {
     return yes;
 }
 
-void WarGrey::STEM::Plane::place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height
-        , float* mfx, float* mfy, float* bfx, float* bfy, float* dx, float* dy) {
-    SET_BOXES(mfx, mfy, 0.0F);
-    SET_VALUES(bfx, 0.618F, bfy, 1.0);
+void WarGrey::STEM::Plane::place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height, Anchor* ma, Anchor* ba, float* dx, float* dy) {
+    ma->reset(0.0F);
+    ba->reset(0.618F, 1.0);
     SET_BOXES(dx, dy, 0.0F);
 }
 
@@ -2224,21 +2214,13 @@ bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target) {
                              tlx, tty, tlx + tw, tty + th);
 }
 
-bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target, float fx, float fy) {
+bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target, const Anchor& a) {
     float slx, sty, sw, sh, tx, ty;
     bool sokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
-    bool tokay = this->feed_matter_location(target, &tx, &ty, fx, fy);
+    bool tokay = this->feed_matter_location(target, &tx, &ty, a);
 
     return sokay && tokay
         && rectangle_contain(slx, sty, slx + sw, sty + sh, tx, ty);
-}
-
-bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target, MatterAnchor a) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-    
-    return this->is_colliding(m, target, fx, fy);
 }
 
 bool WarGrey::STEM::IPlane::is_colliding_with_mouse(IMatter* m) {
@@ -2252,93 +2234,6 @@ bool WarGrey::STEM::IPlane::is_colliding_with_mouse(IMatter* m) {
     }
     
     return mokay;
-}
-
-bool WarGrey::STEM::IPlane::feed_matter_location(IMatter* m, float* x, float* y, MatterAnchor a) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-
-    return this->feed_matter_location(m, x, y, fx, fy);
-}
-
-void WarGrey::STEM::IPlane::insert_at(IMatter* m, float x, float y, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-    this->insert_at(m, x, y, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::move_to(IMatter* m, float x, float y, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-    this->move_to(m, x, y, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
-    float tfx, tfy, fx, fy;
-
-    matter_anchor_fraction(ta, &tfx, &tfy);
-    matter_anchor_fraction(a, &fx, &fy);
-    this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-    this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
-    float tfx, tfy;
-
-    matter_anchor_fraction(ta, &tfx, &tfy);
-    this->move_to(m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::move_to(IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-    
-    matter_anchor_fraction(a, &fx, &fy);
-    this->move_to(m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::glide_to(double sec, IMatter* m, float x, float y, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-    this->glide_to(sec, m, x, y, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::glide_to(double sec, IMatter* m, IMatter* target, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
-    float tfx, tfy, fx, fy;
-
-    matter_anchor_fraction(ta, &tfx, &tfy);
-    matter_anchor_fraction(a, &fx, &fy);
-    this->glide_to(sec, m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::glide_to(double sec, IMatter* m, IMatter* target, float tfx, float tfy, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-
-    matter_anchor_fraction(a, &fx, &fy);
-    this->glide_to(sec, m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::glide_to(double sec, IMatter* m, IMatter* target, MatterAnchor ta, float fx, float fy, float dx, float dy) {
-    float tfx, tfy;
-
-    matter_anchor_fraction(ta, &tfx, &tfy);
-    this->glide_to(sec, m, target, tfx, tfy, fx, fy, dx, dy);
-}
-
-void WarGrey::STEM::IPlane::glide_to(double sec, IMatter* m, IMatter* xtarget, float xfx, IMatter* ytarget, float yfy, MatterAnchor a, float dx, float dy) {
-    float fx, fy;
-    
-    matter_anchor_fraction(a, &fx, &fy);
-    this->glide_to(sec, m, xtarget, xfx, ytarget, yfy, fx, fy, dx, dy);
 }
 
 void WarGrey::STEM::IPlane::glide_to_random_location(double sec, IMatter* m) {
@@ -2355,15 +2250,8 @@ void WarGrey::STEM::IPlane::glide_to_random_location(double sec, IMatter* m) {
         this->glide_to(sec, m,
             float(random_uniform(int(hinset), int(width - hinset))),
             float(random_uniform(int(vinset), int(height - vinset))),
-            MatterAnchor::CC);
+            MatterAnchor::CC, 0.0F, 0.0F);
     }
-}
-
-void WarGrey::STEM::IPlane::glide_to_mouse(double sec, IMatter* m, MatterAnchor a, float dx, float dy) {
-    float mx, my;
-
-    feed_current_mouse_location(&mx, &my);
-    this->glide_to(sec, m, mx, my, a, dx, dy);
 }
 
 /*************************************************************************************************/
@@ -2510,7 +2398,7 @@ int WarGrey::STEM::IPlane::grid_cell_index(float x, float y, int* r, int* c) {
     return row * this->column + col;
 }
 
-int WarGrey::STEM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, MatterAnchor a) {
+int WarGrey::STEM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, const Anchor& a) {
     float x, y;
 
     this->feed_matter_location(m, &x, &y, a);
@@ -2523,7 +2411,7 @@ void WarGrey::STEM::IPlane::feed_grid_cell_extent(float* width, float* height) {
     SET_BOX(height, this->cell_height);
 }
 
-void WarGrey::STEM::IPlane::feed_grid_cell_location(int idx, float* x, float* y, MatterAnchor a) {
+void WarGrey::STEM::IPlane::feed_grid_cell_location(int idx, float* x, float* y, const Anchor& a) {
     if (idx < 0) {
         idx += this->column * this->row;
     }
@@ -2538,9 +2426,7 @@ void WarGrey::STEM::IPlane::feed_grid_cell_location(int idx, float* x, float* y,
     }
 }
 
-void WarGrey::STEM::IPlane::feed_grid_cell_location(int row, int col, float* x, float* y, MatterAnchor a) {
-    float fx, fy;
-
+void WarGrey::STEM::IPlane::feed_grid_cell_location(int row, int col, float* x, float* y, const Anchor& a) {
     /** NOTE
      * Both `row` and `col` are just hints,
      *   and they are therefore allowed to be outside the grid,
@@ -2554,49 +2440,47 @@ void WarGrey::STEM::IPlane::feed_grid_cell_location(int row, int col, float* x, 
     if (col < 0) {
         col += this->column;
     }
-
-    matter_anchor_fraction(a, &fx, &fy);
     
-    SET_BOX(x, this->grid_x + this->cell_width * (float(col) + fx));
-    SET_BOX(y, this->grid_y + this->cell_height * (float(row) + fy));
+    SET_BOX(x, this->grid_x + this->cell_width * (float(col) + a.fx));
+    SET_BOX(y, this->grid_y + this->cell_height * (float(row) + a.fy));
 }
 
-void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int idx, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
     float x, y;
 
     this->feed_grid_cell_location(idx, &x, &y, a);
     this->insert_at(m, x, y, a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int row, int col, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
     float x, y;
 
     this->feed_grid_cell_location(row, col, &x, &y, a);
     this->insert_at(m, x, y, a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int idx, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
     float x, y;
 
     this->feed_grid_cell_location(idx, &x, &y, a);
     this->move_to(m, x, y, a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int row, int col, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
     float x, y;
 
     this->feed_grid_cell_location(row, col, &x, &y, a);
     this->move_to(m, x, y, a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::glide_to_grid(double sec, IMatter* m, int idx, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::glide_to_grid(double sec, IMatter* m, int idx, const Anchor& a, float dx, float dy) {
     float x, y;
 
     this->feed_grid_cell_location(idx, &x, &y, a);
     this->glide_to(sec, m, x, y, a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::glide_to_grid(double sec, IMatter* m, int row, int col, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IPlane::glide_to_grid(double sec, IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
     float x, y;
 
     this->feed_grid_cell_location(row, col, &x, &y, a);

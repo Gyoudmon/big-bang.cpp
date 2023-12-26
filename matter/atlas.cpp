@@ -212,7 +212,7 @@ int WarGrey::STEM::IAtlas::logic_tile_index(float x, float y, int* r, int* c, bo
     return idx;
 }
 
-void WarGrey::STEM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a, bool local) {
+void WarGrey::STEM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y, const Anchor& a, bool local) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
@@ -221,10 +221,9 @@ void WarGrey::STEM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y
     }
 }
 
-void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a, bool local) {
+void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x, float* y, const Anchor& a, bool local) {
     float dx = 0.0F;
     float dy = 0.0F;
-    float fx, fy;
     
     if (this->logic_row > 0) {
         row = safe_index(row, this->logic_row);
@@ -242,12 +241,11 @@ void WarGrey::STEM::IAtlas::feed_logic_tile_location(int row, int col, float* x,
         }
     }
     
-    matter_anchor_fraction(a, &fx, &fy);
-    SET_BOX(x, (this->logic_tile_width * (float(col) + fx) + this->logic_left) * flabs(this->xscale) + dx);
-    SET_BOX(y, (this->logic_tile_height * (float(row) + fy) + this->logic_top) * flabs(this->yscale) + dy);
+    SET_BOX(x, (this->logic_tile_width * (float(col) + a.fx) + this->logic_left) * flabs(this->xscale) + dx);
+    SET_BOX(y, (this->logic_tile_height * (float(row) + a.fy) + this->logic_top) * flabs(this->yscale) + dy);
 }
 
-void WarGrey::STEM::IAtlas::feed_logic_tile_fraction(int idx, float* fx, float* fy, MatterAnchor a) {
+void WarGrey::STEM::IAtlas::feed_logic_tile_fraction(int idx, float* fx, float* fy, const Anchor& a) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
@@ -256,7 +254,7 @@ void WarGrey::STEM::IAtlas::feed_logic_tile_fraction(int idx, float* fx, float* 
     }
 }
 
-void WarGrey::STEM::IAtlas::feed_logic_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a) {
+void WarGrey::STEM::IAtlas::feed_logic_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a) {
     float tx, ty, width, height;
     
     this->feed_logic_tile_location(row, col, &tx, &ty, a, true);
@@ -265,7 +263,7 @@ void WarGrey::STEM::IAtlas::feed_logic_tile_fraction(int row, int col, float* fx
     SET_BOX(fy, ty / height);
 }
 
-void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
@@ -274,7 +272,7 @@ void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int idx, MatterAnchor
     }
 }
 
-void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
     auto master = this->master();
     
     if (master != nullptr) {
@@ -285,7 +283,7 @@ void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, Mat
     }
 }
 
-void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
@@ -294,7 +292,7 @@ void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx,
     }
 }
 
-void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
     auto master = this->master();
     
     if (master != nullptr) {
@@ -481,7 +479,7 @@ int WarGrey::STEM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, b
     return rw * this->map_col + cl;
 }
 
-void WarGrey::STEM::GridAtlas::feed_map_tile_fraction(int idx, float* fx, float* fy, MatterAnchor a) {
+void WarGrey::STEM::GridAtlas::feed_map_tile_fraction(int idx, float* fx, float* fy, const Anchor& a) {
     float tx, ty, width, height;
 
     this->feed_map_tile_location(idx, &tx, &ty, a, true);
@@ -490,16 +488,15 @@ void WarGrey::STEM::GridAtlas::feed_map_tile_fraction(int idx, float* fx, float*
     SET_BOX(fy, ty / height);
 }
 
-void WarGrey::STEM::GridAtlas::feed_map_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a) {
+void WarGrey::STEM::GridAtlas::feed_map_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
     this->feed_map_tile_fraction(row * this->map_col + col, fx, fy, a);
 }
 
-void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a, bool local) {
+void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* y, const Anchor& a, bool local) {
     int total = this->map_col * this->map_row;
     SDL_FRect region;
-    float fx, fy;
     float dx = 0.0F;
     float dy = 0.0F;
     
@@ -513,20 +510,19 @@ void WarGrey::STEM::GridAtlas::feed_map_tile_location(int idx, float* x, float* 
         }
     }
 
-    matter_anchor_fraction(a, &fx, &fy);
     this->feed_map_tile_region(&region, idx);
     
-    SET_BOX(x, (region.x + region.w * fx + dx) * flabs(this->xscale));
-    SET_BOX(y, (region.y + region.h * fy + dy) * flabs(this->yscale));
+    SET_BOX(x, (region.x + region.w * a.fx + dx) * flabs(this->xscale));
+    SET_BOX(y, (region.y + region.h * a.fy + dy) * flabs(this->yscale));
 }
 
-void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a, bool local) {
+void WarGrey::STEM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* y, const Anchor& a, bool local) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
     this->feed_map_tile_location(row * this->map_col + col, x, y, a, local);
 }
 
-void WarGrey::STEM::GridAtlas::move_to_map_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::GridAtlas::move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
     auto master = this->master();
 
     if (master != nullptr) {
@@ -537,13 +533,13 @@ void WarGrey::STEM::GridAtlas::move_to_map_tile(IMatter* m, int idx, MatterAncho
     }
 }
 
-void WarGrey::STEM::GridAtlas::move_to_map_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::GridAtlas::move_to_map_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
     this->move_to_map_tile(m, row * this->map_col + col, ta, a, dx, dy);
 }
 
-void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
     auto master = this->master();
 
     if (master != nullptr) {
@@ -554,7 +550,7 @@ void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx
     }
 }
 
-void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx, float dy) {
+void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
     this->glide_to_map_tile(sec, m, row * this->map_col + col, ta, a, dx, dy);

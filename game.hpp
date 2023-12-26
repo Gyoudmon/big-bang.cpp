@@ -56,6 +56,8 @@
 #include "physics/color/rgba.hpp"
 #include "physics/color/CIE.hpp"
 #include "physics/color/names.hpp"
+#include "physics/geometry/anchor.hpp"
+#include "physics/geometry/vertices.hpp"
 #include "physics/motion/platformer.hpp"
 #include "physics/motion/map2d.hpp"
 

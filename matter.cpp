@@ -80,30 +80,30 @@ bool WarGrey::STEM::IMatter::is_colliding_with_mouse(float lx, float ly) {
     return okay;
 }
 
-void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio, float afx, float afy) {
+void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio, const Anchor& anchor) {
     if (this->can_resize) {
         if ((x_ratio != 1.0F) || (y_ratio != 1.0F)) {
             float width, height;
             float x = 0.0F;
             float y = 0.0F;
 
-            this->feed_location(&x, &y, 0.0F, 0.0F);
+            this->feed_location(&x, &y, MatterAnchor::LT);
             this->feed_extent(x, y, &width, &height);
 
-	        this->moor(afx, afy);
+	        this->moor(anchor);
             this->on_resize(width * x_ratio, height * y_ratio, width, height);
 	        this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio, float afx, float afy) {
+void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio, const Anchor& anchor) {
     if (this->can_resize) {
         float cwidth, cheight, owidth, oheight, nwidth, nheight;
         float x = 0.0F;
         float y = 0.0F;
 
-        this->feed_location(&x, &y, 0.0F, 0.0F);
+        this->feed_location(&x, &y, MatterAnchor::LT);
         this->feed_extent(x, y, &cwidth, &cheight);
         this->feed_original_extent(x, y, &owidth, &oheight);
 
@@ -111,20 +111,20 @@ void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio, float afx, f
         nheight = oheight * y_ratio;
 
         if ((nwidth != cwidth) || (nheight != cheight)) {
-	        this->moor(afx, afy);
+	        this->moor(anchor);
             this->on_resize(nwidth, nheight, cwidth, cheight);
 	        this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::IMatter::scale_by_size(float size, bool given_width, float afx, float afy) {
+void WarGrey::STEM::IMatter::scale_by_size(float size, bool given_width, const Anchor& anchor) {
     if (this->can_resize) {
         float width, height, nwidth, nheight;
         float x = 0.0F;
         float y = 0.0F;
 
-        this->feed_location(&x, &y, 0.0F, 0.0F);
+        this->feed_location(&x, &y, MatterAnchor::LT);
         this->feed_extent(x, y, &width, &height);
 
         if (given_width) {
@@ -136,20 +136,20 @@ void WarGrey::STEM::IMatter::scale_by_size(float size, bool given_width, float a
         }
         
         if ((nwidth != width) || (nheight != height)) {
-            this->moor(afx, afy);
+            this->moor(anchor);
             this->on_resize(nwidth, nheight, width, height);
 	        this->notify_updated();
         }
     }
 }
 
-void WarGrey::STEM::IMatter::resize(float nwidth, float nheight, float afx, float afy) {
+void WarGrey::STEM::IMatter::resize(float nwidth, float nheight, const Anchor& anchor) {
     if (this->can_resize) {
         float width, height;
         float x = 0.0F;
         float y = 0.0F;
 
-        this->feed_location(&x, &y, 0.0F, 0.0F);
+        this->feed_location(&x, &y, MatterAnchor::LT);
         this->feed_extent(x, y, &width, &height);
 
         if (nwidth == 0.0F) {
@@ -161,7 +161,7 @@ void WarGrey::STEM::IMatter::resize(float nwidth, float nheight, float afx, floa
         }
 
 	    if ((width != nwidth) || (height != nheight)) {
-            this->moor(afx, afy);
+            this->moor(anchor);
             this->on_resize(nwidth, nheight, width, height);
 	        this->notify_updated();
 	    }
@@ -170,10 +170,10 @@ void WarGrey::STEM::IMatter::resize(float nwidth, float nheight, float afx, floa
 
 void WarGrey::STEM::IMatter::notify_updated() {
     if (this->info != nullptr) {
-        if ((this->anchor_fx != 0.0F) || (this->anchor_fy != 0.0F)) {
+        if (!this->anchor.is_zero()) {
             float cx, cy;
             
-            this->info->master->feed_matter_location(this, &cx, &cy, this->anchor_fx, this->anchor_fy);
+            this->info->master->feed_matter_location(this, &cx, &cy, this->anchor);
 
             /** NOTE
              * Gliding dramatically increasing the complexity of moving as glidings might be queued,
@@ -198,19 +198,17 @@ void WarGrey::STEM::IMatter::notify_timeline_restart(uint32_t count0, int durati
     }
 }
 
-void WarGrey::STEM::IMatter::moor(float afx, float afy) {
-    if ((afx != 0.0F) || (afy != 0.0F)) {
+void WarGrey::STEM::IMatter::moor(const Anchor& anchor) {
+    if (this->anchor != anchor) {
         if (this->info != nullptr) {
-            this->anchor_fx = afx;
-            this->anchor_fy = afy;
-            this->info->master->feed_matter_location(this, &this->anchor_x, &this->anchor_y, afx, afy);
+            this->anchor = anchor;
+            this->info->master->feed_matter_location(this, &this->anchor_x, &this->anchor_y, anchor);
         }
     }
 }
 
 void WarGrey::STEM::IMatter::clear_moor() {
-    this->anchor_fx = 0.0F;
-    this->anchor_fy = 0.0F;
+    this->anchor.reset();
     this->anchor_x = 0.0F;
     this->anchor_y = 0.0F;
 }
@@ -232,15 +230,9 @@ void WarGrey::STEM::IMatter::show(bool yes_no) {
     }
 }
 
-void WarGrey::STEM::IMatter::feed_location(float* x, float* y, MatterAnchor a) {
+void WarGrey::STEM::IMatter::feed_location(float* x, float* y, const Anchor& a) {
     if (this->info != nullptr) {
         this->info->master->feed_matter_location(this, x, y, a);
-    }
-}
-
-void WarGrey::STEM::IMatter::feed_location(float* x, float* y, float fx, float fy) {
-    if (this->info != nullptr) {
-        this->info->master->feed_matter_location(this, x, y, fx, fy);
     }
 }
 
@@ -252,61 +244,4 @@ void WarGrey::STEM::IMatter::log_message(Log level, const std::string& msg) {
 
 const char* WarGrey::STEM::IMatter::name() {
     return typeid(this).name();
-}
-
-/**************************************************************************************************/
-void WarGrey::STEM::IMatter::moor(MatterAnchor anchor) {
-    if (anchor != MatterAnchor::LT) {
-        if (this->info != nullptr) {
-            float afx, afy;
-
-            matter_anchor_fraction(anchor, &afx, &afy);
-            this->moor(afx, afy);
-        }
-    }
-}
-
-void WarGrey::STEM::IMatter::scale(float x_ratio, float y_ratio, MatterAnchor anchor) {
-    if (this->can_resize) {
-        float afx, afy;
-
-        matter_anchor_fraction(anchor, &afx, &afy);
-        this->scale(x_ratio, y_ratio, afx, afy);
-    }
-}
-
-void WarGrey::STEM::IMatter::scale_to(float x_ratio, float y_ratio, MatterAnchor anchor) {
-    if (this->can_resize) {
-        float afx, afy;
-
-        matter_anchor_fraction(anchor, &afx, &afy);
-        this->scale_to(x_ratio, y_ratio, afx, afy);
-    }
-}
-
-void WarGrey::STEM::IMatter::resize(float nwidth, float nheight, MatterAnchor anchor) {
-    if (this->can_resize) {
-        float afx, afy;
-
-        matter_anchor_fraction(anchor, &afx, &afy);
-        this->resize(nwidth, nheight, afx, afy);
-    }
-}
-
-void WarGrey::STEM::IMatter::resize_by_width(float size, MatterAnchor anchor) {
-    if (this->can_resize) {
-        float afx, afy;
-
-        matter_anchor_fraction(anchor, &afx, &afy);
-        this->resize_by_width(size, afx, afy);
-    }
-}
-
-void WarGrey::STEM::IMatter::resize_by_height(float size, MatterAnchor anchor) {
-    if (this->can_resize) {
-        float afx, afy;
-
-        matter_anchor_fraction(anchor, &afx, &afy);
-        this->resize_by_height(size, afx, afy);
-    }
 }

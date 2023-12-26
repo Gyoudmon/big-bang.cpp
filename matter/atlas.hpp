@@ -2,6 +2,7 @@
 
 #include "../matter.hpp"
 #include "../physics/color/rgba.hpp"
+#include "../physics/geometry/anchor.hpp"
 #include "../virtualization/filesystem/imgdb.hpp"
 
 namespace WarGrey::STEM {
@@ -34,17 +35,17 @@ namespace WarGrey::STEM {
         int logic_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
         void feed_logic_tile_extent(float* width = nullptr, float* height = nullptr);
-        void feed_logic_tile_fraction(int idx, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
-        void feed_logic_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
-        void feed_logic_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
-        void feed_logic_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
+        void feed_logic_tile_fraction(int idx, float* fx, float* fy, const Anchor& a = 0.5F);
+        void feed_logic_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a = 0.5F);
+        void feed_logic_tile_location(int idx, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
+        void feed_logic_tile_location(int row, int col, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
         void set_logic_grid_color(const WarGrey::STEM::RGBA& color) { this->logic_grid_color = color; }
 
     public:
-        void move_to_logic_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-        void move_to_logic_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_logic_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_logic_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_logic_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_logic_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
         
     protected:
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }
@@ -103,17 +104,17 @@ namespace WarGrey::STEM {
     public:
         int map_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int map_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
-        void feed_map_tile_fraction(int idx, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
-        void feed_map_tile_fraction(int row, int col, float* fx, float* fy, MatterAnchor a = MatterAnchor::CC);
-        void feed_map_tile_location(int idx, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
-        void feed_map_tile_location(int row, int col, float* x, float* y, MatterAnchor a = MatterAnchor::CC, bool local = true);
+        void feed_map_tile_fraction(int idx, float* fx, float* fy, const Anchor& a = 0.5F);
+        void feed_map_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a = 0.5F);
+        void feed_map_tile_location(int idx, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
+        void feed_map_tile_location(int row, int col, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
         void feed_map_overlay(float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
         
     public:
-        void move_to_map_tile(IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-        void move_to_map_tile(IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_map_tile(double sec, IMatter* m, int idx, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_map_tile(double sec, IMatter* m, int row, int col, MatterAnchor ta, MatterAnchor a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_map_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_map_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
 
     protected:
         virtual void feed_original_map_overlay(float* top, float* right, float* bottom, float* left);
