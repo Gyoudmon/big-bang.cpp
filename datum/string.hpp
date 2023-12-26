@@ -71,13 +71,19 @@ namespace WarGrey::STEM {
     __lambda__ std::string string_add_between(const char* s, char ch = '\n');
 
     /************************************************************************************************/
+    __lambda__ bool string_equal(const char* s1, const char* s2);
+    __lambda__ bool string_equal(const std::string& s1, const char* s2);
+    __lambda__ bool string_equal(const std::string& s1, const std::string& s2);
     __lambda__ bool string_prefix(const char* src, const char* sub, int max = -1);
     __lambda__ bool string_prefix(const std::string& src, const char* sub);
     __lambda__ bool string_prefix(const std::string& src, const std::string& sub);
     __lambda__ bool string_suffix(const char* src, const char* sub, int max = -1);
     __lambda__ bool string_suffix(const std::string& src, const char* sub);
     __lambda__ bool string_suffix(const std::string& src, const std::string& sub);
-
+    
+    __lambda__ bool string_ci_equal(const char* s1, const char* s2);
+    __lambda__ bool string_ci_equal(const std::string& s1, const char* s2);
+    __lambda__ bool string_ci_equal(const std::string& s1, const std::string& s2);
     __lambda__ bool string_ci_prefix(const char* src, const char* sub, int max = -1);
     __lambda__ bool string_ci_prefix(const std::string& src, const char* sub);
     __lambda__ bool string_ci_prefix(const std::string& src, const std::string& sub);

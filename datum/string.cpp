@@ -30,6 +30,40 @@ static size_t newline_position(const char* src, size_t idx0, size_t idxn, size_t
     return line_size;
 }
 
+static bool string_equal_cs(const char* s1, const char* s2, size_t sz1, size_t sz2) {
+    bool yes = true;
+    
+    if (sz1 == sz2) {
+        for (size_t i = 0; i < sz1; i ++) {
+            if (s1[i] != s2[i]) {
+                yes = false;
+                break;
+            }
+        }
+    } else {
+        yes = false;
+    }
+
+    return yes;
+}
+
+static bool string_equal_ci(const char* s1, const char* s2, size_t sz1, size_t sz2) {
+    bool yes = true;
+    
+    if (sz1 == sz2) {
+        for (size_t i = 0; i < sz1; i ++) {
+            if (!char_ci_eq(s1[i], s2[i])) {
+                yes = false;
+                break;
+            }
+        }
+    } else {
+        yes = false;
+    }
+
+    return yes;
+}
+
 /*************************************************************************************************/
 std::string WarGrey::STEM::flstring(double value, int precision) {
     return ((precision >= 0)
@@ -562,6 +596,18 @@ std::string WarGrey::STEM::string_add_between(const char* s, char ch) {
 }
 
 /************************************************************************************************/
+bool WarGrey::STEM::string_equal(const char* s1, const char* s2) {
+    return string_equal_cs(s1, s2, strlen(s1), strlen(s2));
+}
+
+bool WarGrey::STEM::string_equal(const std::string& s1, const char* s2) {
+    return string_equal_cs(s1.c_str(), s2, s1.size(), strlen(s2));
+}
+
+bool WarGrey::STEM::string_equal(const std::string& s1, const std::string& s2) {
+    return string_equal_cs(s1.c_str(), s2.c_str(), s1.size(), s2.size());
+}
+
 bool WarGrey::STEM::string_prefix(const char* src, const char* sub, int max0) {
     bool yes = true;
     size_t max = (max0 >= 0) ? max0 : strlen(src);
@@ -617,6 +663,18 @@ bool WarGrey::STEM::string_suffix(const std::string& src, const std::string& sub
 }
 
 /************************************************************************************************/
+bool WarGrey::STEM::string_ci_equal(const char* s1, const char* s2) {
+    return string_equal_ci(s1, s2, strlen(s1), strlen(s2));
+}
+
+bool WarGrey::STEM::string_ci_equal(const std::string& s1, const char* s2) {
+    return string_equal_ci(s1.c_str(), s2, s1.size(), strlen(s2));
+}
+
+bool WarGrey::STEM::string_ci_equal(const std::string& s1, const std::string& s2) {
+    return string_equal_ci(s1.c_str(), s2.c_str(), s1.size(), s2.size());
+}
+
 bool WarGrey::STEM::string_ci_prefix(const char* src, const char* sub, int max0) {
     bool yes = true;
     size_t max = (max0 >= 0) ? max0 : strlen(src);
