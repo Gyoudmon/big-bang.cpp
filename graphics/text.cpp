@@ -7,7 +7,7 @@
 #include <cstdarg>
 #include <iostream>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static bool disable_font_selection = false;
@@ -59,12 +59,12 @@ static TTF_Font* select_font(const shared_font_t& sfont, const std::string& text
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::game_disable_font_selection(bool yes) {
+void GYDM::game_disable_font_selection(bool yes) {
     disable_font_selection = yes;
 }
 
 /*************************************************************************************************/
-SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, const shared_font_t& sfont, TextRenderMode mode, const RGBA& fg, const RGBA& bg, int wrap) {
+SDL_Surface* GYDM::game_text_surface(const std::string& text, const shared_font_t& sfont, TextRenderMode mode, const RGBA& fg, const RGBA& bg, int wrap) {
     SDL_Surface* surface = nullptr;
     TTF_Font* font = (disable_font_selection) ? sfont->self() : select_font(sfont, text);
     SDL_Color fgc, bgc;
@@ -102,7 +102,7 @@ SDL_Surface* WarGrey::STEM::game_text_surface(const std::string& text, const sha
     return surface;
 }
 
-SDL_Texture* WarGrey::STEM::game_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, TextRenderMode mode, const RGBA& fgc, const RGBA& bgc, int wrap) {
+SDL_Texture* GYDM::game_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, TextRenderMode mode, const RGBA& fgc, const RGBA& bgc, int wrap) {
     SDL_Surface* surface = game_text_surface(text, font, mode, fgc, bgc, wrap);
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
@@ -111,59 +111,59 @@ SDL_Texture* WarGrey::STEM::game_text_texture(SDL_Renderer* renderer, const std:
     return texture;
 }
 
-SDL_Texture* WarGrey::STEM::game_solid_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, int wrap) {
+SDL_Texture* GYDM::game_solid_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, int wrap) {
     return game_text_texture(renderer, text, font, TextRenderMode::Solid, fgc, fgc, wrap);
 }
 
-SDL_Texture* WarGrey::STEM::game_shaded_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, const RGBA& bgc, int wrap) {
+SDL_Texture* GYDM::game_shaded_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, const RGBA& bgc, int wrap) {
     return game_text_texture(renderer, text, font, TextRenderMode::Shaded, fgc, bgc, wrap);
 }
 
-SDL_Texture* WarGrey::STEM::game_lcd_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, const RGBA& bgc, int wrap) {
+SDL_Texture* GYDM::game_lcd_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, const RGBA& bgc, int wrap) {
     return game_text_texture(renderer, text, font, TextRenderMode::LCD, fgc, bgc, wrap);
 }
 
-SDL_Texture* WarGrey::STEM::game_blended_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, int wrap) {
+SDL_Texture* GYDM::game_blended_text_texture(SDL_Renderer* renderer, const std::string& text, const shared_font_t& font, const RGBA& fgc, int wrap) {
     return game_text_texture(renderer, text, font, TextRenderMode::Blender, fgc, fgc, wrap);
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::Pen::draw_solid_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, int x, int y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_solid_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, int x, int y, const std::string& text, int wrap) {
     SDL_Surface* message = solid_text_surface(font, rgb, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }
 
-void WarGrey::STEM::Pen::draw_shaded_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, int x, int y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_shaded_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, int x, int y, const std::string& text, int wrap) {
     SDL_Surface* message = shaded_text_surface(font, fgc, bgc, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }
 
-void WarGrey::STEM::Pen::draw_lcd_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, int x, int y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_lcd_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, int x, int y, const std::string& text, int wrap) {
     SDL_Surface* message = lcd_text_surface(font, fgc, bgc, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }
 
-void WarGrey::STEM::Pen::draw_blended_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, int x, int y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_blended_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, int x, int y, const std::string& text, int wrap) {
     SDL_Surface* message = blended_text_surface(font, rgb, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }
 
-void WarGrey::STEM::Pen::draw_solid_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, float x, float y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_solid_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, float x, float y, const std::string& text, int wrap) {
     SDL_Surface* message = solid_text_surface(font, rgb, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }
 
-void WarGrey::STEM::Pen::draw_shaded_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, float x, float y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_shaded_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, float x, float y, const std::string& text, int wrap) {
     SDL_Surface* message = shaded_text_surface(font, fgc, bgc, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }
 
-void WarGrey::STEM::Pen::draw_lcd_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, float x, float y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_lcd_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc, float x, float y, const std::string& text, int wrap) {
     SDL_Surface* message = lcd_text_surface(font, fgc, bgc, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }
 
-void WarGrey::STEM::Pen::draw_blended_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, float x, float y, const std::string& text, int wrap) {
+void GYDM::Pen::draw_blended_text(const shared_font_t& font, SDL_Renderer* renderer, const RGBA& rgb, float x, float y, const std::string& text, int wrap) {
     SDL_Surface* message = blended_text_surface(font, rgb, text, wrap);
     safe_render_text_surface(renderer, message, x, y);
 }

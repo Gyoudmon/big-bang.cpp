@@ -1,6 +1,6 @@
 #pragma once
 
-namespace WarGrey::STEM {
+namespace GYDM {
 #define BISQUE 0xffe4c4U
 #define MOCCASIN 0xffe4b5U
 #define FUCHSIA 0xff00ffU
@@ -150,4 +150,3 @@ namespace WarGrey::STEM {
 #define MEDIUMSPRINGGREEN 0xfa9aU
 #define MINTCREAM 0xf5fffaU
 }
-

@@ -4,10 +4,10 @@
 #include "plane.hpp"
 #include "virtualization/screen.hpp"
 
-namespace WarGrey::STEM {
-    class __lambda__ Cosmos : public WarGrey::STEM::IUniverse {
+namespace GYDM {
+    class __lambda__ Cosmos : public GYDM::IUniverse {
     public:
-        Cosmos(uint32_t fps = 60, const WarGrey::STEM::RGBA& fgc = 0x000000U, const WarGrey::STEM::RGBA& bgc = 0xFFFFFFU);
+        Cosmos(uint32_t fps = 60, const GYDM::RGBA& fgc = 0x000000U, const GYDM::RGBA& bgc = 0xFFFFFFU);
         virtual ~Cosmos();
 
     public:
@@ -49,21 +49,21 @@ namespace WarGrey::STEM {
         const char* usrdata_extension() override;
 
     protected:
-        WarGrey::STEM::IPlane* push_plane(WarGrey::STEM::IPlane* plane);
+        GYDM::IPlane* push_plane(GYDM::IPlane* plane);
 
     private:
         void collapse();
-        void notify_transfer(WarGrey::STEM::IPlane* from, WarGrey::STEM::IPlane* to);
+        void notify_transfer(GYDM::IPlane* from, GYDM::IPlane* to);
         void on_navigate(int from_idx, int to_idx);
 
     private:
-        WarGrey::STEM::IScreen* screen = nullptr;
-        WarGrey::STEM::IPlane* head_plane = nullptr;
-        WarGrey::STEM::IPlane* recent_plane = nullptr;
+        GYDM::IScreen* screen = nullptr;
+        GYDM::IPlane* head_plane = nullptr;
+        GYDM::IPlane* recent_plane = nullptr;
         size_t chunk_count = 0;
         int recent_plane_idx = 0;
 
     private:
-        WarGrey::STEM::IPlane* from_plane = nullptr;
+        GYDM::IPlane* from_plane = nullptr;
     };
 }

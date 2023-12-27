@@ -10,7 +10,7 @@
 #include "virtualization/screen.hpp"
 #include "virtualization/position.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     class __lambda__ IPlaneInfo {
     public:
         virtual ~IPlaneInfo() {}
@@ -30,8 +30,8 @@ namespace WarGrey::STEM {
      *  Do not `delete` it on your own.
      */
     class __lambda__ IPlane {
-    friend class WarGrey::STEM::Cosmos;
-    friend class WarGrey::STEM::Continent;
+    friend class GYDM::Cosmos;
+    friend class GYDM::Continent;
     public:
         virtual ~IPlane();
         IPlane(const std::string& name);
@@ -39,7 +39,7 @@ namespace WarGrey::STEM {
 
     public:
         const char* name();
-        WarGrey::STEM::IScreen* master();
+        GYDM::IScreen* master();
         SDL_Renderer* master_renderer();
 
     public:
@@ -53,22 +53,22 @@ namespace WarGrey::STEM {
         virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
     
     public:
-        virtual WarGrey::STEM::IMatter* find_matter(float x, float y, WarGrey::STEM::IMatter* after) = 0;
-        virtual bool feed_matter_location(WarGrey::STEM::IMatter* m, float* x, float* y, const WarGrey::STEM::Anchor& a) = 0;
-        virtual bool feed_matter_boundary(WarGrey::STEM::IMatter* m, float* x, float* y, float* width, float* height) = 0;
+        virtual GYDM::IMatter* find_matter(float x, float y, GYDM::IMatter* after) = 0;
+        virtual bool feed_matter_location(GYDM::IMatter* m, float* x, float* y, const GYDM::Anchor& a) = 0;
+        virtual bool feed_matter_boundary(GYDM::IMatter* m, float* x, float* y, float* width, float* height) = 0;
         virtual void feed_matters_boundary(float* x, float* y, float* width, float* height) = 0;
-        virtual void insert_at(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
+        virtual void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) = 0;
         virtual void insert_as_speech_bubble(IMatter* m) = 0;
         virtual void bring_to_front(IMatter* m, IMatter* target) = 0;
         virtual void bring_forward(IMatter* m, int n) = 0;
         virtual void send_to_back(IMatter* m, IMatter* target) = 0;
         virtual void send_backward(IMatter* m, int n) = 0;
         virtual void move(IMatter* m, double length, bool ignore_gliding) = 0;
-        virtual void move(IMatter* m, const WarGrey::STEM::Vector& vec, bool ignore_gliding) = 0;
-        virtual void move_to(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
+        virtual void move(IMatter* m, const GYDM::Vector& vec, bool ignore_gliding) = 0;
+        virtual void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) = 0;
         virtual void glide(double sec, IMatter* m, double length) = 0;
-        virtual void glide(double sec, IMatter* m, const WarGrey::STEM::Vector& vec) = 0;
-        virtual void glide_to(double sec, IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
+        virtual void glide(double sec, IMatter* m, const GYDM::Vector& vec) = 0;
+        virtual void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) = 0;
         virtual void remove(IMatter* m, bool needs_delete) = 0;
         virtual void erase() = 0;
 
@@ -89,7 +89,7 @@ namespace WarGrey::STEM {
         virtual void after_select(IMatter* m, bool on_or_off) {} // use this method if you want to modify the plane
         
     public:
-        virtual WarGrey::STEM::IMatter* get_focused_matter() = 0;
+        virtual GYDM::IMatter* get_focused_matter() = 0;
         virtual void set_caret_owner(IMatter* m) = 0;
         virtual void notify_matter_ready(IMatter* m) = 0;
         virtual void notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration = 0) = 0;
@@ -97,7 +97,7 @@ namespace WarGrey::STEM {
     public:
         virtual void shh(ISprite* m) = 0;
         virtual void say(ISprite* m, double sec, IMatter* message, SpeechBubble type) = 0;
-        virtual void say(ISprite* m, double sec, const std::string& message, const WarGrey::STEM::RGBA& color, SpeechBubble type) = 0;
+        virtual void say(ISprite* m, double sec, const std::string& message, const GYDM::RGBA& color, SpeechBubble type) = 0;
         
     public:
         void begin_update_sequence();
@@ -107,18 +107,18 @@ namespace WarGrey::STEM {
         void notify_updated(IMatter* m = nullptr);
 
     public:
-        void set_background(const WarGrey::STEM::RGBA& color) { this->background = color; }
-        WarGrey::STEM::RGBA get_background() { return this->background; }
+        void set_background(const GYDM::RGBA& color) { this->background = color; }
+        GYDM::RGBA get_background() { return this->background; }
         void start_input_text(const std::string& prompt);
         void start_input_text(const char* prompt, ...);
-        void log_message(WarGrey::STEM::Log log, const std::string& msg);
+        void log_message(GYDM::Log log, const std::string& msg);
 
     public:
         bool is_colliding(IMatter* m, IMatter* target);
-        bool is_colliding(IMatter* m, IMatter* target, const WarGrey::STEM::Anchor& a);
+        bool is_colliding(IMatter* m, IMatter* target, const GYDM::Anchor& a);
         bool is_colliding_with_mouse(IMatter* m);
         void glide_to_random_location(double sec, IMatter* m);
-        void glide_to_mouse(double sec, IMatter* m, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_mouse(double sec, IMatter* m, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
         
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
@@ -127,17 +127,17 @@ namespace WarGrey::STEM {
         void create_grid(float cell_width, float x = 0.0F, float y = 0.0F, int col = 0);
         void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0);
         int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
-        int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, const WarGrey::STEM::Anchor& a = 0.5F);
+        int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, const GYDM::Anchor& a = 0.5F);
         void feed_grid_cell_extent(float* width, float* height);
-        WarGrey::STEM::Dot get_grid_cell_location(int idx, const WarGrey::STEM::Anchor& a = 0.5F);
-        WarGrey::STEM::Dot get_grid_cell_location(int row, int col, const WarGrey::STEM::Anchor& a = 0.5F);
-        void insert_at_grid(IMatter* m, int idx, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void insert_at_grid(IMatter* m, int row, int col, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void move_to_grid(IMatter* m, int idx, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void move_to_grid(IMatter* m, int row, int col, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_grid(double sec, IMatter* m, int idx, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_grid(double sec, IMatter* m, int row, int col, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void set_grid_color(const WarGrey::STEM::RGBA& color) { this->grid_color = color; }
+        GYDM::Dot get_grid_cell_location(int idx, const GYDM::Anchor& a = 0.5F);
+        GYDM::Dot get_grid_cell_location(int row, int col, const GYDM::Anchor& a = 0.5F);
+        void insert_at_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void insert_at_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void move_to_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void move_to_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_grid(double sec, IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_grid(double sec, IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void set_grid_color(const GYDM::RGBA& color) { this->grid_color = color; }
 
     public:
         void say(ISprite* m, IMatter* message) { this->say(m, 0.0, message, SpeechBubble::Default); }
@@ -145,10 +145,10 @@ namespace WarGrey::STEM {
         void think(ISprite* m, IMatter* message) { this->say(m, 0.0, message, SpeechBubble::Thought); }
         void think(ISprite* m, double sec, IMatter* message) { this->say(m, sec, message, SpeechBubble::Thought); }
     
-        void say(ISprite* m, const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
-        void say(ISprite* m, double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
-        void think(ISprite* m, const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
-        void think(ISprite* m, double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
+        void say(ISprite* m, const std::string& sentence, const GYDM::RGBA& color = BLACK);
+        void say(ISprite* m, double sec, const std::string& sentence, const GYDM::RGBA& color = BLACK);
+        void think(ISprite* m, const std::string& sentence, const GYDM::RGBA& color = DIMGRAY);
+        void think(ISprite* m, double sec, const std::string& sentence, const GYDM::RGBA& color = DIMGRAY);
         
         bool in_speech(ISprite* m);
         bool is_speaking(ISprite* m);
@@ -161,24 +161,24 @@ namespace WarGrey::STEM {
         virtual bool on_scroll(int horizon, int vertical, float hprecise, float vprecise) { return false; }
 
     protected:
-        virtual void on_focus(WarGrey::STEM::IMatter* m, bool on_off) {}
+        virtual void on_focus(GYDM::IMatter* m, bool on_off) {}
         virtual void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {}
         virtual void on_text(const char* text, size_t size, bool entire) {}
         virtual void on_editing_text(const char* text, int pos, int span) {}
         virtual void on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {}
-        virtual void on_hover(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
-        virtual void on_goodbye(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
-        virtual void on_tap(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
-        virtual void on_tap_selected(WarGrey::STEM::IMatter* m, float local_x, float local_y) {}
+        virtual void on_hover(GYDM::IMatter* m, float local_x, float local_y) {}
+        virtual void on_goodbye(GYDM::IMatter* m, float local_x, float local_y) {}
+        virtual void on_tap(GYDM::IMatter* m, float local_x, float local_y) {}
+        virtual void on_tap_selected(GYDM::IMatter* m, float local_x, float local_y) {}
 
     protected:
-        virtual void on_motion_start(WarGrey::STEM::IMatter* m, double sec, float x, float y, double xspd, double yspd) {}
-        virtual void on_motion_step(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd, double percentage) {}
-        virtual void on_motion_complete(WarGrey::STEM::IMatter* m, float x, float y, double xspd, double yspd) {}
+        virtual void on_motion_start(GYDM::IMatter* m, double sec, float x, float y, double xspd, double yspd) {}
+        virtual void on_motion_step(GYDM::IMatter* m, float x, float y, double xspd, double yspd, double percentage) {}
+        virtual void on_motion_complete(GYDM::IMatter* m, float x, float y, double xspd, double yspd) {}
         
     protected:
-        virtual void on_enter(WarGrey::STEM::IPlane* from);
-        virtual void on_leave(WarGrey::STEM::IPlane* to) { /* the completion of mission doesn't imply leaving */ }
+        virtual void on_enter(GYDM::IPlane* from);
+        virtual void on_leave(GYDM::IPlane* to) { /* the completion of mission doesn't imply leaving */ }
         virtual void mission_complete() { this->on_mission_complete(); }
         virtual void on_mission_start(float width, float height) {}
         virtual void on_mission_complete() {}
@@ -194,8 +194,8 @@ namespace WarGrey::STEM {
         virtual void draw_visible_selection(SDL_Renderer* renderer, float X, float Y, float width, float height) = 0;
 
     protected:
-        virtual IMatter* make_bubble_text(const std::string& message, const WarGrey::STEM::RGBA& color) = 0;
-        virtual bool merge_bubble_text(IMatter* bubble, const std::string& message, const WarGrey::STEM::RGBA& color) = 0;
+        virtual IMatter* make_bubble_text(const std::string& message, const GYDM::RGBA& color) = 0;
+        virtual bool merge_bubble_text(IMatter* bubble, const std::string& message, const GYDM::RGBA& color) = 0;
         virtual bool is_bubble_showing(IMatter* m, SpeechBubble* type) = 0;
 
     public:
@@ -207,21 +207,21 @@ namespace WarGrey::STEM {
         }
         
         template<class M>
-        M* insert(M* m, const WarGrey::STEM::Position& pos = origin_position, const WarGrey::STEM::Anchor& a = 0.0F, float dx = 0.0F, float dy = 0.0F) {
+        M* insert(M* m, const GYDM::Position& pos = origin_position, const GYDM::Anchor& a = 0.0F, float dx = 0.0F, float dy = 0.0F) {
             this->insert_at(m, pos, a, dx, dy);
 
             return m;
         }
         
         template<class M>
-        M* insert(M* m, int idx, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F) {
+        M* insert(M* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F) {
             this->insert_at_grid(m, idx, a, dx, dy);
 
             return m;
         }
 
         template<class M>
-        M* insert(M* m, int row, int col, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F) {
+        M* insert(M* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F) {
             this->insert_at_grid(m, row, col, a, dx, dy);
 
             return m;
@@ -231,7 +231,7 @@ namespace WarGrey::STEM {
         IPlaneInfo* info = nullptr;
 
     protected:
-        WarGrey::STEM::RGBA background;
+        GYDM::RGBA background;
 
     protected:
         int column = 0;
@@ -240,13 +240,13 @@ namespace WarGrey::STEM {
         float grid_y = 0.0F;
         float cell_width = 0.0F;
         float cell_height = 0.0F;
-        WarGrey::STEM::RGBA grid_color;
+        GYDM::RGBA grid_color;
         
     private:
         std::string caption;
     };
 
-    class __lambda__ Plane : public WarGrey::STEM::IPlane {
+    class __lambda__ Plane : public GYDM::IPlane {
     public:
         virtual ~Plane();
         Plane(const std::string& caption);
@@ -254,9 +254,9 @@ namespace WarGrey::STEM {
 
     public:
         bool has_mission_completed() override;
-        void set_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->sentry = sentry; }
-        void set_tooltip_matter(WarGrey::STEM::IMatter* m, float dx = 0.0F, float dy = 0.0F);
-        void set_bubble_color(const WarGrey::STEM::RGBA& border, const WarGrey::STEM::RGBA& background);
+        void set_sentry_sprite(GYDM::ISprite* sentry) { this->sentry = sentry; }
+        void set_tooltip_matter(GYDM::IMatter* m, float dx = 0.0F, float dy = 0.0F);
+        void set_bubble_color(const GYDM::RGBA& border, const GYDM::RGBA& background);
         void set_bubble_font(shared_font_t font) { this->bubble_font = font; }
         void set_bubble_duration(double second = 3600.0);
         void set_bubble_margin(float margin) { this->set_bubble_margin(margin, margin); }
@@ -267,45 +267,45 @@ namespace WarGrey::STEM {
         void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) override;
 
     public:
-        WarGrey::STEM::IMatter* find_matter(float x, float y, WarGrey::STEM::IMatter* after = nullptr) override;
-        bool feed_matter_location(WarGrey::STEM::IMatter* m, float* x, float* y, const WarGrey::STEM::Anchor& a = 0.0F) override;
-        bool feed_matter_boundary(WarGrey::STEM::IMatter* m, float* x, float* y, float* width, float* height) override;
+        GYDM::IMatter* find_matter(float x, float y, GYDM::IMatter* after = nullptr) override;
+        bool feed_matter_location(GYDM::IMatter* m, float* x, float* y, const GYDM::Anchor& a = 0.0F) override;
+        bool feed_matter_boundary(GYDM::IMatter* m, float* x, float* y, float* width, float* height) override;
         void feed_matters_boundary(float* x, float* y, float* width, float* height) override;
-        void insert_at(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) override;
+        void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) override;
         void insert_as_speech_bubble(IMatter* m) override;
         void bring_to_front(IMatter* m, IMatter* target = nullptr) override;
         void bring_forward(IMatter* m, int n = 1) override;
         void send_to_back(IMatter* m, IMatter* target = nullptr) override;
         void send_backward(IMatter* m, int n = 1) override;
         void move(IMatter* m, double length, bool ignore_gliding = false) override;
-        void move(IMatter* m, const WarGrey::STEM::Vector& vec, bool ignore_gliding = false) override;
-        void move_to(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
+        void move(IMatter* m, const GYDM::Vector& vec, bool ignore_gliding = false) override;
+        void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
         void glide(double sec, IMatter* m, double length) override;
-        void glide(double sec, IMatter* m, const WarGrey::STEM::Vector& vec) override;
-        void glide_to(double sec, IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
+        void glide(double sec, IMatter* m, const GYDM::Vector& vec) override;
+        void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
         void remove(IMatter* m, bool needs_delete = true) override;
         void erase() override;
         void size_cache_invalid();
         void clear_motion_actions(IMatter* m);
 
     public:
-        void bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, const WarGrey::STEM::Anchor& anchor = 0.5F, bool shared = false);
+        void bind_canvas(IMatter* m, GYDM::Tracklet* canvas, const GYDM::Anchor& anchor = 0.5F, bool shared = false);
         void reset_pen(IMatter* m);
         void stamp(IMatter* m);
         void pen_down(IMatter* m) { this->set_drawing(m, true); }
         void pen_up(IMatter* m) { this->set_drawing(m, false); }
         void set_drawing(IMatter* m, bool yes_or_no);
         void set_pen_width(IMatter* m, uint8_t width);
-        void set_pen_color(IMatter* m, const WarGrey::STEM::RGBA& color);
+        void set_pen_color(IMatter* m, const GYDM::RGBA& color);
         void set_heading(IMatter* m, double direction, bool is_radian = false);
         void turn(IMatter* m, double theta, bool is_radian = false);
 
     public:
-        void log_message(WarGrey::STEM::Log level, const std::string& msg);
+        void log_message(GYDM::Log level, const std::string& msg);
 
         void shh(ISprite* m) override;
-        void say(ISprite* m, double sec, IMatter* message, WarGrey::STEM::SpeechBubble type) override;
-        void say(ISprite* m, double sec, const std::string& message, const WarGrey::STEM::RGBA& color, WarGrey::STEM::SpeechBubble type) override;
+        void say(ISprite* m, double sec, IMatter* message, GYDM::SpeechBubble type) override;
+        void say(ISprite* m, double sec, const std::string& message, const GYDM::RGBA& color, GYDM::SpeechBubble type) override;
 
     public:
         IMatter* find_next_selected_matter(IMatter* start = nullptr) override;
@@ -318,7 +318,7 @@ namespace WarGrey::STEM {
         bool can_select(IMatter* m) override;
 
     public:
-        WarGrey::STEM::IMatter* get_focused_matter() override;
+        GYDM::IMatter* get_focused_matter() override;
         void set_caret_owner(IMatter* m) override;
         void notify_matter_ready(IMatter* m) override;
         void notify_matter_timeline_restart(IMatter* m, uint32_t count0 = 1, int duration = 0) override;
@@ -330,14 +330,14 @@ namespace WarGrey::STEM {
     protected:
         void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
         virtual bool update_tooltip(IMatter* m, float local_x, float local_y, float global_x, float global_y) { return false; }
-        virtual void on_double_tap_sentry_sprite(WarGrey::STEM::ISprite* sentry) { this->mission_complete(); }
+        virtual void on_double_tap_sentry_sprite(GYDM::ISprite* sentry) { this->mission_complete(); }
 
     protected:
-        IMatter* make_bubble_text(const std::string& message, const WarGrey::STEM::RGBA& color) override;
-        bool merge_bubble_text(IMatter* bubble, const std::string& message, const WarGrey::STEM::RGBA& color) override;
+        IMatter* make_bubble_text(const std::string& message, const GYDM::RGBA& color) override;
+        bool merge_bubble_text(IMatter* bubble, const std::string& message, const GYDM::RGBA& color) override;
         bool is_bubble_showing(IMatter* m, SpeechBubble* type) override;
         virtual void place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height,
-                                            WarGrey::STEM::Anchor* ma, WarGrey::STEM::Anchor* ba, float* dx, float* dy);
+                                            GYDM::Anchor* ma, GYDM::Anchor* ba, float* dx, float* dy);
         
     protected:
         bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) override;
@@ -348,11 +348,11 @@ namespace WarGrey::STEM {
         void on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) override;
         void on_text(const char* text, size_t size, bool entire) override;
         void on_editing_text(const char* text, int pos, int span) override;
-        void on_tap(WarGrey::STEM::IMatter* m, float x, float y) override;
-        void on_tap_selected(WarGrey::STEM::IMatter* m, float x, float y) override;
+        void on_tap(GYDM::IMatter* m, float x, float y) override;
+        void on_tap_selected(GYDM::IMatter* m, float x, float y) override;
 
     protected:
-        void on_enter(WarGrey::STEM::IPlane* from) override;
+        void on_enter(GYDM::IPlane* from) override;
         void mission_complete() override;
 
     protected:
@@ -380,8 +380,8 @@ namespace WarGrey::STEM {
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
         bool is_matter_found(IMatter* m, MatterInfo* info, float x, float y);
-        WarGrey::STEM::IMatter* find_matter_for_tooltip(float x, float y);
-        WarGrey::STEM::IMatter* find_least_recent_matter(float x, float y);
+        GYDM::IMatter* find_matter_for_tooltip(float x, float y);
+        GYDM::IMatter* find_least_recent_matter(float x, float y);
         void place_tooltip(IMatter* target);
         void no_selected_except(IMatter* m);
         void delete_matter(IMatter* m);
@@ -393,10 +393,10 @@ namespace WarGrey::STEM {
         float matters_bottom;
 
     private:
-        WarGrey::STEM::IMatter* head_matter = nullptr;
-        WarGrey::STEM::IMatter* head_speech = nullptr;
-        WarGrey::STEM::IMatter* focused_matter = nullptr;
-        WarGrey::STEM::IMatter* hovering_matter = nullptr;
+        GYDM::IMatter* head_matter = nullptr;
+        GYDM::IMatter* head_speech = nullptr;
+        GYDM::IMatter* focused_matter = nullptr;
+        GYDM::IMatter* hovering_matter = nullptr;
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 1U;
         uint32_t local_elapse = 0U;
@@ -411,17 +411,17 @@ namespace WarGrey::STEM {
         float translate_y = 0.0F;
     
     private:
-        WarGrey::STEM::ISprite* sentry = nullptr;
+        GYDM::ISprite* sentry = nullptr;
         bool mission_done = false;
 
     private:
-        WarGrey::STEM::IMatter* tooltip = nullptr;
+        GYDM::IMatter* tooltip = nullptr;
         float tooltip_dx = 0.0F;
         float tooltip_dy = 0.0F;
 
     private:
-        WarGrey::STEM::RGBA bubble_border = GAINSBORO;
-        WarGrey::STEM::RGBA bubble_color = GHOSTWHITE;
+        GYDM::RGBA bubble_border = GAINSBORO;
+        GYDM::RGBA bubble_color = GHOSTWHITE;
         double bubble_second = 0.0;
         float bubble_top_margin = 0.0F;
         float bubble_right_margin = 0.0F;

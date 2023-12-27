@@ -4,8 +4,8 @@
 
 #include "../canvaslet.hpp"
 
-namespace WarGrey::STEM {
-    class __lambda__ Tracklet : public WarGrey::STEM::ICanvaslet {
+namespace GYDM {
+    class __lambda__ Tracklet : public GYDM::ICanvaslet {
     public:
         Tracklet(float size, uint32_t hex = 0x0U, double alpha = 1.0) : Tracklet(size, size, hex, alpha) {}
         Tracklet(float width, float height, uint32_t hex = 0x0U, double alpha = 1.0);
@@ -23,7 +23,7 @@ namespace WarGrey::STEM {
 
     public:
         void add_line(float x1, float y1, float x2, float y2);
-        void stamp(WarGrey::STEM::IMatter* matter, float x, float y);
+        void stamp(GYDM::IMatter* matter, float x, float y);
         void erase();
 
     private:

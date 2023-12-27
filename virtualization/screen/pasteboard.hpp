@@ -3,13 +3,13 @@
 #include "../screen.hpp"
 #include "../../forward.hpp"
 
-namespace WarGrey::STEM {
-	class __lambda__ Pasteboard : public WarGrey::STEM::IScreen {
+namespace GYDM {
+	class __lambda__ Pasteboard : public GYDM::IScreen {
 	public:
-		Pasteboard(WarGrey::STEM::IMatter* master) : matter(master) {}
+		Pasteboard(GYDM::IMatter* master) : matter(master) {}
 	
     public:
-        WarGrey::STEM::IDisplay* display() override;
+        GYDM::IDisplay* display() override;
     
     public:
         void refresh() override;
@@ -25,10 +25,10 @@ namespace WarGrey::STEM {
         void notify_updated() override;
 
     public:
-        void log_message(WarGrey::STEM::Log level, const std::string& message) override;
+        void log_message(GYDM::Log level, const std::string& message) override;
         void start_input_text(const std::string& prompt) override;
 
     private:
-        WarGrey::STEM::IMatter* matter;
+        GYDM::IMatter* matter;
     };
 }

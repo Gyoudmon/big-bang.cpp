@@ -1,6 +1,6 @@
 #include "crc32.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static uint32_t crc_table[256];
@@ -46,15 +46,15 @@ static uint32_t update_crc(uint32_t crc, const uint8_t* message, size_t start, s
 }
 
 /*************************************************************************************************/
-uint32_t WarGrey::STEM::checksum_crc32(const uint8_t* message, size_t start, size_t end) {
+uint32_t GYDM::checksum_crc32(const uint8_t* message, size_t start, size_t end) {
     return update_crc(0xFFFFFFFFL, message, start, end) ^ 0xFFFFFFFFL;
 }
 
-uint32_t WarGrey::STEM::checksum_crc32(uint32_t acc_crc, const uint8_t* message, size_t start, size_t end) {
+uint32_t GYDM::checksum_crc32(uint32_t acc_crc, const uint8_t* message, size_t start, size_t end) {
     return update_crc(acc_crc ^ 0xFFFFFFFF, message, start, end) ^ 0xFFFFFFFFL;
 }
 
-uint32_t WarGrey::STEM::checksum_crc32(uint32_t* acc_crc, const uint8_t* message, size_t start, size_t end) {
+uint32_t GYDM::checksum_crc32(uint32_t* acc_crc, const uint8_t* message, size_t start, size_t end) {
     uint32_t crc = 0UL;
 
     if (acc_crc == nullptr) {

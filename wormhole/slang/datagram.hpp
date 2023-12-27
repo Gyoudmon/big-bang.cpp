@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     struct __lambda__ Datagram {
         int64_t timestamp;
         const char* remote_host;

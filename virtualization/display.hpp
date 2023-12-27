@@ -6,7 +6,7 @@
 #include "../forward.hpp"
 
 /**************************************************************************************************/
-namespace WarGrey::STEM {
+namespace GYDM {
     class __lambda__ IDisplay {
     public:
         IDisplay() {}
@@ -19,7 +19,7 @@ namespace WarGrey::STEM {
         virtual void refresh() = 0;
 
     public:
-        virtual void log_message(WarGrey::STEM::Log level, const std::string& message) = 0;
+        virtual void log_message(GYDM::Log level, const std::string& message) = 0;
         virtual void start_input_text(const std::string& prompt) = 0;
         virtual SDL_Surface* snapshot() = 0;
         virtual SDL_Renderer* master_renderer() = 0;

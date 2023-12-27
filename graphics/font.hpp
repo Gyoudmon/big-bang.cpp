@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     // https://www.w3.org/TR/css-fonts-4
     enum class FontSize { xx_small, x_small, small, medium, large, x_large, xx_large };
     enum class FontFamily { sans_serif, serif, cursive, fantasy, math, monospace, fangsong, _ };
@@ -57,8 +57,8 @@ namespace WarGrey::STEM {
     public:
         const char* basename();
         void feed_text_extent(const char* unicode, int* width = nullptr, int* height = nullptr);
-        WarGrey::STEM::TextMetrics get_text_metrics(const std::string& unicode) { return this->get_text_metrics(unicode.c_str()); }
-        WarGrey::STEM::TextMetrics get_text_metrics(const char* unicode);
+        GYDM::TextMetrics get_text_metrics(const std::string& unicode) { return this->get_text_metrics(unicode.c_str()); }
+        GYDM::TextMetrics get_text_metrics(const char* unicode);
 
         bool is_suitable(const std::string& text);
         int width(const std::string& unicode) { return this->width(unicode.c_str()); }

@@ -5,7 +5,7 @@
 #include "../../datum/flonum.hpp"
 #include "../../datum/string.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     template<template<typename> class Child, typename T>
     class __lambda__ Tuple {
     public:

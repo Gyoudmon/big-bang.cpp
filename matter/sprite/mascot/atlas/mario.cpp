@@ -1,7 +1,7 @@
 #include "mario.hpp"
 #include "../../../../datum/path.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 #define MARIO_WORLD_MAP digimon_mascot_path("atlas/mario", ".png")
@@ -37,7 +37,7 @@ static const row_col_t mario_rt_pipe_positions[] = {
 };
 
 /*************************************************************************************************/
-WarGrey::STEM::MarioGroundAtlas::MarioGroundAtlas(size_t slot, int row, int col, float tile_size)
+GYDM::MarioGroundAtlas::MarioGroundAtlas(size_t slot, int row, int col, float tile_size)
         : GridAtlas(MARIO_WORLD_MAP, 46, 68), slot(slot) {
     this->map_row = row;
     this->map_col = col;
@@ -45,7 +45,7 @@ WarGrey::STEM::MarioGroundAtlas::MarioGroundAtlas(size_t slot, int row, int col,
     this->map_tile_height = tile_size;
 }
 
-int WarGrey::STEM::MarioGroundAtlas::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {
+int GYDM::MarioGroundAtlas::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {
     row_col_t pos0 = mario_ground_positions[slot % (sizeof(mario_ground_positions) / sizeof(row_col_t))];
     int subrow = 0;
     int subcol = 0;
@@ -57,7 +57,7 @@ int WarGrey::STEM::MarioGroundAtlas::get_atlas_tile_index(size_t map_idx, int& x
     return subrow * this->atlas_col + subcol;
 }
 
-void WarGrey::STEM::MarioGroundAtlas::feed_ground_tile_index(size_t map_idx, int& subrow, int& subcol) {
+void GYDM::MarioGroundAtlas::feed_ground_tile_index(size_t map_idx, int& subrow, int& subcol) {
     size_t col = map_idx % this->map_col;
     size_t row = map_idx / this->map_col;
 
@@ -71,7 +71,7 @@ void WarGrey::STEM::MarioGroundAtlas::feed_ground_tile_index(size_t map_idx, int
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::MarioPipe::MarioPipe(int row, int col, MarioPipeColor color, float tile_size)
+GYDM::MarioPipe::MarioPipe(int row, int col, MarioPipeColor color, float tile_size)
         : GridAtlas(MARIO_WORLD_MAP, row, col), color_idx(static_cast<int>(color)) {
     this->map_row = 1;
     this->map_col = 1;
@@ -81,7 +81,7 @@ WarGrey::STEM::MarioPipe::MarioPipe(int row, int col, MarioPipeColor color, floa
     this->camouflage(false);
 }
 
-void WarGrey::STEM::MarioPipe::set_color(MarioPipeColor color) {
+void GYDM::MarioPipe::set_color(MarioPipeColor color) {
     int idx = static_cast<int>(color);
 
     if (idx != this->color_idx) {
@@ -90,17 +90,17 @@ void WarGrey::STEM::MarioPipe::set_color(MarioPipeColor color) {
     }
 }
 
-MarioPipeColor WarGrey::STEM::MarioPipe::get_color() {
+MarioPipeColor GYDM::MarioPipe::get_color() {
     return static_cast<MarioPipeColor>(this->color_idx);
 }
 
-WarGrey::STEM::MarioVPipe::MarioVPipe(int length, MarioVPipeDirection dir, MarioPipeColor color, float tile_size)
+GYDM::MarioVPipe::MarioVPipe(int length, MarioVPipeDirection dir, MarioPipeColor color, float tile_size)
         : MarioPipe(46, 34, color, tile_size), direction(dir) {
     this->map_row = length;
     this->map_tile_width *= 2.0F;
 }
 
-int WarGrey::STEM::MarioVPipe::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {
+int GYDM::MarioVPipe::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {
     row_col_t pos;
 
     if (map_idx == 0) {
@@ -127,13 +127,13 @@ int WarGrey::STEM::MarioVPipe::get_atlas_tile_index(size_t map_idx, int& xoff, i
     return pos.first * this->atlas_col + pos.second;
 }
 
-WarGrey::STEM::MarioHPipe::MarioHPipe(int length, MarioHPipeDirection dir, MarioPipeColor color, float tile_size)
+GYDM::MarioHPipe::MarioHPipe(int length, MarioHPipeDirection dir, MarioPipeColor color, float tile_size)
         : MarioPipe(23, 68, color, tile_size), direction(dir) {
     this->map_col = length;
     this->map_tile_height *= 2.0F;
 }
 
-int WarGrey::STEM::MarioHPipe::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {
+int GYDM::MarioHPipe::get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) {
     row_col_t pos;
 
     if (map_idx == 0) {

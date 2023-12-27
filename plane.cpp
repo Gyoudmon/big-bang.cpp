@@ -24,7 +24,7 @@
 
 #include <deque>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /** NOTE
  *   C-Style casting tries all C++ style casting except dynamic_cast;
@@ -34,7 +34,7 @@ using namespace WarGrey::STEM;
 #define MATTER_INFO(m) (static_cast<MatterInfo*>(m->info))
 #define SPEECH_INFO(m) (static_cast<SpeechInfo*>(m->info))
 
-namespace WarGrey::STEM {
+namespace GYDM {
     enum class MotionActionType { Motion, TrackReset, TrackDrawing, PenColor, PenWidth, Heading, Rotation, Stamp };
 
     struct GlidingMotion {
@@ -114,8 +114,8 @@ namespace WarGrey::STEM {
         };
     };
 
-    struct MatterInfo : public WarGrey::STEM::IMatterInfo {
-        MatterInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {}
+    struct MatterInfo : public GYDM::IMatterInfo {
+        MatterInfo(GYDM::IPlane* master) : IMatterInfo(master) {}
         virtual ~MatterInfo() noexcept;
 
         float x = 0.0F;
@@ -159,9 +159,9 @@ namespace WarGrey::STEM {
         IMatter* prev = nullptr;
     };
 
-    class SpeechInfo : public WarGrey::STEM::IMatterInfo {
+    class SpeechInfo : public GYDM::IMatterInfo {
     public:
-        SpeechInfo(WarGrey::STEM::IPlane* master) : IMatterInfo(master) {}
+        SpeechInfo(GYDM::IPlane* master) : IMatterInfo(master) {}
         virtual ~SpeechInfo() {}
 
     public:
@@ -185,7 +185,7 @@ namespace WarGrey::STEM {
         uint32_t refcount = 0;
     };
 
-    WarGrey::STEM::MatterInfo::~MatterInfo() noexcept {
+    GYDM::MatterInfo::~MatterInfo() noexcept {
         if (this->bubble != nullptr) {
             auto speech_info = dynamic_cast<SpeechInfo*>(this->bubble->info);
 
@@ -370,14 +370,14 @@ static inline void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float*
     (*y) = info->y;
 }
 
-static inline void unsafe_add_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info, bool selected) {
+static inline void unsafe_add_selected(GYDM::IPlane* master, IMatter* m, MatterInfo* info, bool selected) {
     master->on_select(m, selected);
     info->selected = selected;
     master->after_select(m, selected);
     master->notify_updated();
 }
 
-static inline void unsafe_set_selected(WarGrey::STEM::IPlane* master, IMatter* m, MatterInfo* info) {
+static inline void unsafe_set_selected(GYDM::IPlane* master, IMatter* m, MatterInfo* info) {
     master->begin_update_sequence();
     master->no_selected();
     unsafe_add_selected(master, m, info, true);
@@ -413,7 +413,7 @@ Plane::~Plane() {
     this->erase();
 }
 
-void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
+void GYDM::Plane::notify_matter_ready(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -425,7 +425,7 @@ void WarGrey::STEM::Plane::notify_matter_ready(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::bring_to_front(IMatter* m, IMatter* target) {
+void GYDM::Plane::bring_to_front(IMatter* m, IMatter* target) {
     MatterInfo* tinfo = plane_matter_info(this, target);
 
     if (tinfo == nullptr) {
@@ -454,7 +454,7 @@ void WarGrey::STEM::Plane::bring_to_front(IMatter* m, IMatter* target) {
     }
 }
 
-void WarGrey::STEM::Plane::bring_forward(IMatter* m, int n) {
+void GYDM::Plane::bring_forward(IMatter* m, int n) {
     MatterInfo* sinfo = plane_matter_info(this, m);
     
     if (sinfo != nullptr) {
@@ -470,7 +470,7 @@ void WarGrey::STEM::Plane::bring_forward(IMatter* m, int n) {
     }
 }
 
-void WarGrey::STEM::Plane::send_to_back(IMatter* m, IMatter* target) {
+void GYDM::Plane::send_to_back(IMatter* m, IMatter* target) {
     MatterInfo* tinfo = plane_matter_info(this, target);
 
     if (tinfo == nullptr) {
@@ -499,7 +499,7 @@ void WarGrey::STEM::Plane::send_to_back(IMatter* m, IMatter* target) {
     }
 }
 
-void WarGrey::STEM::Plane::send_backward(IMatter* m, int n) {
+void GYDM::Plane::send_backward(IMatter* m, int n) {
     MatterInfo* sinfo = plane_matter_info(this, m);
     
     if (sinfo != nullptr) {
@@ -514,7 +514,7 @@ void WarGrey::STEM::Plane::send_backward(IMatter* m, int n) {
     }
 }
 
-void WarGrey::STEM::Plane::insert_at(IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
+void GYDM::Plane::insert_at(IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
     if (m->info == nullptr) {
         MatterInfo* info = bind_matter_owership(this, m);
         
@@ -536,7 +536,7 @@ void WarGrey::STEM::Plane::insert_at(IMatter* m, const Position& pos, const Anch
     }
 }
 
-void WarGrey::STEM::Plane::insert_as_speech_bubble(IMatter* m) {
+void GYDM::Plane::insert_as_speech_bubble(IMatter* m) {
     if (m->info == nullptr) {
         SpeechInfo* info = bind_speech_owership(this, m);
 
@@ -547,7 +547,7 @@ void WarGrey::STEM::Plane::insert_as_speech_bubble(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::handle_new_matter(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy) {
+void GYDM::Plane::handle_new_matter(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy) {
     this->begin_update_sequence();
     m->construct(this->master_renderer());
     this->move_matter_to_location_via_info(m, info, pos, a, dx, dy);
@@ -561,14 +561,14 @@ void WarGrey::STEM::Plane::handle_new_matter(IMatter* m, MatterInfo* info, const
 }
 
 
-void WarGrey::STEM::Plane::handle_new_matter(IMatter* m, SpeechInfo* info) {
+void GYDM::Plane::handle_new_matter(IMatter* m, SpeechInfo* info) {
     this->begin_update_sequence();
     m->construct(this->master_renderer());
     this->notify_updated();
     this->end_update_sequence();
 }
 
-void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
+void GYDM::Plane::remove(IMatter* m, bool needs_delete) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -596,7 +596,7 @@ void WarGrey::STEM::Plane::remove(IMatter* m, bool needs_delete) {
     }
 }
 
-void WarGrey::STEM::Plane::erase() {
+void GYDM::Plane::erase() {
     IMatter* temp_head = this->head_matter;
         
     if (this->head_matter != nullptr) {
@@ -623,7 +623,7 @@ void WarGrey::STEM::Plane::erase() {
     }
 }
 
-void WarGrey::STEM::Plane::move(IMatter* m, double length, bool ignore_gliding) {
+void GYDM::Plane::move(IMatter* m, double length, bool ignore_gliding) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
 
@@ -649,7 +649,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, double length, bool ignore_gliding) 
     }
 }
 
-void WarGrey::STEM::Plane::move(IMatter* m, const Vector& vec, bool ignore_gliding) {
+void GYDM::Plane::move(IMatter* m, const Vector& vec, bool ignore_gliding) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
 
@@ -675,7 +675,7 @@ void WarGrey::STEM::Plane::move(IMatter* m, const Vector& vec, bool ignore_glidi
     }
 }
 
-void WarGrey::STEM::Plane::move_to(IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
+void GYDM::Plane::move_to(IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
@@ -685,7 +685,7 @@ void WarGrey::STEM::Plane::move_to(IMatter* m, const Position& pos, const Anchor
     }
 }
 
-void WarGrey::STEM::Plane::glide(double sec, IMatter* m, double length) {
+void GYDM::Plane::glide(double sec, IMatter* m, double length) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
 
@@ -707,7 +707,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, double length) {
     }
 }
 
-void WarGrey::STEM::Plane::glide(double sec, IMatter* m, const Vector& vec) {
+void GYDM::Plane::glide(double sec, IMatter* m, const Vector& vec) {
     if (m != nullptr) {
         MatterInfo* info = plane_matter_info(this, m);
 
@@ -729,7 +729,7 @@ void WarGrey::STEM::Plane::glide(double sec, IMatter* m, const Vector& vec) {
     }
 }
 
-void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
+void GYDM::Plane::glide_to(double sec, IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
@@ -737,7 +737,7 @@ void WarGrey::STEM::Plane::glide_to(double sec, IMatter* m, const Position& pos,
     }
 }
 
-void WarGrey::STEM::Plane::clear_motion_actions(IMatter* m) {
+void GYDM::Plane::clear_motion_actions(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -745,7 +745,7 @@ void WarGrey::STEM::Plane::clear_motion_actions(IMatter* m) {
     }
 }
 
-IMatter* WarGrey::STEM::Plane::find_matter(float x, float y, IMatter* after) {
+IMatter* GYDM::Plane::find_matter(float x, float y, IMatter* after) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
@@ -770,7 +770,7 @@ IMatter* WarGrey::STEM::Plane::find_matter(float x, float y, IMatter* after) {
     return found;
 }
 
-IMatter* WarGrey::STEM::Plane::find_least_recent_matter(float x, float y) {
+IMatter* GYDM::Plane::find_least_recent_matter(float x, float y) {
     IMatter* found = nullptr;
     uint32_t found_hit = 0xFFFFFFFFU;
 
@@ -808,7 +808,7 @@ IMatter* WarGrey::STEM::Plane::find_least_recent_matter(float x, float y) {
 /**
  * TODO: if we need to check selected matters first? 
  */
-IMatter* WarGrey::STEM::Plane::find_matter_for_tooltip(float x, float y) {
+IMatter* GYDM::Plane::find_matter_for_tooltip(float x, float y) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
@@ -832,7 +832,7 @@ IMatter* WarGrey::STEM::Plane::find_matter_for_tooltip(float x, float y) {
     return found;
 }
 
-IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
+IMatter* GYDM::Plane::find_next_selected_matter(IMatter* start) {
     IMatter* found = nullptr;
     
     if (start == nullptr) {
@@ -850,7 +850,7 @@ IMatter* WarGrey::STEM::Plane::find_next_selected_matter(IMatter* start) {
     return found;
 }
 
-bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, const Anchor& a) {
+bool GYDM::Plane::feed_matter_location(IMatter* m, float* x, float* y, const Anchor& a) {
     MatterInfo* info = plane_matter_info(this, m);
     bool okay = false;
     
@@ -867,7 +867,7 @@ bool WarGrey::STEM::Plane::feed_matter_location(IMatter* m, float* x, float* y, 
     return okay;
 }
 
-bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) {
+bool GYDM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) {
     MatterInfo* info = plane_matter_info(this, m);
     bool okay = false;
     
@@ -884,7 +884,7 @@ bool WarGrey::STEM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, 
     return okay;
 }
 
-void WarGrey::STEM::Plane::feed_matters_boundary(float* x, float* y, float* width, float* height) {
+void GYDM::Plane::feed_matters_boundary(float* x, float* y, float* width, float* height) {
     this->recalculate_matters_extent_when_invalid();
 
     SET_VALUES(x, this->matters_left, y, this->matters_top);
@@ -892,11 +892,11 @@ void WarGrey::STEM::Plane::feed_matters_boundary(float* x, float* y, float* widt
     SET_BOX(height, this->matters_bottom - this->matters_top);
 }
 
-void WarGrey::STEM::Plane::size_cache_invalid() {
+void GYDM::Plane::size_cache_invalid() {
     this->matters_right = this->matters_left - 1.0F;
 }
 
-void WarGrey::STEM::Plane::recalculate_matters_extent_when_invalid() {
+void GYDM::Plane::recalculate_matters_extent_when_invalid() {
     if (this->matters_right < this->matters_left) {
         float rx, ry, width, height;
 
@@ -928,7 +928,7 @@ void WarGrey::STEM::Plane::recalculate_matters_extent_when_invalid() {
     }
 }
 
-void WarGrey::STEM::Plane::add_selected(IMatter* m) {
+void GYDM::Plane::add_selected(IMatter* m) {
     if (this->can_select_multiple()) {
         MatterInfo* info = plane_matter_info(this, m);
 
@@ -940,7 +940,7 @@ void WarGrey::STEM::Plane::add_selected(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::remove_selected(IMatter* m) {
+void GYDM::Plane::remove_selected(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (info->selected)) {
@@ -948,7 +948,7 @@ void WarGrey::STEM::Plane::remove_selected(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::set_selected(IMatter* m) {
+void GYDM::Plane::set_selected(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (!info->selected)) {
@@ -958,11 +958,11 @@ void WarGrey::STEM::Plane::set_selected(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::no_selected() {
+void GYDM::Plane::no_selected() {
     this->no_selected_except(nullptr);
 }
 
-void WarGrey::STEM::Plane::no_selected_except(IMatter* m) {
+void GYDM::Plane::no_selected_except(IMatter* m) {
     if (this->head_matter != nullptr) {
         IMatter* child = this->head_matter;
 
@@ -982,7 +982,7 @@ void WarGrey::STEM::Plane::no_selected_except(IMatter* m) {
     }
 }
 
-bool WarGrey::STEM::Plane::is_selected(IMatter* m) {
+bool GYDM::Plane::is_selected(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
     bool selected = false;
 
@@ -993,7 +993,7 @@ bool WarGrey::STEM::Plane::is_selected(IMatter* m) {
     return selected;
 }
 
-size_t WarGrey::STEM::Plane::count_selected() {
+size_t GYDM::Plane::count_selected() {
     size_t n = 0U;
 
     if (this->head_matter != nullptr) {
@@ -1013,11 +1013,11 @@ size_t WarGrey::STEM::Plane::count_selected() {
     return n;
 }
 
-IMatter* WarGrey::STEM::Plane::get_focused_matter() {
+IMatter* GYDM::Plane::get_focused_matter() {
     return this->focused_matter;
 }
 
-void WarGrey::STEM::Plane::set_caret_owner(IMatter* m) {
+void GYDM::Plane::set_caret_owner(IMatter* m) {
     if (this->focused_matter != m) {
         if ((m != nullptr) && (m->events_allowed())) {
             MatterInfo* info = plane_matter_info(this, m);
@@ -1044,25 +1044,25 @@ void WarGrey::STEM::Plane::set_caret_owner(IMatter* m) {
 }
 
 /************************************************************************************************/
-void WarGrey::STEM::Plane::on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {
+void GYDM::Plane::on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {
     if (this->focused_matter != nullptr) {
         this->focused_matter->on_char(key, modifiers, repeats, pressed);
     }
 }
 
-void WarGrey::STEM::Plane::on_text(const char* text, size_t size, bool entire) {
+void GYDM::Plane::on_text(const char* text, size_t size, bool entire) {
     if (this->focused_matter != nullptr) {
         this->focused_matter->on_text(text, size, entire);
     }
 }
 
-void WarGrey::STEM::Plane::on_editing_text(const char* text, int pos, int span) {
+void GYDM::Plane::on_editing_text(const char* text, int pos, int span) {
     if (this->focused_matter != nullptr) {
         this->focused_matter->on_editing_text(text, pos, span);
     }
 }
 
-void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
+void GYDM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1086,7 +1086,7 @@ void WarGrey::STEM::Plane::on_tap(IMatter* m, float local_x, float local_y) {
     }
 }
 
-void WarGrey::STEM::Plane::on_tap_selected(IMatter* m, float local_x, float local_y) {
+void GYDM::Plane::on_tap_selected(IMatter* m, float local_x, float local_y) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1094,7 +1094,7 @@ void WarGrey::STEM::Plane::on_tap_selected(IMatter* m, float local_x, float loca
     }
 }
 
-bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) {
+bool GYDM::Plane::on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) {
     bool handled = false;
 
     switch (button) {
@@ -1120,7 +1120,7 @@ bool WarGrey::STEM::Plane::on_pointer_pressed(uint8_t button, float x, float y, 
     return handled;
 }
 
-bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, float dx, float dy) {
+bool GYDM::Plane::on_pointer_move(uint32_t state, float x, float y, float dx, float dy) {
     bool handled = false;
 
     if (state == 0) {
@@ -1175,7 +1175,7 @@ bool WarGrey::STEM::Plane::on_pointer_move(uint32_t state, float x, float y, flo
     return handled;
 }
 
-bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) {
+bool GYDM::Plane::on_pointer_released(uint8_t button, float x, float y, uint8_t clicks) {
     bool handled = false;
 
     switch (button) {
@@ -1219,13 +1219,13 @@ bool WarGrey::STEM::Plane::on_pointer_released(uint8_t button, float x, float y,
     return handled;
 }
 
-bool WarGrey::STEM::Plane::on_scroll(int horizon, int vertical, float hprecise, float vprecise) {
+bool GYDM::Plane::on_scroll(int horizon, int vertical, float hprecise, float vprecise) {
     bool handled = false;
 
     return handled;
 }
 
-bool WarGrey::STEM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy) {
+bool GYDM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy) {
     bool done = false;
 
     if (this->hovering_matter != nullptr) {
@@ -1248,7 +1248,7 @@ bool WarGrey::STEM::Plane::say_goodbye_to_hover_matter(uint32_t state, float x, 
     return done;
 }
 
-void WarGrey::STEM::Plane::on_enter(IPlane* from) {
+void GYDM::Plane::on_enter(IPlane* from) {
     this->mission_done = false;
 
     if (this->sentry != nullptr) {
@@ -1258,7 +1258,7 @@ void WarGrey::STEM::Plane::on_enter(IPlane* from) {
     IPlane::on_enter(from);
 }
 
-void WarGrey::STEM::Plane::mission_complete() {
+void GYDM::Plane::mission_complete() {
     if (this->sentry != nullptr) {
         this->sentry->play_goodbye(1);
         this->sentry->stop(1);
@@ -1268,16 +1268,16 @@ void WarGrey::STEM::Plane::mission_complete() {
     this->mission_done = true;
 }
 
-bool WarGrey::STEM::Plane::has_mission_completed() {
+bool GYDM::Plane::has_mission_completed() {
     return this->mission_done &&
             ((this->sentry == nullptr) || !this->sentry->in_playing());
 }
 
-bool WarGrey::STEM::Plane::can_select(IMatter* m) {
+bool GYDM::Plane::can_select(IMatter* m) {
     return this->sentry == m;
 }
 
-void WarGrey::STEM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
+void GYDM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
     this->begin_update_sequence();
 
     if ((this->tooltip != nullptr) && !this->tooltip->visible()) {
@@ -1292,7 +1292,7 @@ void WarGrey::STEM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
     this->end_update_sequence();
 }
 
-void WarGrey::STEM::Plane::place_tooltip(WarGrey::STEM::IMatter* target) {
+void GYDM::Plane::place_tooltip(GYDM::IMatter* target) {
     float ttx, tty, width, height;
 
     this->move_to(this->tooltip, { target, MatterAnchor::LB },
@@ -1318,7 +1318,7 @@ void WarGrey::STEM::Plane::place_tooltip(WarGrey::STEM::IMatter* target) {
 }
 
 /************************************************************************************************/
-void WarGrey::STEM::Plane::set_matter_fps(IMatter* m, int fps, bool restart) {
+void GYDM::Plane::set_matter_fps(IMatter* m, int fps, bool restart) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1326,12 +1326,12 @@ void WarGrey::STEM::Plane::set_matter_fps(IMatter* m, int fps, bool restart) {
     }
 }
 
-void WarGrey::STEM::Plane::set_local_fps(int fps, bool restart) {
+void GYDM::Plane::set_local_fps(int fps, bool restart) {
     unsafe_set_local_fps(fps, restart, this->local_frame_delta, this->local_frame_count, this->local_elapse);
 }
 
 
-void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration) {
+void GYDM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t count0, int duration) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1340,7 +1340,7 @@ void WarGrey::STEM::Plane::notify_matter_timeline_restart(IMatter* m, uint32_t c
     }
 }
 
-void WarGrey::STEM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
+void GYDM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
     uint32_t elapse = 0U;
 
     if (this->head_matter != nullptr) {
@@ -1385,7 +1385,7 @@ void WarGrey::STEM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t
     }
 }
 
-void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {
+void GYDM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {
     float dsX = flmax(0.0F, X);
     float dsY = flmax(0.0F, Y);
     float dsWidth = X + Width;
@@ -1446,11 +1446,11 @@ void WarGrey::STEM::Plane::draw(SDL_Renderer* renderer, float X, float Y, float 
     }
 }
 
-void WarGrey::STEM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
+void GYDM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) {
     Brush::draw_rect(renderer, x, y, width, height, 0x00FFFFU);
 }
 
-void WarGrey::STEM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
+void GYDM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
     float mx, my, mwidth, mheight;
     SDL_Rect clip;
     
@@ -1482,7 +1482,7 @@ void WarGrey::STEM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, M
     }
 }
 
-void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
+void GYDM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
     if (is_matter_bubble_showing(child, info)) {
         float ix, iy, iwidth, iheight, bx, by, bwidth, bheight;
         float dx, dy, mwidth, mheight;
@@ -1529,7 +1529,7 @@ void WarGrey::STEM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, M
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_track, bool heading) {
+bool GYDM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_track, bool heading) {
     bool moved = false;
     Dot dot = pos.calculate_dot();
     float x = dot.x;
@@ -1559,7 +1559,7 @@ bool WarGrey::STEM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, cons
     return moved;
 }
 
-bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, const Position& pos, double sec, double sec_delta, bool absolute, bool ignore_track) {
+bool GYDM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, const Position& pos, double sec, double sec_delta, bool absolute, bool ignore_track) {
     bool moved = false;
     Dot dot = pos.calculate_dot();
     float x = dot.x;
@@ -1601,7 +1601,7 @@ bool WarGrey::STEM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, con
     return moved;
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading) {
+bool GYDM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading) {
     bool moved = false;
 
     if ((!info->gliding) || ignore_gliding) {
@@ -1617,7 +1617,7 @@ bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, do
     return moved;
 }
 
-bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_gliding, bool heading) {
+bool GYDM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_gliding, bool heading) {
     bool moved = false;
 
     if ((!info->gliding) || ignore_gliding) {
@@ -1631,7 +1631,7 @@ bool WarGrey::STEM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, co
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length) {
+bool GYDM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length) {
     bool moved = false;
 
     if (!info->gliding) {
@@ -1643,7 +1643,7 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, bool absolute, bool heading) {
+bool GYDM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, bool absolute, bool heading) {
     bool moved = false;
     
     if (sec <= 0.0F) {
@@ -1666,7 +1666,7 @@ bool WarGrey::STEM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, d
     return moved;
 }
 
-bool WarGrey::STEM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, const Anchor& a, float dx, float dy, bool heading) {
+bool GYDM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, const Anchor& a, float dx, float dy, bool heading) {
     float sx, sy, sw, sh;
     Position position = pos;
         
@@ -1676,11 +1676,11 @@ bool WarGrey::STEM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterI
     return this->glide_matter_via_info(m, info, sec, position, true, heading);
 }
 
-bool WarGrey::STEM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy) {
+bool GYDM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy) {
     return this->glide_matter_to_location_via_info(m, info, 0.0F, pos, a, dx, dy, false);
 }
 
-void WarGrey::STEM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
+void GYDM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
     if (!m->motion_stopped()) {
         float cwidth, cheight, hdist, vdist;
         double xspd = m->x_speed();
@@ -1788,7 +1788,7 @@ void WarGrey::STEM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, fl
     }
 }
 
-bool WarGrey::STEM::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading) {
+bool GYDM::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading) {
     double x, y;
 
     orthogonal_decomposition(length, m->get_heading(), &x, &y);
@@ -1796,7 +1796,7 @@ bool WarGrey::STEM::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double
     return this->move_matter_via_info(m, info, Position(x, y), false, true, heading);
 }
 
-bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec) {
+bool GYDM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec) {
     double x, y;
 
     orthogonal_decomposition(length, m->get_heading(), &x, &y);
@@ -1804,7 +1804,7 @@ bool WarGrey::STEM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, doubl
     return this->glide_matter_via_info(m, info, sec, Position(x, y), false, true);
 }
 
-bool WarGrey::STEM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x, float y) {
+bool GYDM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x, float y) {
     float sx, sy, sw, sh;
     
     unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
@@ -1817,7 +1817,7 @@ bool WarGrey::STEM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, const Anchor& a, bool shared) {
+void GYDM::Plane::bind_canvas(IMatter* m, GYDM::Tracklet* canvas, const Anchor& a, bool shared) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1831,7 +1831,7 @@ void WarGrey::STEM::Plane::bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canv
     }
 }
 
-void WarGrey::STEM::Plane::reset_pen(IMatter* m) {
+void GYDM::Plane::reset_pen(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1840,7 +1840,7 @@ void WarGrey::STEM::Plane::reset_pen(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::stamp(IMatter* m) {
+void GYDM::Plane::stamp(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1850,7 +1850,7 @@ void WarGrey::STEM::Plane::stamp(IMatter* m) {
     }
 }
 
-void WarGrey::STEM::Plane::set_drawing(IMatter* m, bool yes_or_no) {
+void GYDM::Plane::set_drawing(IMatter* m, bool yes_or_no) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (info->master != nullptr)) {
@@ -1858,7 +1858,7 @@ void WarGrey::STEM::Plane::set_drawing(IMatter* m, bool yes_or_no) {
     }
 }
 
-void WarGrey::STEM::Plane::set_pen_width(IMatter* m, uint8_t width) {
+void GYDM::Plane::set_pen_width(IMatter* m, uint8_t width) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (info->master != nullptr)) {
@@ -1866,7 +1866,7 @@ void WarGrey::STEM::Plane::set_pen_width(IMatter* m, uint8_t width) {
     }
 }
 
-void WarGrey::STEM::Plane::set_pen_color(IMatter* m, const RGBA& color) {
+void GYDM::Plane::set_pen_color(IMatter* m, const RGBA& color) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (info->master != nullptr)) {
@@ -1874,7 +1874,7 @@ void WarGrey::STEM::Plane::set_pen_color(IMatter* m, const RGBA& color) {
     }
 }
 
-void WarGrey::STEM::Plane::set_heading(IMatter* m, double direction, bool is_radian) {
+void GYDM::Plane::set_heading(IMatter* m, double direction, bool is_radian) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (info->master != nullptr)) {
@@ -1882,7 +1882,7 @@ void WarGrey::STEM::Plane::set_heading(IMatter* m, double direction, bool is_rad
     }
 }
 
-void WarGrey::STEM::Plane::turn(IMatter* m, double theta, bool is_radian) {
+void GYDM::Plane::turn(IMatter* m, double theta, bool is_radian) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if ((info != nullptr) && (info->master != nullptr)) {
@@ -1891,7 +1891,7 @@ void WarGrey::STEM::Plane::turn(IMatter* m, double theta, bool is_radian) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Plane::log_message(Log level, const std::string& msg) {
+void GYDM::Plane::log_message(Log level, const std::string& msg) {
     if (this->sentry != nullptr) {
         RGBA color;
 
@@ -1910,7 +1910,7 @@ void WarGrey::STEM::Plane::log_message(Log level, const std::string& msg) {
     }
 }
 
-void WarGrey::STEM::Plane::say(ISprite* m, double sec, IMatter* message, SpeechBubble type) {
+void GYDM::Plane::say(ISprite* m, double sec, IMatter* message, SpeechBubble type) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1944,7 +1944,7 @@ void WarGrey::STEM::Plane::say(ISprite* m, double sec, IMatter* message, SpeechB
     }
 }
 
-void WarGrey::STEM::Plane::say(ISprite* m, double sec, const std::string& message, const RGBA& color, SpeechBubble type) {
+void GYDM::Plane::say(ISprite* m, double sec, const std::string& message, const RGBA& color, SpeechBubble type) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1958,7 +1958,7 @@ void WarGrey::STEM::Plane::say(ISprite* m, double sec, const std::string& messag
     }
 }
 
-void WarGrey::STEM::Plane::shh(ISprite* m) {
+void GYDM::Plane::shh(ISprite* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -1968,11 +1968,11 @@ void WarGrey::STEM::Plane::shh(ISprite* m) {
     }
 }
 
-IMatter* WarGrey::STEM::Plane::make_bubble_text(const std::string& message, const RGBA& color) {
+IMatter* GYDM::Plane::make_bubble_text(const std::string& message, const RGBA& color) {
     return new Labellet(this->bubble_font, color, "%s", message.c_str());
 }
 
-bool WarGrey::STEM::Plane::merge_bubble_text(IMatter* bubble, const std::string& message, const RGBA& color) {
+bool GYDM::Plane::merge_bubble_text(IMatter* bubble, const std::string& message, const RGBA& color) {
     auto bmsg = dynamic_cast<ITextlet*>(bubble);
     bool okay = (bmsg != nullptr);
 
@@ -1984,7 +1984,7 @@ bool WarGrey::STEM::Plane::merge_bubble_text(IMatter* bubble, const std::string&
     return okay;
 }
 
-bool WarGrey::STEM::Plane::is_bubble_showing(IMatter* m, SpeechBubble* type) {
+bool GYDM::Plane::is_bubble_showing(IMatter* m, SpeechBubble* type) {
     MatterInfo* info = plane_matter_info(this, m);
     bool yes = is_matter_bubble_showing(m, info);
 
@@ -1995,13 +1995,13 @@ bool WarGrey::STEM::Plane::is_bubble_showing(IMatter* m, SpeechBubble* type) {
     return yes;
 }
 
-void WarGrey::STEM::Plane::place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height, Anchor* ma, Anchor* ba, float* dx, float* dy) {
+void GYDM::Plane::place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height, Anchor* ma, Anchor* ba, float* dx, float* dy) {
     ma->reset(0.0F);
     ba->reset(0.618F, 1.0);
     SET_BOXES(dx, dy, 0.0F);
 }
 
-void WarGrey::STEM::Plane::set_bubble_duration(double second) {
+void GYDM::Plane::set_bubble_duration(double second) {
     if (second <= 0.0) {
         this->set_bubble_duration();
     } else {
@@ -2009,39 +2009,39 @@ void WarGrey::STEM::Plane::set_bubble_duration(double second) {
     }
 }
 
-void WarGrey::STEM::Plane::set_bubble_margin(float top, float right, float bottom, float left) {
+void GYDM::Plane::set_bubble_margin(float top, float right, float bottom, float left) {
     this->bubble_top_margin = top;
     this->bubble_right_margin = right;
     this->bubble_bottom_margin = bottom;
     this->bubble_left_margin = left;
 }
 
-void WarGrey::STEM::Plane::set_bubble_color(const RGBA& border, const RGBA& background) {
+void GYDM::Plane::set_bubble_color(const RGBA& border, const RGBA& background) {
     this->bubble_border = border;
     this->bubble_color = background;
 }
 
-void WarGrey::STEM::Plane::delete_matter(IMatter* m) {
+void GYDM::Plane::delete_matter(IMatter* m) {
     // m's destructor will delete the associated info object
     delete m;
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IPlane::IPlane(const char* name) : caption(name) {}
-WarGrey::STEM::IPlane::IPlane(const std::string& name) : IPlane(name.c_str()) {}
+GYDM::IPlane::IPlane(const char* name) : caption(name) {}
+GYDM::IPlane::IPlane(const std::string& name) : IPlane(name.c_str()) {}
 
-WarGrey::STEM::IPlane::~IPlane() {
+GYDM::IPlane::~IPlane() {
     if (this->info != nullptr) {
         delete this->info;
         this->info = nullptr;
     }
 }
 
-const char* WarGrey::STEM::IPlane::name() {
+const char* GYDM::IPlane::name() {
     return this->caption.c_str();
 }
 
-IScreen* WarGrey::STEM::IPlane::master() {
+IScreen* GYDM::IPlane::master() {
     IScreen* screen = nullptr;
 
     if (this->info != nullptr) {
@@ -2051,7 +2051,7 @@ IScreen* WarGrey::STEM::IPlane::master() {
     return screen;
 }
 
-SDL_Renderer* WarGrey::STEM::IPlane::master_renderer() {
+SDL_Renderer* GYDM::IPlane::master_renderer() {
     SDL_Renderer* renderer = nullptr;
     IScreen* screen = this->master();
     
@@ -2062,59 +2062,59 @@ SDL_Renderer* WarGrey::STEM::IPlane::master_renderer() {
     return renderer;
 }
 
-void WarGrey::STEM::IPlane::on_enter(IPlane* from) {
+void GYDM::IPlane::on_enter(IPlane* from) {
     float width, height;
 
     this->master()->feed_client_extent(&width, &height);
     this->on_mission_start(width, height);
 }
 
-void WarGrey::STEM::IPlane::start_input_text(const char* fmt, ...) {
+void GYDM::IPlane::start_input_text(const char* fmt, ...) {
     if (this->info != nullptr) {
         VSNPRINT(prompt, fmt);
         this->info->master->start_input_text(prompt);
     }
 }
 
-void WarGrey::STEM::IPlane::start_input_text(const std::string& prompt) {
+void GYDM::IPlane::start_input_text(const std::string& prompt) {
     if (this->info != nullptr) {
         this->info->master->start_input_text(prompt);
     }
 }
 
-void WarGrey::STEM::IPlane::log_message(Log level, const std::string& msg) {
+void GYDM::IPlane::log_message(Log level, const std::string& msg) {
     if (this->info != nullptr) {
         this->info->master->log_message(level, msg);
     }
 }
 
-void WarGrey::STEM::IPlane::begin_update_sequence() {
+void GYDM::IPlane::begin_update_sequence() {
     if (this->info != nullptr) {
         this->info->master->begin_update_sequence();
     }
 }
 
-bool WarGrey::STEM::IPlane::is_in_update_sequence() {
+bool GYDM::IPlane::is_in_update_sequence() {
     return ((this->info != nullptr) && this->info->master->is_in_update_sequence());
 }
 
-void WarGrey::STEM::IPlane::end_update_sequence() {
+void GYDM::IPlane::end_update_sequence() {
     if (this->info != nullptr) {
         this->info->master->end_update_sequence();
     }
 }
 
-bool WarGrey::STEM::IPlane::should_update() {
+bool GYDM::IPlane::should_update() {
     return ((this->info != nullptr) && this->info->master->should_update());
 }
 
-void WarGrey::STEM::IPlane::notify_updated(IMatter* m) {
+void GYDM::IPlane::notify_updated(IMatter* m) {
     if (this->info != nullptr) {
         this->info->master->notify_updated();
     }
 }
 
-bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target) {
+bool GYDM::IPlane::is_colliding(IMatter* m, IMatter* target) {
     float slx, sty, sw, sh, tlx, tty, tw, th;
     bool sokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
     bool tokay = this->feed_matter_boundary(target, &tlx, &tty, &tw, &th);
@@ -2124,7 +2124,7 @@ bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target) {
                              tlx, tty, tlx + tw, tty + th);
 }
 
-bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target, const Anchor& a) {
+bool GYDM::IPlane::is_colliding(IMatter* m, IMatter* target, const Anchor& a) {
     float slx, sty, sw, sh, tx, ty;
     bool sokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
     bool tokay = this->feed_matter_location(target, &tx, &ty, a);
@@ -2133,7 +2133,7 @@ bool WarGrey::STEM::IPlane::is_colliding(IMatter* m, IMatter* target, const Anch
         && rectangle_contain(slx, sty, slx + sw, sty + sh, tx, ty);
 }
 
-bool WarGrey::STEM::IPlane::is_colliding_with_mouse(IMatter* m) {
+bool GYDM::IPlane::is_colliding_with_mouse(IMatter* m) {
     float slx, sty, sw, sh, mx, my;
     bool mokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
 
@@ -2146,7 +2146,7 @@ bool WarGrey::STEM::IPlane::is_colliding_with_mouse(IMatter* m) {
     return mokay;
 }
 
-void WarGrey::STEM::IPlane::glide_to_random_location(double sec, IMatter* m) {
+void GYDM::IPlane::glide_to_random_location(double sec, IMatter* m) {
     IScreen* screen = this->master();
     float hinset, vinset, width, height;
     Dot rpos;
@@ -2166,7 +2166,7 @@ void WarGrey::STEM::IPlane::glide_to_random_location(double sec, IMatter* m) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IPlane::create_grid(int col, float x, float y, float width) {
+void GYDM::IPlane::create_grid(int col, float x, float y, float width) {
     IScreen* master = this->master();
     float height;
 
@@ -2198,7 +2198,7 @@ void WarGrey::STEM::IPlane::create_grid(int col, float x, float y, float width) 
     }
 }
 
-void WarGrey::STEM::IPlane::create_grid(int row, int col, float x, float y, float width, float height) {
+void GYDM::IPlane::create_grid(int row, int col, float x, float y, float width, float height) {
     this->row = row;
     this->column = col;
 
@@ -2232,7 +2232,7 @@ void WarGrey::STEM::IPlane::create_grid(int row, int col, float x, float y, floa
     }
 }
 
-void WarGrey::STEM::IPlane::create_grid(int row, int col, IMatter* m) {
+void GYDM::IPlane::create_grid(int row, int col, IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
@@ -2245,7 +2245,7 @@ void WarGrey::STEM::IPlane::create_grid(int row, int col, IMatter* m) {
     }
 }
 
-void WarGrey::STEM::IPlane::create_grid(float cell_width, float x, float y, int col) {
+void GYDM::IPlane::create_grid(float cell_width, float x, float y, int col) {
     IScreen* master = this->master();
     float height;
 
@@ -2269,7 +2269,7 @@ void WarGrey::STEM::IPlane::create_grid(float cell_width, float x, float y, int 
     }
 }
 
-void WarGrey::STEM::IPlane::create_grid(float cell_width, float cell_height, float x, float y, int row, int col) {
+void GYDM::IPlane::create_grid(float cell_width, float cell_height, float x, float y, int row, int col) {
     this->column = col;
     this->row = row;
 
@@ -2300,7 +2300,7 @@ void WarGrey::STEM::IPlane::create_grid(float cell_width, float cell_height, flo
     }
 }
 
-int WarGrey::STEM::IPlane::grid_cell_index(float x, float y, int* r, int* c) {
+int GYDM::IPlane::grid_cell_index(float x, float y, int* r, int* c) {
     int row = int(flfloor((y - this->grid_y) / this->cell_height));
     int col = int(flfloor((x - this->grid_x) / this->cell_width));
     
@@ -2309,7 +2309,7 @@ int WarGrey::STEM::IPlane::grid_cell_index(float x, float y, int* r, int* c) {
     return row * this->column + col;
 }
 
-int WarGrey::STEM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, const Anchor& a) {
+int GYDM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, const Anchor& a) {
     float x, y;
 
     this->feed_matter_location(m, &x, &y, a);
@@ -2317,12 +2317,12 @@ int WarGrey::STEM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, const Anc
     return this->grid_cell_index(x, y, r, c);    
 }
 
-void WarGrey::STEM::IPlane::feed_grid_cell_extent(float* width, float* height) {
+void GYDM::IPlane::feed_grid_cell_extent(float* width, float* height) {
     SET_BOX(width, this->cell_width);
     SET_BOX(height, this->cell_height);
 }
 
-Dot WarGrey::STEM::IPlane::get_grid_cell_location(int idx, const Anchor& a) {
+Dot GYDM::IPlane::get_grid_cell_location(int idx, const Anchor& a) {
     if (idx < 0) {
         idx += this->column * this->row;
     }
@@ -2337,7 +2337,7 @@ Dot WarGrey::STEM::IPlane::get_grid_cell_location(int idx, const Anchor& a) {
     }
 }
 
-Dot WarGrey::STEM::IPlane::get_grid_cell_location(int row, int col, const Anchor& a) {
+Dot GYDM::IPlane::get_grid_cell_location(int row, int col, const Anchor& a) {
     Dot dot;
     /** NOTE
      * Both `row` and `col` are just hints,
@@ -2359,50 +2359,50 @@ Dot WarGrey::STEM::IPlane::get_grid_cell_location(int row, int col, const Anchor
     return dot;
 }
 
-void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
+void GYDM::IPlane::insert_at_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
     this->insert_at(m, this->get_grid_cell_location(idx, a), a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::insert_at_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
+void GYDM::IPlane::insert_at_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
     this->insert_at(m, this->get_grid_cell_location(row, col, a), a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
+void GYDM::IPlane::move_to_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
     this->move_to(m, this->get_grid_cell_location(idx, a), a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::move_to_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
+void GYDM::IPlane::move_to_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
     this->move_to(m, this->get_grid_cell_location(row, col, a), a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::glide_to_grid(double sec, IMatter* m, int idx, const Anchor& a, float dx, float dy) {
+void GYDM::IPlane::glide_to_grid(double sec, IMatter* m, int idx, const Anchor& a, float dx, float dy) {
     this->glide_to(sec, m, this->get_grid_cell_location(idx, a), a, dx, dy);
 }
 
-void WarGrey::STEM::IPlane::glide_to_grid(double sec, IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
+void GYDM::IPlane::glide_to_grid(double sec, IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
     this->glide_to(sec, m, this->get_grid_cell_location(row, col, a), a, dx, dy);
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::IPlane::in_speech(ISprite* m) {
+bool GYDM::IPlane::in_speech(ISprite* m) {
     return this->is_bubble_showing(m, nullptr);
 }
 
-bool WarGrey::STEM::IPlane::is_speaking(ISprite* m) {
+bool GYDM::IPlane::is_speaking(ISprite* m) {
     SpeechBubble type;
     bool showing = this->is_bubble_showing(m, &type);
 
     return showing && (type == SpeechBubble::Default);
 }
 
-bool WarGrey::STEM::IPlane::is_thinking(ISprite* m) {
+bool GYDM::IPlane::is_thinking(ISprite* m) {
     SpeechBubble type;
     bool showing = this->is_bubble_showing(m, &type);
 
     return showing && (type == SpeechBubble::Thought);
 }
 
-void WarGrey::STEM::IPlane::say(ISprite* m, const std::string& sentence, const RGBA& color) {
+void GYDM::IPlane::say(ISprite* m, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {
@@ -2410,7 +2410,7 @@ void WarGrey::STEM::IPlane::say(ISprite* m, const std::string& sentence, const R
     }
 }
 
-void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const std::string& sentence, const RGBA& color) {
+void GYDM::IPlane::say(ISprite* m, double sec, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {
@@ -2418,7 +2418,7 @@ void WarGrey::STEM::IPlane::say(ISprite* m, double sec, const std::string& sente
     }
 }
 
-void WarGrey::STEM::IPlane::think(ISprite* m, const std::string& sentence, const RGBA& color) {
+void GYDM::IPlane::think(ISprite* m, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {
@@ -2426,7 +2426,7 @@ void WarGrey::STEM::IPlane::think(ISprite* m, const std::string& sentence, const
     }
 }
 
-void WarGrey::STEM::IPlane::think(ISprite* m, double sec, const std::string& sentence, const RGBA& color) {
+void GYDM::IPlane::think(ISprite* m, double sec, const std::string& sentence, const RGBA& color) {
     if (sentence.empty()) {
         this->shh(m);
     } else {

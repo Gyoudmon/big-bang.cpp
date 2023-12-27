@@ -4,11 +4,11 @@
 
 #include <vector>
 
-namespace WarGrey::STEM {
-    class __lambda__ Historylet : public WarGrey::STEM::ICanvaslet {
+namespace GYDM {
+    class __lambda__ Historylet : public GYDM::ICanvaslet {
     public:
-        Historylet(float size, const WarGrey::STEM::RGBA& line_color) : Historylet(size, size, line_color) {}
-        Historylet(float width, float height, const WarGrey::STEM::RGBA& line_color);
+        Historylet(float size, const GYDM::RGBA& line_color) : Historylet(size, size, line_color) {}
+        Historylet(float width, float height, const GYDM::RGBA& line_color);
 
     public:
         void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;

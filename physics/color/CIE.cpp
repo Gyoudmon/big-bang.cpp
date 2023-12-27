@@ -4,7 +4,7 @@
 
 #include "../mathematics.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static inline double color_gamma_encode(double c) {
@@ -24,7 +24,7 @@ static inline void cie_rgb_normalize(double* R, double* G, double* B) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::CIE_XYZ_to_RGB(CIE_Standard type, double X, double Y, double Z, double* R, double* G, double* B, bool gamma) {
+void GYDM::CIE_XYZ_to_RGB(CIE_Standard type, double X, double Y, double Z, double* R, double* G, double* B, bool gamma) {
     switch (type) {
     case CIE_Standard::Primary: {
         SET_BOX(R, +2.36461 * X - 0.89654 * Y - 0.46807 * Z);
@@ -47,7 +47,7 @@ void WarGrey::STEM::CIE_XYZ_to_RGB(CIE_Standard type, double X, double Y, double
     }
 }
 
-void WarGrey::STEM::CIE_RGB_to_XYZ(CIE_Standard type, double R, double G, double B, double* X, double* Y, double* Z, bool gamma) {
+void GYDM::CIE_RGB_to_XYZ(CIE_Standard type, double R, double G, double B, double* X, double* Y, double* Z, bool gamma) {
     if (gamma) {
         R = color_gamma_decode(R);
         G = color_gamma_decode(G);
@@ -68,7 +68,7 @@ void WarGrey::STEM::CIE_RGB_to_XYZ(CIE_Standard type, double R, double G, double
     }
 }
 
-void WarGrey::STEM::CIE_xyY_to_XYZ(double x, double y, double* X, double* Y, double* Z, double L) {
+void GYDM::CIE_xyY_to_XYZ(double x, double y, double* X, double* Y, double* Z, double L) {
     double z = 1.0 - x - y;
 
     SET_BOX(X, L * x / y);
@@ -76,7 +76,7 @@ void WarGrey::STEM::CIE_xyY_to_XYZ(double x, double y, double* X, double* Y, dou
     SET_BOX(Z, L * z / y);
 }
 
-void WarGrey::STEM::CIE_XYZ_to_xyY(double X, double Y, double Z, double* x, double* y) {
+void GYDM::CIE_XYZ_to_xyY(double X, double Y, double Z, double* x, double* y) {
     double L = X + Y + Z;
 
     SET_BOX(x, X / L);

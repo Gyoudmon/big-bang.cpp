@@ -8,7 +8,7 @@
 #include "text.hpp"
 #include "brush.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static const float hatch_long_ratio = 0.618F;
@@ -170,21 +170,21 @@ static void draw_vrhatch(SDL_Renderer* renderer, float x0, float y0
 }
 
 /*************************************************************************************************/
-HHatchMarkMetrics WarGrey::STEM::Ruler::hhatchmark_metrics(double vmin, double vmax, uint8_t precision) {
+HHatchMarkMetrics GYDM::Ruler::hhatchmark_metrics(double vmin, double vmax, uint8_t precision) {
 	return hhatchmark_metrics(hatchmark_default_font(), vmin, vmax, precision);
 }
 
-void WarGrey::STEM::Ruler::draw_ht_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_ht_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, HHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
 	Ruler::draw_ht_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
-void WarGrey::STEM::Ruler::draw_hb_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_hb_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, HHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
 	Ruler::draw_hb_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
-HHatchMarkMetrics WarGrey::STEM::Ruler::hhatchmark_metrics(shared_font_t font, double vmin, double vmax, uint8_t precision) {
+HHatchMarkMetrics GYDM::Ruler::hhatchmark_metrics(shared_font_t font, double vmin, double vmax, uint8_t precision) {
 	HHatchMarkMetrics metrics;
 	std::string min_mark = make_mark_string(vmin, precision);
 	std::string max_mark = make_mark_string(vmax, precision);
@@ -208,7 +208,7 @@ HHatchMarkMetrics WarGrey::STEM::Ruler::hhatchmark_metrics(shared_font_t font, d
 	return metrics;
 }
 
-void WarGrey::STEM::Ruler::draw_ht_hatchmark(shared_font_t font
+void GYDM::Ruler::draw_ht_hatchmark(shared_font_t font
 		, SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax, uint32_t step0
 		, uint32_t color, HHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	uint32_t skip;
@@ -232,7 +232,7 @@ void WarGrey::STEM::Ruler::draw_ht_hatchmark(shared_font_t font
 	SET_BOX(maybe_metrics, metrics);
 }
 
-void WarGrey::STEM::Ruler::draw_hb_hatchmark(shared_font_t font
+void GYDM::Ruler::draw_hb_hatchmark(shared_font_t font
 		, SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax, uint32_t step0
 		, uint32_t color, HHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	uint32_t skip;
@@ -257,21 +257,21 @@ void WarGrey::STEM::Ruler::draw_hb_hatchmark(shared_font_t font
 }
 
 /*************************************************************************************************/
-VHatchMarkMetrics WarGrey::STEM::Ruler::vhatchmark_metrics(double vmin, double vmax, uint8_t precision) {
+VHatchMarkMetrics GYDM::Ruler::vhatchmark_metrics(double vmin, double vmax, uint8_t precision) {
 	return vhatchmark_metrics(hatchmark_default_font(), vmin, vmax, precision);
 }
 
-void WarGrey::STEM::Ruler::draw_vl_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_vl_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, VHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
 	Ruler::draw_vl_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
-void WarGrey::STEM::Ruler::draw_vr_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_vr_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, VHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
 	Ruler::draw_vr_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
-VHatchMarkMetrics WarGrey::STEM::Ruler::vhatchmark_metrics(shared_font_t font, double vmin, double vmax, uint8_t precision) {
+VHatchMarkMetrics GYDM::Ruler::vhatchmark_metrics(shared_font_t font, double vmin, double vmax, uint8_t precision) {
 	VHatchMarkMetrics metrics;
 	std::string min_mark = make_mark_string(vmin, precision);
 	std::string max_mark = make_mark_string(vmax, precision);
@@ -296,7 +296,7 @@ VHatchMarkMetrics WarGrey::STEM::Ruler::vhatchmark_metrics(shared_font_t font, d
 	return metrics;
 }
 
-void WarGrey::STEM::Ruler::draw_vl_hatchmark(shared_font_t font
+void GYDM::Ruler::draw_vl_hatchmark(shared_font_t font
 		, SDL_Renderer* renderer, float x, float y, float height, double vmin, double vmax, uint32_t step0
 		, uint32_t color, VHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	uint32_t skip;
@@ -321,7 +321,7 @@ void WarGrey::STEM::Ruler::draw_vl_hatchmark(shared_font_t font
 	SET_BOX(maybe_metrics, metrics);
 }
 
-void WarGrey::STEM::Ruler::draw_vr_hatchmark(shared_font_t font
+void GYDM::Ruler::draw_vr_hatchmark(shared_font_t font
 		, SDL_Renderer* renderer, float x, float y, float height, double vmin, double vmax, uint32_t step0
 		, uint32_t color, VHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	unsigned int skip;

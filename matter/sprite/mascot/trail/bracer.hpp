@@ -2,10 +2,10 @@
 
 #include "citizen.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     enum class BracerMode { Walk, Run, Win, Lose };
 
-    class __lambda__ Bracer : public WarGrey::STEM::Citizen {
+    class __lambda__ Bracer : public GYDM::Citizen {
     public:
         Bracer(const char* name, const char* nickname = nullptr);
         virtual ~Bracer() {}
@@ -45,90 +45,90 @@ namespace WarGrey::STEM {
 
 
     /*********************************************************************************************/
-    class __lambda__ Estelle : public WarGrey::STEM::Bracer {
+    class __lambda__ Estelle : public GYDM::Bracer {
     public:
         Estelle(const char* nickname = nullptr) : Bracer("Estelle", nickname) {}
         virtual ~Estelle() {}
 
     public:
         const char* name() override { return "Estelle Bright"; }
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Female; }
 
     protected:
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;
     };
 
-    class __lambda__ Joshua : public WarGrey::STEM::Bracer {
+    class __lambda__ Joshua : public GYDM::Bracer {
     public:
         Joshua(const char* nickname = nullptr) : Bracer("Joshua", nickname) {}
         virtual ~Joshua() {}
 
     public:
         const char* name() override { return "Joshua Bright"; }
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Male; }
     };
 
-    class __lambda__ Scherazard : public WarGrey::STEM::Bracer {
+    class __lambda__ Scherazard : public GYDM::Bracer {
     public:
         Scherazard(const char* nickname = nullptr) : Bracer("Scherazard", nickname) {}
         const char* name() override { return "Scherazard Harvey"; }
         virtual ~Scherazard() {}
 
     public:
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Female; }
     };
 
-    class __lambda__ Olivier : public WarGrey::STEM::Bracer {
+    class __lambda__ Olivier : public GYDM::Bracer {
     public:
         Olivier(const char* nickname = nullptr) : Bracer("Olivier", nickname) {}
         virtual ~Olivier() {}
 
     public:
         const char* name() override { return "Olivier Lenheim"; }
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Male; }
     };
 
-    class __lambda__ Klose : public WarGrey::STEM::Bracer {
+    class __lambda__ Klose : public GYDM::Bracer {
     public:
         Klose(const char* nickname = nullptr) : Bracer("Klose", nickname) {}
         virtual ~Klose() {}
 
     public:
         const char* name() override { return "Klose Rinz"; /* Klaudia von Auslese */ }
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Female; }
     };
 
-    class __lambda__ Agate : public WarGrey::STEM::Bracer {
+    class __lambda__ Agate : public GYDM::Bracer {
     public:
         Agate(const char* nickname = nullptr) : Bracer("Agate", nickname) {}
         virtual ~Agate() {}
 
     public:
         const char* name() override { return "Agate Crosner"; }
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Male; }
     };
 
-    class __lambda__ Tita : public WarGrey::STEM::Bracer {
+    class __lambda__ Tita : public GYDM::Bracer {
     public:
         Tita(const char* nickname = nullptr) : Bracer("Tita", nickname) {}
         virtual ~Tita() {}
 
     public:
         const char* name() override { return "Tita Russell"; }
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Female; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Female; }
 
     protected:
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;
     };
 
-    class __lambda__ Zin : public WarGrey::STEM::Bracer {
+    class __lambda__ Zin : public GYDM::Bracer {
     public:
         Zin(const char* nickname = nullptr) : Bracer("Zin", nickname) {}
         virtual ~Zin() {}
 
     public:
         const char* name() override { return "Zin Vathek"; }
-        WarGrey::STEM::CreatureGender gender() override { return CreatureGender::Male; }
+        GYDM::CreatureGender gender() override { return CreatureGender::Male; }
 
     protected:
         void feed_canvas_size(BracerMode mode, float* width, float* height) override;

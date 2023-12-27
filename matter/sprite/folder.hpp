@@ -6,8 +6,8 @@
 #include <vector>
 #include <unordered_map>
 
-namespace WarGrey::STEM {
-    class __lambda__ Sprite : public WarGrey::STEM::ISprite {
+namespace GYDM {
+    class __lambda__ Sprite : public GYDM::ISprite {
     public:
         Sprite(const std::string& pathname);
         Sprite(const char* pathname_fmt, ...);

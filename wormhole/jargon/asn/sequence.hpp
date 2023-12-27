@@ -2,7 +2,7 @@
 
 #include "base.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     class __lambda__ IASNSequence {
     public:
         virtual ~IASNSequence() noexcept {}
@@ -10,10 +10,10 @@ namespace WarGrey::STEM {
 
     public:
         size_t span();
-        WarGrey::STEM::octets to_octets();
+        GYDM::octets to_octets();
         size_t into_octets(uint8_t* octets, size_t offset = 0);
         void from_octets(const uint8_t* basn, size_t* offset = nullptr);
-        inline void from_octets(const WarGrey::STEM::octets& basn, size_t* offset = nullptr) { this->from_octets(basn.c_str(), offset); }
+        inline void from_octets(const GYDM::octets& basn, size_t* offset = nullptr) { this->from_octets(basn.c_str(), offset); }
 
     protected:
         virtual size_t field_payload_span(size_t idx) = 0;

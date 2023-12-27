@@ -2,10 +2,10 @@
 
 #include <SDL2/SDL_net.h>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-void WarGrey::STEM::network_initialize() {
+void GYDM::network_initialize() {
     static bool okay = false;
     
     if (!okay) {

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     template<typename T> void inline vector_fill(std::vector<T>& vs, const T& val = T()) {
         std::fill(vs.begin(), vs.end(), val);
     }

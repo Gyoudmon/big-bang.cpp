@@ -2,10 +2,10 @@
 
 #include "../../datum/flonum.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-void WarGrey::STEM::IPlatformMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double pvr) {
+void GYDM::IPlatformMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double pvr) {
     double hsgn, vsgn;
 
     this->feed_flip_signs(&hsgn, &vsgn);

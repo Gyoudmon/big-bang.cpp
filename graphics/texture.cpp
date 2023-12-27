@@ -2,16 +2,16 @@
 
 #include "../datum/box.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-void WarGrey::STEM::Texture::feed_extent(int* width, int* height) {
+void GYDM::Texture::feed_extent(int* width, int* height) {
     if (this->_self != nullptr) {
         SDL_QueryTexture(this->_self, nullptr, nullptr, width, height);
     }
 }
 
-void WarGrey::STEM::Texture::feed_extent(float* width, float* height) {
+void GYDM::Texture::feed_extent(float* width, float* height) {
     int w, h;
     
     this->feed_extent(&w, &h);

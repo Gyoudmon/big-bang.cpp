@@ -7,14 +7,14 @@
 #include <vector>
 #include <string>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     struct SpriteRenderArguments {
         SDL_FRect dst;
         SDL_RendererFlip flip;
     };
 
     /*********************************************************************************************/
-    class __lambda__ ISprite : public WarGrey::STEM::IMatter {
+    class __lambda__ ISprite : public GYDM::IMatter {
     public:
         ISprite() {}
         virtual ~ISprite() {}
@@ -65,10 +65,10 @@ namespace WarGrey::STEM {
         void say(IMatter* message, double sec) { this->say(message, sec, SpeechBubble::Default); }
         void think(IMatter* message, double sec) { this->say(message, sec, SpeechBubble::Thought); }
         
-        void say(const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
-        void say(double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = BLACK);
-        void think(const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
-        void think(double sec, const std::string& sentence, const WarGrey::STEM::RGBA& color = DIMGRAY);
+        void say(const std::string& sentence, const GYDM::RGBA& color = BLACK);
+        void say(double sec, const std::string& sentence, const GYDM::RGBA& color = BLACK);
+        void think(const std::string& sentence, const GYDM::RGBA& color = DIMGRAY);
+        void think(double sec, const std::string& sentence, const GYDM::RGBA& color = DIMGRAY);
         
     public:
         virtual void play_speaking(int repeat = 1) {}

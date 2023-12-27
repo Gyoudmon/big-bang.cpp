@@ -4,7 +4,7 @@
 #include "../../../datum/fixnum.hpp"
 #include "../../../datum/flonum.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static const uint8_t default_flonum_base = 2; // TODO: implememnt base 10 representation
@@ -132,7 +132,7 @@ static uint8_t make_flonum_infoctet(double real, uint8_t base, size_t E_size, si
 }
 
 /*************************************************************************************************/
-size_t WarGrey::STEM::asn_length_span(size_t length) {
+size_t GYDM::asn_length_span(size_t length) {
     size_t span = 1;
 
     if (length > 127) {
@@ -145,7 +145,7 @@ size_t WarGrey::STEM::asn_length_span(size_t length) {
     return span;
 }
 
-octets WarGrey::STEM::asn_length_to_octets(size_t length) {
+octets GYDM::asn_length_to_octets(size_t length) {
     size_t span = asn_length_span(length);
     octets asn(span, '\0');
 
@@ -154,7 +154,7 @@ octets WarGrey::STEM::asn_length_to_octets(size_t length) {
     return asn;
 }
 
-size_t WarGrey::STEM::asn_length_into_octets(size_t length, uint8_t* octets, size_t offset) {
+size_t GYDM::asn_length_into_octets(size_t length, uint8_t* octets, size_t offset) {
     size_t span = asn_length_span(length);
 
     fill_length_octets(octets + offset, length, span);
@@ -162,7 +162,7 @@ size_t WarGrey::STEM::asn_length_into_octets(size_t length, uint8_t* octets, siz
     return offset + span;
 }
 
-size_t WarGrey::STEM::asn_octets_to_length(const uint8_t* blength, size_t* offset) {
+size_t GYDM::asn_octets_to_length(const uint8_t* blength, size_t* offset) {
     size_t idx = ((offset == nullptr) ? 0 : (*offset));
     size_t length = blength[idx];
 
@@ -182,23 +182,23 @@ size_t WarGrey::STEM::asn_octets_to_length(const uint8_t* blength, size_t* offse
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::asn_primitive_predicate(ASNPrimitive type, const uint8_t* content, size_t offset) {
+bool GYDM::asn_primitive_predicate(ASNPrimitive type, const uint8_t* content, size_t offset) {
     return (asn_primitive_identifier_octet(type) == content[offset]);
 }
 
-bool WarGrey::STEM::asn_primitive_predicate(ASNPrimitive type, const octets& content, size_t offset) {
+bool GYDM::asn_primitive_predicate(ASNPrimitive type, const octets& content, size_t offset) {
     return (asn_primitive_identifier_octet(type) == content[offset]);
 }
 
-bool WarGrey::STEM::asn_constructed_predicate(ASNConstructed type, const uint8_t* content, size_t offset) {
+bool GYDM::asn_constructed_predicate(ASNConstructed type, const uint8_t* content, size_t offset) {
     return (asn_constructed_identifier_octet(type) == content[offset]);
 }
 
-bool WarGrey::STEM::asn_constructed_predicate(ASNConstructed type, const octets& content, size_t offset) {
+bool GYDM::asn_constructed_predicate(ASNConstructed type, const octets& content, size_t offset) {
     return (asn_constructed_identifier_octet(type) == content[offset]);
 }
 
-octets WarGrey::STEM::asn_octets_box(uint8_t tag, const octets& content, size_t size) {
+octets GYDM::asn_octets_box(uint8_t tag, const octets& content, size_t size) {
     uint8_t pool[10];
     size_t capacity = sizeof(pool) / sizeof(uint8_t);
     size_t payload = fill_length_octets(pool, size, capacity);
@@ -208,7 +208,7 @@ octets WarGrey::STEM::asn_octets_box(uint8_t tag, const octets& content, size_t 
     return octets(content, 0, size).insert(0, pool + (capacity - payload), payload);
 }
 
-size_t WarGrey::STEM::asn_octets_unbox(const uint8_t* basn, size_t* offset) {
+size_t GYDM::asn_octets_unbox(const uint8_t* basn, size_t* offset) {
     size_t content_idx = ((offset == nullptr) ? 0 : (*offset)) + 1U;
     size_t size = asn_octets_to_length(basn, &content_idx);
 
@@ -218,7 +218,7 @@ size_t WarGrey::STEM::asn_octets_unbox(const uint8_t* basn, size_t* offset) {
 }
 
 /*************************************************************************************************/
-octets WarGrey::STEM::asn_boolean_to_octets(bool b) {
+octets GYDM::asn_boolean_to_octets(bool b) {
     octets bbool(3, '\0');
 
     asn_boolean_into_octets(b, const_cast<uint8_t*>(bbool.c_str()), 0);
@@ -226,7 +226,7 @@ octets WarGrey::STEM::asn_boolean_to_octets(bool b) {
     return bbool;
 }
 
-size_t WarGrey::STEM::asn_boolean_into_octets(bool b, uint8_t* octets, size_t offset) {
+size_t GYDM::asn_boolean_into_octets(bool b, uint8_t* octets, size_t offset) {
     size_t span = asn_boolean_span(b);
 
     octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::Boolean);
@@ -236,7 +236,7 @@ size_t WarGrey::STEM::asn_boolean_into_octets(bool b, uint8_t* octets, size_t of
     return offset;
 }
 
-bool WarGrey::STEM::asn_octets_to_boolean(const uint8_t* bnat, size_t* offset0) {
+bool GYDM::asn_octets_to_boolean(const uint8_t* bnat, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(bnat, &offset);
 
@@ -245,7 +245,7 @@ bool WarGrey::STEM::asn_octets_to_boolean(const uint8_t* bnat, size_t* offset0) 
     return (bnat[offset - size] > 0x00);
 }
 
-octets WarGrey::STEM::asn_null_to_octets(std::nullptr_t placeholder) {
+octets GYDM::asn_null_to_octets(std::nullptr_t placeholder) {
     uint8_t pool[2];
 
     asn_null_into_octets(placeholder, pool, 0);
@@ -253,14 +253,14 @@ octets WarGrey::STEM::asn_null_to_octets(std::nullptr_t placeholder) {
     return octets(pool, sizeof(pool) / sizeof(uint8_t));
 }
 
-size_t WarGrey::STEM::asn_null_into_octets(std::nullptr_t placeholder, uint8_t* octets, size_t offset) {
+size_t GYDM::asn_null_into_octets(std::nullptr_t placeholder, uint8_t* octets, size_t offset) {
     octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::Null);
     octets[offset++] = 0x00;
 
     return offset;
 }
 
-std::nullptr_t WarGrey::STEM::asn_octets_to_null(const uint8_t* bnull, size_t* offset0) {
+std::nullptr_t GYDM::asn_octets_to_null(const uint8_t* bnull, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     
     asn_octets_unbox(bnull, &offset);
@@ -269,7 +269,7 @@ std::nullptr_t WarGrey::STEM::asn_octets_to_null(const uint8_t* bnull, size_t* o
     return nullptr;
 }
 
-size_t WarGrey::STEM::asn_fixnum_span(int64_t fixnum) {
+size_t GYDM::asn_fixnum_span(int64_t fixnum) {
     size_t span = 0;
 
     /**
@@ -295,7 +295,7 @@ size_t WarGrey::STEM::asn_fixnum_span(int64_t fixnum) {
     return span;
 }
 
-octets WarGrey::STEM::asn_int64_to_octets(int64_t fixnum, ASNPrimitive id) {
+octets GYDM::asn_int64_to_octets(int64_t fixnum, ASNPrimitive id) {
     size_t span = asn_span(asn_fixnum_span(fixnum));
     octets asn(span, '\0');
     
@@ -304,7 +304,7 @@ octets WarGrey::STEM::asn_int64_to_octets(int64_t fixnum, ASNPrimitive id) {
     return asn;
 }
 
-size_t WarGrey::STEM::asn_int64_into_octets(int64_t fixnum, uint8_t* octets, size_t offset, ASNPrimitive id) {
+size_t GYDM::asn_int64_into_octets(int64_t fixnum, uint8_t* octets, size_t offset, ASNPrimitive id) {
     size_t span = asn_fixnum_span(fixnum);
     
     octets[offset++] = asn_primitive_identifier_octet(id);
@@ -315,7 +315,7 @@ size_t WarGrey::STEM::asn_int64_into_octets(int64_t fixnum, uint8_t* octets, siz
     return offset + span;
 }
 
-int64_t WarGrey::STEM::asn_octets_to_fixnum(const uint8_t* bfixnum, size_t* offset0) {
+int64_t GYDM::asn_octets_to_fixnum(const uint8_t* bfixnum, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(bfixnum, &offset);
     int64_t integer = 0;
@@ -327,7 +327,7 @@ int64_t WarGrey::STEM::asn_octets_to_fixnum(const uint8_t* bfixnum, size_t* offs
     return integer;
 }
 
-size_t WarGrey::STEM::asn_natural_span(Natural& nat) {
+size_t GYDM::asn_natural_span(Natural& nat) {
     size_t span = nat.length();
 
     if (nat[0] >= 0b10000000) {
@@ -337,7 +337,7 @@ size_t WarGrey::STEM::asn_natural_span(Natural& nat) {
     return span;
 }
 
-octets WarGrey::STEM::asn_natural_to_octets(Natural& nat) {
+octets GYDM::asn_natural_to_octets(Natural& nat) {
     octets payload = nat.to_bytes();
     size_t size = nat.length();
     
@@ -349,7 +349,7 @@ octets WarGrey::STEM::asn_natural_to_octets(Natural& nat) {
     return asn_octets_box(asn_primitive_identifier_octet(ASNPrimitive::Integer), payload, size);
 }
 
-size_t WarGrey::STEM::asn_natural_into_octets(Natural& nat, uint8_t* octets, size_t offset) {
+size_t GYDM::asn_natural_into_octets(Natural& nat, uint8_t* octets, size_t offset) {
     size_t size = nat.length();
     size_t span = asn_natural_span(nat);
 
@@ -365,7 +365,7 @@ size_t WarGrey::STEM::asn_natural_into_octets(Natural& nat, uint8_t* octets, siz
     return offset + size;
 }
 
-Natural WarGrey::STEM::asn_octets_to_natural(const uint8_t* bnat, size_t* offset0) {
+Natural GYDM::asn_octets_to_natural(const uint8_t* bnat, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(bnat, &offset);
     Natural nat(bnat, offset - size, offset);
@@ -375,7 +375,7 @@ Natural WarGrey::STEM::asn_octets_to_natural(const uint8_t* bnat, size_t* offset
     return nat;
 }
 
-size_t WarGrey::STEM::asn_flonum_span(double real) {
+size_t GYDM::asn_flonum_span(double real) {
     size_t span = 1;
     uint8_t base = 2;
 
@@ -403,7 +403,7 @@ size_t WarGrey::STEM::asn_flonum_span(double real) {
     return span;
 }
 
-octets WarGrey::STEM::asn_flonum_to_octets(double real) {
+octets GYDM::asn_flonum_to_octets(double real) {
     size_t span = asn_span(asn_flonum_span(real));
     octets asn(span, '\0');
     
@@ -412,7 +412,7 @@ octets WarGrey::STEM::asn_flonum_to_octets(double real) {
     return asn;
 }
 
-size_t WarGrey::STEM::asn_flonum_into_octets(double real, uint8_t* octets, size_t offset) {
+size_t GYDM::asn_flonum_into_octets(double real, uint8_t* octets, size_t offset) {
     octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::Real);
 
     if (!flisfinite(real)) {
@@ -457,7 +457,7 @@ size_t WarGrey::STEM::asn_flonum_into_octets(double real, uint8_t* octets, size_
     return offset;
 }
 
-double WarGrey::STEM::asn_octets_to_flonum(const uint8_t* breal, size_t* offset0) {
+double GYDM::asn_octets_to_flonum(const uint8_t* breal, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(breal, &offset);
     double real = flnan;
@@ -511,11 +511,11 @@ double WarGrey::STEM::asn_octets_to_flonum(const uint8_t* breal, size_t* offset0
     return real;
 }
 
-size_t WarGrey::STEM::asn_ia5_span(const std::string& str) {
+size_t GYDM::asn_ia5_span(const std::string& str) {
     return str.length();
 }
 
-octets WarGrey::STEM::asn_ia5_to_octets(const std::string& str) {
+octets GYDM::asn_ia5_to_octets(const std::string& str) {
     size_t payload = asn_ia5_span(str);
     octets asn(asn_span(payload), '\0');
 
@@ -524,7 +524,7 @@ octets WarGrey::STEM::asn_ia5_to_octets(const std::string& str) {
     return asn;
 }
 
-size_t WarGrey::STEM::asn_ia5_into_octets(const std::string& str, uint8_t* octets, size_t offset) {
+size_t GYDM::asn_ia5_into_octets(const std::string& str, uint8_t* octets, size_t offset) {
     size_t size = str.length();
 
     octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::IA5_String);
@@ -534,7 +534,7 @@ size_t WarGrey::STEM::asn_ia5_into_octets(const std::string& str, uint8_t* octet
     return offset + size;
 }
 
-std::string WarGrey::STEM::asn_octets_to_ia5(const uint8_t* bia5, size_t* offset0) {
+std::string GYDM::asn_octets_to_ia5(const uint8_t* bia5, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(bia5, &offset);
 
@@ -543,11 +543,11 @@ std::string WarGrey::STEM::asn_octets_to_ia5(const uint8_t* bia5, size_t* offset
     return std::string(reinterpret_cast<const char*>(bia5 + (offset - size)), size);
 }
 
-size_t WarGrey::STEM::asn_utf8_span(const std::string& str) {
+size_t GYDM::asn_utf8_span(const std::string& str) {
     return str.size();
 }
 
-octets WarGrey::STEM::asn_utf8_to_octets(const std::string& str) {
+octets GYDM::asn_utf8_to_octets(const std::string& str) {
     size_t payload = asn_utf8_span(str);
     octets asn(asn_span(payload), '\0');
 
@@ -556,7 +556,7 @@ octets WarGrey::STEM::asn_utf8_to_octets(const std::string& str) {
     return asn;
 }
 
-size_t WarGrey::STEM::asn_utf8_into_octets(const std::string& str, uint8_t* octets, size_t offset) {
+size_t GYDM::asn_utf8_into_octets(const std::string& str, uint8_t* octets, size_t offset) {
     size_t size = asn_utf8_span(str);
     
     octets[offset++] = asn_primitive_identifier_octet(ASNPrimitive::UTF8_String);
@@ -566,7 +566,7 @@ size_t WarGrey::STEM::asn_utf8_into_octets(const std::string& str, uint8_t* octe
     return offset + size;
 }
 
-std::string WarGrey::STEM::asn_octets_to_utf8(const uint8_t* butf8, size_t* offset0) {
+std::string GYDM::asn_octets_to_utf8(const uint8_t* butf8, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(butf8, &offset);
     

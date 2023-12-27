@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace WarGrey::STEM {
+namespace GYDM {
 	struct __lambda__ HHatchMarkMetrics {
 		float gap_space;
 		float top_space;
@@ -38,63 +38,63 @@ namespace WarGrey::STEM {
 	
 	class __lambda__ Ruler {
 	public:
-		static WarGrey::STEM::HHatchMarkMetrics hhatchmark_metrics(
+		static GYDM::HHatchMarkMetrics hhatchmark_metrics(
 					double vmin, double vmax, uint8_t precision = 0U);
 
-		static WarGrey::STEM::HHatchMarkMetrics hhatchmark_metrics(
-					WarGrey::STEM::shared_font_t font,
+		static GYDM::HHatchMarkMetrics hhatchmark_metrics(
+					GYDM::shared_font_t font,
 					double vmin, double vmax, uint8_t precision = 0U);
 
-		static WarGrey::STEM::VHatchMarkMetrics vhatchmark_metrics(
+		static GYDM::VHatchMarkMetrics vhatchmark_metrics(
 					double vmin, double vmax, uint8_t precision = 0U);
 
-		static WarGrey::STEM::VHatchMarkMetrics vhatchmark_metrics(
-					WarGrey::STEM::shared_font_t font,
+		static GYDM::VHatchMarkMetrics vhatchmark_metrics(
+					GYDM::shared_font_t font,
 					double vmin, double vmax, uint8_t precision = 0U);
 
 	public:
 		static void draw_ht_hatchmark(SDL_Renderer* renderer, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::HHatchMarkMetrics* metrics = nullptr,
+					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
-		static void draw_ht_hatchmark(WarGrey::STEM::shared_font_t font,
+		static void draw_ht_hatchmark(GYDM::shared_font_t font,
 					SDL_Renderer* renderer, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::HHatchMarkMetrics* metrics = nullptr,
+					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
 		static void draw_hb_hatchmark(SDL_Renderer* renderer, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::HHatchMarkMetrics* metrics = nullptr,
+					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 		
-		static void draw_hb_hatchmark(WarGrey::STEM::shared_font_t font,
+		static void draw_hb_hatchmark(GYDM::shared_font_t font,
 					SDL_Renderer* renderer, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::HHatchMarkMetrics* metrics = nullptr,
+					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
 		static void draw_vl_hatchmark(SDL_Renderer* renderer, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::VHatchMarkMetrics* metrics = nullptr,
+					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
-		static void draw_vl_hatchmark(WarGrey::STEM::shared_font_t font,
+		static void draw_vl_hatchmark(GYDM::shared_font_t font,
 					SDL_Renderer* renderer, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::VHatchMarkMetrics* metrics = nullptr,
+					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
 		static void draw_vr_hatchmark(SDL_Renderer* renderer, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::VHatchMarkMetrics* metrics = nullptr,
+					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
-		static void draw_vr_hatchmark(WarGrey::STEM::shared_font_t font,
+		static void draw_vr_hatchmark(GYDM::shared_font_t font,
 					SDL_Renderer* renderer, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
-					WarGrey::STEM::VHatchMarkMetrics* metrics = nullptr,
+					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 	};
 }

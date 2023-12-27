@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-namespace WarGrey::STEM {
+namespace GYDM {
 	enum class Fixnum { Uint16, Uint32, Uint64 };
 
 	class __lambda__ Natural {
@@ -14,10 +14,10 @@ namespace WarGrey::STEM {
 		Natural();
 		Natural(uint64_t n);
 
-		Natural(const WarGrey::STEM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(const GYDM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
 		Natural(const std::string& nstr, size_t nstart = 0, size_t nend = 0);
 		Natural(const std::wstring& nstr, size_t nstart = 0, size_t nend = 0);
-		Natural(uintptr_t base, const WarGrey::STEM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
+		Natural(uintptr_t base, const GYDM::bytes& nstr, size_t nstart = 0, size_t nend = 0);
 		Natural(uintptr_t base, const std::string& nstr, size_t nstart = 0, size_t nend = 0);
 		Natural(uintptr_t base, const std::wstring& nstr, size_t nstart = 0, size_t nend = 0);
 		
@@ -44,125 +44,125 @@ namespace WarGrey::STEM {
 		}
 
 	public:
-		Natural(const WarGrey::STEM::Natural& n); // copy constructor
-		Natural(WarGrey::STEM::Natural&& n);      // move constructor
+		Natural(const GYDM::Natural& n); // copy constructor
+		Natural(GYDM::Natural&& n);      // move constructor
 
-		WarGrey::STEM::Natural& operator=(uint64_t n);
-		WarGrey::STEM::Natural& operator=(const WarGrey::STEM::Natural& n); // copy assignment operator
-		WarGrey::STEM::Natural& operator=(WarGrey::STEM::Natural&& n);      // move assignment operator
+		GYDM::Natural& operator=(uint64_t n);
+		GYDM::Natural& operator=(const GYDM::Natural& n); // copy assignment operator
+		GYDM::Natural& operator=(GYDM::Natural&& n);      // move assignment operator
 
 	public: // NOTE: C++20 has operator<=>
 		int compare(uint64_t rhs) const;
-		int compare(const WarGrey::STEM::Natural& rhs) const;
+		int compare(const GYDM::Natural& rhs) const;
 
-		friend inline bool operator<(const WarGrey::STEM::Natural& lhs, const WarGrey::STEM::Natural& rhs) { return (lhs.compare(rhs) < 0); }
-		friend inline bool operator<(const WarGrey::STEM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) < 0); }
-		friend inline bool operator<(uint64_t lhs, const WarGrey::STEM::Natural& rhs) { return (rhs.compare(lhs) > 0); }
-		friend inline bool operator==(const WarGrey::STEM::Natural& lhs, const WarGrey::STEM::Natural& rhs) { return (lhs.compare(rhs) == 0); }
-		friend inline bool operator==(const WarGrey::STEM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) == 0); }
-		friend inline bool operator==(uint64_t lhs, const WarGrey::STEM::Natural& rhs) { return (rhs.compare(lhs) == 0); }
+		friend inline bool operator<(const GYDM::Natural& lhs, const GYDM::Natural& rhs) { return (lhs.compare(rhs) < 0); }
+		friend inline bool operator<(const GYDM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) < 0); }
+		friend inline bool operator<(uint64_t lhs, const GYDM::Natural& rhs) { return (rhs.compare(lhs) > 0); }
+		friend inline bool operator==(const GYDM::Natural& lhs, const GYDM::Natural& rhs) { return (lhs.compare(rhs) == 0); }
+		friend inline bool operator==(const GYDM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) == 0); }
+		friend inline bool operator==(uint64_t lhs, const GYDM::Natural& rhs) { return (rhs.compare(lhs) == 0); }
 
-		friend inline bool operator>(const WarGrey::STEM::Natural& lhs, const WarGrey::STEM::Natural& rhs) { return (lhs.compare(rhs) > 0); }
-		friend inline bool operator>(const WarGrey::STEM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) > 0); }
-		friend inline bool operator>(uint64_t lhs, const WarGrey::STEM::Natural& rhs) { return (rhs.compare(lhs) < 0); }
-		friend inline bool operator<=(const WarGrey::STEM::Natural& lhs, const WarGrey::STEM::Natural& rhs) { return (lhs.compare(rhs) <= 0); }
-		friend inline bool operator<=(const WarGrey::STEM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) <= 0); }
-		friend inline bool operator<=(uint64_t lhs, const WarGrey::STEM::Natural& rhs) { return (rhs.compare(lhs) >= 0); }
-		friend inline bool operator>=(const WarGrey::STEM::Natural& lhs, const WarGrey::STEM::Natural& rhs) { return (lhs.compare(rhs) >= 0); }
-		friend inline bool operator>=(const WarGrey::STEM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) >= 0); }
-		friend inline bool operator>=(uint64_t lhs, const WarGrey::STEM::Natural& rhs) { return (rhs.compare(lhs) <= 0); }
-		friend inline bool operator!=(const WarGrey::STEM::Natural& lhs, const WarGrey::STEM::Natural& rhs) { return (lhs.compare(rhs) != 0); }
-		friend inline bool operator!=(const WarGrey::STEM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) != 0); }
-		friend inline bool operator!=(uint64_t lhs, const WarGrey::STEM::Natural& rhs) { return (rhs.compare(lhs) != 0); }
+		friend inline bool operator>(const GYDM::Natural& lhs, const GYDM::Natural& rhs) { return (lhs.compare(rhs) > 0); }
+		friend inline bool operator>(const GYDM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) > 0); }
+		friend inline bool operator>(uint64_t lhs, const GYDM::Natural& rhs) { return (rhs.compare(lhs) < 0); }
+		friend inline bool operator<=(const GYDM::Natural& lhs, const GYDM::Natural& rhs) { return (lhs.compare(rhs) <= 0); }
+		friend inline bool operator<=(const GYDM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) <= 0); }
+		friend inline bool operator<=(uint64_t lhs, const GYDM::Natural& rhs) { return (rhs.compare(lhs) >= 0); }
+		friend inline bool operator>=(const GYDM::Natural& lhs, const GYDM::Natural& rhs) { return (lhs.compare(rhs) >= 0); }
+		friend inline bool operator>=(const GYDM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) >= 0); }
+		friend inline bool operator>=(uint64_t lhs, const GYDM::Natural& rhs) { return (rhs.compare(lhs) <= 0); }
+		friend inline bool operator!=(const GYDM::Natural& lhs, const GYDM::Natural& rhs) { return (lhs.compare(rhs) != 0); }
+		friend inline bool operator!=(const GYDM::Natural& lhs, uint64_t rhs) { return (lhs.compare(rhs) != 0); }
+		friend inline bool operator!=(uint64_t lhs, const GYDM::Natural& rhs) { return (rhs.compare(lhs) != 0); }
 
 	public:
-		WarGrey::STEM::Natural& operator++();
-		inline WarGrey::STEM::Natural operator++(int postfix) { Natural snapshot(*this); this->operator++(); return snapshot; }
+		GYDM::Natural& operator++();
+		inline GYDM::Natural operator++(int postfix) { Natural snapshot(*this); this->operator++(); return snapshot; }
 
-		WarGrey::STEM::Natural& operator--();
-		inline WarGrey::STEM::Natural operator--(int postfix) { Natural snapshot(*this); this->operator--(); return snapshot; }
+		GYDM::Natural& operator--();
+		inline GYDM::Natural operator--(int postfix) { Natural snapshot(*this); this->operator--(); return snapshot; }
 
-		WarGrey::STEM::Natural& operator+=(uint64_t rhs);
-		WarGrey::STEM::Natural& operator+=(const WarGrey::STEM::Natural& rhs);
+		GYDM::Natural& operator+=(uint64_t rhs);
+		GYDM::Natural& operator+=(const GYDM::Natural& rhs);
 
-		WarGrey::STEM::Natural& operator-=(uint64_t rhs);
-		WarGrey::STEM::Natural& operator-=(const WarGrey::STEM::Natural& rhs);
+		GYDM::Natural& operator-=(uint64_t rhs);
+		GYDM::Natural& operator-=(const GYDM::Natural& rhs);
 		
-		WarGrey::STEM::Natural& operator*=(uint64_t rhs);
-		WarGrey::STEM::Natural& operator*=(const WarGrey::STEM::Natural& rhs);
+		GYDM::Natural& operator*=(uint64_t rhs);
+		GYDM::Natural& operator*=(const GYDM::Natural& rhs);
 
-		inline WarGrey::STEM::Natural& operator/=(uint64_t rhs) { return this->quotient_remainder(rhs, nullptr); }
-		inline WarGrey::STEM::Natural& operator/=(const WarGrey::STEM::Natural& rhs) { return this->quotient_remainder(rhs, nullptr); }
-		inline WarGrey::STEM::Natural& operator%=(uint64_t rhs) { return this->quotient_remainder(rhs, this); };
-		inline WarGrey::STEM::Natural& operator%=(const WarGrey::STEM::Natural& rhs) { return this->quotient_remainder(rhs, this); };
+		inline GYDM::Natural& operator/=(uint64_t rhs) { return this->quotient_remainder(rhs, nullptr); }
+		inline GYDM::Natural& operator/=(const GYDM::Natural& rhs) { return this->quotient_remainder(rhs, nullptr); }
+		inline GYDM::Natural& operator%=(uint64_t rhs) { return this->quotient_remainder(rhs, this); };
+		inline GYDM::Natural& operator%=(const GYDM::Natural& rhs) { return this->quotient_remainder(rhs, this); };
 
-		friend inline WarGrey::STEM::Natural operator+(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs += rhs; }
-		friend inline WarGrey::STEM::Natural operator+(uint64_t lhs, WarGrey::STEM::Natural rhs) { return rhs += lhs; }
-		friend inline WarGrey::STEM::Natural operator+(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs += rhs; }
+		friend inline GYDM::Natural operator+(GYDM::Natural lhs, uint64_t rhs) { return lhs += rhs; }
+		friend inline GYDM::Natural operator+(uint64_t lhs, GYDM::Natural rhs) { return rhs += lhs; }
+		friend inline GYDM::Natural operator+(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs += rhs; }
 
 		// NOTE: the compiler will cast the number into Natural when encountered `n - Natural`;
-		friend inline WarGrey::STEM::Natural operator-(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs -= rhs; }
-		friend inline WarGrey::STEM::Natural operator-(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs -= rhs; }
+		friend inline GYDM::Natural operator-(GYDM::Natural lhs, uint64_t rhs) { return lhs -= rhs; }
+		friend inline GYDM::Natural operator-(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs -= rhs; }
 
-		friend inline WarGrey::STEM::Natural operator*(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs *= rhs; }
-		friend inline WarGrey::STEM::Natural operator*(uint64_t lhs, WarGrey::STEM::Natural rhs) { return rhs *= lhs; }
-		friend inline WarGrey::STEM::Natural operator*(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs *= rhs; }
+		friend inline GYDM::Natural operator*(GYDM::Natural lhs, uint64_t rhs) { return lhs *= rhs; }
+		friend inline GYDM::Natural operator*(uint64_t lhs, GYDM::Natural rhs) { return rhs *= lhs; }
+		friend inline GYDM::Natural operator*(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs *= rhs; }
 
 		// NOTE: the compiler will cast the number into Natural when encountered `n / Natural` or `n % Natural`
-		friend inline WarGrey::STEM::Natural operator/(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs /= rhs; }
-		friend inline WarGrey::STEM::Natural operator/(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs /= rhs; }
-		friend inline WarGrey::STEM::Natural operator%(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs %= rhs; }
-		friend inline WarGrey::STEM::Natural operator%(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs %= rhs; }
+		friend inline GYDM::Natural operator/(GYDM::Natural lhs, uint64_t rhs) { return lhs /= rhs; }
+		friend inline GYDM::Natural operator/(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs /= rhs; }
+		friend inline GYDM::Natural operator%(GYDM::Natural lhs, uint64_t rhs) { return lhs %= rhs; }
+		friend inline GYDM::Natural operator%(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs %= rhs; }
 
 	public:
-		WarGrey::STEM::Natural& expt(uint64_t e);
-		WarGrey::STEM::Natural& expt(const WarGrey::STEM::Natural& e);
+		GYDM::Natural& expt(uint64_t e);
+		GYDM::Natural& expt(const GYDM::Natural& e);
 
-		WarGrey::STEM::Natural& modular_expt(uint64_t b, uint64_t n);
-		WarGrey::STEM::Natural& modular_expt(uint64_t b, const WarGrey::STEM::Natural& n);
-		WarGrey::STEM::Natural& modular_expt(const WarGrey::STEM::Natural& b, uint64_t n);
-		WarGrey::STEM::Natural& modular_expt(const WarGrey::STEM::Natural& b, const WarGrey::STEM::Natural& n);
+		GYDM::Natural& modular_expt(uint64_t b, uint64_t n);
+		GYDM::Natural& modular_expt(uint64_t b, const GYDM::Natural& n);
+		GYDM::Natural& modular_expt(const GYDM::Natural& b, uint64_t n);
+		GYDM::Natural& modular_expt(const GYDM::Natural& b, const GYDM::Natural& n);
 
-		WarGrey::STEM::Natural& quotient_remainder(uint64_t divisor, Natural* remainder = nullptr);
-		WarGrey::STEM::Natural& quotient_remainder(const WarGrey::STEM::Natural& divisor, Natural* remainder = nullptr);
+		GYDM::Natural& quotient_remainder(uint64_t divisor, Natural* remainder = nullptr);
+		GYDM::Natural& quotient_remainder(const GYDM::Natural& divisor, Natural* remainder = nullptr);
 
-		friend inline WarGrey::STEM::Natural expt(WarGrey::STEM::Natural b, uint64_t e) { return b.expt(e); }
-		friend inline WarGrey::STEM::Natural expt(uint64_t b, WarGrey::STEM::Natural e) { return Natural(b).expt(e); }
-		friend inline WarGrey::STEM::Natural expt(WarGrey::STEM::Natural b, const WarGrey::STEM::Natural& e) { return b.expt(e); }
+		friend inline GYDM::Natural expt(GYDM::Natural b, uint64_t e) { return b.expt(e); }
+		friend inline GYDM::Natural expt(uint64_t b, GYDM::Natural e) { return Natural(b).expt(e); }
+		friend inline GYDM::Natural expt(GYDM::Natural b, const GYDM::Natural& e) { return b.expt(e); }
 
-		friend inline WarGrey::STEM::Natural modular_expt(WarGrey::STEM::Natural a, uint64_t b, uint64_t n) { return a.modular_expt(b, n); }
-		friend inline WarGrey::STEM::Natural modular_expt(WarGrey::STEM::Natural a, uint64_t b, const WarGrey::STEM::Natural& n) { return a.modular_expt(b, n); }
-		friend inline WarGrey::STEM::Natural modular_expt(WarGrey::STEM::Natural a, const WarGrey::STEM::Natural& b, uint64_t n) { return a.modular_expt(b, n); }
-		friend inline WarGrey::STEM::Natural modular_expt(WarGrey::STEM::Natural a, const WarGrey::STEM::Natural& b, const WarGrey::STEM::Natural& n) { return a.modular_expt(b, n); }
+		friend inline GYDM::Natural modular_expt(GYDM::Natural a, uint64_t b, uint64_t n) { return a.modular_expt(b, n); }
+		friend inline GYDM::Natural modular_expt(GYDM::Natural a, uint64_t b, const GYDM::Natural& n) { return a.modular_expt(b, n); }
+		friend inline GYDM::Natural modular_expt(GYDM::Natural a, const GYDM::Natural& b, uint64_t n) { return a.modular_expt(b, n); }
+		friend inline GYDM::Natural modular_expt(GYDM::Natural a, const GYDM::Natural& b, const GYDM::Natural& n) { return a.modular_expt(b, n); }
 
 	public:
-		WarGrey::STEM::Natural operator~();
+		GYDM::Natural operator~();
 
-		WarGrey::STEM::Natural& operator<<=(uint64_t rhs);
-		WarGrey::STEM::Natural& operator>>=(uint64_t rhs);
+		GYDM::Natural& operator<<=(uint64_t rhs);
+		GYDM::Natural& operator>>=(uint64_t rhs);
 
-		WarGrey::STEM::Natural& operator&=(uint64_t rhs);
-		WarGrey::STEM::Natural& operator&=(const WarGrey::STEM::Natural& rhs);
-		WarGrey::STEM::Natural& operator|=(uint64_t rhs);
-		WarGrey::STEM::Natural& operator|=(const WarGrey::STEM::Natural& rhs);
-		WarGrey::STEM::Natural& operator^=(uint64_t rhs);
-		WarGrey::STEM::Natural& operator^=(const WarGrey::STEM::Natural& rhs);
+		GYDM::Natural& operator&=(uint64_t rhs);
+		GYDM::Natural& operator&=(const GYDM::Natural& rhs);
+		GYDM::Natural& operator|=(uint64_t rhs);
+		GYDM::Natural& operator|=(const GYDM::Natural& rhs);
+		GYDM::Natural& operator^=(uint64_t rhs);
+		GYDM::Natural& operator^=(const GYDM::Natural& rhs);
 
-		friend inline WarGrey::STEM::Natural operator<<(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs <<= rhs; }
-		friend inline WarGrey::STEM::Natural operator>>(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs >>= rhs; }
+		friend inline GYDM::Natural operator<<(GYDM::Natural lhs, uint64_t rhs) { return lhs <<= rhs; }
+		friend inline GYDM::Natural operator>>(GYDM::Natural lhs, uint64_t rhs) { return lhs >>= rhs; }
 
-		friend inline WarGrey::STEM::Natural operator&(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs &= rhs; }
-		friend inline WarGrey::STEM::Natural operator&(uint64_t lhs, WarGrey::STEM::Natural rhs) { return rhs &= lhs; }
-		friend inline WarGrey::STEM::Natural operator&(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs &= rhs; }
-		friend inline WarGrey::STEM::Natural operator|(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs |= rhs; }
-		friend inline WarGrey::STEM::Natural operator|(uint64_t lhs, WarGrey::STEM::Natural rhs) { return rhs |= lhs; }
-		friend inline WarGrey::STEM::Natural operator|(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs |= rhs; }
-		friend inline WarGrey::STEM::Natural operator^(WarGrey::STEM::Natural lhs, uint64_t rhs) { return lhs ^= rhs; }
-		friend inline WarGrey::STEM::Natural operator^(uint64_t lhs, WarGrey::STEM::Natural rhs) { return rhs ^= lhs; }
-		friend inline WarGrey::STEM::Natural operator^(WarGrey::STEM::Natural lhs, const WarGrey::STEM::Natural& rhs) { return lhs ^= rhs; }
+		friend inline GYDM::Natural operator&(GYDM::Natural lhs, uint64_t rhs) { return lhs &= rhs; }
+		friend inline GYDM::Natural operator&(uint64_t lhs, GYDM::Natural rhs) { return rhs &= lhs; }
+		friend inline GYDM::Natural operator&(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs &= rhs; }
+		friend inline GYDM::Natural operator|(GYDM::Natural lhs, uint64_t rhs) { return lhs |= rhs; }
+		friend inline GYDM::Natural operator|(uint64_t lhs, GYDM::Natural rhs) { return rhs |= lhs; }
+		friend inline GYDM::Natural operator|(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs |= rhs; }
+		friend inline GYDM::Natural operator^(GYDM::Natural lhs, uint64_t rhs) { return lhs ^= rhs; }
+		friend inline GYDM::Natural operator^(uint64_t lhs, GYDM::Natural rhs) { return rhs ^= lhs; }
+		friend inline GYDM::Natural operator^(GYDM::Natural lhs, const GYDM::Natural& rhs) { return lhs ^= rhs; }
 
 		bool is_bit_set(uint64_t m);
-		WarGrey::STEM::Natural bit_field(uint64_t start, uint64_t endp1);
+		GYDM::Natural bit_field(uint64_t start, uint64_t endp1);
 		uint64_t bitfield(uint64_t start, uint64_t endp1);
 		int64_t signed_bitfield(uint64_t start, uint64_t endp1);
 
@@ -182,15 +182,15 @@ namespace WarGrey::STEM {
 	public:
 		size_t length() const;
 		size_t integer_length(uint8_t alignment = 0U) const;
-		size_t fixnum_count(WarGrey::STEM::Fixnum type = Fixnum::Uint64) const;
+		size_t fixnum_count(GYDM::Fixnum type = Fixnum::Uint64) const;
 
 	public:
 		size_t expand(size_t size);
 
 	public:
-		WarGrey::STEM::bytes to_bytes() const;
-		WarGrey::STEM::bytes to_hexstring(char ten = 'A') const;
-		WarGrey::STEM::bytes to_binstring(uint8_t alignment = 0U) const;
+		GYDM::bytes to_bytes() const;
+		GYDM::bytes to_hexstring(char ten = 'A') const;
+		GYDM::bytes to_binstring(uint8_t alignment = 0U) const;
 
 	private:
 		Natural(void* null, int64_t capacity);
@@ -207,7 +207,7 @@ namespace WarGrey::STEM {
 	private:
 		void add_digit(uint8_t digit);
 		void times_digit(uint8_t digit);
-		void divide_digit(uint8_t digit, WarGrey::STEM::Natural* remainder);
+		void divide_digit(uint8_t digit, GYDM::Natural* remainder);
 		int compare_to_one() const;
 
 	private:

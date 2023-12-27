@@ -3,10 +3,10 @@
 
 #include "../../datum/time.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::IUDPDaemon::IUDPDaemon(IUDPLocalPeer* peer, uint16_t port, int packet_size) {
+GYDM::IUDPDaemon::IUDPDaemon(IUDPLocalPeer* peer, uint16_t port, int packet_size) {
     network_initialize();
 
     this->peer = peer;
@@ -28,7 +28,7 @@ WarGrey::STEM::IUDPDaemon::IUDPDaemon(IUDPLocalPeer* peer, uint16_t port, int pa
     }
 }
 
-WarGrey::STEM::IUDPDaemon::~IUDPDaemon() noexcept {
+GYDM::IUDPDaemon::~IUDPDaemon() noexcept {
     if (this->self != nullptr) {
         SDLNet_UDP_Close(this->self);
         this->self = nullptr;
@@ -41,19 +41,19 @@ WarGrey::STEM::IUDPDaemon::~IUDPDaemon() noexcept {
     /* `this->peer` is managed by itself */
 }
 
-bool WarGrey::STEM::IUDPDaemon::okay() {
+bool GYDM::IUDPDaemon::okay() {
     return (this->self != nullptr);
 }
 
-const char* WarGrey::STEM::IUDPDaemon::hostname() {
+const char* GYDM::IUDPDaemon::hostname() {
     return SDLNet_ResolveIP(&this->addrv4);
 }
 
-uint16_t WarGrey::STEM::IUDPDaemon::service() {
+uint16_t GYDM::IUDPDaemon::service() {
     return this->addrv4.port;
 }
 
-bool WarGrey::STEM::IUDPDaemon::register_to(SDLNet_SocketSet master) {
+bool GYDM::IUDPDaemon::register_to(SDLNet_SocketSet master) {
     bool okay = false;
 
     if (this->okay()) {
@@ -63,14 +63,14 @@ bool WarGrey::STEM::IUDPDaemon::register_to(SDLNet_SocketSet master) {
     return okay;
 }
 
-void WarGrey::STEM::IUDPDaemon::unregister_from(SDLNet_SocketSet master) {
+void GYDM::IUDPDaemon::unregister_from(SDLNet_SocketSet master) {
     if (this->okay()) {
         SDLNet_UDP_DelSocket(master, this->self);
     }
 }
 
 /*************************************************************************************************/
-size_t WarGrey::STEM::IUDPDaemon::packet_capacity() {
+size_t GYDM::IUDPDaemon::packet_capacity() {
     if (this->packet != nullptr) {
         return this->packet->capacity();
     } else {
@@ -78,7 +78,7 @@ size_t WarGrey::STEM::IUDPDaemon::packet_capacity() {
     }
 }
 
-size_t WarGrey::STEM::IUDPDaemon::packet_resize(size_t new_size) {
+size_t GYDM::IUDPDaemon::packet_resize(size_t new_size) {
     if (this->packet != nullptr) {
         return this->packet->resize(new_size);
     } else {
@@ -86,11 +86,11 @@ size_t WarGrey::STEM::IUDPDaemon::packet_resize(size_t new_size) {
     }
 }
 
-bool WarGrey::STEM::IUDPDaemon::ready() {
+bool GYDM::IUDPDaemon::ready() {
     return this->okay() && SDLNet_SocketReady(this->self);
 }
 
-bool WarGrey::STEM::IUDPDaemon::recv_packet() {
+bool GYDM::IUDPDaemon::recv_packet() {
     if (this->okay() && (this->packet != nullptr)) {
         return this->packet->recv(this->self);
     } else {
@@ -99,7 +99,7 @@ bool WarGrey::STEM::IUDPDaemon::recv_packet() {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IUDPDaemon::dispatch_packet() {
+void GYDM::IUDPDaemon::dispatch_packet() {
     if ((this->peer != nullptr) && (!this->peer->absent())) {    
         if (this->packet != nullptr) {
             shared_datagram_t datagram = std::make_shared<Datagram>();
@@ -117,7 +117,7 @@ void WarGrey::STEM::IUDPDaemon::dispatch_packet() {
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IUDPClient::IUDPClient(int packet_size, uint16_t port) {
+GYDM::IUDPClient::IUDPClient(int packet_size, uint16_t port) {
     network_initialize();
 
     this->self = SDLNet_UDP_Open(port);
@@ -129,7 +129,7 @@ WarGrey::STEM::IUDPClient::IUDPClient(int packet_size, uint16_t port) {
     }
 }
 
-WarGrey::STEM::IUDPClient::~IUDPClient() noexcept {
+GYDM::IUDPClient::~IUDPClient() noexcept {
     if (this->self != nullptr) {
         SDLNet_UDP_Close(this->self);
         this->self = nullptr;
@@ -140,11 +140,11 @@ WarGrey::STEM::IUDPClient::~IUDPClient() noexcept {
     }
 }
 
-bool WarGrey::STEM::IUDPClient::okay() {
+bool GYDM::IUDPClient::okay() {
     return (this->self != nullptr);
 }
 
-size_t WarGrey::STEM::IUDPClient::packet_capacity() {
+size_t GYDM::IUDPClient::packet_capacity() {
     if (this->packet != nullptr) {
         return this->packet->capacity();
     } else {
@@ -152,7 +152,7 @@ size_t WarGrey::STEM::IUDPClient::packet_capacity() {
     }
 }
 
-size_t WarGrey::STEM::IUDPClient::packet_resize(size_t new_size) {
+size_t GYDM::IUDPClient::packet_resize(size_t new_size) {
     if (this->packet != nullptr) {
         return this->packet->resize(new_size);
     } else {

@@ -6,7 +6,7 @@
 
 #include <cstdlib>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static size_t newline_position(const char* src, size_t idx0, size_t idxn, size_t* next_idx) {
@@ -65,19 +65,19 @@ static bool string_equal_ci(const char* s1, const char* s2, size_t sz1, size_t s
 }
 
 /*************************************************************************************************/
-std::string WarGrey::STEM::flstring(double value, int precision) {
+std::string GYDM::flstring(double value, int precision) {
     return ((precision >= 0)
         ? make_nstring(make_nstring("%%.%dlf", precision).c_str(), value)
         : make_nstring("%lf", value));
 }
 
-std::string WarGrey::STEM::fxstring(long long value, int width) {
+std::string GYDM::fxstring(long long value, int width) {
     return ((width > 0)
         ? make_nstring(make_nstring("%%0%dld", width).c_str(), value)
         : make_nstring("%lld", value));
 }
 
-std::string WarGrey::STEM::sstring(unsigned long long bytes, int precision) {
+std::string GYDM::sstring(unsigned long long bytes, int precision) {
     static const char* units[] = { "KB", "MB", "GB", "TB" };
     static unsigned int max_idx = sizeof(units) / sizeof(char*) - 1;
     std::string size = make_nstring("%llu", bytes);
@@ -98,7 +98,7 @@ std::string WarGrey::STEM::sstring(unsigned long long bytes, int precision) {
 }
 
 /*************************************************************************************************/
-std::string WarGrey::STEM::substring(const std::string& src, int start, int endplus1) {
+std::string GYDM::substring(const std::string& src, int start, int endplus1) {
     std::string substr;
     size_t max_size = src.size();
     size_t subsize = ((endplus1 > 0) ? fxmin(static_cast<size_t>(endplus1), max_size) : max_size) - start;
@@ -110,13 +110,13 @@ std::string WarGrey::STEM::substring(const std::string& src, int start, int endp
     return substr;
 }
 
-std::string WarGrey::STEM::make_nstring(const char* fmt, ...) {
+std::string GYDM::make_nstring(const char* fmt, ...) {
     VSNPRINT(s, fmt);
 
     return s;
 }
 
-std::string WarGrey::STEM::binumber(unsigned long long n, size_t bitsize) {
+std::string GYDM::binumber(unsigned long long n, size_t bitsize) {
     size_t size = ((bitsize < 1) ? ((n == 0) ? 1 : integer_length(n)) : bitsize);
     std::string bs(size, '0');
 
@@ -127,7 +127,7 @@ std::string WarGrey::STEM::binumber(unsigned long long n, size_t bitsize) {
     return bs;
 }
 
-std::string WarGrey::STEM::hexnumber(unsigned long long n, size_t bytecount) {
+std::string GYDM::hexnumber(unsigned long long n, size_t bytecount) {
     size_t isize = integer_length(n);
     size_t size = ((bytecount < 1) ? ((n == 0) ? 1 : (isize / 8 + ((isize % 8 == 0) ? 0 : 1))) : bytecount) * 2;
     std::string bs(size, '0');
@@ -141,12 +141,12 @@ std::string WarGrey::STEM::hexnumber(unsigned long long n, size_t bytecount) {
 }
 
 /**************************************************************************************************/
-long long WarGrey::STEM::string_to_fixnum(const std::string& string) {
+long long GYDM::string_to_fixnum(const std::string& string) {
     return std::atoll(string.c_str());
 }
 
 /**************************************************************************************************/
-std::string WarGrey::STEM::string_first_line(const std::string& src) {
+std::string GYDM::string_first_line(const std::string& src) {
     const char* raw_src = src.c_str();
     size_t total = src.size();
     size_t line_size = newline_position(raw_src, 0, total, &total);
@@ -154,7 +154,7 @@ std::string WarGrey::STEM::string_first_line(const std::string& src) {
     return std::string(raw_src, line_size);
 }
 
-std::vector<std::string> WarGrey::STEM::string_lines(const std::string& src, bool skip_empty_line) {
+std::vector<std::string> GYDM::string_lines(const std::string& src, bool skip_empty_line) {
     std::vector<std::string> lines;
     const char* raw_src = src.c_str();
     size_t total = src.size();
@@ -175,7 +175,7 @@ std::vector<std::string> WarGrey::STEM::string_lines(const std::string& src, boo
 }
 
 /************************************************************************************************/
-unsigned long long WarGrey::STEM::scan_natural(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+unsigned long long GYDM::scan_natural(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
     unsigned long long value = 0;
 
     while ((*pos) < end) {
@@ -196,7 +196,7 @@ unsigned long long WarGrey::STEM::scan_natural(const char* src, size_t* pos, siz
     return value;
 }
 
-long long WarGrey::STEM::scan_integer(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+long long GYDM::scan_integer(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
     int sign = 1;
     long long value = 0;
 
@@ -227,7 +227,7 @@ long long WarGrey::STEM::scan_integer(const char* src, size_t* pos, size_t end, 
     return value * sign;
 }
 
-double WarGrey::STEM::scan_flonum(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+double GYDM::scan_flonum(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
     double value = flnan;
     double i_acc = 10.0;
     double f_acc = 1.0;
@@ -277,7 +277,7 @@ double WarGrey::STEM::scan_flonum(const char* src, size_t* pos, size_t end, bool
     return value * sign;
 }
 
-std::string WarGrey::STEM::scan_string(const char* src, size_t* pos, size_t end, char delim, bool skip_trailing_space) {
+std::string GYDM::scan_string(const char* src, size_t* pos, size_t end, char delim, bool skip_trailing_space) {
     size_t idx = (*pos);
     size_t size = 0;
     std::string s;
@@ -307,7 +307,7 @@ std::string WarGrey::STEM::scan_string(const char* src, size_t* pos, size_t end,
     return s;
 }
 
-void WarGrey::STEM::scan_bytes(const char* src, size_t* pos, size_t end, char* bs, size_t bs_start, size_t bs_end, bool terminating) {
+void GYDM::scan_bytes(const char* src, size_t* pos, size_t end, char* bs, size_t bs_start, size_t bs_end, bool terminating) {
     size_t bsize = bs_end - bs_start;
     size_t size = fxmin(end - (*pos), bsize);
 
@@ -326,7 +326,7 @@ void WarGrey::STEM::scan_bytes(const char* src, size_t* pos, size_t end, char* b
     (*pos) += size;
 }
 
-size_t WarGrey::STEM::scan_skip_token(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
+size_t GYDM::scan_skip_token(const char* src, size_t* pos, size_t end, bool skip_trailing_space) {
     size_t idx = (*pos);
 
     while ((*pos) < end) {
@@ -346,7 +346,7 @@ size_t WarGrey::STEM::scan_skip_token(const char* src, size_t* pos, size_t end, 
     return (*pos) - idx;
 }
 
-size_t WarGrey::STEM::scan_skip_space(const char* src, size_t* pos, size_t end) {
+size_t GYDM::scan_skip_space(const char* src, size_t* pos, size_t end) {
     size_t idx = (*pos);
 
     while ((*pos) < end) {
@@ -362,7 +362,7 @@ size_t WarGrey::STEM::scan_skip_space(const char* src, size_t* pos, size_t end) 
     return (*pos) - idx;
 }
 
-size_t WarGrey::STEM::scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim, bool skip_trailing_space) {
+size_t GYDM::scan_skip_delimiter(const char* src, size_t* pos, size_t end, char delim, bool skip_trailing_space) {
     size_t idx = (*pos);
 
     if (idx < end) {
@@ -378,7 +378,7 @@ size_t WarGrey::STEM::scan_skip_delimiter(const char* src, size_t* pos, size_t e
     return (*pos) - idx;
 }
 
-size_t WarGrey::STEM::scan_skip_newline(const char* src, size_t* pos, size_t end) {
+size_t GYDM::scan_skip_newline(const char* src, size_t* pos, size_t end) {
     size_t idx = (*pos);
 
     while ((*pos) < end) {
@@ -394,7 +394,7 @@ size_t WarGrey::STEM::scan_skip_newline(const char* src, size_t* pos, size_t end
     return (*pos) - idx;
 }
 
-size_t WarGrey::STEM::scan_skip_this_line(const char* src, size_t* pos, size_t end) {
+size_t GYDM::scan_skip_this_line(const char* src, size_t* pos, size_t end) {
     size_t idx = (*pos);
 
     while ((*pos) < end) {
@@ -420,7 +420,7 @@ size_t WarGrey::STEM::scan_skip_this_line(const char* src, size_t* pos, size_t e
  *   1111 0xxx  10xx xxxx  10xx xxxx  10xx xxxx
  */
 
-size_t WarGrey::STEM::string_utf8_length(const char* src, int max0) {
+size_t GYDM::string_utf8_length(const char* src, int max0) {
     size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t idx = 0;
     size_t n = 0;
@@ -444,11 +444,11 @@ size_t WarGrey::STEM::string_utf8_length(const char* src, int max0) {
     return n;
 }
 
-size_t WarGrey::STEM::string_utf8_length(const std::string& src) {
+size_t GYDM::string_utf8_length(const std::string& src) {
     return string_utf8_length(src.c_str(), int(src.size()));
 }
 
-int WarGrey::STEM::string_utf8_index(const char* src, int idx, int max0) {
+int GYDM::string_utf8_index(const char* src, int idx, int max0) {
     size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t it = 0;
     int cidx = -1;
@@ -478,11 +478,11 @@ int WarGrey::STEM::string_utf8_index(const char* src, int idx, int max0) {
     return cidx;
 }
 
-int WarGrey::STEM::string_utf8_index(const std::string& src, int char_idx) {
+int GYDM::string_utf8_index(const std::string& src, int char_idx) {
     return string_utf8_index(src.c_str(), char_idx, int(src.size()));
 }
 
-uint32_t WarGrey::STEM::string_utf8_ref(const char* src, int idx, int max0) {
+uint32_t GYDM::string_utf8_ref(const char* src, int idx, int max0) {
     size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t codepoint = 0;
     int code_idx = string_utf8_index(src, idx, max0);
@@ -522,11 +522,11 @@ uint32_t WarGrey::STEM::string_utf8_ref(const char* src, int idx, int max0) {
     return static_cast<uint32_t>(codepoint);
 }
 
-uint32_t WarGrey::STEM::string_utf8_ref(const std::string& src, int idx) {
+uint32_t GYDM::string_utf8_ref(const std::string& src, int idx) {
     return string_utf8_ref(src.c_str(), idx, int(src.size()));
 }
 
-size_t WarGrey::STEM::string_character_size(const char* src, int idx) {
+size_t GYDM::string_character_size(const char* src, int idx) {
     unsigned char c = static_cast<unsigned char>(src[idx]);
     size_t size = 1;
 
@@ -541,11 +541,11 @@ size_t WarGrey::STEM::string_character_size(const char* src, int idx) {
     return size;
 }
 
-size_t WarGrey::STEM::string_character_size(const std::string& src, int idx) {
+size_t GYDM::string_character_size(const std::string& src, int idx) {
     return string_character_size(src.c_str(), idx);
 }
 
-bool WarGrey::STEM::string_popback_utf8_char(std::string& src) {
+bool GYDM::string_popback_utf8_char(std::string& src) {
     size_t size = src.size();
     bool okay = false;
 
@@ -566,7 +566,7 @@ bool WarGrey::STEM::string_popback_utf8_char(std::string& src) {
     return okay;
 }
 
-std::string WarGrey::STEM::string_add_between(const char* s, char ch) {
+std::string GYDM::string_add_between(const char* s, char ch) {
     std::string vstr;
     int idx = 0;
 
@@ -596,19 +596,19 @@ std::string WarGrey::STEM::string_add_between(const char* s, char ch) {
 }
 
 /************************************************************************************************/
-bool WarGrey::STEM::string_equal(const char* s1, const char* s2) {
+bool GYDM::string_equal(const char* s1, const char* s2) {
     return string_equal_cs(s1, s2, strlen(s1), strlen(s2));
 }
 
-bool WarGrey::STEM::string_equal(const std::string& s1, const char* s2) {
+bool GYDM::string_equal(const std::string& s1, const char* s2) {
     return string_equal_cs(s1.c_str(), s2, s1.size(), strlen(s2));
 }
 
-bool WarGrey::STEM::string_equal(const std::string& s1, const std::string& s2) {
+bool GYDM::string_equal(const std::string& s1, const std::string& s2) {
     return string_equal_cs(s1.c_str(), s2.c_str(), s1.size(), s2.size());
 }
 
-bool WarGrey::STEM::string_prefix(const char* src, const char* sub, int max0) {
+bool GYDM::string_prefix(const char* src, const char* sub, int max0) {
     bool yes = true;
     size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t n = strnlen(sub, max + 1);
@@ -627,15 +627,15 @@ bool WarGrey::STEM::string_prefix(const char* src, const char* sub, int max0) {
     return yes;
 }
 
-bool WarGrey::STEM::string_prefix(const std::string& src, const char* sub) {
+bool GYDM::string_prefix(const std::string& src, const char* sub) {
     return string_prefix(src.c_str(), sub, int(src.size()));
 }
 
-bool WarGrey::STEM::string_prefix(const std::string& src, const std::string& sub) {
+bool GYDM::string_prefix(const std::string& src, const std::string& sub) {
     return string_prefix(src.c_str(), sub.c_str(), int(src.size()));
 }
 
-bool WarGrey::STEM::string_suffix(const char* src, const char* sub, int max0) {
+bool GYDM::string_suffix(const char* src, const char* sub, int max0) {
     bool yes = true;
     size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t n = strnlen(sub, max + 1);
@@ -654,28 +654,28 @@ bool WarGrey::STEM::string_suffix(const char* src, const char* sub, int max0) {
     return yes;
 }
 
-bool WarGrey::STEM::string_suffix(const std::string& src, const char* sub) {
+bool GYDM::string_suffix(const std::string& src, const char* sub) {
     return string_suffix(src.c_str(), sub, int(src.size()));
 }
 
-bool WarGrey::STEM::string_suffix(const std::string& src, const std::string& sub) {
+bool GYDM::string_suffix(const std::string& src, const std::string& sub) {
     return string_suffix(src.c_str(), sub.c_str(), int(src.size()));
 }
 
 /************************************************************************************************/
-bool WarGrey::STEM::string_ci_equal(const char* s1, const char* s2) {
+bool GYDM::string_ci_equal(const char* s1, const char* s2) {
     return string_equal_ci(s1, s2, strlen(s1), strlen(s2));
 }
 
-bool WarGrey::STEM::string_ci_equal(const std::string& s1, const char* s2) {
+bool GYDM::string_ci_equal(const std::string& s1, const char* s2) {
     return string_equal_ci(s1.c_str(), s2, s1.size(), strlen(s2));
 }
 
-bool WarGrey::STEM::string_ci_equal(const std::string& s1, const std::string& s2) {
+bool GYDM::string_ci_equal(const std::string& s1, const std::string& s2) {
     return string_equal_ci(s1.c_str(), s2.c_str(), s1.size(), s2.size());
 }
 
-bool WarGrey::STEM::string_ci_prefix(const char* src, const char* sub, int max0) {
+bool GYDM::string_ci_prefix(const char* src, const char* sub, int max0) {
     bool yes = true;
     size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t n = strnlen(sub, max + 1);
@@ -694,15 +694,15 @@ bool WarGrey::STEM::string_ci_prefix(const char* src, const char* sub, int max0)
     return yes;
 }
 
-bool WarGrey::STEM::string_ci_prefix(const std::string& src, const char* sub) {
+bool GYDM::string_ci_prefix(const std::string& src, const char* sub) {
     return string_ci_prefix(src.c_str(), sub, int(src.size()));
 }
 
-bool WarGrey::STEM::string_ci_prefix(const std::string& src, const std::string& sub) {
+bool GYDM::string_ci_prefix(const std::string& src, const std::string& sub) {
     return string_ci_prefix(src.c_str(), sub.c_str(), int(src.size()));
 }
 
-bool WarGrey::STEM::string_ci_suffix(const char* src, const char* sub, int max0) {
+bool GYDM::string_ci_suffix(const char* src, const char* sub, int max0) {
     bool yes = true;
     size_t max = (max0 >= 0) ? max0 : strlen(src);
     size_t n = strnlen(sub, max + 1);
@@ -721,10 +721,10 @@ bool WarGrey::STEM::string_ci_suffix(const char* src, const char* sub, int max0)
     return yes;
 }
 
-bool WarGrey::STEM::string_ci_suffix(const std::string& src, const char* sub) {
+bool GYDM::string_ci_suffix(const std::string& src, const char* sub) {
     return string_suffix(src.c_str(), sub, int(src.size()));
 }
 
-bool WarGrey::STEM::string_ci_suffix(const std::string& src, const std::string& sub) {
+bool GYDM::string_ci_suffix(const std::string& src, const std::string& sub) {
     return string_suffix(src.c_str(), sub.c_str(), int(src.size()));
 }

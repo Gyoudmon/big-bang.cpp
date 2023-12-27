@@ -3,7 +3,7 @@
 
 #include <cstddef>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 static uint8_t primitive_identifiers[37];
 static uint8_t constructed_identifiers[37];
@@ -28,7 +28,7 @@ static void initialize_identifiers() {
 }
 
 /*************************************************************************************************/
-uint8_t WarGrey::STEM::asn_identifier_octet(uint8_t tag, bool constructed, ASN1TagClass type) {
+uint8_t GYDM::asn_identifier_octet(uint8_t tag, bool constructed, ASN1TagClass type) {
     uint8_t type_octet = 0b00000000;
 
     switch (type) {
@@ -41,11 +41,11 @@ uint8_t WarGrey::STEM::asn_identifier_octet(uint8_t tag, bool constructed, ASN1T
     return type_octet | (constructed ? 0b00100000 : 0b00000000) | tag;
 }
 
-uint8_t WarGrey::STEM::asn_identifier_tag(uint8_t octet) {
+uint8_t GYDM::asn_identifier_tag(uint8_t octet) {
     return octet & 0b00011111;
 }
 
-ASN1TagClass WarGrey::STEM::asn_identifier_class(uint8_t octet) {
+ASN1TagClass GYDM::asn_identifier_class(uint8_t octet) {
     ASN1TagClass tag = ASN1TagClass::Universal;
 
     switch (octet >> 6U) {
@@ -57,12 +57,12 @@ ASN1TagClass WarGrey::STEM::asn_identifier_class(uint8_t octet) {
     return tag;
 }
 
-bool WarGrey::STEM::asn_identifier_constructed(uint8_t octet) {
+bool GYDM::asn_identifier_constructed(uint8_t octet) {
     return ((octet & 0b00100000) > 0U);
 }
 
 /*************************************************************************************************/
-uint8_t WarGrey::STEM::asn_primitive_identifier_octet(ASNPrimitive type) {
+uint8_t GYDM::asn_primitive_identifier_octet(ASNPrimitive type) {
     size_t idx = 0;
 
     initialize_identifiers();
@@ -81,7 +81,7 @@ uint8_t WarGrey::STEM::asn_primitive_identifier_octet(ASNPrimitive type) {
     return primitive_identifiers[idx];
 }
 
-uint8_t WarGrey::STEM::asn_constructed_identifier_octet(ASNConstructed type) {
+uint8_t GYDM::asn_constructed_identifier_octet(ASNConstructed type) {
     size_t idx = 0;
 
     initialize_identifiers();

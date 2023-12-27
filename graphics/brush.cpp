@@ -8,7 +8,7 @@
 
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /**************************************************************************************************/
 #define FILL_BOX(box, px, py, width, height) { box.x = px; box.y = py; box.w = width; box.h = height; }
@@ -215,12 +215,12 @@ static void pen_fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, fl
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Brush::clear(SDL_Renderer* renderer, const RGBA& color) {
+void GYDM::Brush::clear(SDL_Renderer* renderer, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderClear(renderer);
 }
 
-void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
+void GYDM::Brush::draw_frame(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
     SDL_Rect box;
 
     FILL_BOX(box, x - 1, y - 1, width + 3, height + 3);
@@ -228,7 +228,7 @@ void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, int x, int y, int 
     SDL_RenderDrawRect(renderer, &box);
 }
 
-void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, const RGBA& color, int xoff, int yoff) {
+void GYDM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, int cell_width, int cell_height, const RGBA& color, int xoff, int yoff) {
     int xend = xoff + col * cell_width;
     int yend = yoff + row * cell_height;
 
@@ -247,7 +247,7 @@ void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, i
     }
 }
 
-void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, const RGBA& color, int xoff, int yoff) {
+void GYDM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, int cell_width, int cell_height, const RGBA& color, int xoff, int yoff) {
     SDL_Rect cell_self;
 
     cell_self.w = cell_width;
@@ -266,22 +266,22 @@ void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int r
     }
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, int x, int y, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, int x, int y, SDL_RendererFlip flip, double angle) {
     Brush::stamp(target, surface, x, y, surface->w, surface->h, flip, angle);
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
     Brush::stamp(target, surface, &box, flip, angle);
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* region, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* region, SDL_RendererFlip flip, double angle) {
     Brush::stamp(target, surface, nullptr, region, flip, angle);
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* src, SDL_Rect* dst, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* src, SDL_Rect* dst, SDL_RendererFlip flip, double angle) {
     SDL_Texture* texture = SDL_CreateTextureFromSurface(target, surface);
 
     if (texture != nullptr) {
@@ -290,7 +290,7 @@ void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL
     }
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, int x, int y, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, int x, int y, SDL_RendererFlip flip, double angle) {
     int width, height;
 
     SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
@@ -298,7 +298,7 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, int 
     return Brush::stamp(target, texture, x, y, width, height, flip, angle);
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, int x, int y, int width, int height, SDL_RendererFlip flip, double angle) {
     SDL_Rect box;
     
     FILL_BOX(box, x, y, width, height);
@@ -306,11 +306,11 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, int 
     return Brush::stamp(target, texture, &box, flip, angle);
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* region, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* region, SDL_RendererFlip flip, double angle) {
     return Brush::stamp(target, texture, nullptr, region, flip, angle);
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dst, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_Rect* dst, SDL_RendererFlip flip, double angle) {
     if ((flip == SDL_FLIP_NONE) && (angle == 0.0)) {
         return SDL_RenderCopy(target, texture, src, dst);
     } else {
@@ -319,112 +319,112 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, int x, int y, const RGBA& color) {
+void GYDM::Brush::draw_point(SDL_Renderer* renderer, int x, int y, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, const RGBA& color) {
+void GYDM::Brush::draw_line(SDL_Renderer* renderer, int x1, int y1, int x2, int y2, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
-void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, int x, int y, int length, const RGBA& color) {
+void GYDM::Brush::draw_hline(SDL_Renderer* renderer, int x, int y, int length, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLine(renderer, x, y, x + length, y);
 }
 
-void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, int x, int y, int length, const RGBA& color) {
+void GYDM::Brush::draw_vline(SDL_Renderer* renderer, int x, int y, int length, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLine(renderer, x, y, x, y + length);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_Rect* box, const RGBA& color) {
+void GYDM::Brush::draw_rect(SDL_Renderer* renderer, SDL_Rect* box, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawRect(renderer, box);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_Rect* box, const RGBA& color) {
+void GYDM::Brush::fill_rect(SDL_Renderer* renderer, SDL_Rect* box, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderFillRect(renderer, box);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
+void GYDM::Brush::draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
     Brush::draw_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
+void GYDM::Brush::fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const RGBA& color) {
     SDL_Rect box;
 
     FILL_BOX(box, x, y, width, height);
     Brush::fill_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, const RGBA& color) {
+void GYDM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, const RGBA& color) {
     Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, const RGBA& color) {
+void GYDM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_Rect* box, float rad, const RGBA& color) {
     Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, const RGBA& color) {
+void GYDM::Brush::draw_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, const RGBA& color) {
     Brush::draw_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, const RGBA& color) {
+void GYDM::Brush::fill_rounded_rect(SDL_Renderer* renderer, int x, int y, int width, int height, float radius, const RGBA& color) {
     Brush::fill_rounded_rect(renderer, float(x), float(y), float(width), float(height), radius, color);
 }
 
-void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, const RGBA& color) {
+void GYDM::Brush::draw_square(SDL_Renderer* renderer, int cx, int cy, int apothem, const RGBA& color) {
     Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, color);
 }
 
-void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, const RGBA& color) {
+void GYDM::Brush::fill_square(SDL_Renderer* renderer, int cx, int cy, int apothem, const RGBA& color) {
     Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, const RGBA& color) {
+void GYDM::Brush::draw_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, const RGBA& color) {
     Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, const RGBA& color) {
+void GYDM::Brush::fill_rounded_square(SDL_Renderer* renderer, int cx, int cy, int apothem, float rad, const RGBA& color) {
     Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2, apothem * 2, rad, color);
 }
 
-void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, const RGBA& color) {
+void GYDM::Brush::draw_circle(SDL_Renderer* renderer, int cx, int cy, int radius, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, const RGBA& color) {
+void GYDM::Brush::fill_circle(SDL_Renderer* renderer, int cx, int cy, int radius, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_filled_circle(renderer, cx, cy, radius);
 }
 
-void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, const RGBA& color) {
+void GYDM::Brush::draw_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, const RGBA& color) {
+void GYDM::Brush::fill_ellipse(SDL_Renderer* renderer, int cx, int cy, int ar, int br, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_filled_ellipse(renderer, cx, cy, ar, br);
 }
 
-void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, const RGBA& color) {
+void GYDM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, const RGBA& color) {
     Brush::draw_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, color);
 }
 
-void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, const RGBA& color) {
+void GYDM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, int cx, int cy, int radius, float rotation, const RGBA& color) {
     Brush::fill_regular_polygon(renderer, n, float(cx), float(cy), float(radius), rotation, color);
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
+void GYDM::Brush::draw_frame(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
     SDL_FRect box;
 
     FILL_BOX(box, x - 1.0F, y - 1.0F, width + 3.0F, height + 3.0F);
@@ -432,7 +432,7 @@ void WarGrey::STEM::Brush::draw_frame(SDL_Renderer* renderer, float x, float y, 
     SDL_RenderDrawRectF(renderer, &box);
 }
 
-void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, const RGBA& color, float xoff, float yoff) {
+void GYDM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, float cell_width, float cell_height, const RGBA& color, float xoff, float yoff) {
     float xend = xoff + col * cell_width;
     float yend = yoff + row * cell_height;
 
@@ -451,7 +451,7 @@ void WarGrey::STEM::Brush::draw_grid(SDL_Renderer* renderer, int row, int col, f
     }
 }
 
-void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_width, float cell_height, const RGBA& color, float xoff, float yoff) {
+void GYDM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int row, int col, float cell_width, float cell_height, const RGBA& color, float xoff, float yoff) {
     SDL_FRect cell_self;
 
     cell_self.w = cell_width;
@@ -470,22 +470,22 @@ void WarGrey::STEM::Brush::fill_grid(SDL_Renderer* renderer, int* grids[], int r
     }
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, float x, float y, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, float x, float y, SDL_RendererFlip flip, double angle) {
     Brush::stamp(target, surface, x, y, float(surface->w), float(surface->h), flip, angle);
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
     Brush::stamp(target, surface, &box, flip, angle);
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_FRect* region, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_FRect* region, SDL_RendererFlip flip, double angle) {
     Brush::stamp(target, surface, nullptr, region, flip, angle);
 }
 
-void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* src, SDL_FRect* dst, SDL_RendererFlip flip, double angle) {
+void GYDM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL_Rect* src, SDL_FRect* dst, SDL_RendererFlip flip, double angle) {
     SDL_Texture* texture = SDL_CreateTextureFromSurface(target, surface);
 
     if (texture != nullptr) {
@@ -494,7 +494,7 @@ void WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Surface* surface, SDL
     }
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, float x, float y, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, float x, float y, SDL_RendererFlip flip, double angle) {
     int width, height;
 
     SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
@@ -502,7 +502,7 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, floa
     return Brush::stamp(target, texture, x, y, float(width), float(height), flip, angle);
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, float x, float y, float width, float height, SDL_RendererFlip flip, double angle) {
     SDL_FRect box;
     
     FILL_BOX(box, x, y, width, height);
@@ -510,11 +510,11 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, floa
     return Brush::stamp(target, texture, &box, flip, angle);
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_FRect* region, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_FRect* region, SDL_RendererFlip flip, double angle) {
     return Brush::stamp(target, texture, nullptr, region, flip, angle);
 }
 
-int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_FRect* dst, SDL_RendererFlip flip, double angle) {
+int GYDM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_Rect* src, SDL_FRect* dst, SDL_RendererFlip flip, double angle) {
     if ((flip == SDL_FLIP_NONE) && (angle == 0.0)) {
         return SDL_RenderCopyF(target, texture, src, dst);
     } else {
@@ -523,67 +523,67 @@ int WarGrey::STEM::Brush::stamp(SDL_Renderer* target, SDL_Texture* texture, SDL_
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::Brush::draw_point(SDL_Renderer* renderer, float x, float y, const RGBA& color) {
+void GYDM::Brush::draw_point(SDL_Renderer* renderer, float x, float y, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawPointF(renderer, x, y);
 }
 
-void WarGrey::STEM::Brush::draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, const RGBA& color) {
+void GYDM::Brush::draw_line(SDL_Renderer* renderer, float x1, float y1, float x2, float y2, const RGBA& color) {
     aalineRGBA(renderer, fl2fx<int16_t>(x1), fl2fx<int16_t>(y1), fl2fx<int16_t>(x2), fl2fx<int16_t>(y2),
                 color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::draw_hline(SDL_Renderer* renderer, float x, float y, float length, const RGBA& color) {
+void GYDM::Brush::draw_hline(SDL_Renderer* renderer, float x, float y, float length, const RGBA& color) {
     Brush::draw_hline(renderer, fl2fx<int>(x), fl2fx<int>(y), fl2fx<int>(length), color);
 }
 
-void WarGrey::STEM::Brush::draw_vline(SDL_Renderer* renderer, float x, float y, float length, const RGBA& color) {
+void GYDM::Brush::draw_vline(SDL_Renderer* renderer, float x, float y, float length, const RGBA& color) {
     Brush::draw_vline(renderer, fl2fx<int>(x), fl2fx<int>(y), fl2fx<int>(length), color);
 }
 
-void WarGrey::STEM::Brush::draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, const RGBA& color) {
+void GYDM::Brush::draw_points(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawPointsF(renderer, pts, size);
 }
 
-void WarGrey::STEM::Brush::draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, const RGBA& color) {
+void GYDM::Brush::draw_lines(SDL_Renderer* renderer, const SDL_FPoint* pts, int size, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawLinesF(renderer, pts, size);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, SDL_FRect* box, const RGBA& color) {
+void GYDM::Brush::draw_rect(SDL_Renderer* renderer, SDL_FRect* box, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderDrawRectF(renderer, box);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, SDL_FRect* box, const RGBA& color) {
+void GYDM::Brush::fill_rect(SDL_Renderer* renderer, SDL_FRect* box, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     SDL_RenderFillRectF(renderer, box);
 }
 
-void WarGrey::STEM::Brush::draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
+void GYDM::Brush::draw_rect(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
     Brush::draw_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
+void GYDM::Brush::fill_rect(SDL_Renderer* renderer, float x, float y, float width, float height, const RGBA& color) {
     SDL_FRect box;
 
     FILL_BOX(box, x, y, width, height);
     Brush::fill_rect(renderer, &box, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, const RGBA& color) {
+void GYDM::Brush::draw_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, const RGBA& color) {
     Brush::draw_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, const RGBA& color) {
+void GYDM::Brush::fill_rounded_rect(SDL_Renderer* renderer, SDL_FRect* box, float rad, const RGBA& color) {
     Brush::fill_rounded_rect(renderer, box->x, box->y, box->w, box->h, rad, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, const RGBA& color) {
+void GYDM::Brush::draw_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, const RGBA& color) {
     int16_t X1 = fl2fx<int16_t>(x);
     int16_t Y1 = fl2fx<int16_t>(y);
     int16_t X2 = fl2fx<int16_t>(x + width);
@@ -598,7 +598,7 @@ void WarGrey::STEM::Brush::draw_rounded_rect(SDL_Renderer* renderer, float x, fl
     roundedRectangleRGBA(renderer, X1, Y1, X2, Y2, rad, color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, const RGBA& color) {
+void GYDM::Brush::fill_rounded_rect(SDL_Renderer* renderer, float x, float y, float width, float height, float radius, const RGBA& color) {
     int16_t X1 = fl2fx<int16_t>(x);
     int16_t Y1 = fl2fx<int16_t>(y);
     int16_t X2 = fl2fx<int16_t>(x + width);
@@ -613,23 +613,23 @@ void WarGrey::STEM::Brush::fill_rounded_rect(SDL_Renderer* renderer, float x, fl
     roundedBoxRGBA(renderer, X1, Y1, X2, Y2, rad, color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, const RGBA& color) {
+void GYDM::Brush::draw_square(SDL_Renderer* renderer, float cx, float cy, float apothem, const RGBA& color) {
     Brush::draw_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, color);
 }
 
-void WarGrey::STEM::Brush::fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, const RGBA& color) {
+void GYDM::Brush::fill_square(SDL_Renderer* renderer, float cx, float cy, float apothem, const RGBA& color) {
     Brush::fill_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, color);
 }
 
-void WarGrey::STEM::Brush::draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, const RGBA& color) {
+void GYDM::Brush::draw_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, const RGBA& color) {
     Brush::draw_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, color);
 }
 
-void WarGrey::STEM::Brush::fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, const RGBA& color) {
+void GYDM::Brush::fill_rounded_square(SDL_Renderer* renderer, float cx, float cy, float apothem, float rad, const RGBA& color) {
     Brush::fill_rounded_rect(renderer, cx - apothem, cy - apothem, apothem * 2.0F, apothem * 2.0F, rad, color);
 }
 
-void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, const RGBA& color) {
+void GYDM::Brush::draw_circle(SDL_Renderer* renderer, float cx, float cy, float radius, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t R = fl2fx<int16_t>(radius);
@@ -637,7 +637,7 @@ void WarGrey::STEM::Brush::draw_circle(SDL_Renderer* renderer, float cx, float c
     aacircleRGBA(renderer, CX, CY, R, color.R(), color.G(), color.B(), color.A());
 }
 
-void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, const RGBA& color) {
+void GYDM::Brush::fill_circle(SDL_Renderer* renderer, float cx, float cy, float radius, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t R = fl2fx<int16_t>(radius);
@@ -650,7 +650,7 @@ void WarGrey::STEM::Brush::fill_circle(SDL_Renderer* renderer, float cx, float c
     aacircleRGBA(renderer, CX, CY, R, r, g, b, a);
 }
 
-void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, const RGBA& color) {
+void GYDM::Brush::draw_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t AR = fl2fx<int16_t>(ar);
@@ -667,7 +667,7 @@ void WarGrey::STEM::Brush::draw_ellipse(SDL_Renderer* renderer, float cx, float 
     }
 }
 
-void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, const RGBA& color) {
+void GYDM::Brush::fill_ellipse(SDL_Renderer* renderer, float cx, float cy, float ar, float br, const RGBA& color) {
     int16_t CX = fl2fx<int16_t>(cx);
     int16_t CY = fl2fx<int16_t>(cy);
     int16_t AR = fl2fx<int16_t>(ar);
@@ -686,12 +686,12 @@ void WarGrey::STEM::Brush::fill_ellipse(SDL_Renderer* renderer, float cx, float 
     }
 }
 
-void WarGrey::STEM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, const RGBA& color) {
+void GYDM::Brush::draw_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_draw_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
 
-void WarGrey::STEM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, const RGBA& color) {
+void GYDM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, float cy, float radius, float rotation, const RGBA& color) {
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }

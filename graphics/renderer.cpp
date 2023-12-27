@@ -2,10 +2,10 @@
 
 #include "../datum/box.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-SDL_RendererFlip WarGrey::STEM::game_scales_to_flip(float x_scale, float y_scale) {
+SDL_RendererFlip GYDM::game_scales_to_flip(float x_scale, float y_scale) {
     SDL_RendererFlip flip = SDL_FLIP_NONE;
 
     if ((x_scale < 0.0F) && (y_scale < 0.0F)) {
@@ -19,7 +19,7 @@ SDL_RendererFlip WarGrey::STEM::game_scales_to_flip(float x_scale, float y_scale
     return flip;
 }
 
-void WarGrey::STEM::game_flip_to_signs(SDL_RendererFlip flip, double* hsgn, double* vsgn) {
+void GYDM::game_flip_to_signs(SDL_RendererFlip flip, double* hsgn, double* vsgn) {
     switch (flip) {
     case SDL_FLIP_HORIZONTAL: SET_VALUES(hsgn, -1.0, vsgn, 1.0); break;
     case SDL_FLIP_VERTICAL: SET_VALUES(hsgn, 1.0, vsgn, -1.0); break;
@@ -28,7 +28,7 @@ void WarGrey::STEM::game_flip_to_signs(SDL_RendererFlip flip, double* hsgn, doub
     }
 }
 
-void WarGrey::STEM::game_flip_to_signs(SDL_RendererFlip flip, float* hsgn, float* vsgn) {
+void GYDM::game_flip_to_signs(SDL_RendererFlip flip, float* hsgn, float* vsgn) {
     double flhsgn, flvsgn;
     
     game_flip_to_signs(flip, &flhsgn, &flvsgn);

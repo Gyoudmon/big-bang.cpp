@@ -2,7 +2,7 @@
 
 #include <cctype>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     static const char linefeed = 0x0A;
     static const char carriage_return = 0x0D;
     static const char space = 0x20;

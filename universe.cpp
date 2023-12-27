@@ -15,7 +15,7 @@
 
 #include <filesystem>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 using namespace std::filesystem;
 
 /*************************************************************************************************/
@@ -183,7 +183,7 @@ static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* textu
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::IUniverse::IUniverse(uint32_t fps, const RGBA& fgc, const RGBA& bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
+GYDM::IUniverse::IUniverse(uint32_t fps, const RGBA& fgc, const RGBA& bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
     game_create_world(1, 0, &this->window, &this->renderer);
@@ -192,7 +192,7 @@ WarGrey::STEM::IUniverse::IUniverse(uint32_t fps, const RGBA& fgc, const RGBA& b
     this->echo.h = 0;
 }
 
-WarGrey::STEM::IUniverse::~IUniverse() {
+GYDM::IUniverse::~IUniverse() {
     if (this->timer > 0) {
         SDL_RemoveTimer(this->timer);
     }
@@ -205,7 +205,7 @@ WarGrey::STEM::IUniverse::~IUniverse() {
     SDL_DestroyWindow(this->window);
 }
 
-void WarGrey::STEM::IUniverse::big_bang() {
+void GYDM::IUniverse::big_bang() {
     uint32_t quit_time = 0UL;           // 游戏退出时的在线时间
     timer_parcel_t parcel;              // 时间轴包裹
     SDL_Event e;                        // SDL 事件
@@ -277,7 +277,7 @@ void WarGrey::STEM::IUniverse::big_bang() {
     }
 }
 
-void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseButtonEvent &mouse, bool pressed) {
+void GYDM::IUniverse::on_mouse_event(SDL_MouseButtonEvent &mouse, bool pressed) {
     if (!pressed) {
         if (mouse.clicks == 1) {
             switch (mouse.button) {
@@ -292,11 +292,11 @@ void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseButtonEvent &mouse, bool 
     }
 }
 
-void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseMotionEvent &mouse) {
+void GYDM::IUniverse::on_mouse_event(SDL_MouseMotionEvent &mouse) {
     this->on_mouse_move(mouse.state, mouse.x, mouse.y, mouse.xrel, mouse.yrel);
 }
 
-void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseWheelEvent &mouse) {
+void GYDM::IUniverse::on_mouse_event(SDL_MouseWheelEvent &mouse) {
     int horizon = mouse.x;
     int vertical = mouse.y;
     float hprecise = float(horizon);  // mouse.preciseX;
@@ -312,7 +312,7 @@ void WarGrey::STEM::IUniverse::on_mouse_event(SDL_MouseWheelEvent &mouse) {
     this->on_scroll(horizon, vertical, hprecise, vprecise);
 }
 
-void WarGrey::STEM::IUniverse::on_keyboard_event(SDL_KeyboardEvent &keyboard, bool pressed) {
+void GYDM::IUniverse::on_keyboard_event(SDL_KeyboardEvent &keyboard, bool pressed) {
     SDL_Keysym key = keyboard.keysym;
     int ctrl_mod = KMOD_LCTRL | KMOD_RCTRL;
 
@@ -350,7 +350,7 @@ void WarGrey::STEM::IUniverse::on_keyboard_event(SDL_KeyboardEvent &keyboard, bo
     }
 }
 
-void WarGrey::STEM::IUniverse::on_resize(int width, int height) {
+void GYDM::IUniverse::on_resize(int width, int height) {
     this->window_width = width;
     this->window_height = height;
 
@@ -372,7 +372,7 @@ void WarGrey::STEM::IUniverse::on_resize(int width, int height) {
     this->end_update_sequence();
 }
 
-void WarGrey::STEM::IUniverse::on_user_input(const char* text) {
+void GYDM::IUniverse::on_user_input(const char* text) {
     if (this->in_editing) {
         this->usrin.append(text);
         this->current_usrin = nullptr;
@@ -385,12 +385,12 @@ void WarGrey::STEM::IUniverse::on_user_input(const char* text) {
     this->on_text(text, strlen(text), false);
 }
 
-void WarGrey::STEM::IUniverse::on_editing(const char* text, int pos, int span) {
+void GYDM::IUniverse::on_editing(const char* text, int pos, int span) {
     this->current_usrin = text;
     this->on_editing_text(text, pos, span);
 }
 
-void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height) {
+void GYDM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height) {
     /**
      * Even if the subclass has its own background,
      *   resetting the renderer is also meaningful,
@@ -411,11 +411,11 @@ void WarGrey::STEM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, i
     }
 }
 
-void WarGrey::STEM::IUniverse::draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height) {
+void GYDM::IUniverse::draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height) {
     Brush::draw_line(renderer, x, y, width, y, 0x888888U);
 }
 
-bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
+bool GYDM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
     bool updated = (this->echo.h > 0);
 
     if (updated) {
@@ -437,7 +437,7 @@ bool WarGrey::STEM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
     return updated;
 }
 
-bool WarGrey::STEM::IUniverse::display_usr_input_and_caret(SDL_Renderer* renderer, bool yes) {
+bool GYDM::IUniverse::display_usr_input_and_caret(SDL_Renderer* renderer, bool yes) {
     bool updated = false;
 
     if (this->echo.h > 0) {
@@ -459,7 +459,7 @@ bool WarGrey::STEM::IUniverse::display_usr_input_and_caret(SDL_Renderer* rendere
     return updated;
 }
 
-int WarGrey::STEM::IUniverse::cmdline_message_yposition() {
+int GYDM::IUniverse::cmdline_message_yposition() {
     int yoff = 0;
 
     if (this->echo_font->okay()) {
@@ -474,20 +474,20 @@ int WarGrey::STEM::IUniverse::cmdline_message_yposition() {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IUniverse::set_window_title(std::string& title) {
+void GYDM::IUniverse::set_window_title(std::string& title) {
     SDL_SetWindowTitle(this->window, title.c_str());
 }
 
-void WarGrey::STEM::IUniverse::set_window_title(const char* fmt, ...) {
+void GYDM::IUniverse::set_window_title(const char* fmt, ...) {
     VSNPRINT(title, fmt);
     this->set_window_title(title);
 }
 
-SDL_Renderer* WarGrey::STEM::IUniverse::master_renderer() {
+SDL_Renderer* GYDM::IUniverse::master_renderer() {
     return this->renderer;
 }
 
-const char* WarGrey::STEM::IUniverse::get_renderer_name() {
+const char* GYDM::IUniverse::get_renderer_name() {
     SDL_RendererInfo rinfo;
 
     SDL_GetRendererInfo(this->renderer, &rinfo);
@@ -495,7 +495,7 @@ const char* WarGrey::STEM::IUniverse::get_renderer_name() {
     return rinfo.name; 
 }
 
-void WarGrey::STEM::IUniverse::set_window_size(int width, int height, bool centerize) {
+void GYDM::IUniverse::set_window_size(int width, int height, bool centerize) {
     if ((width <= 0) || (height <= 0)) {
         int oldw, oldh;
 
@@ -524,7 +524,7 @@ void WarGrey::STEM::IUniverse::set_window_size(int width, int height, bool cente
     }
 }
 
-void WarGrey::STEM::IUniverse::feed_window_size(int* width, int* height, bool logical) {
+void GYDM::IUniverse::feed_window_size(int* width, int* height, bool logical) {
     if (logical) {
         SDL_GetRendererOutputSize(this->renderer, width, height);
     } else {
@@ -532,7 +532,7 @@ void WarGrey::STEM::IUniverse::feed_window_size(int* width, int* height, bool lo
     }
 }
 
-void WarGrey::STEM::IUniverse::set_window_fullscreen(bool yes) {
+void GYDM::IUniverse::set_window_fullscreen(bool yes) {
     if (yes) {
         SDL_SetWindowFullscreen(this->window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     } else {
@@ -540,19 +540,19 @@ void WarGrey::STEM::IUniverse::set_window_fullscreen(bool yes) {
     }
 }
 
-void WarGrey::STEM::IUniverse::refresh() {
+void GYDM::IUniverse::refresh() {
     this->do_redraw(this->renderer, 0, 0, this->window_width, this->window_height);
     game_world_refresh(this->renderer, this->texture);
 }
 
-void WarGrey::STEM::IUniverse::feed_extent(float* width, float* height) {
+void GYDM::IUniverse::feed_extent(float* width, float* height) {
     int fxw, fxh;
 
     this->feed_window_size(&fxw, &fxh);
     SET_VALUES(width, float(fxw), height, float(fxh));
 }
 
-void WarGrey::STEM::IUniverse::feed_client_extent(float* width, float* height) {
+void GYDM::IUniverse::feed_client_extent(float* width, float* height) {
     int fxw, fxh;
 
     this->feed_window_size(&fxw, &fxh);
@@ -561,7 +561,7 @@ void WarGrey::STEM::IUniverse::feed_client_extent(float* width, float* height) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int bgc, shared_font_t font) {
+void GYDM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int bgc, shared_font_t font) {
     int width, height;
 
     this->feed_window_size(&width, &height);
@@ -576,7 +576,7 @@ void WarGrey::STEM::IUniverse::set_cmdwin_height(int cmdwinheight, int fgc, int 
     SDL_SetTextInputRect(&this->echo);
 }
 
-void WarGrey::STEM::IUniverse::log_message(Log level, const std::string& msg) {
+void GYDM::IUniverse::log_message(Log level, const std::string& msg) {
     this->needs_termio_if_no_echo = true;
     this->message = msg;
     
@@ -594,12 +594,12 @@ void WarGrey::STEM::IUniverse::log_message(Log level, const std::string& msg) {
     }
 }
 
-void WarGrey::STEM::IUniverse::start_input_text(const char* fmt, ...) {
+void GYDM::IUniverse::start_input_text(const char* fmt, ...) {
     VSNPRINT(p, fmt);
     this->start_input_text(p);
 }
 
-void WarGrey::STEM::IUniverse::start_input_text(const std::string& p) {
+void GYDM::IUniverse::start_input_text(const std::string& p) {
     if (p.size() > 0) {
         this->prompt = p;
     }
@@ -613,7 +613,7 @@ void WarGrey::STEM::IUniverse::start_input_text(const std::string& p) {
     }
 }
 
-void WarGrey::STEM::IUniverse::stop_input_text() {
+void GYDM::IUniverse::stop_input_text() {
     this->in_editing = false;
     SDL_StopTextInput();
     this->on_text(this->usrin.c_str(), this->usrin.size(), true);
@@ -625,7 +625,7 @@ void WarGrey::STEM::IUniverse::stop_input_text() {
     }
 }
 
-void WarGrey::STEM::IUniverse::enter_input_text() {
+void GYDM::IUniverse::enter_input_text() {
     if (this->current_usrin != nullptr) {
         this->on_user_input(this->current_usrin);
         this->current_usrin = nullptr;
@@ -634,7 +634,7 @@ void WarGrey::STEM::IUniverse::enter_input_text() {
     }
 }
 
-void WarGrey::STEM::IUniverse::popback_input_text() {
+void GYDM::IUniverse::popback_input_text() {
     if (string_popback_utf8_char(this->usrin)) {
         if (this->display_usr_input_and_caret(this->renderer, true)) {
             this->notify_updated();
@@ -643,7 +643,7 @@ void WarGrey::STEM::IUniverse::popback_input_text() {
 }
 
 /*************************************************************************************************/
-SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
+SDL_Surface* GYDM::IUniverse::snapshot() {
     uint32_t format = SDL_PIXELFORMAT_RGBA8888;
     SDL_Surface* photograph = game_formatted_surface(this->window_width, this->window_height, format);
 
@@ -656,7 +656,7 @@ SDL_Surface* WarGrey::STEM::IUniverse::snapshot() {
     return photograph;
 }
 
-void WarGrey::STEM::IUniverse::take_snapshot() {
+void GYDM::IUniverse::take_snapshot() {
     const char* basename = SDL_GetWindowTitle(this->window);
     path snapshot_png = (this->snapshot_rootdir.empty() ? current_path() : path(this->snapshot_rootdir))
         / path(make_nstring("%s-%s.png", basename, make_now_timestamp_utc(true).c_str()));
@@ -668,15 +668,15 @@ void WarGrey::STEM::IUniverse::take_snapshot() {
     }
 }
 
-void WarGrey::STEM::IUniverse::set_snapshot_folder(const char* dir) {
+void GYDM::IUniverse::set_snapshot_folder(const char* dir) {
     this->set_snapshot_folder(std::string(dir));
 }
 
-void WarGrey::STEM::IUniverse::set_snapshot_folder(const std::string& dir) {
+void GYDM::IUniverse::set_snapshot_folder(const std::string& dir) {
     this->snapshot_rootdir = path(dir).make_preferred().string();
 }
 
-void WarGrey::STEM::IUniverse::save_file(bool is_save_as) {
+void GYDM::IUniverse::save_file(bool is_save_as) {
     const char* ext = this->usrdata_extension();
 
     if (ext != nullptr) {
@@ -704,21 +704,21 @@ void WarGrey::STEM::IUniverse::save_file(bool is_save_as) {
     }
 }
 
-void WarGrey::STEM::IUniverse::set_usrdata_folder(const char* dir) {
+void GYDM::IUniverse::set_usrdata_folder(const char* dir) {
     this->set_usrdata_folder(std::string(dir));
 }
 
-void WarGrey::STEM::IUniverse::set_usrdata_folder(const std::string& dir) {
+void GYDM::IUniverse::set_usrdata_folder(const std::string& dir) {
     this->usrdata_rootdir = path(dir).make_preferred().string();
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Universe::Universe() : Universe("The Big Bang!") {}
-WarGrey::STEM::Universe::Universe(const char *title, uint32_t fps, const RGBA& fgc, const RGBA& bgc) : IUniverse(fps, fgc, bgc) {
+GYDM::Universe::Universe() : Universe("The Big Bang!") {}
+GYDM::Universe::Universe(const char *title, uint32_t fps, const RGBA& fgc, const RGBA& bgc) : IUniverse(fps, fgc, bgc) {
     this->set_window_title("%s", title);
 }
 
-void WarGrey::STEM::Universe::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
+void GYDM::Universe::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
     this->update(count, interval, uptime);
     this->notify_updated();
 }

@@ -2,8 +2,8 @@
 
 #include "../agent.hpp"
 
-namespace WarGrey::STEM {
-    class __lambda__ Linkmon : public WarGrey::STEM::AgentSpriteSheet {
+namespace GYDM {
+    class __lambda__ Linkmon : public GYDM::AgentSpriteSheet {
     public:
         Linkmon();
 

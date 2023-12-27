@@ -7,13 +7,13 @@
 
 #include "../../forward.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     /** NOTE: the HSB and HSV are identical **/
     class __lambda__ RGBA {
     public:
-        static WarGrey::STEM::RGBA HSV(double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
-        static WarGrey::STEM::RGBA HSL(double hue, double saturation = 1.0, double lightness = 1.0, double alpha = 1.0);
-        static WarGrey::STEM::RGBA HSI(double hue, double saturation = 1.0, double intensity = 1.0, double alpha = 1.0);
+        static GYDM::RGBA HSV(double hue, double saturation = 1.0, double brightness = 1.0, double alpha = 1.0);
+        static GYDM::RGBA HSL(double hue, double saturation = 1.0, double lightness = 1.0, double alpha = 1.0);
+        static GYDM::RGBA HSI(double hue, double saturation = 1.0, double intensity = 1.0, double alpha = 1.0);
 
     public:
         RGBA() : r(0.0), g(0.0), b(0.0), a(0.0) { /* transparent color */ }
@@ -33,17 +33,17 @@ namespace WarGrey::STEM {
         ~RGBA() noexcept {}
 
     public:
-        WarGrey::STEM::RGBA& operator=(const RGBA& c); // copy assignment
-        WarGrey::STEM::RGBA& operator=(uint32_t hex);  // copy assignment
+        GYDM::RGBA& operator=(const RGBA& c); // copy assignment
+        GYDM::RGBA& operator=(uint32_t hex);  // copy assignment
         double operator[](size_t i) const;
         
-		friend inline WarGrey::STEM::RGBA operator+(RGBA lhs, const RGBA& rhs) { return lhs += rhs; }
-        friend inline WarGrey::STEM::RGBA operator+(RGBA lhs, uint32_t rhs) { return lhs += rhs; }
-		friend inline WarGrey::STEM::RGBA operator+(uint32_t lhs, RGBA rhs) { return rhs += lhs; }
+		friend inline GYDM::RGBA operator+(RGBA lhs, const RGBA& rhs) { return lhs += rhs; }
+        friend inline GYDM::RGBA operator+(RGBA lhs, uint32_t rhs) { return lhs += rhs; }
+		friend inline GYDM::RGBA operator+(uint32_t lhs, RGBA rhs) { return rhs += lhs; }
 
-		friend inline WarGrey::STEM::RGBA operator*(RGBA lhs, const RGBA& rhs) { return lhs *= rhs; }
-        friend inline WarGrey::STEM::RGBA operator*(RGBA lhs, uint32_t rhs) { return lhs *= rhs; }
-		friend inline WarGrey::STEM::RGBA operator*(uint32_t lhs, RGBA rhs) { return rhs *= lhs; }
+		friend inline GYDM::RGBA operator*(RGBA lhs, const RGBA& rhs) { return lhs *= rhs; }
+        friend inline GYDM::RGBA operator*(RGBA lhs, uint32_t rhs) { return lhs *= rhs; }
+		friend inline GYDM::RGBA operator*(uint32_t lhs, RGBA rhs) { return rhs *= lhs; }
 
         // C++20 has the `operator<=>`
         bool equal(const RGBA& rhs) const;
@@ -56,8 +56,8 @@ namespace WarGrey::STEM {
         friend inline bool operator!=(uint32_t lhs, const RGBA& rhs) { return !rhs.equal(lhs); }
 
     public:
-        WarGrey::STEM::RGBA contrast() const;
-        WarGrey::STEM::RGBA contrast_for_background() const;
+        GYDM::RGBA contrast() const;
+        GYDM::RGBA contrast_for_background() const;
 
     public:
         void unbox(uint8_t* r = nullptr, uint8_t* g = nullptr, uint8_t* b = nullptr, uint8_t* a = nullptr) const;
@@ -93,11 +93,11 @@ namespace WarGrey::STEM {
         std::string hexstring(const char* fmt, bool needs_alpha = true) const { return this->hexstring(needs_alpha, fmt); }
 
     private:
-        WarGrey::STEM::RGBA& operator+=(const RGBA& rhs);
-		WarGrey::STEM::RGBA& operator+=(uint32_t rhs);
+        GYDM::RGBA& operator+=(const RGBA& rhs);
+		GYDM::RGBA& operator+=(uint32_t rhs);
 
-        WarGrey::STEM::RGBA& operator*=(const RGBA& rhs);
-		WarGrey::STEM::RGBA& operator*=(uint32_t rhs);
+        GYDM::RGBA& operator*=(const RGBA& rhs);
+		GYDM::RGBA& operator*=(uint32_t rhs);
 
     private:
         double r;
@@ -107,5 +107,5 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    const WarGrey::STEM::RGBA transparent;
+    const GYDM::RGBA transparent;
 }

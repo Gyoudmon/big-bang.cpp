@@ -3,14 +3,14 @@
 #include "base.hpp"
 #include "identifier.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
 #define define_asn_enum(e, E, ...) \
 enum class E { __VA_ARGS__ }; \
 inline size_t asn_##e##_span(E e) { return asn_enum_span(e); } \
-inline WarGrey::STEM::octets asn_##e##_to_octets(E e) { return asn_enum_to_octets(e); } \
+inline GYDM::octets asn_##e##_to_octets(E e) { return asn_enum_to_octets(e); } \
 inline size_t asn_##e##_into_octets(E e, uint8_t* octets, size_t offset = 0) { return asn_enum_into_octets(e, octets, offset); } \
 inline E asn_octets_to_##e(const uint8_t* benum, size_t* offset = nullptr) { return asn_octets_to_enum<E>(benum, offset); } \
-inline E asn_octets_to_##e(const WarGrey::STEM::octets& benum, size_t* offset = nullptr) { return asn_octets_to_enum<E>(benum.c_str(), offset); }
+inline E asn_octets_to_##e(const GYDM::octets& benum, size_t* offset = nullptr) { return asn_octets_to_enum<E>(benum.c_str(), offset); }
 
     template<typename E>
     inline size_t asn_enum_span(E enumerated) {
@@ -18,7 +18,7 @@ inline E asn_octets_to_##e(const WarGrey::STEM::octets& benum, size_t* offset = 
     }
 
     template<typename E>
-    inline WarGrey::STEM::octets asn_enum_to_octets(E enumerated) {
+    inline GYDM::octets asn_enum_to_octets(E enumerated) {
         return asn_int64_to_octets(static_cast<int64_t>(enumerated), ASNPrimitive::Enumerated);
     }
 

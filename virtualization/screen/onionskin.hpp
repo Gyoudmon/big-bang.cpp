@@ -2,13 +2,13 @@
 
 #include "../screen.hpp"
 
-namespace WarGrey::STEM {
-    class __lambda__ OnionSkin : public WarGrey::STEM::IScreen {
+namespace GYDM {
+    class __lambda__ OnionSkin : public GYDM::IScreen {
     public:
-        OnionSkin(WarGrey::STEM::IDisplay* display) : _display(display) {}
+        OnionSkin(GYDM::IDisplay* display) : _display(display) {}
 
     public:
-        WarGrey::STEM::IDisplay* display() override { return this->_display; }
+        GYDM::IDisplay* display() override { return this->_display; }
     
     public:
         void refresh() override { this->_display->refresh(); }
@@ -24,10 +24,10 @@ namespace WarGrey::STEM {
         void notify_updated() override { this->_display->notify_updated(); }
 
     public:
-        void log_message(WarGrey::STEM::Log level, const std::string& message) override { this->_display->log_message(level, message); }
+        void log_message(GYDM::Log level, const std::string& message) override { this->_display->log_message(level, message); }
         void start_input_text(const std::string& prompt) override { this->_display->start_input_text(prompt); }
 
     private:
-        WarGrey::STEM::IDisplay* _display;
+        GYDM::IDisplay* _display;
     };
 }

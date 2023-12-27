@@ -9,22 +9,22 @@
 
 #include <filesystem>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 using namespace std::filesystem;
 
 /*************************************************************************************************/
-WarGrey::STEM::Sprite::Sprite(const char* pathname_fmt, ...) {
+GYDM::Sprite::Sprite(const char* pathname_fmt, ...) {
     VSNPRINT(pathname, pathname_fmt);
 
     this->_pathname = pathname;
     this->enable_resize(true);
 }
 
-WarGrey::STEM::Sprite::Sprite(const std::string& pathname) : _pathname(pathname) {
+GYDM::Sprite::Sprite(const std::string& pathname) : _pathname(pathname) {
     this->enable_resize(true);
 }
 
-const char* WarGrey::STEM::Sprite::name() {
+const char* GYDM::Sprite::name() {
     static std::string _name;
 
     _name = file_name_from_path(_pathname);
@@ -32,7 +32,7 @@ const char* WarGrey::STEM::Sprite::name() {
     return _name.c_str();
 }
 
-void WarGrey::STEM::Sprite::construct(SDL_Renderer* renderer) {
+void GYDM::Sprite::construct(SDL_Renderer* renderer) {
     path target = imgdb_absolute_path(this->_pathname);
     
     if (exists(target)) {
@@ -59,11 +59,11 @@ void WarGrey::STEM::Sprite::construct(SDL_Renderer* renderer) {
     }
 }
 
-void WarGrey::STEM::Sprite::feed_costume_extent(size_t idx, float* width, float* height) {
+void GYDM::Sprite::feed_costume_extent(size_t idx, float* width, float* height) {
     this->costumes[idx].second->feed_extent(width, height);
 }
 
-void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
+void GYDM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
     Brush::stamp(renderer, this->costumes[idx].second->self(), src, &argv->dst, argv->flip);
 
     if (this->current_decorate.size() > 0) {
@@ -76,29 +76,29 @@ void WarGrey::STEM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, SDL
     }
 }
 
-size_t WarGrey::STEM::Sprite::costume_count() {
+size_t GYDM::Sprite::costume_count() {
     return this->costumes.size();
 }
 
-const char* WarGrey::STEM::Sprite::costume_index_to_name(size_t idx) {
+const char* GYDM::Sprite::costume_index_to_name(size_t idx) {
     return this->costumes[idx].first.c_str();
 }
 
-void WarGrey::STEM::Sprite::wear(const std::string& name) {
+void GYDM::Sprite::wear(const std::string& name) {
     if (this->decorates.find(name) != this->decorates.end()) {
         this->current_decorate = name;
         this->notify_updated();
     }
 }
 
-void WarGrey::STEM::Sprite::take_off() {
+void GYDM::Sprite::take_off() {
     if (!this->current_decorate.empty()) {
         this->current_decorate.clear();
         this->notify_updated();
     }
 }
 
-void WarGrey::STEM::Sprite::load_costume(SDL_Renderer* renderer, const std::string& png) {
+void GYDM::Sprite::load_costume(SDL_Renderer* renderer, const std::string& png) {
     std::string name = file_basename_from_path(png);
     
     if (!name.empty()) { // ignore dot files
@@ -122,7 +122,7 @@ void WarGrey::STEM::Sprite::load_costume(SDL_Renderer* renderer, const std::stri
     }
 }
 
-void WarGrey::STEM::Sprite::load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png) {
+void GYDM::Sprite::load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png) {
     std::string c_name = file_basename_from_path(png);
 
     if (!c_name.empty()) {

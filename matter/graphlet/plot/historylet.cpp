@@ -6,10 +6,10 @@
 #include "../../../graphics/image.hpp"
 #include "../../../graphics/brush.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::Historylet::Historylet(float width, float height, const RGBA& line_color)
+GYDM::Historylet::Historylet(float width, float height, const RGBA& line_color)
         : width(flabs(width)), height(flabs(height)) {
     if (this->height == 0.0F) {
         this->height = this->width;
@@ -20,18 +20,18 @@ WarGrey::STEM::Historylet::Historylet(float width, float height, const RGBA& lin
     this->set_pen_color(line_color);
 }
 
-void WarGrey::STEM::Historylet::feed_extent(float x, float y, float* w, float* h) {
+void GYDM::Historylet::feed_extent(float x, float y, float* w, float* h) {
     SET_VALUES(w, this->width, h, this->height);
 }
 
-void WarGrey::STEM::Historylet::on_resize(float w, float h, float width, float height) {
+void GYDM::Historylet::on_resize(float w, float h, float width, float height) {
     ICanvaslet::on_resize(w, h, width, height);
 
     this->width = flabs(w);
     this->height = flabs(h);
 }
 
-void WarGrey::STEM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
+void GYDM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
     size_t n = this->raw_dots.size();
     float xrange = flmax(this->xmax - this->xmin, flwidth);
     float yrange = flmax(this->ymax - this->ymin, flheight);
@@ -55,7 +55,7 @@ void WarGrey::STEM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flw
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Historylet::clear() {
+void GYDM::Historylet::clear() {
     this->xmax = this->ymax = -infinity;
     this->xmin = this->ymin = +infinity;
 
@@ -65,7 +65,7 @@ void WarGrey::STEM::Historylet::clear() {
     }
 }
 
-void WarGrey::STEM::Historylet::set_capacity(size_t n) {
+void GYDM::Historylet::set_capacity(size_t n) {
     if (this->capacity != n) {
         this->capacity = n;
 
@@ -77,7 +77,7 @@ void WarGrey::STEM::Historylet::set_capacity(size_t n) {
     }
 }
 
-void WarGrey::STEM::Historylet::push_back_datum(float x, float y) {
+void GYDM::Historylet::push_back_datum(float x, float y) {
     if (this->raw_dots.empty() || (this->raw_dots.back().first != x)) {
         this->raw_dots.push_back({ x , y });
 

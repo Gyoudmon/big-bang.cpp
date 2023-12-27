@@ -2,16 +2,16 @@
 
 #include "tuple.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     template<typename T>
-    class __lambda__ Point : public WarGrey::STEM::Tuple<WarGrey::STEM::Point, T> {
+    class __lambda__ Point : public GYDM::Tuple<GYDM::Point, T> {
     public:
         Point() = default;
-        Point(T x, T y) : Tuple<WarGrey::STEM::Point, T>(x, y) {}
+        Point(T x, T y) : Tuple<GYDM::Point, T>(x, y) {}
 
         template<typename U>
-        explicit Point(const WarGrey::STEM::Point<U>& v)
-            : Tuple<WarGrey::STEM::Point, U>(T(v.x), T(v.y)) {}
+        explicit Point(const GYDM::Point<U>& v)
+            : Tuple<GYDM::Point, U>(T(v.x), T(v.y)) {}
 
         ~Point() noexcept {}
     };

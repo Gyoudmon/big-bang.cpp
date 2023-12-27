@@ -5,8 +5,8 @@
 #include "../physics/geometry/anchor.hpp"
 #include "../virtualization/filesystem/imgdb.hpp"
 
-namespace WarGrey::STEM {
-    class __lambda__ IAtlas : public WarGrey::STEM::IMatter {
+namespace GYDM {
+    class __lambda__ IAtlas : public GYDM::IMatter {
     public:
         IAtlas(const std::string& pathname);
         IAtlas(const char* pathname) : IAtlas(std::string(pathname)) {}
@@ -39,7 +39,7 @@ namespace WarGrey::STEM {
         void feed_logic_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a = 0.5F);
         void feed_logic_tile_location(int idx, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
         void feed_logic_tile_location(int row, int col, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
-        void set_logic_grid_color(const WarGrey::STEM::RGBA& color) { this->logic_grid_color = color; }
+        void set_logic_grid_color(const GYDM::RGBA& color) { this->logic_grid_color = color; }
 
     public:
         void move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
@@ -50,7 +50,7 @@ namespace WarGrey::STEM {
     protected:
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }
         virtual void feed_map_extent(float* width, float* height) = 0;
-        virtual void on_tilemap_load(WarGrey::STEM::shared_texture_t atlas) = 0;
+        virtual void on_tilemap_load(GYDM::shared_texture_t atlas) = 0;
         virtual void feed_atlas_tile_region(SDL_Rect* tile, size_t idx) = 0;
         virtual void feed_map_tile_region(SDL_FRect* tile, size_t idx) = 0;
 
@@ -69,14 +69,14 @@ namespace WarGrey::STEM {
         float yscale = 1.0F;
 
     private:
-        WarGrey::STEM::shared_texture_t atlas;
+        GYDM::shared_texture_t atlas;
 
     private:
         float map_width = -1.0F;
         float map_height = 0.0F;
 
     private:
-        WarGrey::STEM::RGBA logic_grid_color;
+        GYDM::RGBA logic_grid_color;
         int logic_row = 0;
         int logic_col = 0;
         float logic_top = 0.0F;
@@ -90,7 +90,7 @@ namespace WarGrey::STEM {
         std::string _pathname;
     };
 
-    class __lambda__ GridAtlas : public WarGrey::STEM::IAtlas {
+    class __lambda__ GridAtlas : public GYDM::IAtlas {
     public:
         GridAtlas(const char* pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0, bool inset = false);
         GridAtlas(const std::string& pathname, int row = 1, int col = 1, int xgap = 0, int ygap = 0, bool inset = false);
@@ -123,7 +123,7 @@ namespace WarGrey::STEM {
         void create_map_grid(int row, int col, float tile_width = 0.0F, float tile_height = 0.0F, float xgap = 0.0F, float ygap = 0.0F);
         
     protected:
-        void on_tilemap_load(WarGrey::STEM::shared_texture_t atlas) override;
+        void on_tilemap_load(GYDM::shared_texture_t atlas) override;
         void feed_map_extent(float* width, float* height) override;
         void feed_atlas_tile_region(SDL_Rect* tile, size_t idx) override;
         void feed_map_tile_region(SDL_FRect* tile, size_t idx) override;

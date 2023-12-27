@@ -5,12 +5,12 @@
 
 /* https://github.com/SuperTux/supertux */
 
-namespace WarGrey::STEM {
-    class __lambda__ Coinlet : public WarGrey::STEM::Sprite {
+namespace GYDM {
+    class __lambda__ Coinlet : public GYDM::Sprite {
     public:
         Coinlet(const std::string& name, int idx) : Coinlet(name.c_str(), idx) {}
         Coinlet(const char* name, int idx)
-            : WarGrey::STEM::Sprite(WarGrey::STEM::digimon_mascot_path("coinlet", ""))
+            : GYDM::Sprite(GYDM::digimon_mascot_path("coinlet", ""))
             , _name(name), _idx(idx) {}
         virtual ~Coinlet() noexcept {}
 

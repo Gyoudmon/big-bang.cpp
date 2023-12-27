@@ -8,7 +8,7 @@
 #include "slang/udp.hpp"
 
 /**************************************************************************************************/
-namespace WarGrey::STEM {
+namespace GYDM {
     class __lambda__ SocketDaemon {
     public:
         SocketDaemon(int maxsockets = 16);
@@ -16,8 +16,8 @@ namespace WarGrey::STEM {
 
     public:
         template<typename E>
-        bool udp_listen(WarGrey::STEM::UDPLocalPeer<E>* peer, uint16_t service, int packet_capacity = 512) {
-            return this->udp_listen(new WarGrey::STEM::UDPDaemon<E>(peer, service, packet_capacity));
+        bool udp_listen(GYDM::UDPLocalPeer<E>* peer, uint16_t service, int packet_capacity = 512) {
+            return this->udp_listen(new GYDM::UDPDaemon<E>(peer, service, packet_capacity));
         }
 
     public:
@@ -27,7 +27,7 @@ namespace WarGrey::STEM {
         void wait_read_process_loop(int timeout_ms);
 
     private:
-        bool udp_listen(WarGrey::STEM::IUDPDaemon* daemon);
+        bool udp_listen(GYDM::IUDPDaemon* daemon);
 
     private:
         SDLNet_SocketSet master = nullptr;

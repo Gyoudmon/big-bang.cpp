@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     class __lambda__ Texture {
     public:
         Texture(SDL_Texture* raw) : _self(raw) {}

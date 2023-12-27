@@ -2,7 +2,7 @@
 
 //// https://tools.ietf.org/html/rfc1071
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static uint16_t update_sum(uint16_t sum, const uint8_t* message, size_t start, size_t end) {
@@ -25,15 +25,15 @@ static uint16_t update_sum(uint16_t sum, const uint8_t* message, size_t start, s
 }
 
 /*************************************************************************************************/
-uint16_t WarGrey::STEM::checksum_ipv4(const uint8_t* message, size_t start, size_t end) {
+uint16_t GYDM::checksum_ipv4(const uint8_t* message, size_t start, size_t end) {
     return update_sum(0xFFFFL, message, start, end);
 }
 
-uint16_t WarGrey::STEM::checksum_ipv4(uint16_t acc_crc, const uint8_t* message, size_t start, size_t end) {
+uint16_t GYDM::checksum_ipv4(uint16_t acc_crc, const uint8_t* message, size_t start, size_t end) {
     return update_sum(~acc_crc, message, start, end);
 }
 
-uint16_t WarGrey::STEM::checksum_ipv4(uint16_t* acc_crc, const uint8_t* message, size_t start, size_t end) {
+uint16_t GYDM::checksum_ipv4(uint16_t* acc_crc, const uint8_t* message, size_t start, size_t end) {
     uint16_t sum = 0UL;
 
     if (acc_crc == nullptr) {

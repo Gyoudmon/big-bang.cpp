@@ -1,12 +1,12 @@
 #include "sequence.hpp"
 #include "../../../datum/box.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::IASNSequence::IASNSequence(size_t count) : count(count) {}
+GYDM::IASNSequence::IASNSequence(size_t count) : count(count) {}
 
-size_t WarGrey::STEM::IASNSequence::span() {
+size_t GYDM::IASNSequence::span() {
     size_t payload = 0;
 
     for (size_t idx = 0; idx < this->count; idx++) {        
@@ -16,7 +16,7 @@ size_t WarGrey::STEM::IASNSequence::span() {
     return payload;
 }
 
-octets WarGrey::STEM::IASNSequence::to_octets() {
+octets GYDM::IASNSequence::to_octets() {
     size_t ospan = asn_span(this->span());
     octets basn(ospan, '\0');
 
@@ -25,7 +25,7 @@ octets WarGrey::STEM::IASNSequence::to_octets() {
     return basn;
 }
 
-size_t WarGrey::STEM::IASNSequence::into_octets(uint8_t* octets, size_t offset) {
+size_t GYDM::IASNSequence::into_octets(uint8_t* octets, size_t offset) {
     size_t pay_span = this->span();
 
     octets[offset++] = asn_constructed_identifier_octet(ASNConstructed::Sequence);
@@ -38,7 +38,7 @@ size_t WarGrey::STEM::IASNSequence::into_octets(uint8_t* octets, size_t offset) 
     return offset;
 }
 
-void WarGrey::STEM::IASNSequence::from_octets(const uint8_t* basn, size_t* offset0) {
+void GYDM::IASNSequence::from_octets(const uint8_t* basn, size_t* offset0) {
     size_t offset = ((offset0 == nullptr) ? 0 : (*offset0));
     size_t size = asn_octets_unbox(basn, &offset);
     size_t position = offset - size;

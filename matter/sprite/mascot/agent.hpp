@@ -10,8 +10,8 @@
 /* MS Office Assistant, Link (the cat) */
 /* https://github.com/jaseg/clippy */
 
-namespace WarGrey::STEM {
-    class __lambda__ AgentSpriteSheet : public WarGrey::STEM::SpriteGridSheet {
+namespace GYDM {
+    class __lambda__ AgentSpriteSheet : public GYDM::SpriteGridSheet {
     public:
         AgentSpriteSheet(const std::string& pathname, int row, int col)
             : SpriteGridSheet(pathname, row, col) {}

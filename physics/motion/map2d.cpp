@@ -2,7 +2,7 @@
 
 #include "../../datum/flonum.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 static const double pi_125 = q_pi * 0.5;
 
@@ -13,7 +13,7 @@ static const double theta_thresholds [] = {
 };
 
 /*************************************************************************************************/
-void WarGrey::STEM::I4WayMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double prev_vr) {
+void GYDM::I4WayMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double prev_vr) {
     double theta = flabs(theta_rad);
 
     if (theta < q_pi) {
@@ -28,7 +28,7 @@ void WarGrey::STEM::I4WayMotion::dispatch_heading_event(double theta_rad, double
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::I8WayMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double prev_vr) {
+void GYDM::I8WayMotion::dispatch_heading_event(double theta_rad, double vx, double vy, double prev_vr) {
     double theta = theta_rad;
     
     if (theta < 0.0) {

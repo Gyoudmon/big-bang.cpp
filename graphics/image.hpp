@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <string>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     __lambda__ SDL_Texture* game_blank_image(SDL_Renderer* renderer, int width, int height);
     __lambda__ SDL_Texture* game_blank_image(SDL_Renderer* renderer, float width, float height);
 

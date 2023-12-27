@@ -3,7 +3,7 @@
 #include "../datum/box.hpp"
 #include "../datum/flonum.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     template<typename Fl>
     inline Fl clamp(Fl v, Fl min, Fl max) {
         if (v > max) {

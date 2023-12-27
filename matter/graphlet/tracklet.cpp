@@ -9,10 +9,10 @@
 // https://www.ferzkopp.net/Software/SDL2_gfx/Docs/html/index.html
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::Tracklet::Tracklet(float width, float height, uint32_t hex, double alpha)
+GYDM::Tracklet::Tracklet(float width, float height, uint32_t hex, double alpha)
         : width(flabs(width)), height(flabs(height)), line_width(1) {
     if (this->height == 0.0F) {
         this->height = this->width;
@@ -24,11 +24,11 @@ WarGrey::STEM::Tracklet::Tracklet(float width, float height, uint32_t hex, doubl
     this->camouflage(true);
 }
 
-void WarGrey::STEM::Tracklet::feed_extent(float x, float y, float* w, float* h) {
+void GYDM::Tracklet::feed_extent(float x, float y, float* w, float* h) {
     SET_VALUES(w, this->width, h, this->height);
 }
 
-void WarGrey::STEM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
+void GYDM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
     if (this->is_drawing()) {
         if (this->canvas->okay()) {
             auto master = this->master_renderer();
@@ -66,7 +66,7 @@ void WarGrey::STEM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
     }
 }
 
-void WarGrey::STEM::Tracklet::stamp(WarGrey::STEM::IMatter* matter, float x, float y) {
+void GYDM::Tracklet::stamp(GYDM::IMatter* matter, float x, float y) {
     if (this->canvas->okay()) {
         auto master = this->master_renderer();
 
@@ -90,7 +90,7 @@ void WarGrey::STEM::Tracklet::stamp(WarGrey::STEM::IMatter* matter, float x, flo
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Tracklet::erase() {
+void GYDM::Tracklet::erase() {
     if (this->xmax != -infinity) {
         this->xmax = this->ymax = -infinity;
         this->xmin = this->ymin = +infinity;
@@ -98,13 +98,13 @@ void WarGrey::STEM::Tracklet::erase() {
     }
 }
 
-void WarGrey::STEM::Tracklet::set_pen_width(uint8_t lwidth) {
+void GYDM::Tracklet::set_pen_width(uint8_t lwidth) {
     if (this->line_width != lwidth) {
         this->line_width = lwidth;
     }
 }
 
-void WarGrey::STEM::Tracklet::resolve_boundary(float x, float y) {
+void GYDM::Tracklet::resolve_boundary(float x, float y) {
     // don't merge with `else if`
     if (x < this->xmin) this->xmin = x;
     if (x > this->xmax) this->xmax = x;

@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace WarGrey::STEM {
+namespace GYDM {
 	__lambda__ int path_next_slash_position(const std::string& path, int start = 0, int fallback = -1);
 
 	__lambda__ std::string path_only(const std::string& path);

@@ -5,8 +5,8 @@
 
 #include <vector>
 
-namespace WarGrey::STEM {
-    class __lambda__ Histogramlet : public WarGrey::STEM::IGraphlet {
+namespace GYDM {
+    class __lambda__ Histogramlet : public GYDM::IGraphlet {
     public:
         Histogramlet(float size, uint32_t box_hex, uint32_t mark_hex) : Histogramlet(size, size, box_hex, mark_hex) {}
         Histogramlet(float width, float height, uint32_t box_hex, uint32_t mark_hex);

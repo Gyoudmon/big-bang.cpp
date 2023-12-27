@@ -11,12 +11,12 @@
 
 /* Protagonists in the RPG 空の軌跡 */
 
-namespace WarGrey::STEM {
+namespace GYDM {
     #define TRAIL_KIDS_PATH "trail/Kids"
     #define TRAIL_STUDENTS_PATH "trail/Students"
     #define TRAIL_SPECIALS_PATH "trail/Specials"
 
-    class __lambda__ Citizen : public WarGrey::STEM::Sprite, public WarGrey::STEM::ICreature, protected WarGrey::STEM::I8WayMotion {
+    class __lambda__ Citizen : public GYDM::Sprite, public GYDM::ICreature, protected GYDM::I8WayMotion {
     public:
         static size_t special_name_count();
         static std::vector<std::string> list_special_names();
@@ -58,7 +58,7 @@ namespace WarGrey::STEM {
     // https://kiseki.fandom.com/wiki/Perzel_Farm
     // https://kiseki.fandom.com/wiki/Mercia_Orphanage
     // https://kiseki.fandom.com/wiki/Category:Trails_in_the_Sky_FC_NPCs
-    class __lambda__ TrailKid : public WarGrey::STEM::Citizen {
+    class __lambda__ TrailKid : public GYDM::Citizen {
     public:
         static size_t name_count();
         static std::vector<std::string> list_names();
@@ -72,7 +72,7 @@ namespace WarGrey::STEM {
     };
 
     // https://kiseki.fandom.com/wiki/Jenis_Royal_Academy
-    class __lambda__ TrailStudent : public WarGrey::STEM::Citizen {
+    class __lambda__ TrailStudent : public GYDM::Citizen {
     public:
         static size_t name_count();
         static std::vector<std::string> list_names();

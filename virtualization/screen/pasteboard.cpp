@@ -3,10 +3,10 @@
 #include "../../plane.hpp"
 #include "../../matter.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-IDisplay* WarGrey::STEM::Pasteboard::display() {
+IDisplay* GYDM::Pasteboard::display() {
 	IPlane* plane = this->matter->master();
 	IDisplay* display = nullptr;
 
@@ -17,7 +17,7 @@ IDisplay* WarGrey::STEM::Pasteboard::display() {
 	return display;
 }
 
-void WarGrey::STEM::Pasteboard::refresh() {
+void GYDM::Pasteboard::refresh() {
 	IDisplay* display = this->display();
 	
 	if (display != nullptr) {
@@ -25,7 +25,7 @@ void WarGrey::STEM::Pasteboard::refresh() {
 	}
 }
 
-void WarGrey::STEM::Pasteboard::feed_extent(float* width, float* height) {
+void GYDM::Pasteboard::feed_extent(float* width, float* height) {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -33,7 +33,7 @@ void WarGrey::STEM::Pasteboard::feed_extent(float* width, float* height) {
 	}
 }
 
-void WarGrey::STEM::Pasteboard::feed_client_extent(float* width, float* height) {
+void GYDM::Pasteboard::feed_client_extent(float* width, float* height) {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -41,7 +41,7 @@ void WarGrey::STEM::Pasteboard::feed_client_extent(float* width, float* height) 
 	}
 }
 
-uint32_t WarGrey::STEM::Pasteboard::frame_rate() {
+uint32_t GYDM::Pasteboard::frame_rate() {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -51,7 +51,7 @@ uint32_t WarGrey::STEM::Pasteboard::frame_rate() {
 	}
 }
 
-void WarGrey::STEM::Pasteboard::begin_update_sequence() {
+void GYDM::Pasteboard::begin_update_sequence() {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -59,7 +59,7 @@ void WarGrey::STEM::Pasteboard::begin_update_sequence() {
 	}
 }
 
-bool WarGrey::STEM::Pasteboard::is_in_update_sequence() {
+bool GYDM::Pasteboard::is_in_update_sequence() {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -69,7 +69,7 @@ bool WarGrey::STEM::Pasteboard::is_in_update_sequence() {
 	}
 }
 
-void WarGrey::STEM::Pasteboard::end_update_sequence() {
+void GYDM::Pasteboard::end_update_sequence() {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -77,7 +77,7 @@ void WarGrey::STEM::Pasteboard::end_update_sequence() {
 	}
 }
 
-bool WarGrey::STEM::Pasteboard::should_update() {
+bool GYDM::Pasteboard::should_update() {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -87,7 +87,7 @@ bool WarGrey::STEM::Pasteboard::should_update() {
 	}
 }
 
-void WarGrey::STEM::Pasteboard::notify_updated() {
+void GYDM::Pasteboard::notify_updated() {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -95,7 +95,7 @@ void WarGrey::STEM::Pasteboard::notify_updated() {
 	}
 }
 
-void WarGrey::STEM::Pasteboard::log_message(Log level, const std::string& message) {
+void GYDM::Pasteboard::log_message(Log level, const std::string& message) {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {
@@ -103,7 +103,7 @@ void WarGrey::STEM::Pasteboard::log_message(Log level, const std::string& messag
 	};
 }
 
-void WarGrey::STEM::Pasteboard::start_input_text(const std::string& prompt) {
+void GYDM::Pasteboard::start_input_text(const std::string& prompt) {
 	IDisplay* display = this->display();
 
 	if (display != nullptr) {

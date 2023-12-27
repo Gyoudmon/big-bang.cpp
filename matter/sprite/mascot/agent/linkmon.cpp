@@ -8,7 +8,7 @@
 
 #include <optional>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static const std::vector<AgentAction> RestPoseFrames = {
@@ -1494,10 +1494,10 @@ static bool is_ending_frame(std::vector<AgentFrameBranch>& branches, std::option
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Linkmon::Linkmon()
+GYDM::Linkmon::Linkmon()
     : AgentSpriteSheet(digimon_mascot_path("agent/linkmon", ".png"), 31, 24) {}
 
-int WarGrey::STEM::Linkmon::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
+int GYDM::Linkmon::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
     int next_branch = -1;
     
     if (the_agent_link.frames.find(action) != the_agent_link.frames.end()) {
@@ -1507,14 +1507,14 @@ int WarGrey::STEM::Linkmon::submit_action_frames(std::vector<std::pair<int, int>
     return next_branch;
 }
 
-int WarGrey::STEM::Linkmon::submit_idle_frames(std::vector<std::pair<int, int>>& frame_refs, int& times) {
+int GYDM::Linkmon::submit_idle_frames(std::vector<std::pair<int, int>>& frame_refs, int& times) {
     static int idle_count = int(sizeof(idles) / sizeof(std::string));
     int idx = random_uniform(0, idle_count - 1);
 
     return this->push_action_frames(frame_refs, idles[idx], 0);
 }
 
-int WarGrey::STEM::Linkmon::update_action_frames(std::vector<std::pair<int, int>>& frame_refs, int next_branch) {
+int GYDM::Linkmon::update_action_frames(std::vector<std::pair<int, int>>& frame_refs, int next_branch) {
     int selection_idx = this->find_agent_frames_by_index(next_branch);
 
     frame_refs.clear();
@@ -1530,7 +1530,7 @@ int WarGrey::STEM::Linkmon::update_action_frames(std::vector<std::pair<int, int>
     return next_branch;
 }
 
-int WarGrey::STEM::Linkmon::find_agent_frames_by_index(int frame_idx) {
+int GYDM::Linkmon::find_agent_frames_by_index(int frame_idx) {
     int selection_idx = -1;
 
     if (the_frames.find(frame_idx) == the_frames.end()) {    
@@ -1556,7 +1556,7 @@ int WarGrey::STEM::Linkmon::find_agent_frames_by_index(int frame_idx) {
     return selection_idx;
 }
 
-int WarGrey::STEM::Linkmon::push_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action, int idx0) {
+int GYDM::Linkmon::push_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action, int idx0) {
     auto frames = the_agent_link.frames.at(action);
     size_t frame_size = frames.size();
     std::vector<int> indices(frame_size, -1);

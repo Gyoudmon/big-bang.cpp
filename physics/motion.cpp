@@ -4,10 +4,10 @@
 
 #include "../physics/mathematics.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::IMovable::IMovable() {
+GYDM::IMovable::IMovable() {
     this->set_border_strategy(BorderStrategy::IGNORE);
     this->motion_stop(true, true);
 
@@ -17,7 +17,7 @@ WarGrey::STEM::IMovable::IMovable() {
     this->vr = 0.0; // not using `flnan` for heading
 }
 
-void WarGrey::STEM::IMovable::set_acceleration(double acc, double dir, bool is_radian) {
+void GYDM::IMovable::set_acceleration(double acc, double dir, bool is_radian) {
     double ax = 0.0;
     double ay = 0.0;
 
@@ -25,7 +25,7 @@ void WarGrey::STEM::IMovable::set_acceleration(double acc, double dir, bool is_r
     this->set_delta_speed(ax, ay);
 }
 
-void WarGrey::STEM::IMovable::set_delta_speed(double xacc, double yacc) {
+void GYDM::IMovable::set_delta_speed(double xacc, double yacc) {
     bool xchanged = (this->ax != xacc);
     bool ychanged = (this->ay != yacc);
 
@@ -37,7 +37,7 @@ void WarGrey::STEM::IMovable::set_delta_speed(double xacc, double yacc) {
     }
 }
 
-void WarGrey::STEM::IMovable::add_delta_speed(double xacc, double yacc) {
+void GYDM::IMovable::add_delta_speed(double xacc, double yacc) {
     bool xchanged = (xacc != 0.0);
     bool ychanged = (yacc != 0.0);
 
@@ -49,7 +49,7 @@ void WarGrey::STEM::IMovable::add_delta_speed(double xacc, double yacc) {
     }
 }
 
-void WarGrey::STEM::IMovable::add_acceleration(double acc, double dir, bool is_radian) {
+void GYDM::IMovable::add_acceleration(double acc, double dir, bool is_radian) {
     double ax = 0.0;
     double ay = 0.0;
 
@@ -57,7 +57,7 @@ void WarGrey::STEM::IMovable::add_acceleration(double acc, double dir, bool is_r
     this->add_delta_speed(ax, ay);
 }
 
-double WarGrey::STEM::IMovable::get_acceleration(double* direction, double* x, double* y) {
+double GYDM::IMovable::get_acceleration(double* direction, double* x, double* y) {
     double mag = vector_magnitude(this->ax, this->ay);
 
     SET_BOX(direction, this->get_acceleration_direction());
@@ -66,7 +66,7 @@ double WarGrey::STEM::IMovable::get_acceleration(double* direction, double* x, d
     return mag;
 }
 
-double WarGrey::STEM::IMovable::get_acceleration_direction(bool need_radian) {
+double GYDM::IMovable::get_acceleration_direction(bool need_radian) {
     double rad = this->ar;
 
     if (flisnan(rad)) {
@@ -76,7 +76,7 @@ double WarGrey::STEM::IMovable::get_acceleration_direction(bool need_radian) {
     return (need_radian ? rad : radians_to_degrees(rad));
 }
 
-void WarGrey::STEM::IMovable::set_velocity(double spd, double dir, bool is_radian) {
+void GYDM::IMovable::set_velocity(double spd, double dir, bool is_radian) {
     double vx = 0.0;
     double vy = 0.0;
 
@@ -85,7 +85,7 @@ void WarGrey::STEM::IMovable::set_velocity(double spd, double dir, bool is_radia
     this->set_speed(vx, vy);
 }
 
-void WarGrey::STEM::IMovable::add_velocity(double spd, double dir, bool is_radian) {
+void GYDM::IMovable::add_velocity(double spd, double dir, bool is_radian) {
     double vx = 0.0;
     double vy = 0.0;
 
@@ -93,7 +93,7 @@ void WarGrey::STEM::IMovable::add_velocity(double spd, double dir, bool is_radia
     this->add_speed(vx, vy);
 }
 
-void WarGrey::STEM::IMovable::set_speed(double xspd, double yspd) {
+void GYDM::IMovable::set_speed(double xspd, double yspd) {
     bool trigger_heading_event = this->motion_stopped();
 
     xspd = vector_clamp(xspd, this->tvx);
@@ -110,11 +110,11 @@ void WarGrey::STEM::IMovable::set_speed(double xspd, double yspd) {
     }
 }
 
-void WarGrey::STEM::IMovable::add_speed(double xspd, double yspd) {
+void GYDM::IMovable::add_speed(double xspd, double yspd) {
     this->set_speed(this->vx + xspd, this->vy + yspd);
 }
 
-double WarGrey::STEM::IMovable::get_velocity(double* direction, double* x, double* y) {
+double GYDM::IMovable::get_velocity(double* direction, double* x, double* y) {
     double mag = vector_magnitude(this->vx, this->vy);
 
     SET_BOX(direction, this->get_velocity_direction());
@@ -123,13 +123,13 @@ double WarGrey::STEM::IMovable::get_velocity(double* direction, double* x, doubl
     return mag;
 }
 
-double WarGrey::STEM::IMovable::get_velocity_direction(bool need_radian) {
+double GYDM::IMovable::get_velocity_direction(bool need_radian) {
     double rad = this->vr;
 
     return (need_radian ? rad : radians_to_degrees(rad));
 }
 
-void WarGrey::STEM::IMovable::set_terminal_velocity(double v, double dir, bool is_radian) {
+void GYDM::IMovable::set_terminal_velocity(double v, double dir, bool is_radian) {
     double vx = 0.0;
     double vy = 0.0;
 
@@ -137,7 +137,7 @@ void WarGrey::STEM::IMovable::set_terminal_velocity(double v, double dir, bool i
     this->set_terminal_speed(vx, vy);
 }
 
-void WarGrey::STEM::IMovable::set_terminal_speed(double mxspd, double myspd) {
+void GYDM::IMovable::set_terminal_speed(double mxspd, double myspd) {
     bool changed = false;
     
     this->tvx = flabs(mxspd);
@@ -158,12 +158,12 @@ void WarGrey::STEM::IMovable::set_terminal_speed(double mxspd, double myspd) {
     }
 }
 
-void WarGrey::STEM::IMovable::set_heading(double dx, double dy) {
+void GYDM::IMovable::set_heading(double dx, double dy) {
     // Usually this is meaningful when stopped
     this->set_heading(flatan(dy, dx), true);
 }
 
-void WarGrey::STEM::IMovable::set_heading(double direction, bool is_radian) {
+void GYDM::IMovable::set_heading(double direction, bool is_radian) {
     // Usually this is meaningful when stopped
 
     if (!is_radian) {
@@ -173,7 +173,7 @@ void WarGrey::STEM::IMovable::set_heading(double direction, bool is_radian) {
     this->check_heading_changing(direction, false);
 }
 
-void WarGrey::STEM::IMovable::add_heading(double theta, bool is_radian) {
+void GYDM::IMovable::add_heading(double theta, bool is_radian) {
     // Usually this is meaningful when stopped
 
     if (!is_radian) {
@@ -183,14 +183,14 @@ void WarGrey::STEM::IMovable::add_heading(double theta, bool is_radian) {
     this->check_heading_changing(this->vr + theta, false);
 }
 
-void WarGrey::STEM::IMovable::heading_rotate(double theta, bool is_radian) {
+void GYDM::IMovable::heading_rotate(double theta, bool is_radian) {
     if (theta != 0.0) {
         vector_rotate(this->vx, this->vy, theta, &this->vx, &this->vy, 0.0, 0.0, is_radian);
         this->on_velocity_changed(false);
     }
 }
 
-void WarGrey::STEM::IMovable::on_border(float hoffset, float voffset) {
+void GYDM::IMovable::on_border(float hoffset, float voffset) {
     BorderStrategy hstrategy = BorderStrategy::IGNORE;
     BorderStrategy vstrategy = BorderStrategy::IGNORE;
 
@@ -213,22 +213,22 @@ void WarGrey::STEM::IMovable::on_border(float hoffset, float voffset) {
     }
 }
 
-void WarGrey::STEM::IMovable::set_border_strategy(BorderStrategy s) {
+void GYDM::IMovable::set_border_strategy(BorderStrategy s) {
     this->set_border_strategy(s, s, s, s);
 }
 
-void WarGrey::STEM::IMovable::set_border_strategy(BorderStrategy vs, BorderStrategy hs) {
+void GYDM::IMovable::set_border_strategy(BorderStrategy vs, BorderStrategy hs) {
     this->set_border_strategy(vs, hs, vs, hs);
 }
     
-void WarGrey::STEM::IMovable::set_border_strategy(BorderStrategy ts, BorderStrategy rs, BorderStrategy bs, BorderStrategy ls) {
+void GYDM::IMovable::set_border_strategy(BorderStrategy ts, BorderStrategy rs, BorderStrategy bs, BorderStrategy ls) {
     this->border_strategies[static_cast<int>(BorderEdge::TOP)] = ts;
     this->border_strategies[static_cast<int>(BorderEdge::RIGHT)] = rs;
     this->border_strategies[static_cast<int>(BorderEdge::BOTTOM)] = bs;
     this->border_strategies[static_cast<int>(BorderEdge::LEFT)] = ls;
 }
 
-void WarGrey::STEM::IMovable::step(float* sx, float* sy) {
+void GYDM::IMovable::step(float* sx, float* sy) {
     double flsx = double(*sx);
     double flsy = double(*sy);
     
@@ -237,7 +237,7 @@ void WarGrey::STEM::IMovable::step(float* sx, float* sy) {
     (*sy) = float(flsy);
 }
 
-void WarGrey::STEM::IMovable::step(double* sx, double* sy) {
+void GYDM::IMovable::step(double* sx, double* sy) {
     if (this->ax != 0.0) this->vx = vector_clamp(this->vx + this->ax, this->tvx);
     if (this->ay != 0.0) this->vy = vector_clamp(this->vy + this->ay, this->tvy);
     this->check_velocity_changing();
@@ -246,7 +246,7 @@ void WarGrey::STEM::IMovable::step(double* sx, double* sy) {
     if (this->vy != 0.0) (*sy) += this->vy;
 }
 
-void WarGrey::STEM::IMovable::motion_bounce(bool horizon, bool vertical) {
+void GYDM::IMovable::motion_bounce(bool horizon, bool vertical) {
     if (horizon) {
         this->vx *= -1.0;
 
@@ -272,7 +272,7 @@ void WarGrey::STEM::IMovable::motion_bounce(bool horizon, bool vertical) {
     }
 }
 
-void WarGrey::STEM::IMovable::motion_stop(bool horizon, bool vertical) {
+void GYDM::IMovable::motion_stop(bool horizon, bool vertical) {
     if (horizon) {
         this->vx = 0.0;
         this->ax = 0.0;
@@ -294,17 +294,17 @@ void WarGrey::STEM::IMovable::motion_stop(bool horizon, bool vertical) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::IMovable::on_acceleration_changed() {
+void GYDM::IMovable::on_acceleration_changed() {
     this->ar = flatan(this->ay, this->ax);
 }
 
-void WarGrey::STEM::IMovable::on_velocity_changed(bool always_trigger_heading_event) {
+void GYDM::IMovable::on_velocity_changed(bool always_trigger_heading_event) {
     double rad = flatan(this->vy, this->vx);
 
     this->check_heading_changing(rad, always_trigger_heading_event);
 }
 
-void WarGrey::STEM::IMovable::check_velocity_changing() {
+void GYDM::IMovable::check_velocity_changing() {
     if ((this->ax != 0.0) || (this->ay != 0.0)) {
         if (this->ar != this->vr) {
             this->on_velocity_changed(false);
@@ -312,7 +312,7 @@ void WarGrey::STEM::IMovable::check_velocity_changing() {
     }
 }
 
-void WarGrey::STEM::IMovable::check_heading_changing(double rad, bool always_trigger_event) {
+void GYDM::IMovable::check_heading_changing(double rad, bool always_trigger_event) {
     if (this->vr != rad) {
         double pvr = this->vr;
 

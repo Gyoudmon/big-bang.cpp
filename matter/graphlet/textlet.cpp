@@ -9,7 +9,7 @@
 
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static Labellet* make_styled_label(shared_font_t font, const RGBA& bg_color, const RGBA& bd_color, const RGBA& fg_color, float cr) {
@@ -26,20 +26,20 @@ static Labellet* make_styled_label(shared_font_t font, const RGBA& bg_color, con
 }
 
 /*************************************************************************************************/
-Labellet* WarGrey::STEM::make_label_for_tooltip(shared_font_t font, const RGBA& bg_color, const RGBA& bd_color, const RGBA& fg_color) {
+Labellet* GYDM::make_label_for_tooltip(shared_font_t font, const RGBA& bg_color, const RGBA& bd_color, const RGBA& fg_color) {
     return make_styled_label(font, bg_color, bd_color, fg_color, 0.0F);
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::ITextlet::ITextlet() {
+GYDM::ITextlet::ITextlet() {
     this->set_text_color();
 }
 
-void WarGrey::STEM::ITextlet::construct(SDL_Renderer* renderer) {
+void GYDM::ITextlet::construct(SDL_Renderer* renderer) {
     this->update_texture();
 }
 
-void WarGrey::STEM::ITextlet::set_text_color(const RGBA& fgc) {
+void GYDM::ITextlet::set_text_color(const RGBA& fgc) {
     if (this->foreground_color != fgc) {
         this->foreground_color = fgc;
         this->update_texture();
@@ -47,7 +47,7 @@ void WarGrey::STEM::ITextlet::set_text_color(const RGBA& fgc) {
     }
 }
 
-void WarGrey::STEM::ITextlet::set_text_alpha(double alpha) {
+void GYDM::ITextlet::set_text_alpha(double alpha) {
     if (this->foreground_color.alpha() != alpha) {
         this->foreground_color = RGBA(this->foreground_color, alpha);
         this->update_texture();
@@ -55,28 +55,28 @@ void WarGrey::STEM::ITextlet::set_text_alpha(double alpha) {
     }
 }
 
-void WarGrey::STEM::ITextlet::set_background_color(const RGBA& bgc) {
+void GYDM::ITextlet::set_background_color(const RGBA& bgc) {
     if (this->background_color != bgc) {
         this->background_color = bgc;
         this->notify_updated();
     }
 }
 
-void WarGrey::STEM::ITextlet::set_border_color(const RGBA& bdc) {
+void GYDM::ITextlet::set_border_color(const RGBA& bdc) {
     if (this->border_color != bdc) {
         this->border_color = bdc;
         this->notify_updated();
     }
 }
 
-void WarGrey::STEM::ITextlet::set_corner_radius(float radius) {
+void GYDM::ITextlet::set_corner_radius(float radius) {
     if (this->corner_radius != radius) {
         this->corner_radius = radius;
         this->notify_updated();
     }
 }
 
-void WarGrey::STEM::ITextlet::set_font(shared_font_t font, MatterAnchor anchor) {
+void GYDM::ITextlet::set_font(shared_font_t font, MatterAnchor anchor) {
     this->moor(anchor);
 
     this->text_font = (((font.use_count() > 0) && (font->okay())) ? font : GameFont::Default());
@@ -86,7 +86,7 @@ void WarGrey::STEM::ITextlet::set_font(shared_font_t font, MatterAnchor anchor) 
     this->notify_updated();
 }
 
-void WarGrey::STEM::ITextlet::set_text(const std::string& content, MatterAnchor anchor) {
+void GYDM::ITextlet::set_text(const std::string& content, MatterAnchor anchor) {
     this->raw = content;
 
     this->moor(anchor);
@@ -100,23 +100,23 @@ void WarGrey::STEM::ITextlet::set_text(const std::string& content, MatterAnchor 
     this->notify_updated();
 }
 
-void WarGrey::STEM::ITextlet::set_text(const char* fmt, ...) {
+void GYDM::ITextlet::set_text(const char* fmt, ...) {
     VSNPRINT(content, fmt);
     this->set_text(content);
 }
 
-void WarGrey::STEM::ITextlet::set_text(const RGBA& color, const char* fmt, ...) {
+void GYDM::ITextlet::set_text(const RGBA& color, const char* fmt, ...) {
     VSNPRINT(content, fmt);
     this->set_text(content);
     this->set_text_color(color);
 }
 
-void WarGrey::STEM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...) {
+void GYDM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...) {
     VSNPRINT(content, fmt);
     this->set_text(content, anchor);
 }
 
-void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) {
+void GYDM::ITextlet::feed_extent(float x, float y, float* w, float* h) {
     if ((this->texture.use_count() > 0) && (this->texture->okay())) {
         this->texture->feed_extent(w, h);
     } else {
@@ -124,7 +124,7 @@ void WarGrey::STEM::ITextlet::feed_extent(float x, float y, float* w, float* h) 
     }
 }
 
-void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if ((this->texture.use_count() > 0) && this->texture->okay()) {
         if (this->corner_radius == 0.0F) {
             float pos_off = 0.0F;
@@ -164,7 +164,7 @@ void WarGrey::STEM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, flo
     }
 }
 
-void WarGrey::STEM::ITextlet::update_texture() {
+void GYDM::ITextlet::update_texture() {
     SDL_Renderer* renderer = this->master_renderer();
 
     if ((this->raw.empty()) || (renderer == nullptr)) {
@@ -176,18 +176,18 @@ void WarGrey::STEM::ITextlet::update_texture() {
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Labellet::Labellet(const char *fmt, ...) {
+GYDM::Labellet::Labellet(const char *fmt, ...) {
     VSNPRINT(caption, fmt);
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(shared_font_t font, const char* fmt, ...) {
+GYDM::Labellet::Labellet(shared_font_t font, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
     this->set_font(font);
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(shared_font_t font, uint32_t hex, const char* fmt, ...) {
+GYDM::Labellet::Labellet(shared_font_t font, uint32_t hex, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_font(font);
@@ -195,7 +195,7 @@ WarGrey::STEM::Labellet::Labellet(shared_font_t font, uint32_t hex, const char* 
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(shared_font_t font, const RGBA& rgb, const char* fmt, ...) {
+GYDM::Labellet::Labellet(shared_font_t font, const RGBA& rgb, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_font(font);
@@ -203,14 +203,14 @@ WarGrey::STEM::Labellet::Labellet(shared_font_t font, const RGBA& rgb, const cha
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(uint32_t hex, const char* fmt, ...) {
+GYDM::Labellet::Labellet(uint32_t hex, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_text_color(hex);
     this->set_text(caption);
 }
 
-WarGrey::STEM::Labellet::Labellet(const RGBA& rgb, const char* fmt, ...) {
+GYDM::Labellet::Labellet(const RGBA& rgb, const char* fmt, ...) {
     VSNPRINT(caption, fmt);
 
     this->set_text_color(rgb);

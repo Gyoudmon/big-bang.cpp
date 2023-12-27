@@ -6,10 +6,10 @@
 #include "../../../graphics/image.hpp"
 #include "../../../graphics/brush.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::Histogramlet::Histogramlet(float width, float height, uint32_t hex, double alpha)
+GYDM::Histogramlet::Histogramlet(float width, float height, uint32_t hex, double alpha)
         : width(flabs(width)), height(flabs(height)), color(hex), alpha(alpha) {
     if (this->height == 0.0F) {
         this->height = this->width;
@@ -20,17 +20,17 @@ WarGrey::STEM::Histogramlet::Histogramlet(float width, float height, uint32_t he
     this->enable_resize(true);
 }
 
-void WarGrey::STEM::Histogramlet::feed_extent(float x, float y, float* w, float* h) {
+void GYDM::Histogramlet::feed_extent(float x, float y, float* w, float* h) {
     SET_VALUES(w, this->width, h, this->height);
 }
 
-void WarGrey::STEM::Histogramlet::on_resize(float w, float h, float width, float height) {
+void GYDM::Histogramlet::on_resize(float w, float h, float width, float height) {
     this->width = flabs(w);
     this->height = flabs(h);
     this->invalidate_geometry();
 }
 
-void WarGrey::STEM::Histogramlet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
+void GYDM::Histogramlet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
     if (this->diagram.use_count() == 0) {
         this->diagram = std::make_shared<Texture>(game_blank_image(renderer, fl2fxi(this->width) + 1, fl2fxi(this->height) + 1));
     }
@@ -72,18 +72,18 @@ void WarGrey::STEM::Histogramlet::draw(SDL_Renderer* renderer, float flx, float 
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Histogramlet::invalidate_geometry() {
+void GYDM::Histogramlet::invalidate_geometry() {
     if (this->diagram.use_count() > 0) {
         this->diagram.reset();
         this->clear_geometry();
     }
 }
 
-void WarGrey::STEM::Histogramlet::clear_geometry() {
+void GYDM::Histogramlet::clear_geometry() {
     this->needs_refresh_diagram = true;
 }
 
-void WarGrey::STEM::Histogramlet::clear() {
+void GYDM::Histogramlet::clear() {
     this->xmax = this->ymax = -infinity;
     this->xmin = this->ymin = +infinity;
 
@@ -95,7 +95,7 @@ void WarGrey::STEM::Histogramlet::clear() {
     }
 }
 
-void WarGrey::STEM::Histogramlet::set_color(uint32_t hex, double alpha) {
+void GYDM::Histogramlet::set_color(uint32_t hex, double alpha) {
     if ((this->color != hex) || (this->alpha != alpha)) {
         this->color = hex;
         this->alpha = alpha;
@@ -104,7 +104,7 @@ void WarGrey::STEM::Histogramlet::set_color(uint32_t hex, double alpha) {
     }
 }
 
-void WarGrey::STEM::Histogramlet::set_capacity(size_t n) {
+void GYDM::Histogramlet::set_capacity(size_t n) {
     if (this->capacity != n) {
         this->capacity = n;
 
@@ -117,7 +117,7 @@ void WarGrey::STEM::Histogramlet::set_capacity(size_t n) {
     }
 }
 
-void WarGrey::STEM::Histogramlet::push_back_datum(float x, float y) {
+void GYDM::Histogramlet::push_back_datum(float x, float y) {
     if (this->raw_dots.empty() || (this->raw_dots.back().first != x)) {
         this->raw_dots.push_back({ x , y });
 

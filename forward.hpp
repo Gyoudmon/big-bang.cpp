@@ -1,6 +1,6 @@
 #pragma once
 
-namespace WarGrey::STEM {
+namespace GYDM {
     class IPlane;
     class IMatter;
     class ISprite;

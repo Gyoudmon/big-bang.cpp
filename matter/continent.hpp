@@ -5,13 +5,13 @@
 #include "../virtualization/screen.hpp"
 #include "../forward.hpp"
 
-namespace WarGrey::STEM {
-	class __lambda__ Continent : public WarGrey::STEM::IMatter {
+namespace GYDM {
+	class __lambda__ Continent : public GYDM::IMatter {
 	public:
 		virtual ~Continent() noexcept;
 		
-		Continent(WarGrey::STEM::IPlane* planet, const WarGrey::STEM::RGBA& background = transparent);
-		Continent(WarGrey::STEM::IPlane* planet, float width, float height = 0.0F, const WarGrey::STEM::RGBA& background = transparent);
+		Continent(GYDM::IPlane* planet, const GYDM::RGBA& background = transparent);
+		Continent(GYDM::IPlane* planet, float width, float height = 0.0F, const GYDM::RGBA& background = transparent);
 
 		const char* name() override;
 
@@ -22,8 +22,8 @@ namespace WarGrey::STEM {
 		void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
 	public:
-		void set_background_color(const WarGrey::STEM::RGBA& color);
-		void set_border_color(const WarGrey::STEM::RGBA& color);
+		void set_background_color(const GYDM::RGBA& color);
+		void set_border_color(const GYDM::RGBA& color);
 
     public: // low-level events
         bool on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) override;
@@ -34,12 +34,12 @@ namespace WarGrey::STEM {
 		template<typename P> P* unsafe_plane() { return static_cast<P*>(this->plane); }
 
 	private:
-		WarGrey::STEM::IPlane* plane;
+		GYDM::IPlane* plane;
 
 	private:
-		WarGrey::STEM::IScreen* screen;
-		WarGrey::STEM::RGBA background;
-		WarGrey::STEM::RGBA border;
+		GYDM::IScreen* screen;
+		GYDM::RGBA background;
+		GYDM::RGBA border;
 		float width;
 		float height;
 	};

@@ -6,7 +6,7 @@
 
 #include "../checksum/ipv4.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 /**
@@ -86,18 +86,18 @@ static void dispatch_message(const uint8_t* message, unsigned int total, double 
 */
 
 /*************************************************************************************************/
-bool WarGrey::STEM::is_slang_message(const uint8_t* message, size_t idx) {
+bool GYDM::is_slang_message(const uint8_t* message, size_t idx) {
 	return network_uint16_ref(message, idx) == slang_message_magic;
 }
 
-bool WarGrey::STEM::slang_message_validate(const uint8_t* message, size_t size, size_t idx) {
+bool GYDM::slang_message_validate(const uint8_t* message, size_t size, size_t idx) {
 	uint16_t checksum = network_uint16_ref(message, idx + slang_checksum_idx);
 
 	return ((checksum == 0x0000U) /* checksum is disabled */
 			|| (checksum_ipv4(message, idx, idx + size) == 0));
 }
 
-size_t WarGrey::STEM::slang_metainfo_unbox(const uint8_t* message, uint8_t* version, uint8_t* type, size_t idx) {
+size_t GYDM::slang_metainfo_unbox(const uint8_t* message, uint8_t* version, uint8_t* type, size_t idx) {
 	SET_BOX(version, network_uint8_ref(message, idx + slang_version_idx));
 	SET_BOX(type, network_uint8_ref(message, idx + slang_type_idx));
 

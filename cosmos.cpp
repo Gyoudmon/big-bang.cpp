@@ -3,7 +3,7 @@
 
 #include "virtualization/screen/onionskin.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 #define PLANE_INFO(plane) (static_cast<LinkedPlaneInfo*>(plane->info))
@@ -52,16 +52,16 @@ static inline void draw_plane(SDL_Renderer* renderer, IPlane* plane, float x, fl
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Cosmos::Cosmos(uint32_t fps, const RGBA& fgc, const RGBA& bgc) : IUniverse(fps, fgc, bgc) {
+GYDM::Cosmos::Cosmos(uint32_t fps, const RGBA& fgc, const RGBA& bgc) : IUniverse(fps, fgc, bgc) {
     this->screen = new OnionSkin(this);
 }
 
-WarGrey::STEM::Cosmos::~Cosmos() {
+GYDM::Cosmos::~Cosmos() {
     this->collapse();
     delete this->screen;
 }
 
-IPlane* WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
+IPlane* GYDM::Cosmos::push_plane(IPlane* plane) {
     // NOTE: this method is designed to be invoked in `Cosmos::construct()`
 
     if (plane->info == nullptr) {
@@ -91,7 +91,7 @@ IPlane* WarGrey::STEM::Cosmos::push_plane(IPlane* plane) {
     return plane;
 }
 
-void WarGrey::STEM::Cosmos::collapse() {
+void GYDM::Cosmos::collapse() {
     if (this->head_plane != nullptr) {
         IPlane* temp_head = this->head_plane;
         LinkedPlaneInfo* temp_info = PLANE_INFO(temp_head);
@@ -111,24 +111,24 @@ void WarGrey::STEM::Cosmos::collapse() {
     }
 }
 
-bool WarGrey::STEM::Cosmos::has_current_mission_completed() {
+bool GYDM::Cosmos::has_current_mission_completed() {
     return (this->recent_plane != nullptr) && this->recent_plane->has_mission_completed();
 }
 
-bool WarGrey::STEM::Cosmos::can_exit() {
+bool GYDM::Cosmos::can_exit() {
     return this->has_current_mission_completed()
             && (this->recent_plane == PLANE_INFO(this->recent_plane)->next);
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Cosmos::on_big_bang(int width, int height) {
+void GYDM::Cosmos::on_big_bang(int width, int height) {
     if (this->recent_plane != nullptr) {
         construct_plane(this->recent_plane, float(width), float(height), false);
         this->set_window_title("%s", this->recent_plane->name());
     }
 }
 
-void WarGrey::STEM::Cosmos::reflow(float width, float height) {
+void GYDM::Cosmos::reflow(float width, float height) {
     if ((width > 0.0F) && (height > 0.0F)) {
         if (this->head_plane != nullptr) {
             IPlane* child = this->head_plane;
@@ -146,13 +146,13 @@ void WarGrey::STEM::Cosmos::reflow(float width, float height) {
     }
 }
 
-void WarGrey::STEM::Cosmos::on_game_start() {
+void GYDM::Cosmos::on_game_start() {
     if ((this->recent_plane == this->head_plane) && (this->recent_plane != nullptr)) {
 		this->notify_transfer(nullptr, this->recent_plane);
 	}
 }
 
-void WarGrey::STEM::Cosmos::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
+void GYDM::Cosmos::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) {
     this->begin_update_sequence();
 
     /**
@@ -171,7 +171,7 @@ void WarGrey::STEM::Cosmos::on_elapse(uint64_t count, uint32_t interval, uint64_
     this->end_update_sequence();
 }
 
-void WarGrey::STEM::Cosmos::draw(SDL_Renderer* renderer, int x, int y, int width, int height) {
+void GYDM::Cosmos::draw(SDL_Renderer* renderer, int x, int y, int width, int height) {
     float flx = float(x);
     float fly = float(y);
     float flwidth = float(width);
@@ -185,7 +185,7 @@ void WarGrey::STEM::Cosmos::draw(SDL_Renderer* renderer, int x, int y, int width
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Cosmos::on_mouse_event(SDL_MouseButtonEvent& m, bool pressed) {
+void GYDM::Cosmos::on_mouse_event(SDL_MouseButtonEvent& m, bool pressed) {
     if (this->recent_plane != nullptr) {
         uint8_t button = m.button;
         float flx = float(m.x);
@@ -202,7 +202,7 @@ void WarGrey::STEM::Cosmos::on_mouse_event(SDL_MouseButtonEvent& m, bool pressed
     }
 }
 
-void WarGrey::STEM::Cosmos::on_mouse_move(uint32_t state, int x, int y, int dx, int dy) {
+void GYDM::Cosmos::on_mouse_move(uint32_t state, int x, int y, int dx, int dy) {
     if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
         this->recent_plane->on_pointer_move(state, float(x), float(y), float(dx), float(dy));
@@ -210,7 +210,7 @@ void WarGrey::STEM::Cosmos::on_mouse_move(uint32_t state, int x, int y, int dx, 
     }
 }
 
-void WarGrey::STEM::Cosmos::on_scroll(int horizon, int vertical, float hprecise, float vprecise) {
+void GYDM::Cosmos::on_scroll(int horizon, int vertical, float hprecise, float vprecise) {
     if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
         this->recent_plane->on_scroll(horizon, vertical, hprecise, vprecise);
@@ -218,7 +218,7 @@ void WarGrey::STEM::Cosmos::on_scroll(int horizon, int vertical, float hprecise,
     }
 }
 
-void WarGrey::STEM::Cosmos::on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {
+void GYDM::Cosmos::on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) {
     if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
         this->recent_plane->on_char(key, modifiers, repeats, pressed);
@@ -226,7 +226,7 @@ void WarGrey::STEM::Cosmos::on_char(char key, uint16_t modifiers, uint8_t repeat
     }
 }
 
-void WarGrey::STEM::Cosmos::on_text(const char* text, size_t size, bool entire) {
+void GYDM::Cosmos::on_text(const char* text, size_t size, bool entire) {
     if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
         this->recent_plane->on_text(text, size, entire);
@@ -234,7 +234,7 @@ void WarGrey::STEM::Cosmos::on_text(const char* text, size_t size, bool entire) 
     }
 }
 
-void WarGrey::STEM::Cosmos::on_editing_text(const char* text, int pos, int span) {
+void GYDM::Cosmos::on_editing_text(const char* text, int pos, int span) {
     if (this->recent_plane != nullptr) {
         this->begin_update_sequence();
         this->recent_plane->on_editing_text(text, pos, span);
@@ -242,13 +242,13 @@ void WarGrey::STEM::Cosmos::on_editing_text(const char* text, int pos, int span)
     }
 }
             
-void WarGrey::STEM::Cosmos::on_save(const std::string& full_path, std::ofstream& dev_datout) {
+void GYDM::Cosmos::on_save(const std::string& full_path, std::ofstream& dev_datout) {
     if (this->recent_plane != nullptr) {
         this->recent_plane->on_save(full_path, dev_datout);
     }
 }
 
-const char* WarGrey::STEM::Cosmos::usrdata_extension() {
+const char* GYDM::Cosmos::usrdata_extension() {
     if (this->recent_plane != nullptr) {
         return this->recent_plane->usrdata_extension();
     } else {
@@ -257,7 +257,7 @@ const char* WarGrey::STEM::Cosmos::usrdata_extension() {
 }
 
 /*************************************************************************************************/
-const char* WarGrey::STEM::Cosmos::plane_name(int idx) {
+const char* GYDM::Cosmos::plane_name(int idx) {
     const char* pname = nullptr;
 
 	if (this->head_plane != nullptr) {
@@ -278,7 +278,7 @@ const char* WarGrey::STEM::Cosmos::plane_name(int idx) {
     return pname;
 }
 
-int WarGrey::STEM::Cosmos::plane_index(const std::string& name) {
+int GYDM::Cosmos::plane_index(const std::string& name) {
 	int to_idx = -1;
 	
 	if ((this->head_plane != nullptr) && (!name.empty())) {
@@ -301,7 +301,7 @@ int WarGrey::STEM::Cosmos::plane_index(const std::string& name) {
 	return to_idx;
 }
 
-void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
+void GYDM::Cosmos::transfer(int delta_idx) {
 	if ((this->recent_plane != nullptr) && (delta_idx != 0)) {
 		if (this->from_plane == nullptr) {
 			this->from_plane = this->recent_plane;
@@ -338,7 +338,7 @@ void WarGrey::STEM::Cosmos::transfer(int delta_idx) {
 	}
 }
 
-void WarGrey::STEM::Cosmos::transfer_to_plane(const std::string& name) {
+void GYDM::Cosmos::transfer_to_plane(const std::string& name) {
 	int to_idx = plane_index(name);
 	
 	if (to_idx >= 0) {
@@ -346,11 +346,11 @@ void WarGrey::STEM::Cosmos::transfer_to_plane(const std::string& name) {
 	}
 }
 
-void WarGrey::STEM::Cosmos::transfer_to_plane(int to_idx) {
+void GYDM::Cosmos::transfer_to_plane(int to_idx) {
 	this->on_navigate(this->recent_plane_idx, to_idx);
 }
 
-void WarGrey::STEM::Cosmos::on_navigate(int from_idx, int to_idx) {
+void GYDM::Cosmos::on_navigate(int from_idx, int to_idx) {
     int delta_idx = to_idx - from_idx;
 
     if (delta_idx != 0) {
@@ -359,7 +359,7 @@ void WarGrey::STEM::Cosmos::on_navigate(int from_idx, int to_idx) {
     }
 }
 
-void WarGrey::STEM::Cosmos::notify_transfer(IPlane* from, IPlane* to) {
+void GYDM::Cosmos::notify_transfer(IPlane* from, IPlane* to) {
     if (from != nullptr) {
         from->on_leave(to);
     }

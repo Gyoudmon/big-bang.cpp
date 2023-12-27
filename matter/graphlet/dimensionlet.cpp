@@ -8,7 +8,7 @@
 #include "../../datum/box.hpp"
 #include "../../datum/slot.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 static uint32_t default_text_color = GHOSTWHITE;
@@ -20,7 +20,7 @@ static uint8_t datum_idx = 1U;
 static uint8_t  unit_idx = 2U;
 
 /*************************************************************************************************/
-DimensionStyle WarGrey::STEM::make_plain_dimension_style(int lfontsize, int nfsize, int ufsize, int precision) {
+DimensionStyle GYDM::make_plain_dimension_style(int lfontsize, int nfsize, int ufsize, int precision) {
 	DimensionStyle ds;
 
     ds.label_font = GameFont::Default(lfontsize);
@@ -31,7 +31,7 @@ DimensionStyle WarGrey::STEM::make_plain_dimension_style(int lfontsize, int nfsi
 	return ds;
 }
 
-DimensionStyle WarGrey::STEM::make_plain_dimension_style(int nfsize, unsigned int min_number, int precision) {
+DimensionStyle GYDM::make_plain_dimension_style(int nfsize, unsigned int min_number, int precision) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize, fl2fxi(nfsize * 0.90F), precision);
 
     ds.minimize_number_width = ds.number_font->width('0') * float(min_number);
@@ -43,7 +43,7 @@ DimensionStyle WarGrey::STEM::make_plain_dimension_style(int nfsize, unsigned in
 	return ds;
 }
 
-DimensionStyle WarGrey::STEM::make_setting_dimension_style(int nfsize, unsigned int min_number, int precision, const RGBA& color) {
+DimensionStyle GYDM::make_setting_dimension_style(int nfsize, unsigned int min_number, int precision, const RGBA& color) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, nfsize, nfsize, precision);
 	
     ds.minimize_number_width = ds.number_font->width('0') * float(min_number);
@@ -54,12 +54,12 @@ DimensionStyle WarGrey::STEM::make_setting_dimension_style(int nfsize, unsigned 
 	return ds;
 }
 
-DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_number, int precision
+DimensionStyle GYDM::make_highlight_dimension_style(int nfsize, unsigned int min_number, int precision
         , const RGBA& number_bgcolor, const RGBA& label_bgcolor, const RGBA& color) {
 	return make_highlight_dimension_style(nfsize, 0U, min_number, precision, number_bgcolor, label_bgcolor, color);
 }
 
-DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigned int min_label, unsigned int min_number, int precision
+DimensionStyle GYDM::make_highlight_dimension_style(int nfsize, unsigned int min_label, unsigned int min_number, int precision
         , const RGBA& number_bgcolor, const RGBA& label_bgcolor, const RGBA& color) {
 	DimensionStyle ds = make_plain_dimension_style(nfsize, fl2fxi(nfsize * 1.2F), nfsize, precision);
 
@@ -77,51 +77,37 @@ DimensionStyle WarGrey::STEM::make_highlight_dimension_style(int nfsize, unsigne
 }
 
 /*************************************************************************************************/
-WarGrey::STEM::Dimensionlet::Dimensionlet(const char* unit, const std::string& label) {
+GYDM::Dimensionlet::Dimensionlet(const char* unit, const std::string& label) {
     this->unit = std::string(unit);
     this->label = std::string(label);
 }
 
-WarGrey::STEM::Dimensionlet::Dimensionlet(const char* unit, const char* label_fmt, ...) {
+GYDM::Dimensionlet::Dimensionlet(const char* unit, const char* label_fmt, ...) {
     VSNPRINT(label, label_fmt);
 
     this->unit = std::string(unit);
     this->label = label;
 }
 
-WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, const char* unit, const std::string& label) : IStatelet(state) {
+GYDM::Dimensionlet::Dimensionlet(DimensionState& state, const char* unit, const std::string& label) : IStatelet(state) {
     this->unit = std::string(unit);
     this->label = label;
 }
 
-WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, const char* unit, const char* label_fmt, ...) : IStatelet(state) {
-    VSNPRINT(label, label_fmt);
-    
-    this->unit = std::string(unit);
-    this->label = label;
-}
-
-WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const std::string& label) {
-    this->unit = std::string(unit);
-    this->label = label;
-    this->set_style(style);
-}
-
-WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const char* label_fmt, ...) {
+GYDM::Dimensionlet::Dimensionlet(DimensionState& state, const char* unit, const char* label_fmt, ...) : IStatelet(state) {
     VSNPRINT(label, label_fmt);
     
     this->unit = std::string(unit);
     this->label = label;
-    this->set_style(style);
 }
 
-WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle& style, const char* unit, const std::string& label) : IStatelet(state) {
+GYDM::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const std::string& label) {
     this->unit = std::string(unit);
     this->label = label;
     this->set_style(style);
 }
 
-WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle& style, const char* unit, const char* label_fmt, ...) : IStatelet(state) {
+GYDM::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const char* label_fmt, ...) {
     VSNPRINT(label, label_fmt);
     
     this->unit = std::string(unit);
@@ -129,13 +115,27 @@ WarGrey::STEM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle&
     this->set_style(style);
 }
 
-void WarGrey::STEM::Dimensionlet::feed_extent(float x, float y, float* w, float* h) {
+GYDM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle& style, const char* unit, const std::string& label) : IStatelet(state) {
+    this->unit = std::string(unit);
+    this->label = label;
+    this->set_style(style);
+}
+
+GYDM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle& style, const char* unit, const char* label_fmt, ...) : IStatelet(state) {
+    VSNPRINT(label, label_fmt);
+    
+    this->unit = std::string(unit);
+    this->label = label;
+    this->set_style(style);
+}
+
+void GYDM::Dimensionlet::feed_extent(float x, float y, float* w, float* h) {
     size_t n = sizeof(this->textures) / sizeof(shared_texture_t);
 
     this->feed_subextent(n, w, h);
 }
 
-void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, const std::optional<RGBA>& bgcolor, const std::optional<RGBA>& bcolor) {
+void GYDM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, const std::optional<RGBA>& bgcolor, const std::optional<RGBA>& bcolor) {
     SDL_FRect* self = &this->boxes[idx];
     
     if ((self->w > 0.0F) && (self->h > 0.0F)) {
@@ -165,7 +165,7 @@ void WarGrey::STEM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfra
     }
 }
 
-void WarGrey::STEM::Dimensionlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::Dimensionlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     DimensionStyle style = this->get_style();
 
     this->draw_box(renderer, label_idx, style.label_xfraction, x, y, Height, style.label_background_color, style.label_border_color);
@@ -173,7 +173,7 @@ void WarGrey::STEM::Dimensionlet::draw(SDL_Renderer* renderer, float x, float y,
     this->draw_box(renderer,  unit_idx, 0.0F, x, y, Height, style.unit_background_color, style.unit_border_color);
 }
 
-void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, DimensionStyle& style) {
+void GYDM::Dimensionlet::prepare_style(DimensionState status, DimensionStyle& style) {
     CAS_SLOT(style.number_font, GameFont::math());
 	CAS_SLOT(style.unit_font, GameFont::monospace());
 	CAS_SLOT(style.label_font, GameFont::Default());
@@ -198,7 +198,7 @@ void WarGrey::STEM::Dimensionlet::prepare_style(DimensionState status, Dimension
 	// NOTE: the others can be `nullptr`
 }
 
-void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
+void GYDM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
     if (!this->label.empty()) {
         this->textures[label_idx].reset(
             new Texture(game_blended_text_texture(renderer, this->label, style.label_font,
@@ -218,18 +218,18 @@ void WarGrey::STEM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Rendere
     this->update_drawing_box( unit_idx, -1.0F, style.unit_font, style.unit_leading_space);
 }
 
-void WarGrey::STEM::Dimensionlet::on_value_changed(SDL_Renderer* ds, double value) {
+void GYDM::Dimensionlet::on_value_changed(SDL_Renderer* ds, double value) {
 	this->update_number_texture(ds, value, this->get_style());
 }
 
-void WarGrey::STEM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, double value, DimensionStyle& style) {
+void GYDM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, double value, DimensionStyle& style) {
     this->textures[datum_idx].reset(
         new Texture(game_blended_text_texture(renderer,
                         flstring(value, style.precision), style.number_font,
                         style.number_color.value(), 0)));
 }
 
-void WarGrey::STEM::Dimensionlet::update_drawing_box(size_t idx, float min_width, shared_font_t font, float leading_space) {
+void GYDM::Dimensionlet::update_drawing_box(size_t idx, float min_width, shared_font_t font, float leading_space) {
     shared_texture_t self = this->textures[idx];
     SDL_FRect* sbox = &this->boxes[idx];
     int width, height;
@@ -250,7 +250,7 @@ void WarGrey::STEM::Dimensionlet::update_drawing_box(size_t idx, float min_width
     }
 }
 
-void WarGrey::STEM::Dimensionlet::feed_subextent(size_t n, float* w, float* h) {
+void GYDM::Dimensionlet::feed_subextent(size_t n, float* w, float* h) {
     float flw = 0.0F;
     float flh = 0.0F;
 

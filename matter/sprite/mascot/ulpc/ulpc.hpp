@@ -9,10 +9,8 @@
 /* https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/index.html */
 /* https://lpc.opengameart.org/static/LPC-Style-Guide/build/index.html */
 
-namespace WarGrey::STEM {
-    class SpriteULPCSheet : public WarGrey::STEM::SpriteGridSheet
-        , public WarGrey::STEM::ICreature
-        , protected WarGrey::STEM::I4WayMotion {
+namespace GYDM {
+    class SpriteULPCSheet : public GYDM::SpriteGridSheet, public GYDM::ICreature, protected GYDM::I4WayMotion {
     public:
         SpriteULPCSheet(const std::string& pathname);
 

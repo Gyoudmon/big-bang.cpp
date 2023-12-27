@@ -5,13 +5,13 @@
 #include "../datum/enum.hpp"
 #include "../datum/flonum.hpp"
 
-namespace WarGrey::STEM {
-    class __lambda__ IGraphlet : public WarGrey::STEM::IMatter {
+namespace GYDM {
+    class __lambda__ IGraphlet : public GYDM::IMatter {
 		// Yes, meanwhile it's empty
     };
 
     template<typename T>
-	class __lambda__ IValuelet : public virtual WarGrey::STEM::IGraphlet {
+	class __lambda__ IValuelet : public virtual GYDM::IGraphlet {
     public:
 		T get_value() {
 			return this->guarded_value();
@@ -37,11 +37,11 @@ namespace WarGrey::STEM {
 			}
 		}
 
-		void set_value_anchor(WarGrey::STEM::MatterAnchor anchor) {
+		void set_value_anchor(GYDM::MatterAnchor anchor) {
 			this->anchor = anchor;
 		}
 
-		WarGrey::STEM::MatterAnchor get_value_anchor() {
+		GYDM::MatterAnchor get_value_anchor() {
 			return this->anchor;
 		}
 
@@ -68,7 +68,7 @@ namespace WarGrey::STEM {
 		}
 
 	private:
-		MatterAnchor anchor = WarGrey::STEM::MatterAnchor::LT;
+		MatterAnchor anchor = GYDM::MatterAnchor::LT;
 		T shadow = T();
 
 	private:
@@ -77,7 +77,7 @@ namespace WarGrey::STEM {
 	};
 
     template<typename T>
-	class __lambda__ IRangelet : public virtual WarGrey::STEM::IValuelet<T> {
+	class __lambda__ IRangelet : public virtual GYDM::IValuelet<T> {
 	public:
 		IRangelet(T vmin, T vmax) {
 			if (vmin <= vmax) {
@@ -156,7 +156,7 @@ namespace WarGrey::STEM {
 	};
 
 	template<typename State, typename Style>
-	class __lambda__ IStatelet : public virtual WarGrey::STEM::IGraphlet {
+	class __lambda__ IStatelet : public virtual GYDM::IGraphlet {
 	public:
 		IStatelet() : IStatelet(State::_) {}
 

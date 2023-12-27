@@ -2,16 +2,16 @@
 
 #include "tuple.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     template<typename T>
-    class __lambda__ EuclideanVector : public WarGrey::STEM::Tuple<WarGrey::STEM::EuclideanVector, T> {
+    class __lambda__ EuclideanVector : public GYDM::Tuple<GYDM::EuclideanVector, T> {
     public:
         EuclideanVector() = default;
-        EuclideanVector(T x, T y) : Tuple<WarGrey::STEM::EuclideanVector, T>(x, y) {}
+        EuclideanVector(T x, T y) : Tuple<GYDM::EuclideanVector, T>(x, y) {}
 
         template <typename U>
         explicit EuclideanVector(const EuclideanVector<U>& v)
-            : Tuple<WarGrey::STEM::EuclideanVector, U>(T(v.x), T(v.y)) {}
+            : Tuple<GYDM::EuclideanVector, U>(T(v.x), T(v.y)) {}
 
         ~EuclideanVector() noexcept {}
     };

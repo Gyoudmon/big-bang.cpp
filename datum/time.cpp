@@ -4,7 +4,7 @@
 
 #include "time.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 using namespace std::chrono;
 
 /**************************************************************************************************/
@@ -29,29 +29,29 @@ static inline void ntime(char* timestamp, const time_t utc_s, const char* tfmt, 
 }
 
 /**************************************************************************************************/
-long long WarGrey::STEM::current_seconds() {
+long long GYDM::current_seconds() {
     return time(nullptr);
 }
 
-long long WarGrey::STEM::current_milliseconds() {
+long long GYDM::current_milliseconds() {
     return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }
 
-double WarGrey::STEM::current_inexact_milliseconds() {
+double GYDM::current_inexact_milliseconds() {
     return double(duration_cast<microseconds>(system_clock::now().time_since_epoch()).count()) / 1000.0;
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::sleep(long long ms) {
+void GYDM::sleep(long long ms) {
     std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-void WarGrey::STEM::sleep_us(long long us) {
+void GYDM::sleep_us(long long us) {
     std::this_thread::sleep_for(std::chrono::microseconds(us));
 }
 
 /*************************************************************************************************/
-std::string WarGrey::STEM::make_now_timestamp_utc(bool locale, bool needs_ms) {
+std::string GYDM::make_now_timestamp_utc(bool locale, bool needs_ms) {
     long long ms = current_milliseconds();
     long long s = ms / 1000;
     std::string ts = make_timestamp_utc(s, locale);
@@ -64,7 +64,7 @@ std::string WarGrey::STEM::make_now_timestamp_utc(bool locale, bool needs_ms) {
     return ts;
 }
 
-std::string WarGrey::STEM::make_timestamp_utc(long long utc_s, bool locale) {
+std::string GYDM::make_timestamp_utc(long long utc_s, bool locale) {
     char timestamp[32];
 
     ntime(timestamp, utc_s, "%FT%T", locale);
@@ -72,7 +72,7 @@ std::string WarGrey::STEM::make_timestamp_utc(long long utc_s, bool locale) {
     return std::string(timestamp);
 }
 
-std::string WarGrey::STEM::make_datestamp_utc(long long utc_s, bool locale) {
+std::string GYDM::make_datestamp_utc(long long utc_s, bool locale) {
     char timestamp[32];
 
     ntime(timestamp, utc_s, "%F", locale);
@@ -80,7 +80,7 @@ std::string WarGrey::STEM::make_datestamp_utc(long long utc_s, bool locale) {
     return std::string(timestamp);
 }
 
-std::string WarGrey::STEM::make_daytimestamp_utc(long long utc_s, bool locale) {
+std::string GYDM::make_daytimestamp_utc(long long utc_s, bool locale) {
     char timestamp[32];
 
     ntime(timestamp, utc_s, "%T", locale);

@@ -4,7 +4,7 @@
 #include <limits>
 #include <cstdlib>
 
-namespace WarGrey::STEM {
+namespace GYDM {
 #define flin(open, v, close) ((open <= v) && (v <= close))
 #define flout(open, v, close) ((v < open) || (v > close))
 
@@ -137,6 +137,6 @@ namespace WarGrey::STEM {
     template<typename T> T inline fl2fx(float f) { return T(std::round(f)); }
     template<typename T> T inline fl2fx(double fl) { return T(std::round(fl)); }
 
-    int inline fl2fxi(float f) { return WarGrey::STEM::fl2fx<int>(f); }
-    int inline fl2fxi(double fl) { return WarGrey::STEM::fl2fx<int>(fl); }
+    int inline fl2fxi(float f) { return GYDM::fl2fx<int>(f); }
+    int inline fl2fxi(double fl) { return GYDM::fl2fx<int>(fl); }
 }

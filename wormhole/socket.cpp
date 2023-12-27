@@ -3,10 +3,10 @@
 #include "slang/datagram.hpp"
 #include "slang/network.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::SocketDaemon::SocketDaemon(int maxsockets) {
+GYDM::SocketDaemon::SocketDaemon(int maxsockets) {
     int msckt = (maxsockets <= 0) ? 1 : maxsockets;
 
     network_initialize();
@@ -14,7 +14,7 @@ WarGrey::STEM::SocketDaemon::SocketDaemon(int maxsockets) {
     this->fallback_timeout = msckt;
 }
 
-WarGrey::STEM::SocketDaemon::~SocketDaemon() noexcept {
+GYDM::SocketDaemon::~SocketDaemon() noexcept {
     SDLNet_SocketSet shadow = this->master;
 
     if (this->wrpl != nullptr) {
@@ -35,7 +35,7 @@ WarGrey::STEM::SocketDaemon::~SocketDaemon() noexcept {
 }
 
 /*************************************************************************************************/
-bool WarGrey::STEM::SocketDaemon::udp_listen(IUDPDaemon* daemon) {
+bool GYDM::SocketDaemon::udp_listen(IUDPDaemon* daemon) {
     uint16_t service = daemon->service();
 
     if (this->udp_deamons.find(service) == this->udp_deamons.end()) {
@@ -56,13 +56,13 @@ bool WarGrey::STEM::SocketDaemon::udp_listen(IUDPDaemon* daemon) {
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::SocketDaemon::start_wait_read_process_loop(int timeout_ms) {
+void GYDM::SocketDaemon::start_wait_read_process_loop(int timeout_ms) {
     if (this->wrpl == nullptr) {
         this->wrpl = new std::thread(&SocketDaemon::wait_read_process_loop, this, timeout_ms);
     }
 }
 
-void WarGrey::STEM::SocketDaemon::wait_read_process_loop(int timeout_ms) {
+void GYDM::SocketDaemon::wait_read_process_loop(int timeout_ms) {
     int timeout = (timeout_ms <= 0) ? this->fallback_timeout : timeout_ms;
     int ready = 0;
     

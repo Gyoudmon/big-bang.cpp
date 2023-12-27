@@ -2,15 +2,15 @@
 
 #include "game.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     /* Constants */
     static const char* unknown_plane_name = "冒险越来越深入了";
 
     /*********************************************************************************************/
-    class __lambda__ TheBigBang : public WarGrey::STEM::Plane {
+    class __lambda__ TheBigBang : public GYDM::Plane {
     public:
         TheBigBang(const char* name = unknown_plane_name, uint32_t title_color = BLACK)
-            : WarGrey::STEM::Plane(name), title_color(title_color) {}
+            : GYDM::Plane(name), title_color(title_color) {}
         virtual ~TheBigBang() {}
 
     public:
@@ -25,9 +25,9 @@ namespace WarGrey::STEM {
         float get_titlebar_height();
 
     protected:
-        WarGrey::STEM::Linkmon* agent = nullptr;
-        WarGrey::STEM::Labellet* title = nullptr;
-        WarGrey::STEM::Labellet* tooltip = nullptr;
+        GYDM::Linkmon* agent = nullptr;
+        GYDM::Labellet* title = nullptr;
+        GYDM::Labellet* tooltip = nullptr;
 
     private:
         uint32_t title_color;

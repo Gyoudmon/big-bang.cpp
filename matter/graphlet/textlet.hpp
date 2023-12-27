@@ -11,8 +11,8 @@
 #include "../../physics/color/rgba.hpp"
 #include "../../physics/color/names.hpp"
 
-namespace WarGrey::STEM {
-    class __lambda__ ITextlet : public virtual WarGrey::STEM::IGraphlet {
+namespace GYDM {
+    class __lambda__ ITextlet : public virtual GYDM::IGraphlet {
     public:
         ITextlet();
         virtual ~ITextlet() noexcept {}
@@ -22,21 +22,21 @@ namespace WarGrey::STEM {
 
     public:
         void set_text(const char* fmt, ...);
-        void set_text(const WarGrey::STEM::RGBA& color, const char* fmt, ...);
-        void set_text(WarGrey::STEM::MatterAnchor anchor, const char* fmt, ...);
-        void set_text(const std::string& content, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
+        void set_text(const GYDM::RGBA& color, const char* fmt, ...);
+        void set_text(GYDM::MatterAnchor anchor, const char* fmt, ...);
+        void set_text(const std::string& content, GYDM::MatterAnchor anchor = MatterAnchor::LT);
         
     public:
-        void set_font(shared_font_t font, WarGrey::STEM::MatterAnchor anchor = MatterAnchor::LT);
-        void set_text_color(const WarGrey::STEM::RGBA& color = SILVER);
-        void set_foreground_color(const WarGrey::STEM::RGBA& color = SILVER) { this->set_text_color(color); }
+        void set_font(shared_font_t font, GYDM::MatterAnchor anchor = MatterAnchor::LT);
+        void set_text_color(const GYDM::RGBA& color = SILVER);
+        void set_foreground_color(const GYDM::RGBA& color = SILVER) { this->set_text_color(color); }
         void set_text_alpha(double alpha);
         void set_foreground_alpha(double alpha) { this->set_text_alpha(alpha); }
-        WarGrey::STEM::RGBA get_foreground_color() { return this->foreground_color; }
-        void set_background_color(const WarGrey::STEM::RGBA& color);
-        WarGrey::STEM::RGBA get_background_color() { return this->background_color; }
-        void set_border_color(const WarGrey::STEM::RGBA& color);
-        WarGrey::STEM::RGBA get_border_color() { return this->border_color; }
+        GYDM::RGBA get_foreground_color() { return this->foreground_color; }
+        void set_background_color(const GYDM::RGBA& color);
+        GYDM::RGBA get_background_color() { return this->background_color; }
+        void set_border_color(const GYDM::RGBA& color);
+        GYDM::RGBA get_border_color() { return this->border_color; }
         void set_corner_radius(float radius);
 
     public:
@@ -56,28 +56,28 @@ namespace WarGrey::STEM {
     protected:
         shared_font_t text_font = nullptr;
         shared_texture_t texture = nullptr;
-        WarGrey::STEM::RGBA foreground_color;
-        WarGrey::STEM::RGBA background_color;
-        WarGrey::STEM::RGBA border_color;
+        GYDM::RGBA foreground_color;
+        GYDM::RGBA background_color;
+        GYDM::RGBA border_color;
         float corner_radius = 0.0F;
 
     private:
         std::string raw;
     };
 
-    class __lambda__ Labellet : public virtual WarGrey::STEM::ITextlet {
+    class __lambda__ Labellet : public virtual GYDM::ITextlet {
     public:
         Labellet(const char* fmt, ...);
         Labellet(shared_font_t font, const char* fmt, ...);
         Labellet(uint32_t hex, const char* fmt, ...);
-        Labellet(const WarGrey::STEM::RGBA& rgb, const char* fmt, ...);
+        Labellet(const GYDM::RGBA& rgb, const char* fmt, ...);
         Labellet(shared_font_t font, uint32_t hex, const char* fmt, ...);
-        Labellet(shared_font_t font, const WarGrey::STEM::RGBA& rgb, const char* fmt, ...);
+        Labellet(shared_font_t font, const GYDM::RGBA& rgb, const char* fmt, ...);
     };
 
     /*********************************************************************************************/
     __lambda__ Labellet* make_label_for_tooltip(shared_font_t font,
-        const WarGrey::STEM::RGBA& background_color = SNOW,
-        const WarGrey::STEM::RGBA& border_color = GOLD,
-        const WarGrey::STEM::RGBA& foreground_color = BLACK);
+        const GYDM::RGBA& background_color = SNOW,
+        const GYDM::RGBA& border_color = GOLD,
+        const GYDM::RGBA& foreground_color = BLACK);
 }

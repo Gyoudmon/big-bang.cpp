@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     /*********************************************************************************************/
 #define _B(lit_string) reinterpret_cast<const unsigned char*>(lit_string)
 #define _b(lit_string) reinterpret_cast<unsigned char*>(lit_string)

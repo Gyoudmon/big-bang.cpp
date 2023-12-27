@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     __lambda__ long long current_seconds();
     __lambda__ long long current_milliseconds();
     __lambda__ double current_inexact_milliseconds();

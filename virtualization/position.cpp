@@ -3,10 +3,10 @@
 
 #include "position.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-Point<float> WarGrey::STEM::Position::calculate_dot() const {
+Point<float> GYDM::Position::calculate_dot() const {
     Point<float> pos;
 
     if (this->xtarget == nullptr) {

@@ -6,37 +6,37 @@
 #include "../../datum/box.hpp"
 #include "../../datum/bytes.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
-WarGrey::STEM::UserDatagramPacket::UserDatagramPacket(size_t size) {
+GYDM::UserDatagramPacket::UserDatagramPacket(size_t size) {
     this->self = SDLNet_AllocPacket(int(size));
 }
 
-WarGrey::STEM::UserDatagramPacket::~UserDatagramPacket() noexcept {
+GYDM::UserDatagramPacket::~UserDatagramPacket() noexcept {
     if (this->self != nullptr) {
         SDLNet_FreePacket(this->self);
         this->self = nullptr;
     }
 }
 
-size_t WarGrey::STEM::UserDatagramPacket::capacity() {
+size_t GYDM::UserDatagramPacket::capacity() {
     return static_cast<size_t>(this->self->maxlen);
 }
 
-size_t WarGrey::STEM::UserDatagramPacket::resize(size_t new_size) {
+size_t GYDM::UserDatagramPacket::resize(size_t new_size) {
     return static_cast<size_t>(SDLNet_ResizePacket(this->self, int(new_size)));
 }
 
-const char* WarGrey::STEM::UserDatagramPacket::hostname() {
+const char* GYDM::UserDatagramPacket::hostname() {
     return SDLNet_ResolveIP(&this->self->address);
 }
 
-uint16_t WarGrey::STEM::UserDatagramPacket::port() {
+uint16_t GYDM::UserDatagramPacket::port() {
     return this->self->address.port;
 }
 
-const unsigned char* WarGrey::STEM::UserDatagramPacket::unbox(uint8_t* type, uint16_t* transaction, uint16_t* response_port, size_t* size) {
+const unsigned char* GYDM::UserDatagramPacket::unbox(uint8_t* type, uint16_t* transaction, uint16_t* response_port, size_t* size) {
     unsigned char* payload = nullptr;
     
     if (is_slang_message(this->self->data)) {
@@ -71,7 +71,7 @@ const unsigned char* WarGrey::STEM::UserDatagramPacket::unbox(uint8_t* type, uin
     return payload;
 }
 
-int WarGrey::STEM::UserDatagramPacket::recv(UDPsocket udp) {
+int GYDM::UserDatagramPacket::recv(UDPsocket udp) {
     int rsize = -1;
 
     if (SDLNet_UDP_Recv(udp, this->self) == 1) {

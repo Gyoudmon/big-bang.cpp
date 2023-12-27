@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     __lambda__ void imgdb_setup(const char* rootdir);
     __lambda__ void imgdb_setup(const std::string& rootdir);
     __lambda__ void imgdb_teardown();

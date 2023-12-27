@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL.h>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     enum class ColorMixture {
         None = SDL_BLENDMODE_NONE,
         Add = SDL_BLENDMODE_ADD,
@@ -16,7 +16,7 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    inline SDL_BlendMode color_mixture_to_blend_mode(WarGrey::STEM::ColorMixture mixture) { return static_cast<SDL_BlendMode>(mixture); }
+    inline SDL_BlendMode color_mixture_to_blend_mode(GYDM::ColorMixture mixture) { return static_cast<SDL_BlendMode>(mixture); }
     inline ColorMixture blend_mode_to_color_mixture(SDL_BlendMode mode) { return static_cast<ColorMixture>(mode); }
 
     /*********************************************************************************************/

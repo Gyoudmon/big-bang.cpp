@@ -4,7 +4,7 @@
 
 #include <utility>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     enum class MarioPipeColor {
         // Order matters
         Green = 0,
@@ -19,7 +19,7 @@ namespace WarGrey::STEM {
     enum class MarioHPipeDirection { Left, Right, Both };
 
     /*********************************************************************************************/
-    class __lambda__ MarioGroundAtlas : public WarGrey::STEM::GridAtlas {
+    class __lambda__ MarioGroundAtlas : public GYDM::GridAtlas {
     public:
         MarioGroundAtlas(size_t slot, int row, int col, float tile_size = 0.0F);
 
@@ -34,45 +34,45 @@ namespace WarGrey::STEM {
     };
 
     /*********************************************************************************************/
-    class __lambda__ MarioPipe : public WarGrey::STEM::GridAtlas {
+    class __lambda__ MarioPipe : public GYDM::GridAtlas {
     public:
         MarioPipe(int row, int col,
-            WarGrey::STEM::MarioPipeColor color = MarioPipeColor::Green,
+            GYDM::MarioPipeColor color = MarioPipeColor::Green,
             float tile_size = 0.0F);
 
     public:
-        void set_color(WarGrey::STEM::MarioPipeColor color);
-        WarGrey::STEM::MarioPipeColor get_color();
+        void set_color(GYDM::MarioPipeColor color);
+        GYDM::MarioPipeColor get_color();
 
     protected:
         int color_idx;
     };
 
-    class __lambda__ MarioVPipe : public WarGrey::STEM::MarioPipe {
+    class __lambda__ MarioVPipe : public GYDM::MarioPipe {
     public:
         MarioVPipe(int length,
-            WarGrey::STEM::MarioVPipeDirection dir = MarioVPipeDirection::Up,
-            WarGrey::STEM::MarioPipeColor color = MarioPipeColor::Green,
+            GYDM::MarioVPipeDirection dir = MarioVPipeDirection::Up,
+            GYDM::MarioPipeColor color = MarioPipeColor::Green,
             float tile_size = 0.0F);
 
     protected:
         int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) override;
         
     private:
-        WarGrey::STEM::MarioVPipeDirection direction;
+        GYDM::MarioVPipeDirection direction;
     };
 
-    class __lambda__ MarioHPipe : public WarGrey::STEM::MarioPipe {
+    class __lambda__ MarioHPipe : public GYDM::MarioPipe {
     public:
         MarioHPipe(int length,
-            WarGrey::STEM::MarioHPipeDirection dir = MarioHPipeDirection::Both,
-            WarGrey::STEM::MarioPipeColor color = MarioPipeColor::Green,
+            GYDM::MarioHPipeDirection dir = MarioHPipeDirection::Both,
+            GYDM::MarioPipeColor color = MarioPipeColor::Green,
             float tile_size = 0.0F);
 
     protected:
         int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) override;
         
     private:
-        WarGrey::STEM::MarioHPipeDirection direction;
+        GYDM::MarioHPipeDirection direction;
     };
 }

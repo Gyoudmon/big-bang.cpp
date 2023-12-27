@@ -12,7 +12,7 @@
 #include "../physics/random.hpp"
 #include "../physics/mathematics.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 #ifdef __windows__
@@ -20,7 +20,7 @@ using namespace WarGrey::STEM;
 #endif
 
 /*************************************************************************************************/
-void WarGrey::STEM::ISprite::construct(SDL_Renderer* renderer) {
+void GYDM::ISprite::construct(SDL_Renderer* renderer) {
     int idx = this->get_initial_costume_index();
 
     if (idx >= 0) {
@@ -30,7 +30,7 @@ void WarGrey::STEM::ISprite::construct(SDL_Renderer* renderer) {
     }
 }
 
-void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* height) {
+void GYDM::ISprite::feed_extent(float x, float y, float* width, float* height) {
     float owidth, oheight;
 
     this->feed_original_extent(x, y, &owidth, &oheight);
@@ -38,7 +38,7 @@ void WarGrey::STEM::ISprite::feed_extent(float x, float y, float* width, float* 
     SET_BOX(height, oheight * flabs(this->yscale));
 }
 
-void WarGrey::STEM::ISprite::feed_original_extent(float x, float y, float* width, float* height) {
+void GYDM::ISprite::feed_original_extent(float x, float y, float* width, float* height) {
     if (this->current_costume_idx >= this->costume_count()) {
         SET_BOXES(width, height, 0.0F);
     } else if ((this->canvas_width > 0.0F) && (this->canvas_height > 0.0F)) {
@@ -56,14 +56,14 @@ void WarGrey::STEM::ISprite::feed_original_extent(float x, float y, float* width
     }
 }
 
-void WarGrey::STEM::ISprite::feed_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
+void GYDM::ISprite::feed_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
     float t, r, b, l;
 
     this->feed_original_margin(x, y, &t, &r, &b, &l);
     margin_scale(t, r, b, l, this->xscale, this->yscale, top, right, bottom, left);
 }
 
-void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
+void GYDM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
     if (this->current_costume_idx < this->costume_count()) {
         float cwidth, cheight;
 
@@ -76,7 +76,7 @@ void WarGrey::STEM::ISprite::on_resize(float width, float height, float old_widt
     }
 }
 
-void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
     if (this->current_costume_idx < this->costume_count()) {
         SpriteRenderArguments argv;
         
@@ -136,7 +136,7 @@ void WarGrey::STEM::ISprite::draw(SDL_Renderer* renderer, float x, float y, floa
     }
 }
 
-void WarGrey::STEM::ISprite::set_virtual_canvas(float width, float height) {
+void GYDM::ISprite::set_virtual_canvas(float width, float height) {
     if ((this->canvas_width != width) || (this->canvas_height != height)) {
         this->canvas_width = width;
         this->canvas_height = height;
@@ -144,7 +144,7 @@ void WarGrey::STEM::ISprite::set_virtual_canvas(float width, float height) {
     }
 }
 
-void WarGrey::STEM::ISprite::auto_virtual_canvas(const char* action_name) {
+void GYDM::ISprite::auto_virtual_canvas(const char* action_name) {
     float cwidth = 0.0F;
     float cheight = 0.0F;
     float cw, ch;
@@ -166,7 +166,7 @@ void WarGrey::STEM::ISprite::auto_virtual_canvas(const char* action_name) {
     this->set_virtual_canvas(cwidth, cheight);
 }
 
-void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
+void GYDM::ISprite::switch_to_costume(int idx) {
     /** WARNING
      * `size_t` will implicitly convert the `actual_idx` into a nonnegative integer,
      *      and cause it always be true for `actual_idx >= maxsize`.
@@ -184,7 +184,7 @@ void WarGrey::STEM::ISprite::switch_to_costume(int idx) {
     }
 }
 
-void WarGrey::STEM::ISprite::switch_to_costume(const char* name) {
+void GYDM::ISprite::switch_to_costume(const char* name) {
     int cidx = this->costume_name_to_index(name);
 
     if (cidx >= 0) {
@@ -192,12 +192,12 @@ void WarGrey::STEM::ISprite::switch_to_costume(const char* name) {
     }
 }
 
-void WarGrey::STEM::ISprite::switch_to_random_costume(int idx0, int idxn) {
+void GYDM::ISprite::switch_to_random_costume(int idx0, int idxn) {
     this->switch_to_costume(random_uniform(idx0, idxn));
 }
 
 
-int WarGrey::STEM::ISprite::costume_name_to_index(const char* name) {
+int GYDM::ISprite::costume_name_to_index(const char* name) {
     int cidx = -1;
     
     for (size_t idx = 0; idx < this->costume_count(); idx ++) {
@@ -219,7 +219,7 @@ int WarGrey::STEM::ISprite::costume_name_to_index(const char* name) {
     return cidx;
 }
 
-int WarGrey::STEM::ISprite::update(uint64_t count, uint32_t interval, uint64_t uptime) {
+int GYDM::ISprite::update(uint64_t count, uint32_t interval, uint64_t uptime) {
     size_t frame_size = this->frame_refs.size();
     int duration = 0;
 
@@ -287,7 +287,7 @@ int WarGrey::STEM::ISprite::update(uint64_t count, uint32_t interval, uint64_t u
     return duration;
 }
 
-size_t WarGrey::STEM::ISprite::play(const char* action, int repetition) {
+size_t GYDM::ISprite::play(const char* action, int repetition) {
     this->current_action_name.clear();
     this->current_action_name.append((action == nullptr) ? "" : action);
 
@@ -303,7 +303,7 @@ size_t WarGrey::STEM::ISprite::play(const char* action, int repetition) {
     return this->frame_refs.size();
 }
 
-size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repetition) {
+size_t GYDM::ISprite::play(int idx0, size_t count, int repetition) {
     size_t size = this->costume_count();
 
     this->current_action_name.clear();
@@ -322,7 +322,7 @@ size_t WarGrey::STEM::ISprite::play(int idx0, size_t count, int repetition) {
     return this->frame_refs.size();
 }
 
-void WarGrey::STEM::ISprite::stop(int rest) {
+void GYDM::ISprite::stop(int rest) {
     this->animation_rest = (rest <= 0) ? 0 : rest;
 
     if (this->animation_rest == 0) {
@@ -331,7 +331,7 @@ void WarGrey::STEM::ISprite::stop(int rest) {
     }
 }
 
-int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
+int GYDM::ISprite::submit_action_frames(std::vector<std::pair<int, int>>& frame_refs, const std::string& action) {
     for (int i = 0; i < this->costume_count(); i++) {
         if (string_ci_prefix(this->costume_index_to_name(i), action)) {
             frame_refs.push_back({ i, 0 });
@@ -341,15 +341,15 @@ int WarGrey::STEM::ISprite::submit_action_frames(std::vector<std::pair<int, int>
     return -1;
 }
 
-int WarGrey::STEM::ISprite::submit_idle_frames(std::vector<std::pair<int, int>>& frame_refs, int& times) {
+int GYDM::ISprite::submit_idle_frames(std::vector<std::pair<int, int>>& frame_refs, int& times) {
     return ISprite::submit_action_frames(frame_refs, "idle");
 }
 
-uint64_t WarGrey::STEM::ISprite::preferred_idle_duration() {
+uint64_t GYDM::ISprite::preferred_idle_duration() {
     return static_cast<uint64_t>(random_uniform(2000, 4000));
 }
 
-void WarGrey::STEM::ISprite::flip(bool horizontal, bool vertical) {
+void GYDM::ISprite::flip(bool horizontal, bool vertical) {
     if (horizontal || vertical) {
         if (horizontal) {
             this->xscale *= -1.0F;
@@ -363,56 +363,56 @@ void WarGrey::STEM::ISprite::flip(bool horizontal, bool vertical) {
     }
 }
 
-SDL_RendererFlip WarGrey::STEM::ISprite::current_flip_status() {
+SDL_RendererFlip GYDM::ISprite::current_flip_status() {
     return game_scales_to_flip(this->xscale, this->yscale);
 }
 
-float WarGrey::STEM::ISprite::get_horizontal_scale() {
+float GYDM::ISprite::get_horizontal_scale() {
     return flabs(this->xscale);
 }
 
-float WarGrey::STEM::ISprite::get_vertical_scale() {
+float GYDM::ISprite::get_vertical_scale() {
     return flabs(this->yscale);
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::ISprite::shh() {
+void GYDM::ISprite::shh() {
     if (this->info != nullptr) {
         this->info->master->shh(this);
     }
 }
 
-void WarGrey::STEM::ISprite::say(IMatter* message, double sec, SpeechBubble type) {
+void GYDM::ISprite::say(IMatter* message, double sec, SpeechBubble type) {
     if (this->info != nullptr) {
         this->info->master->say(this, sec, message, type);
     }
 }
 
-void WarGrey::STEM::ISprite::say(const std::string& sentence, const RGBA& color) {
+void GYDM::ISprite::say(const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->say(this, sentence, color);
     }
 }
 
-void WarGrey::STEM::ISprite::say(double sec, const std::string& sentence, const RGBA& color) {
+void GYDM::ISprite::say(double sec, const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->say(this, sec, sentence, color);
     }
 }
 
-void WarGrey::STEM::ISprite::think(const std::string& sentence, const RGBA& color) {
+void GYDM::ISprite::think(const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->think(this, sentence, color);
     }
 }
 
-void WarGrey::STEM::ISprite::think(double sec, const std::string& sentence, const RGBA& color) {
+void GYDM::ISprite::think(double sec, const std::string& sentence, const RGBA& color) {
     if (this->info != nullptr) {
         this->info->master->think(this, sentence, color);
     }
 }
 
-bool WarGrey::STEM::ISprite::is_speaking() {
+bool GYDM::ISprite::is_speaking() {
     bool yes = false;
 
     if (this->info != nullptr) {
@@ -422,7 +422,7 @@ bool WarGrey::STEM::ISprite::is_speaking() {
     return yes;
 }
 
-bool WarGrey::STEM::ISprite::is_thinking() {
+bool GYDM::ISprite::is_thinking() {
     bool yes = false;
 
     if (this->info != nullptr) {
@@ -432,7 +432,7 @@ bool WarGrey::STEM::ISprite::is_thinking() {
     return yes;
 }
 
-bool WarGrey::STEM::ISprite::in_speech() {
+bool GYDM::ISprite::in_speech() {
     bool yes = false;
     
     if (this->info != nullptr) {

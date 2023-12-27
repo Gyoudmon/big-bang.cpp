@@ -10,7 +10,7 @@
 #include "physics/color/names.hpp"
 #include "physics/geometry/anchor.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     class __lambda__ IMatterInfo {
     public:
         virtual ~IMatterInfo() {};
@@ -22,13 +22,13 @@ namespace WarGrey::STEM {
 
     class __lambda__ IMatterMetadata {};
 
-    class __lambda__ IMatter : public WarGrey::STEM::IMovable {
+    class __lambda__ IMatter : public GYDM::IMovable {
     public:
         IMatter() {}
         virtual ~IMatter();
 
     public:
-        WarGrey::STEM::IPlane* master() const;
+        GYDM::IPlane* master() const;
         SDL_Renderer* master_renderer() const;
 
     public:
@@ -72,14 +72,14 @@ namespace WarGrey::STEM {
 
     public:
         bool resizable() { return this->can_resize; }
-        void scale(float ratio, const WarGrey::STEM::Anchor& anchor = 0.5F) { this->scale(ratio, ratio, anchor); }
-        void scale(float x_ratio, float y_ratio, const WarGrey::STEM::Anchor& anchor = 0.5F);
-        void scale_to(float ratio, const WarGrey::STEM::Anchor& anchor = 0.5F) { this->scale_to(ratio, ratio, anchor); }
-        void scale_to(float x_ratio, float y_ratio, const WarGrey::STEM::Anchor& anchor = 0.5F);
-        void resize(float size, const WarGrey::STEM::Anchor& anchor = 0.5F) { this->resize(size, size, anchor); }
-        void resize(float width, float height, const WarGrey::STEM::Anchor& anchor = 0.5F);
-        void resize_by_width(float size, const WarGrey::STEM::Anchor& anchor = 0.5F);
-        void resize_by_height(float size, const WarGrey::STEM::Anchor& anchor = 0.5F);
+        void scale(float ratio, const GYDM::Anchor& anchor = 0.5F) { this->scale(ratio, ratio, anchor); }
+        void scale(float x_ratio, float y_ratio, const GYDM::Anchor& anchor = 0.5F);
+        void scale_to(float ratio, const GYDM::Anchor& anchor = 0.5F) { this->scale_to(ratio, ratio, anchor); }
+        void scale_to(float x_ratio, float y_ratio, const GYDM::Anchor& anchor = 0.5F);
+        void resize(float size, const GYDM::Anchor& anchor = 0.5F) { this->resize(size, size, anchor); }
+        void resize(float width, float height, const GYDM::Anchor& anchor = 0.5F);
+        void resize_by_width(float size, const GYDM::Anchor& anchor = 0.5F);
+        void resize_by_height(float size, const GYDM::Anchor& anchor = 0.5F);
 
     public:
         bool events_allowed() { return this->deal_with_events; }
@@ -87,7 +87,7 @@ namespace WarGrey::STEM {
     
     public:
         bool has_caret();
-        void moor(const WarGrey::STEM::Anchor& anchor);
+        void moor(const GYDM::Anchor& anchor);
         void clear_moor(); /* the notify_updated() will clear the moor,
                               but the notification is not always guaranteed to be done,
                               use this method to do it manually. */
@@ -101,8 +101,8 @@ namespace WarGrey::STEM {
     public:
         void notify_updated();
         void notify_timeline_restart(uint32_t count0 = 0, int duration = 0);
-        void feed_location(float* x, float* y, const WarGrey::STEM::Anchor& a = 0.0F);
-        void log_message(WarGrey::STEM::Log level, const std::string& msg);
+        void feed_location(float* x, float* y, const GYDM::Anchor& a = 0.0F);
+        void log_message(GYDM::Log level, const std::string& msg);
         
     public:
         IMatterInfo* info = nullptr;    
@@ -113,7 +113,7 @@ namespace WarGrey::STEM {
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
 
     private:
-        void scale_by_size(float size, bool given_width, const WarGrey::STEM::Anchor& anchor);
+        void scale_by_size(float size, bool given_width, const GYDM::Anchor& anchor);
 
     private:
         bool findable = true;
@@ -124,11 +124,11 @@ namespace WarGrey::STEM {
         // bool wheel_translation = true;
     
     private:
-        WarGrey::STEM::Anchor anchor;
+        GYDM::Anchor anchor;
         float anchor_x = 0.0F;
         float anchor_y = 0.0F;
 
     private:
-        WarGrey::STEM::IMatterMetadata* _metatdata = nullptr;
+        GYDM::IMatterMetadata* _metatdata = nullptr;
     };
 }

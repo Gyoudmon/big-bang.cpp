@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdlib>
 
-namespace WarGrey::STEM {
+namespace GYDM {
 #define fxin(open, v, close) ((open <= v) && (v <= close))
 #define fxout(open, v, close) ((v < open) || (v > close))
 

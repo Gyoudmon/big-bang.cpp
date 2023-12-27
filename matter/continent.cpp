@@ -6,7 +6,7 @@
 
 #include "../virtualization/screen/pasteboard.hpp"
 
-using namespace WarGrey::STEM;
+using namespace GYDM;
 
 /*************************************************************************************************/
 namespace {
@@ -16,7 +16,7 @@ namespace {
 		PlaceholderPlane() : Plane("_") {}
 	};
 
-	class PlaneInfo : public WarGrey::STEM::IPlaneInfo {
+	class PlaneInfo : public GYDM::IPlaneInfo {
 	public:
 		PlaneInfo(IScreen* master) : IPlaneInfo(master) {};
 	};
@@ -42,10 +42,10 @@ static void construct_subplane(IPlane* plane, float width, float height) {
 }
 
 /**************************************************************************************************/
-WarGrey::STEM::Continent::Continent(IPlane* plane, const WarGrey::STEM::RGBA& background)
+GYDM::Continent::Continent(IPlane* plane, const GYDM::RGBA& background)
 	: Continent(plane, 0.0F, 0.0F, background) {}
 
-WarGrey::STEM::Continent::Continent(IPlane* plane, float width, float height, const WarGrey::STEM::RGBA& background)
+GYDM::Continent::Continent(IPlane* plane, float width, float height, const GYDM::RGBA& background)
 		: plane(plane), background(background), border(transparent), width(width), height(height) {
 	if (this->plane == nullptr) {
 		this->plane = new PlaceholderPlane();
@@ -58,22 +58,22 @@ WarGrey::STEM::Continent::Continent(IPlane* plane, float width, float height, co
 	// this->enable_events(true, true);
 }
 
-WarGrey::STEM::Continent::~Continent() noexcept {
+GYDM::Continent::~Continent() noexcept {
 	delete this->plane;
 	delete this->screen;
 }
 
-const char* WarGrey::STEM::Continent::name() {
+const char* GYDM::Continent::name() {
 	return this->plane->name();
 }
 
 /*************************************************************************************************/
-void WarGrey::STEM::Continent::construct(SDL_Renderer* renderer) {
+void GYDM::Continent::construct(SDL_Renderer* renderer) {
 	bind_subplane_owership(this->screen, this->plane);
 	construct_subplane(this->plane, this->width, this->height);
 }
 
-void WarGrey::STEM::Continent::feed_extent(float x, float y, float* width, float* height) {
+void GYDM::Continent::feed_extent(float x, float y, float* width, float* height) {
 	if ((this->width > 0.0F) && (this->height > 0.0F)) {
 		SET_VALUES(width, this->width, height, this->height);
 	} else {
@@ -90,7 +90,7 @@ void WarGrey::STEM::Continent::feed_extent(float x, float y, float* width, float
 	}
 }
 
-int WarGrey::STEM::Continent::update(uint64_t count, uint32_t interval, uint64_t uptime) {
+int GYDM::Continent::update(uint64_t count, uint32_t interval, uint64_t uptime) {
 	this->plane->begin_update_sequence();
 	this->plane->on_elapse(count, interval, uptime);
 	this->plane->end_update_sequence();
@@ -98,7 +98,7 @@ int WarGrey::STEM::Continent::update(uint64_t count, uint32_t interval, uint64_t
 	return 0;
 }
 
-void WarGrey::STEM::Continent::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::Continent::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
 	if (this->background.is_opacity()) {
         Brush::fill_rect(renderer, x, y, Width, Height, this->background);
     }
@@ -111,14 +111,14 @@ void WarGrey::STEM::Continent::draw(SDL_Renderer* renderer, float x, float y, fl
 }
 
 /**************************************************************************************************/
-void WarGrey::STEM::Continent::set_background_color(const RGBA& color) {
+void GYDM::Continent::set_background_color(const RGBA& color) {
 	if (this->background != color) {
 		this->background = color;
 		this->notify_updated();
 	}
 }
 
-void WarGrey::STEM::Continent::set_border_color(const RGBA& color) {
+void GYDM::Continent::set_border_color(const RGBA& color) {
 	if (this->border != color) {
 		this->border = color;
 		this->notify_updated();
@@ -126,14 +126,14 @@ void WarGrey::STEM::Continent::set_border_color(const RGBA& color) {
 }
 
 /**************************************************************************************************/
-bool WarGrey::STEM::Continent::on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) {
+bool GYDM::Continent::on_pointer_pressed(uint8_t button, float local_x, float local_y, uint8_t clicks) {
 	return this->plane->on_pointer_pressed(button, local_x, local_y, clicks);
 }
 
-bool WarGrey::STEM::Continent::on_pointer_move(uint32_t state, float local_x, float local_y, float dx, float dy, bool bye) {
+bool GYDM::Continent::on_pointer_move(uint32_t state, float local_x, float local_y, float dx, float dy, bool bye) {
 	return this->plane->on_pointer_move(state, local_x, local_y, dx, dy);
 }
 
-bool WarGrey::STEM::Continent::on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) {
+bool GYDM::Continent::on_pointer_released(uint8_t button, float local_x, float local_y, uint8_t clicks) {
 	return this->plane->on_pointer_released(button, local_x, local_y, clicks);
 }

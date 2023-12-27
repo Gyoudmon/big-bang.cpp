@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace WarGrey::STEM {
+namespace GYDM {
     enum class CreatureGender { Male, Female, _ };
 
     class __lambda__ ICreature {

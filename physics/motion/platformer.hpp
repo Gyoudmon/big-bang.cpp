@@ -2,7 +2,7 @@
 
 #include "../../forward.hpp"
 
-namespace WarGrey::STEM {
+namespace GYDM {
     class __lambda__ IPlatformMotion {
     public:
         IPlatformMotion(bool facing_right = true, bool walk_only = false)
