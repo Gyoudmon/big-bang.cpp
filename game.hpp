@@ -56,6 +56,7 @@
 #include "physics/color/rgba.hpp"
 #include "physics/color/CIE.hpp"
 #include "physics/color/names.hpp"
+#include "physics/geometry/point.hpp"
 #include "physics/geometry/anchor.hpp"
 #include "physics/geometry/vertices.hpp"
 #include "physics/motion/platformer.hpp"
@@ -67,6 +68,7 @@
 #include "datum/vector.hpp"
 
 #include "virtualization/filesystem/imgdb.hpp"
+#include "virtualization/position.hpp"
 
 /*************************************************************************************************/
 #define isinstance(object, Type) (dynamic_cast<Type*>(object) != nullptr)

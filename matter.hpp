@@ -28,8 +28,8 @@ namespace WarGrey::STEM {
         virtual ~IMatter();
 
     public:
-        WarGrey::STEM::IPlane* master();
-        SDL_Renderer* master_renderer();
+        WarGrey::STEM::IPlane* master() const;
+        SDL_Renderer* master_renderer() const;
 
     public:
         void attach_metadata(IMatterMetadata* metadata);

@@ -3,9 +3,12 @@
 #include "graphics/font.hpp"
 #include "physics/color/rgba.hpp"
 #include "physics/color/names.hpp"
+#include "physics/geometry/point.hpp"
+#include "physics/geometry/vector.hpp"
 #include "physics/geometry/anchor.hpp"
 
 #include "virtualization/screen.hpp"
+#include "virtualization/position.hpp"
 
 namespace WarGrey::STEM {
     class __lambda__ IPlaneInfo {
@@ -51,25 +54,21 @@ namespace WarGrey::STEM {
     
     public:
         virtual WarGrey::STEM::IMatter* find_matter(float x, float y, WarGrey::STEM::IMatter* after) = 0;
-        virtual bool feed_matter_location(IMatter* m, float* x, float* y, const WarGrey::STEM::Anchor& a) = 0;
-        virtual bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) = 0;
+        virtual bool feed_matter_location(WarGrey::STEM::IMatter* m, float* x, float* y, const WarGrey::STEM::Anchor& a) = 0;
+        virtual bool feed_matter_boundary(WarGrey::STEM::IMatter* m, float* x, float* y, float* width, float* height) = 0;
         virtual void feed_matters_boundary(float* x, float* y, float* width, float* height) = 0;
-        virtual void insert_at(IMatter* m, float x, float y, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
+        virtual void insert_at(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
         virtual void insert_as_speech_bubble(IMatter* m) = 0;
         virtual void bring_to_front(IMatter* m, IMatter* target) = 0;
         virtual void bring_forward(IMatter* m, int n) = 0;
         virtual void send_to_back(IMatter* m, IMatter* target) = 0;
         virtual void send_backward(IMatter* m, int n) = 0;
         virtual void move(IMatter* m, double length, bool ignore_gliding) = 0;
-        virtual void move(IMatter* m, float x, float y, bool ignore_gliding) = 0;
-        virtual void move_to(IMatter* m, float x, float y, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
-        virtual void move_to(IMatter* m, IMatter* tm, const WarGrey::STEM::Anchor& ta, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
-        virtual void move_to(IMatter* m, IMatter* xtm, const WarGrey::STEM::Anchor& xa, IMatter* ytm, const WarGrey::STEM::Anchor& ya, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
+        virtual void move(IMatter* m, const WarGrey::STEM::Vector& vec, bool ignore_gliding) = 0;
+        virtual void move_to(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
         virtual void glide(double sec, IMatter* m, double length) = 0;
-        virtual void glide(double sec, IMatter* m, float x, float y) = 0;
-        virtual void glide_to(double sec, IMatter* m, float x, float y, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
-        virtual void glide_to(double sec, IMatter* m, IMatter* tm, const WarGrey::STEM::Anchor& ta, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
-        virtual void glide_to(double sec, IMatter* m, IMatter* xtm, const WarGrey::STEM::Anchor& xa, IMatter* ytm, const WarGrey::STEM::Anchor& ya, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
+        virtual void glide(double sec, IMatter* m, const WarGrey::STEM::Vector& vec) = 0;
+        virtual void glide_to(double sec, IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) = 0;
         virtual void remove(IMatter* m, bool needs_delete) = 0;
         virtual void erase() = 0;
 
@@ -130,8 +129,8 @@ namespace WarGrey::STEM {
         int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
         int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, const WarGrey::STEM::Anchor& a = 0.5F);
         void feed_grid_cell_extent(float* width, float* height);
-        void feed_grid_cell_location(int idx, float* x, float* y, const WarGrey::STEM::Anchor& a = 0.5F);
-        void feed_grid_cell_location(int row, int col, float* x, float* y, const WarGrey::STEM::Anchor& a = 0.5F);
+        WarGrey::STEM::Dot get_grid_cell_location(int idx, const WarGrey::STEM::Anchor& a = 0.5F);
+        WarGrey::STEM::Dot get_grid_cell_location(int row, int col, const WarGrey::STEM::Anchor& a = 0.5F);
         void insert_at_grid(IMatter* m, int idx, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
         void insert_at_grid(IMatter* m, int row, int col, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
         void move_to_grid(IMatter* m, int idx, const WarGrey::STEM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
@@ -208,8 +207,8 @@ namespace WarGrey::STEM {
         }
         
         template<class M>
-        M* insert(M* m, float x = 0.0F, float y = 0.0F, const WarGrey::STEM::Anchor& a = 0.0F, float dx = 0.0F, float dy = 0.0F) {
-            this->insert_at(m, x, y, a, dx, dy);
+        M* insert(M* m, const WarGrey::STEM::Position& pos = origin_position, const WarGrey::STEM::Anchor& a = 0.0F, float dx = 0.0F, float dy = 0.0F) {
+            this->insert_at(m, pos, a, dx, dy);
 
             return m;
         }
@@ -269,32 +268,28 @@ namespace WarGrey::STEM {
 
     public:
         WarGrey::STEM::IMatter* find_matter(float x, float y, WarGrey::STEM::IMatter* after = nullptr) override;
-        bool feed_matter_location(IMatter* m, float* x, float* y, const WarGrey::STEM::Anchor& a = 0.0F) override;
-        bool feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) override;
+        bool feed_matter_location(WarGrey::STEM::IMatter* m, float* x, float* y, const WarGrey::STEM::Anchor& a = 0.0F) override;
+        bool feed_matter_boundary(WarGrey::STEM::IMatter* m, float* x, float* y, float* width, float* height) override;
         void feed_matters_boundary(float* x, float* y, float* width, float* height) override;
-        void insert_at(IMatter* m, float x, float y, const WarGrey::STEM::Anchor& a, float dx, float dy) override;
+        void insert_at(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a, float dx, float dy) override;
         void insert_as_speech_bubble(IMatter* m) override;
         void bring_to_front(IMatter* m, IMatter* target = nullptr) override;
         void bring_forward(IMatter* m, int n = 1) override;
         void send_to_back(IMatter* m, IMatter* target = nullptr) override;
         void send_backward(IMatter* m, int n = 1) override;
         void move(IMatter* m, double length, bool ignore_gliding = false) override;
-        void move(IMatter* m, float x, float y, bool ignore_gliding = false) override;
-        void move_to(IMatter* m, float x, float y, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
-        void move_to(IMatter* m, IMatter* tm, const WarGrey::STEM::Anchor& ta, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
-        void move_to(IMatter* m, IMatter* xtm, const WarGrey::STEM::Anchor& xa, IMatter* ytm, const WarGrey::STEM::Anchor& ya, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
+        void move(IMatter* m, const WarGrey::STEM::Vector& vec, bool ignore_gliding = false) override;
+        void move_to(IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
         void glide(double sec, IMatter* m, double length) override;
-        void glide(double sec, IMatter* m, float x, float y) override;
-        void glide_to(double sec, IMatter* m, float x, float y, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
-        void glide_to(double sec, IMatter* m, IMatter* tm, const WarGrey::STEM::Anchor& ta, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
-        void glide_to(double sec, IMatter* m, IMatter* xtm, const WarGrey::STEM::Anchor& xa, IMatter* ytm, const WarGrey::STEM::Anchor& ya, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
+        void glide(double sec, IMatter* m, const WarGrey::STEM::Vector& vec) override;
+        void glide_to(double sec, IMatter* m, const WarGrey::STEM::Position& pos, const WarGrey::STEM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
         void remove(IMatter* m, bool needs_delete = true) override;
         void erase() override;
         void size_cache_invalid();
         void clear_motion_actions(IMatter* m);
 
     public:
-        void bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, const WarGrey::STEM::Anchor& anchor, bool shared = false);
+        void bind_canvas(IMatter* m, WarGrey::STEM::Tracklet* canvas, const WarGrey::STEM::Anchor& anchor = 0.5F, bool shared = false);
         void reset_pen(IMatter* m);
         void stamp(IMatter* m);
         void pen_down(IMatter* m) { this->set_drawing(m, true); }
@@ -367,19 +362,19 @@ namespace WarGrey::STEM {
     private:
         void handle_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading);
-        bool move_matter_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_gliding, bool heading);
-        bool move_matter_to_location_via_info(IMatter* m, MatterInfo* info, float x, float y, const WarGrey::STEM::Anchor& a, float dx, float dy);
+        bool move_matter_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_gliding, bool heading);
+        bool move_matter_to_location_via_info(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length);
-        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, bool absolute, bool heading);
-        bool glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, float x, float y, const WarGrey::STEM::Anchor& a, float dx, float dy, bool heading);
-        bool do_moving_via_info(IMatter* m, MatterInfo* info, float x, float y, bool absolute, bool ignore_track, bool heading);
-        bool do_gliding_via_info(IMatter* m, MatterInfo* info, float x, float y, double sec, double sec_delta, bool absolute, bool ignore_track);
+        bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, bool absolute, bool heading);
+        bool glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, const Anchor& a, float dx, float dy, bool heading);
+        bool do_moving_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_track, bool heading);
+        bool do_gliding_via_info(IMatter* m, MatterInfo* info, const Position& pos, double sec, double sec_delta, bool absolute, bool ignore_track);
         bool do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading);
         bool do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec);
         
     private:
         void handle_new_matter(IMatter* m, SpeechInfo* info);
-        void handle_new_matter(IMatter* m, MatterInfo* info, float x, float y, const WarGrey::STEM::Anchor& a, float dx, float dy);
+        void handle_new_matter(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy);
         void draw_matter(SDL_Renderer* renderer, IMatter* self, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
         void draw_speech(SDL_Renderer* renderer, IMatter* self, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
         void recalculate_matters_extent_when_invalid();

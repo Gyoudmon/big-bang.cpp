@@ -279,7 +279,7 @@ void WarGrey::STEM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, con
         float x, y;
 
         this->feed_logic_tile_location(row, col, &x, &y, ta, false);
-        master->move_to(m, x, y, a, dx, dy);
+        master->move_to(m, Position(x, y), a, dx, dy);
     }
 }
 
@@ -299,7 +299,7 @@ void WarGrey::STEM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row,
         float x, y;
 
         this->feed_logic_tile_location(row, col, &x, &y, ta, false);
-        master->glide_to(sec, m, x, y, a, dx, dy);
+        master->glide_to(sec, m, Position(x, y), a, dx, dy);
     }
 }
 
@@ -529,7 +529,7 @@ void WarGrey::STEM::GridAtlas::move_to_map_tile(IMatter* m, int idx, const Ancho
         float x, y;
             
         this->feed_map_tile_location(idx, &x, &y, ta, false);
-        master->move_to(m, x, y, a, dx, dy);
+        master->move_to(m, Position(x, y), a, dx, dy);
     }
 }
 
@@ -546,7 +546,7 @@ void WarGrey::STEM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx
         float x, y;
             
         this->feed_map_tile_location(idx, &x, &y, ta, false);
-        master->glide_to(sec, m, x, y, a, dx, dy);
+        master->glide_to(sec, m, Position(x, y), a, dx, dy);
     }
 }
 

@@ -3,6 +3,7 @@
 
 #include "datum/box.hpp"
 #include "graphics/image.hpp"
+#include "physics/geometry/vector.hpp"
 
 #include <typeinfo>
 
@@ -21,7 +22,7 @@ WarGrey::STEM::IMatter::~IMatter() {
     }
 }
 
-IPlane* WarGrey::STEM::IMatter::master() {
+IPlane* WarGrey::STEM::IMatter::master() const {
     IPlane* plane = nullptr;
 
     if (this->info != nullptr) {
@@ -31,7 +32,7 @@ IPlane* WarGrey::STEM::IMatter::master() {
     return plane;
 }
 
-SDL_Renderer* WarGrey::STEM::IMatter::master_renderer() {
+SDL_Renderer* WarGrey::STEM::IMatter::master_renderer() const {
     IPlane* master = this->master();
     SDL_Renderer* renderer = nullptr;
 
@@ -182,7 +183,7 @@ void WarGrey::STEM::IMatter::notify_updated() {
              **/
 
             if ((cx != this->anchor_x) || (cy != this->anchor_y)) {
-                this->info->master->move(this, this->anchor_x - cx, this->anchor_y - cy, true);
+                this->info->master->move(this, Vector(this->anchor_x - cx, this->anchor_y - cy), true);
             }
 
             this->clear_moor();

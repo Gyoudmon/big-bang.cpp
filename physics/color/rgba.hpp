@@ -30,8 +30,11 @@ namespace WarGrey::STEM {
         RGBA(const RGBA& c, int alpha);
         RGBA(const RGBA& c, double alpha);
 
+        ~RGBA() noexcept {}
+
     public:
-        WarGrey::STEM::RGBA& operator=(uint32_t hex); // copy assignment
+        WarGrey::STEM::RGBA& operator=(const RGBA& c); // copy assignment
+        WarGrey::STEM::RGBA& operator=(uint32_t hex);  // copy assignment
         double operator[](size_t i) const;
         
 		friend inline WarGrey::STEM::RGBA operator+(RGBA lhs, const RGBA& rhs) { return lhs += rhs; }

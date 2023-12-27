@@ -43,6 +43,10 @@ namespace WarGrey::STEM {
     bool inline flisfinite(double fl) { return std::isfinite(fl); }
     bool inline flisfinite(long double fl) { return std::isfinite(fl); }
 
+    bool inline flisinfinity(float f) { return std::isinf(f); }
+    bool inline flisinfinity(double fl) { return std::isinf(fl); }
+    bool inline flisinfinity(long double fl) { return std::isinf(fl); }
+
     float inline flsafe(float v, float fallback = 0.0F) { return (flisnan(v) ? fallback : v); }
     double inline flsafe(double v, double fallback = 0.0) { return (flisnan(v) ? fallback : v); }
     long double inline flsafe(long double v, long double fallback = 0.0L) { return (flisnan(v) ? fallback : v); }
@@ -50,6 +54,8 @@ namespace WarGrey::STEM {
     // for non-flonums
     template<typename T> T inline flsafe(T v, T fallback) { return v; }
     template<typename T> bool inline flisnan(T fl) { return false; }
+    template<typename T> bool inline flisinfinity(T fl) { return false; }
+    template<typename T> bool inline flisfinite(T fl) { return true; }
 
     template<typename T> T inline flsafe(T v, T min, T max) {
         if (v < min) {

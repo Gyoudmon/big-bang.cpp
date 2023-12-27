@@ -257,6 +257,15 @@ void WarGrey::STEM::RGBA::unbox(double* r, double* g, double* b, double* a) cons
 }
 
 /*************************************************************************************************/
+RGBA& WarGrey::STEM::RGBA::operator=(const RGBA& c) {
+    this->a = c.a;
+    this->r = c.r;
+    this->g = c.g;
+    this->b = c.b;
+
+    return (*this);
+}
+
 RGBA& WarGrey::STEM::RGBA::operator=(uint32_t hex) {
     this->a = 1.0;
     hexadecimal_to_rgb(hex, &this->r, &this->g, &this->b);
