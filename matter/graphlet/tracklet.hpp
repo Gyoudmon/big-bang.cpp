@@ -3,6 +3,7 @@
 #include "../../forward.hpp"
 
 #include "../canvaslet.hpp"
+#include "../../physics/geometry/aabox.hpp"
 
 namespace GYDM {
     class __lambda__ Tracklet : public GYDM::ICanvaslet {
@@ -11,7 +12,7 @@ namespace GYDM {
         Tracklet(float width, float height, uint32_t hex = 0x0U, double alpha = 1.0);
 
     public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+        GYDM::Box get_bounding_box() override;
         
     public:
         void pen_down() { this->in_drawing = true; }

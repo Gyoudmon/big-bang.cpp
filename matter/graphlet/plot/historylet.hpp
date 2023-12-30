@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../canvaslet.hpp"
+#include "../../../physics/geometry/aabox.hpp"
 
 #include <vector>
 
@@ -11,7 +12,7 @@ namespace GYDM {
         Historylet(float width, float height, const GYDM::RGBA& line_color);
 
     public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+        GYDM::Box get_bounding_box() override;
 
     public:
         void push_back_datum(float x, float y);

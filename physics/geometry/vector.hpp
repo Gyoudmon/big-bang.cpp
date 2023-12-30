@@ -11,10 +11,14 @@ namespace GYDM {
 
         template <typename U>
         explicit EuclideanVector(const EuclideanVector<U>& v)
-            : Tuple<GYDM::EuclideanVector, U>(T(v.x), T(v.y)) {}
+            : GYDM::Tuple<GYDM::EuclideanVector, U>(T(v.x), T(v.y)) {}
+
+        template<typename U>
+        explicit EuclideanVector(const GYDM::EuclideanVector<U>& v, T sx, T sy)
+            : GYDM::Tuple<GYDM::EuclideanVector, T>(T(v.x * sx), T(v.y * sy)) {}
 
         ~EuclideanVector() noexcept {}
     };
 
-    typedef EuclideanVector<float> Vector;
+    typedef GYDM::EuclideanVector<float> Vector;
 }

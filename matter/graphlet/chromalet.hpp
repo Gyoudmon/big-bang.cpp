@@ -2,6 +2,8 @@
 
 #include "../canvaslet.hpp"
 #include "../../physics/color/CIE.hpp"
+#include "../../physics/geometry/point.hpp"
+#include "../../physics/geometry/aabox.hpp"
 
 namespace GYDM {
     class __lambda__ Chromalet : public GYDM::ICanvaslet {
@@ -9,8 +11,8 @@ namespace GYDM {
         Chromalet(float width, float height = 0.0F, GYDM::CIE_Standard std = CIE_Standard::Primary, double Y = 1.0);
         
     public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        bool is_colliding_with_mouse(float x, float y) override;
+        GYDM::Box get_bounding_box() override;
+        bool is_colliding(const GYDM::Dot& local_pt) override;
 
     public:
         void set_standard(GYDM::CIE_Standard std = CIE_Standard::Primary);

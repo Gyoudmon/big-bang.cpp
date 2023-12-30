@@ -22,7 +22,7 @@ float GYDM::TheBigBang::get_titlebar_height() {
     float height = 0.0F;
 
     if (this->agent != nullptr) {
-        this->agent->feed_extent(0.0F, 0.0F, nullptr, &height);
+        height = this->agent->get_bounding_box().height();
     }
 
     return height;

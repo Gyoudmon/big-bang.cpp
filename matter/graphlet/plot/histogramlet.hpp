@@ -2,6 +2,7 @@
 
 #include "../../graphlet.hpp"
 #include "../../../graphics/texture.hpp"
+#include "../../../physics/geometry/aabox.hpp"
 
 #include <vector>
 
@@ -13,7 +14,7 @@ namespace GYDM {
         virtual ~Histogramlet() { this->invalidate_geometry(); }
 
     public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+        GYDM::Box get_bounding_box() override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 
     public:

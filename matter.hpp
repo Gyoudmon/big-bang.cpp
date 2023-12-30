@@ -9,6 +9,9 @@
 #include "physics/motion.hpp"
 #include "physics/color/names.hpp"
 #include "physics/geometry/anchor.hpp"
+#include "physics/geometry/point.hpp"
+#include "physics/geometry/aabox.hpp"
+#include "physics/geometry/margin.hpp"
 
 namespace GYDM {
     class __lambda__ IMatterInfo {
@@ -40,10 +43,10 @@ namespace GYDM {
 
     public:
         virtual void construct(SDL_Renderer* renderer) {}
-        virtual void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr);
-        virtual void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) { this->feed_extent(x, y, width, height); }
-        virtual void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr) { this->feed_original_margin(x, y, top, right, bottom, left); }
-        virtual void feed_original_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
+        virtual GYDM::Box get_bounding_box() { return GYDM::Box(); }
+        virtual GYDM::Box get_original_bounding_box() { return this->get_bounding_box(); }
+        virtual GYDM::Margin get_margin() { return this->get_original_margin(); }
+        virtual GYDM::Margin get_original_margin() { return GYDM::Margin(); }
         virtual int update(uint64_t count, uint32_t interval, uint64_t uptime) { return 0; }
         virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
         virtual void draw_in_progress(SDL_Renderer* renderer, float x, float y, float Width, float Height) {}
@@ -55,7 +58,9 @@ namespace GYDM {
         virtual const char* name();
         
     public:
-        virtual bool is_colliding_with_mouse(float local_x, float local_y);
+        virtual bool is_colliding(const GYDM::Dot& local_pt);
+
+    public:
         virtual void on_location_changed(float x, float y, float old_x, float old_y) {}
         virtual bool on_char(char key, uint16_t modifiers, uint8_t repeats, bool pressed) { return false; }
         virtual bool on_text(const char* text, size_t size, bool entire) { return false; }
@@ -101,7 +106,7 @@ namespace GYDM {
     public:
         void notify_updated();
         void notify_timeline_restart(uint32_t count0 = 0, int duration = 0);
-        void feed_location(float* x, float* y, const GYDM::Anchor& a = 0.0F);
+        GYDM::Dot get_location(const GYDM::Anchor& a = 0.0F);
         void log_message(GYDM::Log level, const std::string& msg);
         
     public:
@@ -125,8 +130,7 @@ namespace GYDM {
     
     private:
         GYDM::Anchor anchor;
-        float anchor_x = 0.0F;
-        float anchor_y = 0.0F;
+        GYDM::Dot anchor_dot;
 
     private:
         GYDM::IMatterMetadata* _metatdata = nullptr;

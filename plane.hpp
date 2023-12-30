@@ -6,6 +6,7 @@
 #include "physics/geometry/point.hpp"
 #include "physics/geometry/vector.hpp"
 #include "physics/geometry/anchor.hpp"
+#include "physics/geometry/aabox.hpp"
 
 #include "virtualization/screen.hpp"
 #include "virtualization/position.hpp"
@@ -54,9 +55,9 @@ namespace GYDM {
     
     public:
         virtual GYDM::IMatter* find_matter(float x, float y, GYDM::IMatter* after) = 0;
-        virtual bool feed_matter_location(GYDM::IMatter* m, float* x, float* y, const GYDM::Anchor& a) = 0;
-        virtual bool feed_matter_boundary(GYDM::IMatter* m, float* x, float* y, float* width, float* height) = 0;
-        virtual void feed_matters_boundary(float* x, float* y, float* width, float* height) = 0;
+        virtual GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a) = 0;
+        virtual GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) = 0;
+        virtual GYDM::Box get_bounding_box() = 0;
         virtual void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) = 0;
         virtual void insert_as_speech_bubble(IMatter* m) = 0;
         virtual void bring_to_front(IMatter* m, IMatter* target) = 0;
@@ -116,9 +117,6 @@ namespace GYDM {
     public:
         bool is_colliding(IMatter* m, IMatter* target);
         bool is_colliding(IMatter* m, IMatter* target, const GYDM::Anchor& a);
-        bool is_colliding_with_mouse(IMatter* m);
-        void glide_to_random_location(double sec, IMatter* m);
-        void glide_to_mouse(double sec, IMatter* m, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
         
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
@@ -265,12 +263,17 @@ namespace GYDM {
         
     public:
         void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) override;
+        
+    public:
+        bool is_colliding_with_mouse(IMatter* m);
+        void glide_to_random_location(double sec, IMatter* m);
+        void glide_to_mouse(double sec, IMatter* m, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
 
     public:
         GYDM::IMatter* find_matter(float x, float y, GYDM::IMatter* after = nullptr) override;
-        bool feed_matter_location(GYDM::IMatter* m, float* x, float* y, const GYDM::Anchor& a = 0.0F) override;
-        bool feed_matter_boundary(GYDM::IMatter* m, float* x, float* y, float* width, float* height) override;
-        void feed_matters_boundary(float* x, float* y, float* width, float* height) override;
+        GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a = 0.0F) override;
+        GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) override;
+        GYDM::Box get_bounding_box() override;
         void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) override;
         void insert_as_speech_bubble(IMatter* m) override;
         void bring_to_front(IMatter* m, IMatter* target = nullptr) override;
@@ -387,10 +390,7 @@ namespace GYDM {
         void delete_matter(IMatter* m);
 
     private:
-        float matters_left;
-        float matters_top;
-        float matters_right;
-        float matters_bottom;
+        GYDM::Box extent;
 
     private:
         GYDM::IMatter* head_matter = nullptr;
@@ -407,8 +407,7 @@ namespace GYDM {
 
     private:
         // TODO: implement other transformation
-        float translate_x = 0.0F;
-        float translate_y = 0.0F;
+        GYDM::Dot translate = {};
     
     private:
         GYDM::ISprite* sentry = nullptr;

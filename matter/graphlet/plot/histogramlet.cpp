@@ -9,8 +9,8 @@
 using namespace GYDM;
 
 /*************************************************************************************************/
-GYDM::Histogramlet::Histogramlet(float width, float height, uint32_t hex, double alpha)
-        : width(flabs(width)), height(flabs(height)), color(hex), alpha(alpha) {
+GYDM::Histogramlet::Histogramlet(float width, float height, uint32_t box_hex, uint32_t mark_hex)
+        : width(flabs(width)), height(flabs(height)), color(box_hex), alpha(1.0) {
     if (this->height == 0.0F) {
         this->height = this->width;
     }
@@ -20,8 +20,8 @@ GYDM::Histogramlet::Histogramlet(float width, float height, uint32_t hex, double
     this->enable_resize(true);
 }
 
-void GYDM::Histogramlet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, this->width, h, this->height);
+Box GYDM::Histogramlet::get_bouding_box() {
+    return { this->width, this->height };
 }
 
 void GYDM::Histogramlet::on_resize(float w, float h, float width, float height) {
@@ -56,8 +56,8 @@ void GYDM::Histogramlet::draw(SDL_Renderer* renderer, float flx, float fly, floa
 
                 SDL_SetRenderTarget(renderer, this->diagram->self());
 
-                Brush::clear(renderer, 0U, 0.0);
-                Brush::draw_lines(renderer, dots.data(), int(n), this->color, this->alpha);
+                Brush::clear(renderer, transparent);
+                Brush::draw_lines(renderer, dots.data(), int(n), RGBA(this->color, this->alpha));
 
                 SDL_SetRenderTarget(renderer, origin);
             }

@@ -21,7 +21,7 @@ void GYDM::IMovable::set_acceleration(double acc, double dir, bool is_radian) {
     double ax = 0.0;
     double ay = 0.0;
 
-    orthogonal_decomposition(acc, dir, &ax, &ay, is_radian);
+    orthogonal_decompose(acc, dir, &ax, &ay, is_radian);
     this->set_delta_speed(ax, ay);
 }
 
@@ -53,7 +53,7 @@ void GYDM::IMovable::add_acceleration(double acc, double dir, bool is_radian) {
     double ax = 0.0;
     double ay = 0.0;
 
-    orthogonal_decomposition(acc, dir, &ax, &ay, is_radian);
+    orthogonal_decompose(acc, dir, &ax, &ay, is_radian);
     this->add_delta_speed(ax, ay);
 }
 
@@ -80,7 +80,7 @@ void GYDM::IMovable::set_velocity(double spd, double dir, bool is_radian) {
     double vx = 0.0;
     double vy = 0.0;
 
-    orthogonal_decomposition(spd, dir, &vx, &vy, is_radian);
+    orthogonal_decompose(spd, dir, &vx, &vy, is_radian);
 
     this->set_speed(vx, vy);
 }
@@ -89,7 +89,7 @@ void GYDM::IMovable::add_velocity(double spd, double dir, bool is_radian) {
     double vx = 0.0;
     double vy = 0.0;
 
-    orthogonal_decomposition(spd, dir, &vx, &vy, is_radian);
+    orthogonal_decompose(spd, dir, &vx, &vy, is_radian);
     this->add_speed(vx, vy);
 }
 
@@ -133,7 +133,7 @@ void GYDM::IMovable::set_terminal_velocity(double v, double dir, bool is_radian)
     double vx = 0.0;
     double vy = 0.0;
 
-    orthogonal_decomposition(v, dir, &vx, &vy, is_radian);
+    orthogonal_decompose(v, dir, &vx, &vy, is_radian);
     this->set_terminal_speed(vx, vy);
 }
 

@@ -44,9 +44,8 @@ void GYDM::Linelet::on_resize(float w, float h, float width, float height) {
     this->epy *= h / height;
 }
 
-void GYDM::Linelet::feed_extent(float x, float y, float* width, float* height) {
-    SET_BOX(width, flmax(flabs(this->epx), 1.0F));
-    SET_BOX(height, flmax(flabs(this->epy), 1.0F));
+Box GYDM::Linelet::get_bounding_box() {
+    return { flmax(flabs(this->epx), 1.0F), flmax(flabs(this->epy), 1.0F) };
 }
 
 void GYDM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -80,8 +79,8 @@ void GYDM::Rectanglet::on_resize(float w, float h, float width, float height) {
     this->height = h;
 }
 
-void GYDM::Rectanglet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, this->width, h, this->height);
+Box GYDM::Rectanglet::get_bounding_box() {
+    return { this->width, this->height };
 }
 
 void GYDM::Rectanglet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -106,8 +105,8 @@ void GYDM::RoundedRectanglet::on_resize(float w, float h, float width, float hei
     this->height = h;
 }
 
-void GYDM::RoundedRectanglet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, this->width, h, this->height);
+Box GYDM::RoundedRectanglet::get_bounding_box() {
+    return { this->width, this->height };
 }
 
 void GYDM::RoundedRectanglet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -144,8 +143,8 @@ void GYDM::Ellipselet::on_resize(float w, float h, float width, float height) {
     this->bradius = h * 0.5F;
 }
 
-void GYDM::Ellipselet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, this->aradius * 2.0F, h, this->bradius * 2.0F);
+Box GYDM::Ellipselet::get_bounding_box() {
+    return { this->aradius * 2.0F, this->bradius * 2.0F };
 }
 
 void GYDM::Ellipselet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -238,9 +237,9 @@ void GYDM::Polygonlet::on_resize(float w, float h, float width, float height) {
     this->initialize_vertices((w / width), (h / height));
 }
 
-void GYDM::Polygonlet::feed_extent(float x, float y, float* w, float* h) {
-    SET_BOX(w, this->rx - this->lx + 1.0F);
-    SET_BOX(h, this->by - this->ty + 1.0F);
+Box GYDM::Polygonlet::get_bounding_box() {
+    return { this->rx - this->lx + 1.0F,
+             this->by - this->ty + 1.0F };
 }
 
 void GYDM::Polygonlet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {

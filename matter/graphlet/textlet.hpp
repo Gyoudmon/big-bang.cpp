@@ -10,6 +10,7 @@
 #include "../../graphics/texture.hpp"
 #include "../../physics/color/rgba.hpp"
 #include "../../physics/color/names.hpp"
+#include "../../physics/geometry/aabox.hpp"
 
 namespace GYDM {
     class __lambda__ ITextlet : public virtual GYDM::IGraphlet {
@@ -40,12 +41,12 @@ namespace GYDM {
         void set_corner_radius(float radius);
 
     public:
-        void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
+        GYDM::Box get_bounding_box() override;
         void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
 
     public:
         size_t content_size() { return this->raw.size(); }
-        const char* c_str() { return this->raw.c_str(); }
+        const char* c_str() const { return this->raw.c_str(); }
 
     protected:
         virtual void on_font_changed() {}

@@ -6,6 +6,20 @@
 using namespace GYDM;
 
 /*************************************************************************************************/
+GYDM::Position::Position(const GYDM::Position& pos) : Position(pos.xtarget, pos.dot, pos.ytarget, pos.dot) {
+    this->offset = pos.offset;
+}
+
+Position& GYDM::Position::operator=(const GYDM::Position& pos) {
+    this->dot = pos.dot;
+    this->xtarget = pos.xtarget;
+    this->ytarget = pos.ytarget;
+    this->offset = pos.offset;
+
+    return *this;
+}
+
+/*************************************************************************************************/
 Point<float> GYDM::Position::calculate_dot() const {
     Point<float> pos;
 
@@ -16,23 +30,42 @@ Point<float> GYDM::Position::calculate_dot() const {
         IPlane* master = this->xtarget->master();
 
         if (master != nullptr) {
-            master->feed_matter_location(const_cast<IMatter*>(this->xtarget), &pos.x, &pos.y, this->dot);
+            pos = master->get_matter_location(const_cast<IMatter*>(this->xtarget), this->dot);
         }
     } else {
         IPlane* xmaster = this->xtarget->master();
         IPlane* ymaster = this->ytarget->master();
+        Dot xdot, ydot;
 
         if (xmaster != nullptr) {
-            xmaster->feed_matter_location(const_cast<IMatter*>(this->xtarget), &pos.x, nullptr, this->dot);
+            xdot = xmaster->get_matter_location(const_cast<IMatter*>(this->xtarget), this->dot);
         }
         
         if (ymaster != nullptr) {
-            ymaster->feed_matter_location(const_cast<IMatter*>(this->ytarget), nullptr, &pos.y, this->dot);
+            ydot = ymaster->get_matter_location(const_cast<IMatter*>(this->ytarget), this->dot);
         }
+
+        pos.x = xdot.x;
+        pos.y = ydot.y;
     }
 
     pos.x += this->offset.x;
     pos.y += this->offset.y;
 
     return pos;
+}
+
+std::string GYDM::Position::desc() const {
+    std::string description;
+
+    if (this->xtarget == nullptr) {
+        description = this->dot.desc();
+    } else if (this->ytarget == nullptr) {
+        description = this->dot.desc() + "@" + const_cast<IMatter*>(this->xtarget)->name();
+    } else {
+        description = "(" + std::to_string(this->dot.fx) + "@" + const_cast<IMatter*>(this->xtarget)->name()
+                    + ", " + std::to_string(this->dot.fy) + "@" + const_cast<IMatter*>(this->ytarget)->name() + ")";
+    }
+
+    return description; 
 }

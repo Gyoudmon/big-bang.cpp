@@ -48,8 +48,8 @@ namespace GYDM {
 		Natural(GYDM::Natural&& n);      // move constructor
 
 		GYDM::Natural& operator=(uint64_t n);
-		GYDM::Natural& operator=(const GYDM::Natural& n); // copy assignment operator
-		GYDM::Natural& operator=(GYDM::Natural&& n);      // move assignment operator
+		GYDM::Natural& operator=(const GYDM::Natural& n);     // copy assignment operator
+		GYDM::Natural& operator=(GYDM::Natural&& n) noexcept; // move assignment operator
 
 	public: // NOTE: C++20 has operator<=>
 		int compare(uint64_t rhs) const;

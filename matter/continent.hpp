@@ -2,6 +2,7 @@
 
 #include "../matter.hpp"
 #include "../physics/color/rgba.hpp"
+#include "../physics/geometry/aabox.hpp"
 #include "../virtualization/screen.hpp"
 #include "../forward.hpp"
 
@@ -17,7 +18,7 @@ namespace GYDM {
 
 	public:
 		void construct(SDL_Renderer* renderer) override;
-		void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+		GYDM::Box get_bounding_box() override;
 		int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
 		void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 

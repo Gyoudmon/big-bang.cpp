@@ -29,14 +29,12 @@ GYDM::PlanetCuteAtlas::~PlanetCuteAtlas() {
     }
 }
 
-void GYDM::PlanetCuteAtlas::feed_original_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
-    SET_BOXES(left, right, 0.0F);
-    SET_VALUES(top, planet_cute_tile_top_margin, bottom, 0.0F);
+Margin GYDM::PlanetCuteAtlas::get_original_margin() {
+    return { planet_cute_tile_top_margin, 0.0F, 0.0F, 0.0F };
 }
 
-void GYDM::PlanetCuteAtlas::feed_original_map_overlay(float* top, float* right, float* bottom, float* left) {
-    SET_BOXES(left, right, 0.5F);
-    SET_VALUES(top, planet_cute_tile_top_margin, bottom, planet_cute_tile_thickness);
+Margin GYDM::PlanetCuteAtlas::get_original_map_overlay() {
+    return { planet_cute_tile_top_margin, 0.5F, planet_cute_tile_thickness, 0.5F };
 }
 
 void GYDM::PlanetCuteAtlas::set_tile_type(int r, int c, GroundBlockType type) {
@@ -79,14 +77,12 @@ GYDM::PlanetCuteTile::PlanetCuteTile(GroundBlockType default_type, int row, int 
         this->map_col = col;
 }
 
-void GYDM::PlanetCuteTile::feed_original_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
-    SET_BOXES(left, right, 0.0F);
-    SET_VALUES(top, planet_cute_tile_top_margin, bottom, 0.0F);
+Margin GYDM::PlanetCuteTile::get_original_margin() {
+    return { planet_cute_tile_top_margin, 0.0F, 0.0F, 0.0F };
 }
 
-void GYDM::PlanetCuteTile::feed_original_map_overlay(float* top, float* right, float* bottom, float* left) {
-    SET_BOXES(left, right, 0.5F);
-    SET_VALUES(top, planet_cute_tile_top_margin, bottom, planet_cute_tile_thickness);
+Margin GYDM::PlanetCuteTile::get_original_map_overlay() {
+    return { planet_cute_tile_top_margin, 0.5F, planet_cute_tile_thickness, 0.5F };
 }
 
 void GYDM::PlanetCuteTile::set_type(GroundBlockType type) {

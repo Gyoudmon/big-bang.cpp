@@ -24,19 +24,20 @@ namespace GYDM {
                     const GYDM::IMatter* ytarget, const GYDM::Anchor& yanchor)
             : dot(xanchor.fx, yanchor.fy), xtarget(xtarget), ytarget(ytarget) {}
 
-        Position(const GYDM::Position& pos) = default;
-        Position(GYDM::Position&& pos) = default;
+        Position(const GYDM::Position& pos);
 
         ~Position() noexcept { /* instances of Position don't own matters */ }
 
     public:
-        GYDM::Position& operator=(const GYDM::Position& c) = default;
-        GYDM::Position& operator=(GYDM::Position&& c) = default;
+        GYDM::Position& operator=(const GYDM::Position& c);
 
     public:
         GYDM::Dot calculate_dot() const;
         GYDM::Vector get_offset() const { return this->offset; }
         void set_offset(const GYDM::Vector& vec) { this->offset = vec; }
+
+    public:
+        std::string desc() const;
 
     private:
         GYDM::Anchor dot; // also serves as an absolute location

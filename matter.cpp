@@ -51,31 +51,15 @@ void GYDM::IMatter::attach_metadata(IMatterMetadata* metadata) {
     this->_metatdata = metadata;
 }
 
-void GYDM::IMatter::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, 0.0F, h, 0.0F);
-}
-
-void GYDM::IMatter::feed_original_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
-    SET_VALUES(top, 0.0F, bottom, 0.0F);
-    SET_VALUES(left, 0.0F, right, 0.0F);
-}
-
-bool GYDM::IMatter::is_colliding_with_mouse(float lx, float ly) {
-    float t, b, l, r, w, h;
+bool GYDM::IMatter::is_colliding(const Dot& local_pt) {
+    Box box = this->get_bounding_box();
+    Margin margin = this->get_margin();
     bool okay = true;
 
-    this->feed_margin(0.0F, 0.0F, &t, &r, &b, &l);
-
-    if ((t > 0.0F) || (l > 0.0F) || (r > 0.0F) || (b > 0.0F)) {
-        if ((lx < l) || (ly < t)) {
-            okay = false;
-        } else {
-            this->feed_extent(0.0F, 0.0F, &w, &h);
-
-            if ((lx > (w - r)) || (ly > (h - b))) {
-                okay = false;
-            }
-        }
+    if ((local_pt.x < margin.left) || (local_pt.y < margin.top)
+        || (local_pt.x > (box.width() - margin.right))
+        || (local_pt.y > (box.height() - margin.bottom))) {
+        okay = false;
     }
 
     return okay;
@@ -84,15 +68,10 @@ bool GYDM::IMatter::is_colliding_with_mouse(float lx, float ly) {
 void GYDM::IMatter::scale(float x_ratio, float y_ratio, const Anchor& anchor) {
     if (this->can_resize) {
         if ((x_ratio != 1.0F) || (y_ratio != 1.0F)) {
-            float width, height;
-            float x = 0.0F;
-            float y = 0.0F;
-
-            this->feed_location(&x, &y, MatterAnchor::LT);
-            this->feed_extent(x, y, &width, &height);
+            Box box = this->get_bounding_box();
 
 	        this->moor(anchor);
-            this->on_resize(width * x_ratio, height * y_ratio, width, height);
+            this->on_resize(box.width() * x_ratio, box.height() * y_ratio, box.width(), box.height());
 	        this->notify_updated();
         }
     }
@@ -100,20 +79,16 @@ void GYDM::IMatter::scale(float x_ratio, float y_ratio, const Anchor& anchor) {
 
 void GYDM::IMatter::scale_to(float x_ratio, float y_ratio, const Anchor& anchor) {
     if (this->can_resize) {
-        float cwidth, cheight, owidth, oheight, nwidth, nheight;
-        float x = 0.0F;
-        float y = 0.0F;
+        float nwidth, nheight;
+        Box cbox = this->get_bounding_box();
+        Box obox = this->get_original_bounding_box();
 
-        this->feed_location(&x, &y, MatterAnchor::LT);
-        this->feed_extent(x, y, &cwidth, &cheight);
-        this->feed_original_extent(x, y, &owidth, &oheight);
+        nwidth = obox.width() * x_ratio;
+        nheight = obox.height() * y_ratio;
 
-        nwidth = owidth * x_ratio;
-        nheight = oheight * y_ratio;
-
-        if ((nwidth != cwidth) || (nheight != cheight)) {
+        if ((nwidth != cbox.width()) || (nheight != cbox.height())) {
 	        this->moor(anchor);
-            this->on_resize(nwidth, nheight, cwidth, cheight);
+            this->on_resize(nwidth, nheight, cbox.width(), cbox.height());
 	        this->notify_updated();
         }
     }
@@ -121,24 +96,20 @@ void GYDM::IMatter::scale_to(float x_ratio, float y_ratio, const Anchor& anchor)
 
 void GYDM::IMatter::scale_by_size(float size, bool given_width, const Anchor& anchor) {
     if (this->can_resize) {
-        float width, height, nwidth, nheight;
-        float x = 0.0F;
-        float y = 0.0F;
-
-        this->feed_location(&x, &y, MatterAnchor::LT);
-        this->feed_extent(x, y, &width, &height);
-
+        float nwidth, nheight;
+        Box box = this->get_bounding_box();
+        
         if (given_width) {
             nwidth = size;
-            nheight = height * (size / width);
+            nheight = box.height() * (size / box.width());
         } else {
             nheight = size;
-            nwidth = width * (size / height);
+            nwidth = box.width() * (size / box.height());
         }
         
-        if ((nwidth != width) || (nheight != height)) {
+        if ((nwidth != box.width()) || (nheight != box.height())) {
             this->moor(anchor);
-            this->on_resize(nwidth, nheight, width, height);
+            this->on_resize(nwidth, nheight, box.width(), box.height());
 	        this->notify_updated();
         }
     }
@@ -146,24 +117,19 @@ void GYDM::IMatter::scale_by_size(float size, bool given_width, const Anchor& an
 
 void GYDM::IMatter::resize(float nwidth, float nheight, const Anchor& anchor) {
     if (this->can_resize) {
-        float width, height;
-        float x = 0.0F;
-        float y = 0.0F;
-
-        this->feed_location(&x, &y, MatterAnchor::LT);
-        this->feed_extent(x, y, &width, &height);
+        Box box = this->get_bounding_box();
 
         if (nwidth == 0.0F) {
-            nwidth = width;
+            nwidth = box.width();
         }
 
         if (nheight == 0.0F) {
-            nheight = height;
+            nheight = box.height();
         }
 
-	    if ((width != nwidth) || (height != nheight)) {
+	    if ((box.width() != nwidth) || (box.height() != nheight)) {
             this->moor(anchor);
-            this->on_resize(nwidth, nheight, width, height);
+            this->on_resize(nwidth, nheight, box.width(), box.height());
 	        this->notify_updated();
 	    }
     }
@@ -172,9 +138,7 @@ void GYDM::IMatter::resize(float nwidth, float nheight, const Anchor& anchor) {
 void GYDM::IMatter::notify_updated() {
     if (this->info != nullptr) {
         if (!this->anchor.is_zero()) {
-            float cx, cy;
-            
-            this->info->master->feed_matter_location(this, &cx, &cy, this->anchor);
+            Dot dot = this->info->master->get_matter_location(this, this->anchor);
 
             /** NOTE
              * Gliding dramatically increasing the complexity of moving as glidings might be queued,
@@ -182,8 +146,8 @@ void GYDM::IMatter::notify_updated() {
              *   and do the moving immediately.
              **/
 
-            if ((cx != this->anchor_x) || (cy != this->anchor_y)) {
-                this->info->master->move(this, Vector(this->anchor_x - cx, this->anchor_y - cy), true);
+            if (dot != this->anchor_dot) {
+                this->info->master->move(this, Vector(this->anchor_dot.x - dot.x, this->anchor_dot.y - dot.y), true);
             }
 
             this->clear_moor();
@@ -203,15 +167,14 @@ void GYDM::IMatter::moor(const Anchor& anchor) {
     if (this->anchor != anchor) {
         if (this->info != nullptr) {
             this->anchor = anchor;
-            this->info->master->feed_matter_location(this, &this->anchor_x, &this->anchor_y, anchor);
+            this->anchor_dot = this->info->master->get_matter_location(this, anchor);
         }
     }
 }
 
 void GYDM::IMatter::clear_moor() {
     this->anchor.reset();
-    this->anchor_x = 0.0F;
-    this->anchor_y = 0.0F;
+    // this->anchor_dot *= 0.0F;
 }
 
 bool GYDM::IMatter::has_caret() {
@@ -231,10 +194,14 @@ void GYDM::IMatter::show(bool yes_no) {
     }
 }
 
-void GYDM::IMatter::feed_location(float* x, float* y, const Anchor& a) {
+Dot GYDM::IMatter::get_location(const Anchor& a) {
+    Dot dot(flnan, flnan);
+
     if (this->info != nullptr) {
-        this->info->master->feed_matter_location(this, x, y, a);
+        dot = this->info->master->get_matter_location(this, a);
     }
+
+    return dot;
 }
 
 void GYDM::IMatter::log_message(Log level, const std::string& msg) {

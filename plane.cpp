@@ -20,8 +20,6 @@
 #include "datum/box.hpp"
 #include "datum/time.hpp"
 
-#include "virtualization/position.hpp"
-
 #include <deque>
 
 using namespace GYDM;
@@ -76,26 +74,26 @@ namespace GYDM {
 
     struct MotionAction {
         MotionAction(const MotionAction& a) : type(a.type) {
-            switch (this->type) {
+            switch (a.type) {
             case MotionActionType::Motion: this->motion = a.motion; break;
             case MotionActionType::Heading: this->direction = a.direction; break;
             case MotionActionType::Rotation: this->theta = a.theta; break;
             case MotionActionType::TrackDrawing: this->drawing = a.drawing; break;
             case MotionActionType::PenWidth: this->pen_width = a.pen_width; break;
             case MotionActionType::PenColor: this->color = a.color; break;
-            default: break;
+            default: this->unused = true;
             }
         }
 
-        MotionAction(MotionActionType type, double datum, bool is_radian) {
-            switch (type) {
-            case MotionActionType::Heading: this->type = type; this->direction = (is_radian ? datum : degrees_to_radians(datum)); break;
-            case MotionActionType::Rotation: this->type = type; this->theta = (is_radian ? datum : degrees_to_radians(datum)); break;
-            default: this->type = type; break;
+        MotionAction(MotionActionType type, double datum, bool is_radian) : type(type) {
+            switch (this->type) {
+            case MotionActionType::Heading: this->direction = (is_radian ? datum : degrees_to_radians(datum)); break;
+            case MotionActionType::Rotation: this->theta = (is_radian ? datum : degrees_to_radians(datum)); break;
+            default: this->unused = true;
             }
         }
 
-        MotionAction(MotionActionType type) : type(type) {}
+        MotionAction(MotionActionType type) : type(type), unused(true) {}
         MotionAction(bool drawing) : type(MotionActionType::TrackDrawing), drawing(drawing) {}
         MotionAction(uint8_t width) : type(MotionActionType::PenWidth), pen_width(width) {}
         MotionAction(const RGBA& c) : type(MotionActionType::PenColor), color(c) {}
@@ -111,6 +109,7 @@ namespace GYDM {
             uint8_t pen_width;
             RGBA color;
             GlidingMotion motion;
+            bool unused;
         };
     };
 
@@ -257,10 +256,9 @@ static void unsafe_canvas_info_do_setting(IPlane* self, IMatter* m, MatterInfo* 
     case MotionActionType::Rotation: m->add_heading(op.theta, true); break;
     case MotionActionType::Heading: m->set_heading(op.direction, true); break;
     case MotionActionType::Stamp: {
-        float x, y;
+        Dot dot = self->get_matter_location(m, MatterAnchor::LT);
 
-        self->feed_matter_location(m, &x, &y, MatterAnchor::LT);
-        info->canvas->stamp(m, x, y);
+        info->canvas->stamp(m, dot.x, dot.y);
      }; break;
     default: /* ignored */;
     }
@@ -280,13 +278,9 @@ static void unsafe_do_canvas_setting(Plane* self, IMatter* m, MatterInfo* info, 
 
 static void unsafe_canvas_do_drawing(IMatter* m, MatterInfo* info, float x1, float y1, float x2, float y2) {
     if (!info->draw_anchor.is_zero()) {
-        float dx, dy, mwidth, mheight;
-        
-        m->feed_extent(x1, y1, &mwidth, &mheight);
-        dx = info->draw_anchor.fx * mwidth;
-        dy = info->draw_anchor.fy * mheight;
+        Dot dot = m->get_bounding_box().dot(info->draw_anchor);
 
-        info->canvas->add_line(x1 + dx, y1 + dy, x2 + dx, y2 + dy);
+        info->canvas->add_line(x1 + dot.x, y1 + dot.y, x2 + dot.x, y2 + dot.y);
     } else {
         info->canvas->add_line(x1, y1, x2, y2);
     }
@@ -304,7 +298,7 @@ static inline void unsafe_location_changed(IMatter* m, MatterInfo* info, float o
     }
 }
 
-static inline MatterInfo* bind_matter_owership(IPlane* master, IMatter* m) {
+static inline MatterInfo* bind_matter_ownership(IPlane* master, IMatter* m) {
     auto info = new MatterInfo(master);
     
     unsafe_set_matter_fps(info, m->preferred_local_fps(), true);
@@ -363,11 +357,8 @@ static inline bool is_matter_bubble_showing(IMatter* m, MatterInfo* info) {
     return yes;
 }
 
-static inline void unsafe_feed_matter_bound(IMatter* m, MatterInfo* info, float* x, float* y, float* width, float* height) {
-    m->feed_extent(info->x, info->y, width, height);
-
-    (*x) = info->x;
-    (*y) = info->y;
+static inline Box unsafe_get_matter_bound(IMatter* m, MatterInfo* info) {
+    return m->get_bounding_box() + Dot(info->x, info->y);
 }
 
 static inline void unsafe_add_selected(GYDM::IPlane* master, IMatter* m, MatterInfo* info, bool selected) {
@@ -516,7 +507,7 @@ void GYDM::Plane::send_backward(IMatter* m, int n) {
 
 void GYDM::Plane::insert_at(IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
     if (m->info == nullptr) {
-        MatterInfo* info = bind_matter_owership(this, m);
+        MatterInfo* info = bind_matter_ownership(this, m);
         
         if (this->head_matter == nullptr) {
             this->head_matter = m;
@@ -850,78 +841,49 @@ IMatter* GYDM::Plane::find_next_selected_matter(IMatter* start) {
     return found;
 }
 
-bool GYDM::Plane::feed_matter_location(IMatter* m, float* x, float* y, const Anchor& a) {
+GYDM::Dot GYDM::Plane::get_matter_location(IMatter* m, const Anchor& a) {
     MatterInfo* info = plane_matter_info(this, m);
-    bool okay = false;
+    Dot dot(flnan, flnan);
     
     if (info != nullptr) {
-        float sx, sy, sw, sh;
-
-        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-        if (x != nullptr) (*x) = sx + sw * a.fx;
-        if (y != nullptr) (*y) = sy + sh * a.fy;
-
-        okay = true;
+        dot = unsafe_get_matter_bound(m, info).dot(a);
     }
 
-    return okay;
+    return dot;
 }
 
-bool GYDM::Plane::feed_matter_boundary(IMatter* m, float* x, float* y, float* width, float* height) {
+GYDM::Box GYDM::Plane::get_matter_bounding_box(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
-    bool okay = false;
+    Box box;
     
     if (info != nullptr) {
-        float sx, sy, sw, sh;
-            
-        unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-        SET_VALUES(x, sx, y, sy);
-        SET_VALUES(width, sw, height, sh);
-
-        okay = true;
+        box = unsafe_get_matter_bound(m, info);
     }
 
-    return okay;
+    return box;
 }
 
-void GYDM::Plane::feed_matters_boundary(float* x, float* y, float* width, float* height) {
+GYDM::Box GYDM::Plane::get_bounding_box() {
     this->recalculate_matters_extent_when_invalid();
 
-    SET_VALUES(x, this->matters_left, y, this->matters_top);
-    SET_BOX(width, this->matters_right - this->matters_left);
-    SET_BOX(height, this->matters_bottom - this->matters_top);
+    return this->extent;
 }
 
 void GYDM::Plane::size_cache_invalid() {
-    this->matters_right = this->matters_left - 1.0F;
+    this->extent.invalidate();
 }
 
 void GYDM::Plane::recalculate_matters_extent_when_invalid() {
-    if (this->matters_right < this->matters_left) {
-        float rx, ry, width, height;
-
+    if (this->extent.is_empty()) {
         if (this->head_matter == nullptr) {
-            this->matters_left = 0.0F;
-            this->matters_top = 0.0F;
-            this->matters_right = 0.0F;
-            this->matters_bottom = 0.0F;
+            this->extent *= 0.0F;
         } else {
             IMatter* child = this->head_matter;
 
-            this->matters_left = infinity_f;
-            this->matters_top = infinity_f;
-            this->matters_right = -infinity_f;
-            this->matters_bottom = -infinity_f;
-
             do {
                 MatterInfo* info = MATTER_INFO(child);
-
-                unsafe_feed_matter_bound(child, info, &rx, &ry, &width, &height);
-                this->matters_left = flmin(this->matters_left, rx);
-                this->matters_top = flmin(this->matters_top, ry);
-                this->matters_right = flmax(this->matters_right, rx + width);
-                this->matters_bottom = flmax(this->matters_bottom, ry + height);
-
+                
+                this->extent += unsafe_get_matter_bound(child, info);
                 child = info->next;
             } while (child != this->head_matter);
         }
@@ -1293,26 +1255,25 @@ void GYDM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
 }
 
 void GYDM::Plane::place_tooltip(GYDM::IMatter* target) {
-    float ttx, tty, width, height;
+    float width, height;
+    Dot tt;
 
-    this->move_to(this->tooltip, { target, MatterAnchor::LB },
-                    MatterAnchor::LT, this->tooltip_dx, this->tooltip_dy);
+    this->move_to(this->tooltip, Position(target, MatterAnchor::LB), MatterAnchor::LT, this->tooltip_dx, this->tooltip_dy);
 
     this->master()->feed_client_extent(&width, &height);
-    this->feed_matter_location(this->tooltip, &ttx, &tty, MatterAnchor::LB);
+    tt = this->get_matter_location(this->tooltip, MatterAnchor::LB);
 
-    if (tty > height) {
-        this->move_to(this->tooltip, { target, MatterAnchor::LT },
-                        MatterAnchor::LB, this->tooltip_dx, this->tooltip_dy);
+    if (tt.y > height) {
+        this->move_to(this->tooltip, Position(target, MatterAnchor::LT), MatterAnchor::LB, this->tooltip_dx, this->tooltip_dy);
     }
 
-    if (ttx < 0.0F) {
-        this->move(this->tooltip, -ttx, 0.0F);
+    if (tt.x < 0.0F) {
+        this->move(this->tooltip, Vector(-tt.x, 0.0F));
     } else {
-        this->feed_matter_location(this->tooltip, &ttx, &tty, MatterAnchor::RB);
+        tt = this->get_matter_location(this->tooltip, MatterAnchor::RB);
 
-        if (ttx > width) {
-            this->move(this->tooltip, width - ttx, 0.0F);
+        if (tt.x > width) {
+            this->move(this->tooltip, Vector(width - tt.x, 0.0F));
         }
     }
 }
@@ -1451,14 +1412,16 @@ void GYDM::Plane::draw_visible_selection(SDL_Renderer* renderer, float x, float 
 }
 
 void GYDM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
-    float mx, my, mwidth, mheight;
+    float mx, my;
     SDL_Rect clip;
     
     if (child->visible()) {
-        child->feed_extent(info->x, info->y, &mwidth, &mheight);
+        Box box = child->get_bounding_box();
+        float mwidth = box.width();
+        float mheight = box.height();
 
-        mx = (info->x + this->translate_x) + X;
-        my = (info->y + this->translate_y) + Y;
+        mx = (info->x + this->translate.x) + X;
+        my = (info->y + this->translate.y) + Y;
                 
         if (rectangle_overlay(mx, my, mx + mwidth, my + mheight, dsX, dsY, dsWidth, dsHeight)) {
             clip.x = fl2fxi(flfloor(mx));
@@ -1484,21 +1447,24 @@ void GYDM::Plane::draw_matter(SDL_Renderer* renderer, IMatter* child, MatterInfo
 
 void GYDM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight) {
     if (is_matter_bubble_showing(child, info)) {
-        float ix, iy, iwidth, iheight, bx, by, bwidth, bheight;
-        float dx, dy, mwidth, mheight;
+        float ix, iy, bx, by, bwidth, bheight, dx, dy;
         Anchor ma, ba;
         SDL_Rect clip;
-    
-        child->feed_extent(info->x, info->y, &mwidth, &mheight);
-        info->bubble->feed_extent(0.0F, 0.0F, &iwidth, &iheight);
 
+        Box cbox = child->get_bounding_box();
+        Box ibox = info->bubble->get_bounding_box();
+        float mwidth = cbox.width();
+        float mheight = cbox.height();
+        float iwidth = ibox.width();
+        float iheight = ibox.height();
+        
         bwidth =  iwidth +  (this->bubble_left_margin + this->bubble_right_margin);
         bheight = iheight + (this->bubble_top_margin + this->bubble_bottom_margin);
         this->place_speech_bubble(child, bwidth, bheight, Width, Height, &ma, &ba, &dx, &dy);
         bx = info->x + mwidth  * ma.fx - bwidth  * ba.fx + dx;
         by = info->y + mheight * ma.fy - bheight * ba.fy + dy;
-        bx = (bx + this->translate_x) + X;
-        by = (by + this->translate_y) + Y;
+        bx = (bx + this->translate.x) + X;
+        by = (by + this->translate.y) + Y;
 
         if (rectangle_overlay(bx, by, bx + bwidth, by + bheight, dsX, dsY, dsWidth, dsHeight)) {
             bx = flmax(bx, this->bubble_left_margin + X);
@@ -1609,7 +1575,7 @@ bool GYDM::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double leng
     } else {
         double x, y;
 
-        orthogonal_decomposition(length, m->get_heading(), &x, &y);
+        orthogonal_decompose(length, m->get_heading(), &x, &y);
     
         return this->move_matter_via_info(m, info, Position(x, y), false, ignore_gliding, heading);
     }
@@ -1667,13 +1633,27 @@ bool GYDM::Plane::glide_matter_via_info(IMatter* m, MatterInfo* info, double sec
 }
 
 bool GYDM::Plane::glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, const Anchor& a, float dx, float dy, bool heading) {
-    float sx, sy, sw, sh;
-    Position position = pos;
-        
-    unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-    position.set_offset(Vector(dx - sw * a.fx, dy - sh * a.fy));
-    
-    return this->glide_matter_via_info(m, info, sec, position, true, heading);
+    float xoff = dx;
+    float yoff = dy;
+    bool moved = false;
+
+    if (!a.is_zero()) {    
+        Box box = unsafe_get_matter_bound(m, info);
+
+        xoff -= box.width() * a.fx;
+        yoff -= box.height() * a.fy;
+    }
+
+    if ((xoff == 0.0F) && (yoff == 0.0F)) {
+        moved = this->glide_matter_via_info(m, info, sec, pos, true, heading);
+    } else {
+        Position position = pos;
+
+        position.set_offset({ xoff, yoff });
+        moved = this->glide_matter_via_info(m, info, sec, position, true, heading);
+    }
+
+    return moved;
 }
 
 bool GYDM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy) {
@@ -1682,11 +1662,14 @@ bool GYDM::Plane::move_matter_to_location_via_info(IMatter* m, MatterInfo* info,
 
 void GYDM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight) {
     if (!m->motion_stopped()) {
-        float cwidth, cheight, hdist, vdist;
+        Box box = m->get_bounding_box();
+        float cwidth = box.width();
+        float cheight = box.height();
         double xspd = m->x_speed();
         double yspd = m->y_speed();
         float ox = info->x;
         float oy = info->y;
+        float hdist, vdist;
         
         m->step(&info->x, &info->y);
         
@@ -1704,8 +1687,6 @@ void GYDM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidt
                 this->on_motion_step(m, info->x, info->y, xspd, yspd, info->current_step / info->progress_total);
             }
         }
-
-        m->feed_extent(info->x, info->y, &cwidth, &cheight);
 
         if (info->x < 0.0F) {
             hdist = info->x;
@@ -1791,7 +1772,7 @@ void GYDM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidt
 bool GYDM::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading) {
     double x, y;
 
-    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    orthogonal_decompose(length, m->get_heading(), &x, &y);
     
     return this->move_matter_via_info(m, info, Position(x, y), false, true, heading);
 }
@@ -1799,21 +1780,16 @@ bool GYDM::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length, 
 bool GYDM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec) {
     double x, y;
 
-    orthogonal_decomposition(length, m->get_heading(), &x, &y);
+    orthogonal_decompose(length, m->get_heading(), &x, &y);
     
     return this->glide_matter_via_info(m, info, sec, Position(x, y), false, true);
 }
 
 bool GYDM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x, float y) {
-    float sx, sy, sw, sh;
+    float lx = x - (info->x + this->translate.x);
+    float ly = y - (info->y + this->translate.y);
     
-    unsafe_feed_matter_bound(m, info, &sx, &sy, &sw, &sh);
-
-    sx += this->translate_x;
-    sy += this->translate_y;
-
-    return flin(sx, x, (sx + sw)) && flin(sy, y, (sy + sh))
-        && m->is_colliding_with_mouse(x - sx, y - sy);
+    return m->is_colliding({ lx, ly });
 }
 
 /*************************************************************************************************/
@@ -1844,9 +1820,7 @@ void GYDM::Plane::stamp(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        MotionAction action(MotionActionType::Stamp);
-
-        unsafe_do_canvas_setting(this, m, info, action);
+        unsafe_do_canvas_setting(this, m, info, MotionAction(MotionActionType::Stamp));
     }
 }
 
@@ -2027,6 +2001,41 @@ void GYDM::Plane::delete_matter(IMatter* m) {
 }
 
 /*************************************************************************************************/
+bool GYDM::Plane::is_colliding_with_mouse(IMatter* m) {
+    Dot mdot = this->get_matter_location(m, MatterAnchor::LT);
+    bool okay = false;
+    
+    if (mdot.okay()) {
+        Dot mouse;
+    
+        feed_current_mouse_location(&mouse.x, &mouse.y);
+        okay = m->is_colliding(mouse - (mdot + this->translate));
+    }
+    
+    return okay;
+}
+
+void GYDM::Plane::glide_to_random_location(double sec, IMatter* m) {
+    IScreen* screen = this->master();
+    float width, height;
+    Dot rpos;
+    
+    if (screen != nullptr) {
+        Box box = m->get_bounding_box();
+        float hinset = box.width() * 0.5F;
+        float vinset = box.height() * 0.5F;
+
+        screen->feed_client_extent(&width, &height);
+
+        // TODO: deal with translation
+        rpos.x = float(random_uniform(int(hinset), int(width - hinset)));
+        rpos.y = float(random_uniform(int(vinset), int(height - vinset)));
+
+        this->glide_to(sec, m, rpos, MatterAnchor::CC, 0.0F, 0.0F);
+    }
+}
+
+/*************************************************************************************************/
 GYDM::IPlane::IPlane(const char* name) : caption(name) {}
 GYDM::IPlane::IPlane(const std::string& name) : IPlane(name.c_str()) {}
 
@@ -2115,54 +2124,17 @@ void GYDM::IPlane::notify_updated(IMatter* m) {
 }
 
 bool GYDM::IPlane::is_colliding(IMatter* m, IMatter* target) {
-    float slx, sty, sw, sh, tlx, tty, tw, th;
-    bool sokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
-    bool tokay = this->feed_matter_boundary(target, &tlx, &tty, &tw, &th);
+    Box sbox = this->get_matter_bounding_box(m);
+    Box tbox = this->get_matter_bounding_box(target);
 
-    return sokay && tokay
-        && rectangle_overlay(slx, sty, slx + sw, sty + sh,
-                             tlx, tty, tlx + tw, tty + th);
+    return sbox.overlay(tbox);
 }
 
 bool GYDM::IPlane::is_colliding(IMatter* m, IMatter* target, const Anchor& a) {
-    float slx, sty, sw, sh, tx, ty;
-    bool sokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
-    bool tokay = this->feed_matter_location(target, &tx, &ty, a);
+    Box sbox = this->get_matter_bounding_box(m);
+    Dot tdot = this->get_matter_location(target, a);
 
-    return sokay && tokay
-        && rectangle_contain(slx, sty, slx + sw, sty + sh, tx, ty);
-}
-
-bool GYDM::IPlane::is_colliding_with_mouse(IMatter* m) {
-    float slx, sty, sw, sh, mx, my;
-    bool mokay = this->feed_matter_boundary(m, &slx, &sty, &sw, &sh);
-
-    if (mokay) {
-        feed_current_mouse_location(&mx, &my);
-        mokay = rectangle_contain(slx, sty, slx + sw, sty + sh, mx, my)
-                && m->is_colliding_with_mouse(mx - slx, my - sty);
-    }
-    
-    return mokay;
-}
-
-void GYDM::IPlane::glide_to_random_location(double sec, IMatter* m) {
-    IScreen* screen = this->master();
-    float hinset, vinset, width, height;
-    Dot rpos;
-    
-    if (screen != nullptr) {
-        m->feed_extent(0.0F, 0.0F, &hinset, &vinset);
-        screen->feed_client_extent(&width, &height);
-
-        hinset *= 0.5F;
-        vinset *= 0.5F;
-
-        rpos.x = float(random_uniform(int(hinset), int(width - hinset)));
-        rpos.y = float(random_uniform(int(vinset), int(height - vinset)));
-
-        this->glide_to(sec, m, rpos, 0.5F, 0.0F, 0.0F);
-    }
+    return sbox.contain(tdot);
 }
 
 /*************************************************************************************************/
@@ -2238,10 +2210,9 @@ void GYDM::IPlane::create_grid(int row, int col, IMatter* m) {
     if (info != nullptr) {
         float x = info->x;
         float y = info->y;
-        float width, height;
+        Box box = m->get_bounding_box();
 
-        m->feed_extent(x, y, &width, &height);
-        this->create_grid(row, col, x, y, width, height);
+        this->create_grid(row, col, x, y, box.width(), box.height());
     }
 }
 
@@ -2310,11 +2281,9 @@ int GYDM::IPlane::grid_cell_index(float x, float y, int* r, int* c) {
 }
 
 int GYDM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, const Anchor& a) {
-    float x, y;
-
-    this->feed_matter_location(m, &x, &y, a);
+    Dot dot = this->get_matter_location(m, a);
     
-    return this->grid_cell_index(x, y, r, c);    
+    return this->grid_cell_index(dot.x, dot.y, r, c);    
 }
 
 void GYDM::IPlane::feed_grid_cell_extent(float* width, float* height) {

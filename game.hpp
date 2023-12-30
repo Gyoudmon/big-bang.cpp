@@ -59,6 +59,8 @@
 #include "physics/geometry/point.hpp"
 #include "physics/geometry/anchor.hpp"
 #include "physics/geometry/vertices.hpp"
+#include "physics/geometry/aabox.hpp"
+#include "physics/geometry/margin.hpp"
 #include "physics/motion/platformer.hpp"
 #include "physics/motion/map2d.hpp"
 

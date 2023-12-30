@@ -20,8 +20,8 @@ GYDM::Historylet::Historylet(float width, float height, const RGBA& line_color)
     this->set_pen_color(line_color);
 }
 
-void GYDM::Historylet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, this->width, h, this->height);
+Box GYDM::Historylet::get_bounding_box() {
+    return { this->width, this->height };
 }
 
 void GYDM::Historylet::on_resize(float w, float h, float width, float height) {

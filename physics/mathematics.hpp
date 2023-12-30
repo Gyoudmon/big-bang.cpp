@@ -47,7 +47,7 @@ namespace GYDM {
     }
 
     template<typename Fl>
-    void orthogonal_decomposition(Fl magnitude, Fl direction, Fl* x, Fl* y, bool is_radian = true) {
+    void orthogonal_decompose(Fl magnitude, Fl direction, Fl* x, Fl* y, bool is_radian = true) {
         Fl rad = is_radian ? direction : degrees_to_radians(direction);
 
         SET_BOX(x, magnitude * flcos(rad));
@@ -104,25 +104,6 @@ namespace GYDM {
     template<typename Fl>
     inline bool rectangle_contain(Fl tlx, Fl tly, Fl brx, Fl bry, Fl x, Fl y) {
         return flin(tlx, x, brx) && flin(tly, y, bry);
-    }
-
-    template<typename Fl>
-    void margin_scale(Fl t, Fl r, Fl b, Fl l, Fl sx, Fl sy, Fl* top = nullptr, Fl* right = nullptr, Fl* bottom = nullptr, Fl* left = nullptr) {
-        if (sx >= 0.0F) {
-            SET_BOX(left, l * sx);
-            SET_BOX(right, r * sx);
-        } else {
-            SET_BOX(left, -r * sx);
-            SET_BOX(right, -l * sx);
-        }
-    
-        if (sy >= 0.0F) {
-            SET_BOX(top, t * sy);
-            SET_BOX(bottom, b * sy);
-        } else {
-            SET_BOX(top, -b * sy);
-            SET_BOX(bottom, -t * sy);
-        }
     }
 
     /*********************************************************************************************/

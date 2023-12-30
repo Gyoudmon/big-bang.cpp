@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../canvaslet.hpp"
+#include "../../physics/geometry/point.hpp"
+#include "../../physics/geometry/aabox.hpp"
 #include "../../physics/geometry/vertices.hpp"
 
 namespace GYDM {
@@ -23,7 +25,7 @@ namespace GYDM {
 	    Linelet(float ex, float ey, const GYDM::RGBA& color);
 
 	public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
+        GYDM::Box get_bounding_box() override;
         
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
@@ -52,8 +54,8 @@ namespace GYDM {
 	    Rectanglet(float width, float height, const GYDM::RGBA& color, const GYDM::RGBA& border_color = transparent);
 	    
     public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-	    
+        GYDM::Box get_bounding_box() override;
+
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
         void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
@@ -76,8 +78,8 @@ namespace GYDM {
 	    RoundedRectanglet(float width, float height, float radius, const GYDM::RGBA& color, const GYDM::RGBA& border_color = transparent);
 	    
 	public:
-	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-	    
+	    GYDM::Box get_bounding_box() override;
+        
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
         void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
@@ -101,8 +103,8 @@ namespace GYDM {
 	    Ellipselet(float aradius, float bradius, const GYDM::RGBA& color, const GYDM::RGBA& border_color = transparent);
 
 	public:
-	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-	    
+	    GYDM::Box get_bounding_box() override;
+        
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
         void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
@@ -126,8 +128,8 @@ namespace GYDM {
 	    virtual ~Polygonlet();
 
 	public:
-	    void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-
+	    GYDM::Box get_bounding_box() override;
+        
     public:
         size_t side_count() { return this->n; }
         float leftmost_x() { return this->lx; }

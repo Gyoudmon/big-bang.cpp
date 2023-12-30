@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../datum/string.hpp"
+
 namespace GYDM {
     enum class MatterAnchor { LT, CT, RT, LC, CC, RC, LB, CB, RB };
     
@@ -27,6 +29,9 @@ namespace GYDM {
 
 	    friend inline bool operator==(const GYDM::Anchor& lhs, const GYDM::Anchor& rhs)
             { return (lhs.fx == rhs.fx) && (lhs.fy == rhs.fy); }
+
+    public:
+        std::string desc() const { return make_nstring("(%f, %f)", this->fx, this->fy); }
         
     public:
         float fx;

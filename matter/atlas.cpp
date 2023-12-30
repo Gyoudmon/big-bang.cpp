@@ -36,29 +36,23 @@ void GYDM::IAtlas::construct(SDL_Renderer* renderer) {
     }
 }
 
-void GYDM::IAtlas::feed_extent(float x, float y, float* width, float* height) {
-    float owidth, oheight;
-
-    this->feed_original_extent(x, y, &owidth, &oheight);
-    SET_BOX(width, owidth * flabs(this->xscale));
-    SET_BOX(height, oheight * flabs(this->yscale));
-}
-
-void GYDM::IAtlas::feed_original_extent(float x, float y, float* width, float* height) {
+Box GYDM::IAtlas::get_original_bounding_box() {
     if (this->map_width < 0.0F) {
         this->feed_map_extent(&this->map_width, &this->map_height);
         this->on_map_resize(this->map_width, this->map_height);
     }
 
-    SET_BOX(width, this->map_width);
-    SET_BOX(height, this->map_height);
+    return Box(this->map_width, this->map_height);
 }
 
-void GYDM::IAtlas::feed_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
-    float t, r, b, l;
+Box GYDM::IAtlas::get_bounding_box() {
+    return Box(this->get_original_bounding_box(),
+                flabs(this->xscale), flabs(this->yscale));
+}
 
-    this->feed_original_margin(x, y, &t, &r, &b, &l);
-    margin_scale(t, r, b, l, this->xscale, this->yscale, top, right, bottom, left);
+Margin GYDM::IAtlas::get_margin() {
+    return Margin(this->get_original_margin(),
+                flabs(this->xscale), flabs(this->yscale));
 }
 
 void GYDM::IAtlas::feed_map_extent(float* width, float* height) {
@@ -93,13 +87,11 @@ float GYDM::IAtlas::get_vertical_scale() {
 }
 
 void GYDM::IAtlas::on_resize(float width, float height, float old_width, float old_height) {
-    float cwidth, cheight;
+    Box box = this->get_original_bounding_box();
 
-    this->feed_original_extent(0.0F, 0.0F, &cwidth, &cheight);
-
-    if ((cwidth > 0.0F) && (cheight > 0.0F)) {
-        this->xscale = width  / cwidth;
-        this->yscale = height / cheight;
+    if (!box.is_empty()) {
+        this->xscale = width  / box.width();
+        this->yscale = height / box.height();
     }
 }
 
@@ -157,24 +149,17 @@ void GYDM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float Width, f
         Brush::draw_grid(renderer, this->logic_row, this->logic_col,
             this->logic_tile_width * sx, this->logic_tile_height * sy,
             this->logic_grid_color,
-            x + this->logic_left * sx, y + this->logic_top * sy);
+            x + this->logic_margin.left * sx, y + this->logic_margin.top * sy);
     }
 }
 
 /*************************************************************************************************/
-void GYDM::IAtlas::create_logic_grid(int row, int col, float hinset, float vinset) {
-    this->create_logic_grid(row, col, vinset, hinset, vinset, hinset);
-}
-
-void GYDM::IAtlas::create_logic_grid(int row, int col, float top, float right, float bottom, float left) {
+void GYDM::IAtlas::create_logic_grid(int row, int col, const Margin& margin) {
     float map_width, map_height;
 
     this->feed_map_extent(&map_width, &map_height);
     
-    this->logic_top = top;
-    this->logic_right = right;
-    this->logic_bottom = bottom;
-    this->logic_left = left;
+    this->logic_margin = margin;
     this->logic_row = row;
     this->logic_col = col;
     this->on_map_resize(map_width, map_height);
@@ -191,17 +176,16 @@ int GYDM::IAtlas::logic_tile_index(float x, float y, int* r, int* c, bool local)
         auto master = this->master();
 
         if (master != nullptr) {
-            float dx, dy;
+            Dot dot = master->get_matter_location(this, MatterAnchor::LT);
 
-            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
-            x -= dx;
-            y -= dy;
+            x -= dot.x;
+            y -= dot.y;
         }
     }
     
-    if ((x >= this->logic_left) && (y >= this->logic_top)) {
-        int cl = int(flfloor((x - this->logic_left) / (this->logic_tile_width  * flabs(this->xscale))));
-        int rw = int(flfloor((y - this->logic_top) / (this->logic_tile_height * flabs(this->yscale))));
+    if ((x >= this->logic_margin.left) && (y >= this->logic_margin.top)) {
+        int cl = int(flfloor((x - this->logic_margin.left) / (this->logic_tile_width  * flabs(this->xscale))));
+        int rw = int(flfloor((y - this->logic_margin.top) / (this->logic_tile_height * flabs(this->yscale))));
     
         if ((rw < this->logic_row) && (cl < this->logic_col)) {
             SET_VALUES(r, rw, c, cl);
@@ -222,8 +206,7 @@ void GYDM::IAtlas::feed_logic_tile_location(int idx, float* x, float* y, const A
 }
 
 void GYDM::IAtlas::feed_logic_tile_location(int row, int col, float* x, float* y, const Anchor& a, bool local) {
-    float dx = 0.0F;
-    float dy = 0.0F;
+    Dot dot;
     
     if (this->logic_row > 0) {
         row = safe_index(row, this->logic_row);
@@ -237,12 +220,12 @@ void GYDM::IAtlas::feed_logic_tile_location(int row, int col, float* x, float* y
         auto master = this->master();
 
         if (master != nullptr) {
-            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
+            dot = master->get_matter_location(this, MatterAnchor::LT);
         }
     }
     
-    SET_BOX(x, (this->logic_tile_width * (float(col) + a.fx) + this->logic_left) * flabs(this->xscale) + dx);
-    SET_BOX(y, (this->logic_tile_height * (float(row) + a.fy) + this->logic_top) * flabs(this->yscale) + dy);
+    SET_BOX(x, (this->logic_tile_width * (float(col) + a.fx) + this->logic_margin.left) * flabs(this->xscale) + dot.x);
+    SET_BOX(y, (this->logic_tile_height * (float(row) + a.fy) + this->logic_margin.top) * flabs(this->yscale) + dot.y);
 }
 
 void GYDM::IAtlas::feed_logic_tile_fraction(int idx, float* fx, float* fy, const Anchor& a) {
@@ -255,12 +238,12 @@ void GYDM::IAtlas::feed_logic_tile_fraction(int idx, float* fx, float* fy, const
 }
 
 void GYDM::IAtlas::feed_logic_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a) {
-    float tx, ty, width, height;
+    Box box = this->get_bounding_box();
+    float tx, ty;
     
     this->feed_logic_tile_location(row, col, &tx, &ty, a, true);
-    this->feed_extent(0.0F, 0.0F, &width, &height);
-    SET_BOX(fx, tx / width);
-    SET_BOX(fy, ty / height);
+    SET_BOX(fx, tx / box.width());
+    SET_BOX(fy, ty / box.height());
 }
 
 void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
@@ -314,8 +297,8 @@ void GYDM::IAtlas::feed_logic_tile_extent(float* width, float* height) {
 
 void GYDM::IAtlas::on_map_resize(float map_width, float map_height) {
     if ((this->logic_row > 0) && (this->logic_col > 0)) {
-        this->logic_tile_width  = (map_width  - this->logic_left - this->logic_right) / float(this->logic_col);
-        this->logic_tile_height = (map_height - this->logic_top - this->logic_bottom) / float(this->logic_row);
+        this->logic_tile_width  = (map_width  - this->logic_margin.horizon()) / float(this->logic_col);
+        this->logic_tile_height = (map_height - this->logic_margin.vertical()) / float(this->logic_row);
     } else {
         this->logic_row = 0;
         this->logic_col = 0;
@@ -331,7 +314,6 @@ GYDM::GridAtlas::GridAtlas(const std::string& pathname, int row, int col, int xg
     , atlas_inset(inset), atlas_tile_xgap(xgap), atlas_tile_ygap(ygap) {}
 
 void GYDM::GridAtlas::on_tilemap_load(shared_texture_t atlas) {
-    float t, r, b, l;
     int w, h;
 
     atlas->feed_extent(&w, &h);
@@ -360,16 +342,13 @@ void GYDM::GridAtlas::on_tilemap_load(shared_texture_t atlas) {
         this->map_tile_height = float(this->atlas_tile_height);
     }
 
-    this->feed_original_map_overlay(&t, &r, &b, &l);
-    this->create_logic_grid(this->map_row, this->map_col, t, r, b, l);
+    this->create_logic_grid(this->map_row, this->map_col, this->get_original_map_overlay());
 }
 
 void GYDM::GridAtlas::feed_map_extent(float* width, float* height) {
-    float t, r, b, l, hmargin, vmargin;
-
-    this->feed_original_map_overlay(&t, &r, &b, &l);
-    hmargin = l + r -  this->map_tile_xgap;
-    vmargin = t + b -  this->map_tile_ygap;
+    Margin margin = this->get_original_map_overlay();
+    float hmargin = margin.horizon()  - this->map_tile_xgap;
+    float vmargin = margin.vertical() - this->map_tile_ygap;
 
     SET_BOX(width,  float(this->map_col) * (this->map_tile_width  - hmargin) + hmargin);
     SET_BOX(height, float(this->map_row) * (this->map_tile_height - vmargin) + vmargin);
@@ -409,14 +388,12 @@ void GYDM::GridAtlas::feed_atlas_tile_region(SDL_Rect* region, size_t idx) {
 }
 
 void GYDM::GridAtlas::feed_map_tile_region(SDL_FRect* region, size_t idx) {
+    Margin margin = this->get_original_map_overlay();
     size_t row = idx / this->map_col;
     size_t col = idx % this->map_col;
-    float t, r, b, l;
     
-    this->feed_original_map_overlay(&t, &r, &b, &l);
-    
-    region->x = float(col) * (this->map_tile_width + this->map_tile_xgap - (l + r));
-    region->y = float(row) * (this->map_tile_height + this->map_tile_ygap - (t + b));
+    region->x = float(col) * (this->map_tile_width + this->map_tile_xgap - margin.horizon());
+    region->y = float(row) * (this->map_tile_height + this->map_tile_ygap - margin.vertical());
     region->w = this->map_tile_width;
     region->h = this->map_tile_height;
 }
@@ -452,27 +429,25 @@ int GYDM::GridAtlas::map_tile_index(int x, int y, int* r, int* c, bool local) {
 int GYDM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, bool local) {
     float htile_step = (this->map_tile_width  + this->map_tile_xgap) * flabs(this->xscale);
     float vtile_step = (this->map_tile_height + this->map_tile_ygap) * flabs(this->yscale);
-    float top, right, bottom, left;
+    Margin margin = this->get_map_overlay();
     int cl ,rw;
     
     if (!local) {
         auto master = this->master();
 
         if (master != nullptr) {
-            float dx, dy;
+            Dot dot = master->get_matter_location(this, MatterAnchor::LT);
 
-            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
-            x -= dx;
-            y -= dy;
+            x -= dot.x;
+            y -= dot.y;
         }
     }
     
-    this->feed_map_overlay(&top, &right, &bottom, &left);
-    htile_step -= (left + right);
-    vtile_step -= (top + bottom);
+    htile_step -= margin.horizon();
+    vtile_step -= margin.vertical();
 
-    cl = (x < left) ? 0 : fxmin(int(flfloor((x - left) / htile_step)), this->map_col - 1);
-    rw = (y < top) ? 0 : fxmin(int(flfloor((y - top) / vtile_step)), this->map_row - 1);
+    cl = (x < margin.left) ? 0 : fxmin(int(flfloor((x - margin.left) / htile_step)), this->map_col - 1);
+    rw = (y < margin.top) ? 0 : fxmin(int(flfloor((y - margin.top) / vtile_step)), this->map_row - 1);
     
     SET_VALUES(r, rw, c, cl);
     
@@ -480,12 +455,12 @@ int GYDM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, bool local
 }
 
 void GYDM::GridAtlas::feed_map_tile_fraction(int idx, float* fx, float* fy, const Anchor& a) {
-    float tx, ty, width, height;
+    Box box = this->get_bounding_box();
+    float tx, ty;
 
     this->feed_map_tile_location(idx, &tx, &ty, a, true);
-    this->feed_extent(0.0F, 0.0F, &width, &height);
-    SET_BOX(fx, tx / width);
-    SET_BOX(fy, ty / height);
+    SET_BOX(fx, tx / box.width());
+    SET_BOX(fy, ty / box.height());
 }
 
 void GYDM::GridAtlas::feed_map_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a) {
@@ -497,8 +472,7 @@ void GYDM::GridAtlas::feed_map_tile_fraction(int row, int col, float* fx, float*
 void GYDM::GridAtlas::feed_map_tile_location(int idx, float* x, float* y, const Anchor& a, bool local) {
     int total = this->map_col * this->map_row;
     SDL_FRect region;
-    float dx = 0.0F;
-    float dy = 0.0F;
+    Dot dot;
     
     idx = safe_index(idx, total);
 
@@ -506,14 +480,14 @@ void GYDM::GridAtlas::feed_map_tile_location(int idx, float* x, float* y, const 
         auto master = this->master();
 
         if (master != nullptr) {
-            master->feed_matter_location(this, &dx, &dy, MatterAnchor::LT);
+            dot = master->get_matter_location(this, MatterAnchor::LT);
         }
     }
 
     this->feed_map_tile_region(&region, idx);
     
-    SET_BOX(x, (region.x + region.w * a.fx + dx) * flabs(this->xscale));
-    SET_BOX(y, (region.y + region.h * a.fy + dy) * flabs(this->yscale));
+    SET_BOX(x, (region.x + region.w * a.fx + dot.x) * flabs(this->xscale));
+    SET_BOX(y, (region.y + region.h * a.fy + dot.y) * flabs(this->yscale));
 }
 
 void GYDM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* y, const Anchor& a, bool local) {
@@ -556,13 +530,6 @@ void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col
     this->glide_to_map_tile(sec, m, row * this->map_col + col, ta, a, dx, dy);
 }
 
-void GYDM::GridAtlas::feed_map_overlay(float* top, float* right, float* bottom, float* left) {
-    float t, r, b, l;
-
-    this->feed_original_map_overlay(&t, &r, &b, &l);
-    margin_scale(t, r, b, l, this->xscale, this->yscale, top, right, bottom, left);
-}
-
-void GYDM::GridAtlas::feed_original_map_overlay(float* top, float* right, float* bottom, float* left) {
-    this->feed_original_margin(0.0F, 0.0F, top, right, bottom, left);
+GYDM::Margin GYDM::GridAtlas::get_map_overlay() {
+    return this->get_original_map_overlay().scale(this->xscale, this->yscale);
 }

@@ -10,6 +10,7 @@
 #include "../../graphics/texture.hpp"
 #include "../../physics/color/rgba.hpp"
 #include "../../physics/color/names.hpp"
+#include "../../physics/geometry/aabox.hpp"
 
 namespace GYDM {
     /*********************************************************************************************/
@@ -77,7 +78,7 @@ namespace GYDM {
         virtual ~Dimensionlet() noexcept {}
 
     public:
-        void feed_extent(float x, float y, float* w = nullptr, float* h = nullptr) override;
+        GYDM::Box get_bounding_box() override;
         void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
 
     protected:

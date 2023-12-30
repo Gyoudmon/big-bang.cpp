@@ -3,6 +3,8 @@
 #include "../matter.hpp"
 #include "../graphics/image.hpp"
 #include "../physics/color/rgba.hpp"
+#include "../physics/geometry/aabox.hpp"
+#include "../physics/geometry/margin.hpp"
 
 #include <vector>
 #include <string>
@@ -22,9 +24,9 @@ namespace GYDM {
         void construct(SDL_Renderer* renderer) override;
 
     public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr) override;
+        GYDM::Box get_bounding_box() override;
+        GYDM::Box get_original_bounding_box() override;
+        GYDM::Margin get_margin() override;
         int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
 

@@ -116,12 +116,19 @@ void GYDM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...) {
     this->set_text(content, anchor);
 }
 
-void GYDM::ITextlet::feed_extent(float x, float y, float* w, float* h) {
+Box GYDM::ITextlet::get_bounding_box() {
+    Box box;
+
     if ((this->texture.use_count() > 0) && (this->texture->okay())) {
-        this->texture->feed_extent(w, h);
+        float w, h;
+
+        this->texture->feed_extent(&w, &h);
+        box = { w, h };
     } else {
-        IGraphlet::feed_extent(x, y, w, h);
+        box = IGraphlet::get_bounding_box();
     }
+
+    return box;
 }
 
 void GYDM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {

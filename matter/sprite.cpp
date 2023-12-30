@@ -15,11 +15,6 @@
 using namespace GYDM;
 
 /*************************************************************************************************/
-#ifdef __windows__
-#define strcasecmp _stricmp
-#endif
-
-/*************************************************************************************************/
 void GYDM::ISprite::construct(SDL_Renderer* renderer) {
     int idx = this->get_initial_costume_index();
 
@@ -30,37 +25,38 @@ void GYDM::ISprite::construct(SDL_Renderer* renderer) {
     }
 }
 
-void GYDM::ISprite::feed_extent(float x, float y, float* width, float* height) {
-    float owidth, oheight;
+GYDM::Box GYDM::ISprite::get_original_bounding_box() {
+    float width = 0.0F;
+    float height = 0.0F;
 
-    this->feed_original_extent(x, y, &owidth, &oheight);
-    SET_BOX(width, owidth * flabs(this->xscale));
-    SET_BOX(height, oheight * flabs(this->yscale));
-}
-
-void GYDM::ISprite::feed_original_extent(float x, float y, float* width, float* height) {
-    if (this->current_costume_idx >= this->costume_count()) {
-        SET_BOXES(width, height, 0.0F);
-    } else if ((this->canvas_width > 0.0F) && (this->canvas_height > 0.0F)) {
-        SET_VALUES(width, this->canvas_width, height, this->canvas_height);
-    } else {
-        this->feed_costume_extent(this->current_costume_idx, width, height);
+    if (this->current_costume_idx < this->costume_count()) {
+        if ((this->canvas_width > 0.0F) && (this->canvas_height > 0.0F)) {
+            width = this->canvas_width;
+            height = this->canvas_height;
+        } else {
+            this->feed_costume_extent(this->current_costume_idx, &width, &height);
         
-        if (this->canvas_width > 0.0F) {
-            SET_BOX(width, this->canvas_width);
-        }
+            if (this->canvas_width > 0.0F) {
+                width = this->canvas_width;
+            }
 
-        if (this->canvas_height > 0.0F) {
-            SET_BOX(height, this->canvas_height);
+            if (this->canvas_height > 0.0F) {
+                height = this->canvas_height;
+            }
         }
     }
+
+    return Box(width, height);
 }
 
-void GYDM::ISprite::feed_margin(float x, float y, float* top, float* right, float* bottom, float* left) {
-    float t, r, b, l;
+Box GYDM::ISprite::get_bounding_box() {
+    return Box(this->get_original_bounding_box(),
+                flabs(this->xscale), flabs(this->yscale));
+}
 
-    this->feed_original_margin(x, y, &t, &r, &b, &l);
-    margin_scale(t, r, b, l, this->xscale, this->yscale, top, right, bottom, left);
+Margin GYDM::ISprite::get_margin() {
+    return Margin(this->get_original_margin(),
+                flabs(this->xscale), flabs(this->yscale));
 }
 
 void GYDM::ISprite::on_resize(float width, float height, float old_width, float old_height) {
@@ -201,7 +197,7 @@ int GYDM::ISprite::costume_name_to_index(const char* name) {
     int cidx = -1;
     
     for (size_t idx = 0; idx < this->costume_count(); idx ++) {
-        if (strcasecmp(this->costume_index_to_name(idx), name) == 0) {
+        if (string_ci_equal(this->costume_index_to_name(idx), name)) {
             cidx = int(idx);
             break;
         }

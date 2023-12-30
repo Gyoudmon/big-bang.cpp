@@ -3,6 +3,9 @@
 #include "../matter.hpp"
 #include "../physics/color/rgba.hpp"
 #include "../physics/geometry/anchor.hpp"
+#include "../physics/geometry/aabox.hpp"
+#include "../physics/geometry/margin.hpp"
+
 #include "../virtualization/filesystem/imgdb.hpp"
 
 namespace GYDM {
@@ -16,9 +19,9 @@ namespace GYDM {
         const char* name() override;
 
     public:
-        void feed_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        void feed_original_extent(float x, float y, float* width = nullptr, float* height = nullptr) override;
-        void feed_margin(float x, float y, float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr) override;
+        GYDM::Box get_bounding_box() override;
+        GYDM::Box get_original_bounding_box() override;
+        GYDM::Margin get_margin() override;
         void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
         
     public:
@@ -30,8 +33,7 @@ namespace GYDM {
         
     public:
         size_t logic_tile_count();
-        void create_logic_grid(int row, int col, float top, float right, float bottom, float left = 0.0F);
-        void create_logic_grid(int row, int col, float hinset = 0.0F, float vinset = 0.0F);
+        void create_logic_grid(int row, int col, const GYDM::Margin& margin = 0.0F);
         int logic_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
         void feed_logic_tile_extent(float* width = nullptr, float* height = nullptr);
@@ -76,15 +78,12 @@ namespace GYDM {
         float map_height = 0.0F;
 
     private:
+        GYDM::Margin logic_margin;
         GYDM::RGBA logic_grid_color;
-        int logic_row = 0;
-        int logic_col = 0;
-        float logic_top = 0.0F;
-        float logic_right = 0.0F;
-        float logic_bottom = 0.0F;
-        float logic_left = 0.0F;
         float logic_tile_width = 0.0F;
         float logic_tile_height = 0.0F;
+        int logic_row = 0;
+        int logic_col = 0;
 
     private:
         std::string _pathname;
@@ -108,7 +107,7 @@ namespace GYDM {
         void feed_map_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a = 0.5F);
         void feed_map_tile_location(int idx, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
         void feed_map_tile_location(int row, int col, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
-        void feed_map_overlay(float* top = nullptr, float* right = nullptr, float* bottom = nullptr, float* left = nullptr);
+        GYDM::Margin get_map_overlay();
         
     public:
         void move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
@@ -117,7 +116,7 @@ namespace GYDM {
         void glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
 
     protected:
-        virtual void feed_original_map_overlay(float* top, float* right, float* bottom, float* left);
+        virtual GYDM::Margin get_original_map_overlay() { return this->get_original_margin(); }
 
     protected:
         void create_map_grid(int row, int col, float tile_width = 0.0F, float tile_height = 0.0F, float xgap = 0.0F, float ygap = 0.0F);

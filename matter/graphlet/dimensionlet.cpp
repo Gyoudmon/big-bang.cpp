@@ -129,10 +129,13 @@ GYDM::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle& style, c
     this->set_style(style);
 }
 
-void GYDM::Dimensionlet::feed_extent(float x, float y, float* w, float* h) {
+Box GYDM::Dimensionlet::get_bounding_box() {
     size_t n = sizeof(this->textures) / sizeof(shared_texture_t);
+    float w, h;
 
-    this->feed_subextent(n, w, h);
+    this->feed_subextent(n, &w, &h);
+
+    return { w, h };
 }
 
 void GYDM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, const std::optional<RGBA>& bgcolor, const std::optional<RGBA>& bcolor) {

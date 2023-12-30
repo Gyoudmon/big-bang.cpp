@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../../../sprite/folder.hpp"
+#include "../../folder.hpp"
 #include "../../../atlas.hpp"
+
+#include "../../../../physics/geometry/margin.hpp"
 
 #include <utility>
 
@@ -16,7 +18,7 @@ namespace GYDM {
         virtual ~PlanetCuteAtlas();
 
     public:
-        void feed_original_margin(float x, float y, float* top, float* right, float* bottom, float* left) override;
+        GYDM::Margin get_original_margin() override;
 
     public:
         void set_tile_type(int r, int c, GroundBlockType type);
@@ -25,7 +27,7 @@ namespace GYDM {
     protected:
         void on_tilemap_load(GYDM::shared_texture_t atlas) override;
         int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) override;
-        void feed_original_map_overlay(float* top, float* right, float* bottom, float* left) override;
+        GYDM::Margin get_original_map_overlay() override;
 
     private:
         GroundBlockType** tiles = nullptr;
@@ -38,7 +40,7 @@ namespace GYDM {
         PlanetCuteTile(GroundBlockType default_type, int row = 1, int col = 1);
 
     public:
-        void feed_original_margin(float x, float y, float* top, float* right, float* bottom, float* left) override;
+        GYDM::Margin get_original_margin() override;
 
     public:
         void set_type(GroundBlockType type);
@@ -46,7 +48,7 @@ namespace GYDM {
 
     protected:
         int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) override;
-        void feed_original_map_overlay(float* top, float* right, float* bottom, float* left) override;
+        GYDM::Margin get_original_map_overlay() override;
 
     private:
         GroundBlockType type;

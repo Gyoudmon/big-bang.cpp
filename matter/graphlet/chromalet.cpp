@@ -242,8 +242,8 @@ GYDM::Chromalet::Chromalet(float width, float height, CIE_Standard std, double Y
     this->recalculate_primary_colors();
 }
 
-void GYDM::Chromalet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, flabs(this->width), h, flabs(this->height));
+Box GYDM::Chromalet::get_bounding_box() {
+    return { flabs(this->width), flabs(this->height) };
 }
 
 void GYDM::Chromalet::on_resize(float w, float h, float width, float height) {
@@ -273,8 +273,8 @@ void GYDM::Chromalet::draw_after_canvas(SDL_Renderer* renderer, float flx, float
     }
 }
 
-bool GYDM::Chromalet::is_colliding_with_mouse(float x, float y) {
-    return this->is_point_inside_the_spectrum(double(x), double(y));
+bool GYDM::Chromalet::is_colliding(const Dot& local_pt) {
+    return this->is_point_inside_the_spectrum(double(local_pt.x), double(local_pt.y));
 }
 
 /*************************************************************************************************/

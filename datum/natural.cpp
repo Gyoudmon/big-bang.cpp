@@ -333,7 +333,7 @@ Natural& GYDM::Natural::operator=(const Natural& n) { // copy assignment operato
 	return (*this);
 }
 
-Natural& GYDM::Natural::operator=(Natural&& n) { // move assignment operator
+Natural& GYDM::Natural::operator=(Natural&& n) noexcept { // move assignment operator
 	if (this->natural != nullptr) {
 		delete[] this->natural;
 	}

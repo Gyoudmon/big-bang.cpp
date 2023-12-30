@@ -73,21 +73,20 @@ void GYDM::Continent::construct(SDL_Renderer* renderer) {
 	construct_subplane(this->plane, this->width, this->height);
 }
 
-void GYDM::Continent::feed_extent(float x, float y, float* width, float* height) {
+Box GYDM::Continent::get_bounding_box() {
+	Box box;
+
 	if ((this->width > 0.0F) && (this->height > 0.0F)) {
-		SET_VALUES(width, this->width, height, this->height);
+		box = { this->width, this->height };
 	} else {
-		float subx, suby, subw, subh;
-		float w = this->width;
-		float h = this->height;
+		Box sub = this->plane->get_bounding_box();
+		float w = (this->width > 0.0F) ? this->width : sub.rbdot.x;
+		float h = (this->height > 0.0F) ? this->height : sub.rbdot.y;
 
-		this->plane->feed_matters_boundary(&subx, &suby, &subw, &subh);
-		
-		if (w <= 0.0F) w = subx + subw;
-		if (h <= 0.0F) h = suby + subh;
-
-		SET_VALUES(width, w, height, h);
+		box = { w, h };
 	}
+
+	return box;
 }
 
 int GYDM::Continent::update(uint64_t count, uint32_t interval, uint64_t uptime) {

@@ -24,8 +24,8 @@ GYDM::Tracklet::Tracklet(float width, float height, uint32_t hex, double alpha)
     this->camouflage(true);
 }
 
-void GYDM::Tracklet::feed_extent(float x, float y, float* w, float* h) {
-    SET_VALUES(w, this->width, h, this->height);
+Box GYDM::Tracklet::get_bounding_box() {
+    return { this->width, this->height };
 }
 
 void GYDM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
@@ -72,17 +72,16 @@ void GYDM::Tracklet::stamp(GYDM::IMatter* matter, float x, float y) {
 
         if (master != nullptr) {
             SDL_Texture* origin = SDL_GetRenderTarget(master);
-            float mwidth, mheight;
+            Box mbox = matter->get_bounding_box();
+            float mwidth = mbox.width();
+            float mheight = mbox.height();
                 
             SDL_SetRenderTarget(master, this->canvas->self());
-
-            matter->feed_extent(x, y, &mwidth, &mheight);
             matter->draw(master, x, y, mwidth, mheight);
-
             SDL_SetRenderTarget(master, origin);
 
             this->resolve_boundary(x, y);
-            this->resolve_boundary(x + mwidth, mheight);
+            this->resolve_boundary(x + mwidth, y + mheight);
 
             this->dirty_canvas(0U, -1.0);
         }
