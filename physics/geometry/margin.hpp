@@ -21,7 +21,7 @@ namespace GYDM {
             this->left = m.left;
             this->top = m.top;
             this->bottom = m.bottom;
-            this->right = m.bottom;
+            this->right = m.right;
            
             return (*this);
         }

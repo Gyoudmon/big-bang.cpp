@@ -2,18 +2,19 @@
 
 #include <SDL2/SDL.h>
 
+#include "physics/geometry/point.hpp"
+
 /*************************************************************************************************/
 namespace GYDM {
     bool inline is_shift_pressed() { return (SDL_GetModState() & KMOD_SHIFT); }
     bool inline is_ctrl_pressed() { return (SDL_GetModState() & KMOD_CTRL); }
     bool inline is_alt_pressed() { return (SDL_GetModState() & KMOD_ALT); }
 
-    void inline feed_current_mouse_location(float* mx, float* my) {
-        int fxmx, fxmy;
+    GYDM::Dot inline get_current_mouse_location() {
+        int mx, my;
 
-        SDL_GetMouseState(&fxmx, &fxmy);
+        SDL_GetMouseState(&mx, &my);
         
-        if (mx != nullptr) *mx = float(fxmx);
-        if (my != nullptr) *my = float(fxmy);
+        return { float(mx), float(my) };
     }
 }

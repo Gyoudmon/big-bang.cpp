@@ -187,8 +187,8 @@ GYDM::Polygonlet::Polygonlet(const polygon_vertices& vertices, const RGBA& color
         this->tys = new short[this->n];
 
         for (size_t idx = 0; idx < this->n; idx++) {
-            this->xs[idx] = vertices[idx].first;
-            this->ys[idx] = vertices[idx].second;
+            this->xs[idx] = vertices[idx].x;
+            this->ys[idx] = vertices[idx].y;
         }
 
         this->initialize_vertices(1.0F, 1.0F);

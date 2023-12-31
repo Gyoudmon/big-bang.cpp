@@ -7,6 +7,7 @@
 #include "physics/geometry/vector.hpp"
 #include "physics/geometry/anchor.hpp"
 #include "physics/geometry/aabox.hpp"
+#include "physics/geometry/margin.hpp"
 
 #include "virtualization/screen.hpp"
 #include "virtualization/position.hpp"
@@ -58,7 +59,7 @@ namespace GYDM {
         virtual GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a) = 0;
         virtual GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) = 0;
         virtual GYDM::Box get_bounding_box() = 0;
-        virtual void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) = 0;
+        virtual void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) = 0;
         virtual void insert_as_speech_bubble(IMatter* m) = 0;
         virtual void bring_to_front(IMatter* m, IMatter* target) = 0;
         virtual void bring_forward(IMatter* m, int n) = 0;
@@ -66,10 +67,10 @@ namespace GYDM {
         virtual void send_backward(IMatter* m, int n) = 0;
         virtual void move(IMatter* m, double length, bool ignore_gliding) = 0;
         virtual void move(IMatter* m, const GYDM::Vector& vec, bool ignore_gliding) = 0;
-        virtual void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) = 0;
+        virtual void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) = 0;
         virtual void glide(double sec, IMatter* m, double length) = 0;
         virtual void glide(double sec, IMatter* m, const GYDM::Vector& vec) = 0;
-        virtual void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) = 0;
+        virtual void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) = 0;
         virtual void remove(IMatter* m, bool needs_delete) = 0;
         virtual void erase() = 0;
 
@@ -126,15 +127,15 @@ namespace GYDM {
         void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0);
         int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
         int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, const GYDM::Anchor& a = 0.5F);
-        void feed_grid_cell_extent(float* width, float* height);
+        GYDM::Box get_grid_cell_bounding_box();
         GYDM::Dot get_grid_cell_location(int idx, const GYDM::Anchor& a = 0.5F);
         GYDM::Dot get_grid_cell_location(int row, int col, const GYDM::Anchor& a = 0.5F);
-        void insert_at_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void insert_at_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void move_to_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void move_to_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_grid(double sec, IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_grid(double sec, IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void insert_at_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void insert_at_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void move_to_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void move_to_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void glide_to_grid(double sec, IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void glide_to_grid(double sec, IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
         void set_grid_color(const GYDM::RGBA& color) { this->grid_color = color; }
 
     public:
@@ -205,22 +206,22 @@ namespace GYDM {
         }
         
         template<class M>
-        M* insert(M* m, const GYDM::Position& pos = origin_position, const GYDM::Anchor& a = 0.0F, float dx = 0.0F, float dy = 0.0F) {
-            this->insert_at(m, pos, a, dx, dy);
+        M* insert(M* m, const GYDM::Position& pos = Position::O, const GYDM::Anchor& a = 0.0F, const GYDM::Vector& vec = Vector::O) {
+            this->insert_at(m, pos, a, vec);
 
             return m;
         }
         
         template<class M>
-        M* insert(M* m, int idx, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F) {
-            this->insert_at_grid(m, idx, a, dx, dy);
+        M* insert(M* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O) {
+            this->insert_at_grid(m, idx, a, vec);
 
             return m;
         }
 
         template<class M>
-        M* insert(M* m, int row, int col, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F) {
-            this->insert_at_grid(m, row, col, a, dx, dy);
+        M* insert(M* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O) {
+            this->insert_at_grid(m, row, col, a, vec);
 
             return m;
         }
@@ -253,13 +254,11 @@ namespace GYDM {
     public:
         bool has_mission_completed() override;
         void set_sentry_sprite(GYDM::ISprite* sentry) { this->sentry = sentry; }
-        void set_tooltip_matter(GYDM::IMatter* m, float dx = 0.0F, float dy = 0.0F);
+        void set_tooltip_matter(GYDM::IMatter* m, const GYDM::Vector& vec = Vector::O);
         void set_bubble_color(const GYDM::RGBA& border, const GYDM::RGBA& background);
         void set_bubble_font(shared_font_t font) { this->bubble_font = font; }
         void set_bubble_duration(double second = 3600.0);
-        void set_bubble_margin(float margin) { this->set_bubble_margin(margin, margin); }
-        void set_bubble_margin(float hmargin, float vmargin) { this->set_bubble_margin(vmargin, hmargin, vmargin, hmargin); }
-        void set_bubble_margin(float top, float right, float bottom, float left);
+        void set_bubble_margin(const GYDM::Margin& margin) { this->bubble_margin = margin; }
         
     public:
         void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) override;
@@ -274,7 +273,7 @@ namespace GYDM {
         GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a = 0.0F) override;
         GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) override;
         GYDM::Box get_bounding_box() override;
-        void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, float dx, float dy) override;
+        void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) override;
         void insert_as_speech_bubble(IMatter* m) override;
         void bring_to_front(IMatter* m, IMatter* target = nullptr) override;
         void bring_forward(IMatter* m, int n = 1) override;
@@ -282,10 +281,10 @@ namespace GYDM {
         void send_backward(IMatter* m, int n = 1) override;
         void move(IMatter* m, double length, bool ignore_gliding = false) override;
         void move(IMatter* m, const GYDM::Vector& vec, bool ignore_gliding = false) override;
-        void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
+        void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, const GYDM::Vector& vec = Vector::O) override;
         void glide(double sec, IMatter* m, double length) override;
         void glide(double sec, IMatter* m, const GYDM::Vector& vec) override;
-        void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, float dx = 0.0F, float dy = 0.0F) override;
+        void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, const GYDM::Vector& vec = Vector::O) override;
         void remove(IMatter* m, bool needs_delete = true) override;
         void erase() override;
         void size_cache_invalid();
@@ -400,10 +399,8 @@ namespace GYDM {
         uint32_t local_frame_delta = 0U;
         uint32_t local_frame_count = 1U;
         uint32_t local_elapse = 0U;
-        float hovering_mgx = 0.0F;
-        float hovering_mgy = 0.0F;
-        float hovering_mlx = 0.0F;
-        float hovering_mly = 0.0F;
+        GYDM::Dot hovering_gm;
+        GYDM::Dot hovering_lm;
 
     private:
         // TODO: implement other transformation
@@ -415,17 +412,13 @@ namespace GYDM {
 
     private:
         GYDM::IMatter* tooltip = nullptr;
-        float tooltip_dx = 0.0F;
-        float tooltip_dy = 0.0F;
+        GYDM::Vector tooltip_offset = Vector::O;
 
     private:
         GYDM::RGBA bubble_border = GAINSBORO;
         GYDM::RGBA bubble_color = GHOSTWHITE;
+        GYDM::Margin bubble_margin;
         double bubble_second = 0.0;
-        float bubble_top_margin = 0.0F;
-        float bubble_right_margin = 0.0F;
-        float bubble_bottom_margin = 0.0F;
-        float bubble_left_margin = 0.0F;
         shared_font_t bubble_font;
     };
 }

@@ -246,43 +246,43 @@ void GYDM::IAtlas::feed_logic_tile_fraction(int row, int col, float* fx, float* 
     SET_BOX(fy, ty / box.height());
 }
 
-void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
         idx = safe_index(idx, total);
-        this->move_to_logic_tile(m, idx / this->logic_col, idx / this->logic_row, ta, a, dx, dy);
+        this->move_to_logic_tile(m, idx / this->logic_col, idx / this->logic_row, ta, a, vec);
     }
 }
 
-void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
     auto master = this->master();
     
     if (master != nullptr) {
         float x, y;
 
         this->feed_logic_tile_location(row, col, &x, &y, ta, false);
-        master->move_to(m, Position(x, y), a, dx, dy);
+        master->move_to(m, Position(x, y), a, vec);
     }
 }
 
-void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
         idx = safe_index(idx, total);
-        this->glide_to_logic_tile(sec, m, idx / this->logic_col, idx / this->logic_row, ta, a, dx, dy);
+        this->glide_to_logic_tile(sec, m, idx / this->logic_col, idx / this->logic_row, ta, a, vec);
     }
 }
 
-void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
     auto master = this->master();
     
     if (master != nullptr) {
         float x, y;
 
         this->feed_logic_tile_location(row, col, &x, &y, ta, false);
-        master->glide_to(sec, m, Position(x, y), a, dx, dy);
+        master->glide_to(sec, m, Position(x, y), a, vec);
     }
 }
 
@@ -496,38 +496,38 @@ void GYDM::GridAtlas::feed_map_tile_location(int row, int col, float* x, float* 
     this->feed_map_tile_location(row * this->map_col + col, x, y, a, local);
 }
 
-void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
     auto master = this->master();
 
     if (master != nullptr) {
         float x, y;
             
         this->feed_map_tile_location(idx, &x, &y, ta, false);
-        master->move_to(m, Position(x, y), a, dx, dy);
+        master->move_to(m, Position(x, y), a, vec);
     }
 }
 
-void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
-    this->move_to_map_tile(m, row * this->map_col + col, ta, a, dx, dy);
+    this->move_to_map_tile(m, row * this->map_col + col, ta, a, vec);
 }
 
-void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
     auto master = this->master();
 
     if (master != nullptr) {
         float x, y;
             
         this->feed_map_tile_location(idx, &x, &y, ta, false);
-        master->glide_to(sec, m, Position(x, y), a, dx, dy);
+        master->glide_to(sec, m, Position(x, y), a, vec);
     }
 }
 
-void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx, float dy) {
+void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
-    this->glide_to_map_tile(sec, m, row * this->map_col + col, ta, a, dx, dy);
+    this->glide_to_map_tile(sec, m, row * this->map_col + col, ta, a, vec);
 }
 
 GYDM::Margin GYDM::GridAtlas::get_map_overlay() {

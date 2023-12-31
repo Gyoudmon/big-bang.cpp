@@ -505,7 +505,7 @@ void GYDM::Plane::send_backward(IMatter* m, int n) {
     }
 }
 
-void GYDM::Plane::insert_at(IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
+void GYDM::Plane::insert_at(IMatter* m, const Position& pos, const Anchor& a, const Vector& vec) {
     if (m->info == nullptr) {
         MatterInfo* info = bind_matter_ownership(this, m);
         
@@ -523,7 +523,7 @@ void GYDM::Plane::insert_at(IMatter* m, const Position& pos, const Anchor& a, fl
             head_info->prev = m;
         }
 
-        this->handle_new_matter(m, info, pos, a, dx, dy);
+        this->handle_new_matter(m, info, pos, a, vec.x, vec.y);
     }
 }
 
@@ -666,11 +666,11 @@ void GYDM::Plane::move(IMatter* m, const Vector& vec, bool ignore_gliding) {
     }
 }
 
-void GYDM::Plane::move_to(IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
+void GYDM::Plane::move_to(IMatter* m, const Position& pos, const Anchor& a, const Vector& vec) {
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        if (this->move_matter_to_location_via_info(m, info, pos, a, dx, dy)) {
+        if (this->move_matter_to_location_via_info(m, info, pos, a, vec.x, vec.y)) {
             this->notify_updated();
         }
     }
@@ -720,11 +720,11 @@ void GYDM::Plane::glide(double sec, IMatter* m, const Vector& vec) {
     }
 }
 
-void GYDM::Plane::glide_to(double sec, IMatter* m, const Position& pos, const Anchor& a, float dx, float dy) {
+void GYDM::Plane::glide_to(double sec, IMatter* m, const Position& pos, const Anchor& a, const Vector& vec) {
     MatterInfo* info = plane_matter_info(this, m);
     
     if (info != nullptr) {
-        this->glide_matter_to_location_via_info(m, info, sec, pos, a, dx, dy, true);
+        this->glide_matter_to_location_via_info(m, info, sec, pos, a, vec.x, vec.y, true);
     }
 }
 
@@ -1105,10 +1105,8 @@ bool GYDM::Plane::on_pointer_move(uint32_t state, float x, float y, float dx, fl
 
             if (!self_matter->concealled()) {
                 this->hovering_matter = self_matter;
-                this->hovering_mgx = x;
-                this->hovering_mgy = y;
-                this->hovering_mlx = local_x;
-                this->hovering_mly = local_y;
+                this->hovering_gm = { x,  y };
+                this->hovering_lm = { local_x, local_y };
 
                 if (self_matter->events_allowed()) {
                     self_matter->on_hover(local_x, local_y);
@@ -1239,7 +1237,7 @@ bool GYDM::Plane::can_select(IMatter* m) {
     return this->sentry == m;
 }
 
-void GYDM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
+void GYDM::Plane::set_tooltip_matter(IMatter* m, const Vector& offset) {
     this->begin_update_sequence();
 
     if ((this->tooltip != nullptr) && !this->tooltip->visible()) {
@@ -1248,8 +1246,7 @@ void GYDM::Plane::set_tooltip_matter(IMatter* m, float dx, float dy) {
 
     this->tooltip = m;
     this->tooltip->show(false);
-    this->tooltip_dx = dx;
-    this->tooltip_dy = dy;
+    this->tooltip_offset = offset;
 
     this->end_update_sequence();
 }
@@ -1258,13 +1255,13 @@ void GYDM::Plane::place_tooltip(GYDM::IMatter* target) {
     float width, height;
     Dot tt;
 
-    this->move_to(this->tooltip, Position(target, MatterAnchor::LB), MatterAnchor::LT, this->tooltip_dx, this->tooltip_dy);
+    this->move_to(this->tooltip, Position(target, MatterAnchor::LB), MatterAnchor::LT, this->tooltip_offset);
 
     this->master()->feed_client_extent(&width, &height);
     tt = this->get_matter_location(this->tooltip, MatterAnchor::LB);
 
     if (tt.y > height) {
-        this->move_to(this->tooltip, Position(target, MatterAnchor::LT), MatterAnchor::LB, this->tooltip_dx, this->tooltip_dy);
+        this->move_to(this->tooltip, Position(target, MatterAnchor::LT), MatterAnchor::LB, this->tooltip_offset);
     }
 
     if (tt.x < 0.0F) {
@@ -1339,7 +1336,7 @@ void GYDM::Plane::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime) 
 
         if ((this->tooltip != nullptr) && this->tooltip->visible()) {
             if (this->hovering_matter != nullptr) {
-                this->update_tooltip(this->hovering_matter, this->hovering_mlx, this->hovering_mly, this->hovering_mgx, this->hovering_mgy);
+                this->update_tooltip(this->hovering_matter, this->hovering_lm.x, this->hovering_lm.y, this->hovering_gm.x, this->hovering_gm.y);
                 this->place_tooltip(this->hovering_matter);
             }
         }
@@ -1458,8 +1455,8 @@ void GYDM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo
         float iwidth = ibox.width();
         float iheight = ibox.height();
         
-        bwidth =  iwidth +  (this->bubble_left_margin + this->bubble_right_margin);
-        bheight = iheight + (this->bubble_top_margin + this->bubble_bottom_margin);
+        bwidth =  iwidth +  this->bubble_margin.horizon();
+        bheight = iheight + this->bubble_margin.vertical();
         this->place_speech_bubble(child, bwidth, bheight, Width, Height, &ma, &ba, &dx, &dy);
         bx = info->x + mwidth  * ma.fx - bwidth  * ba.fx + dx;
         by = info->y + mheight * ma.fy - bheight * ba.fy + dy;
@@ -1467,11 +1464,11 @@ void GYDM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo
         by = (by + this->translate.y) + Y;
 
         if (rectangle_overlay(bx, by, bx + bwidth, by + bheight, dsX, dsY, dsWidth, dsHeight)) {
-            bx = flmax(bx, this->bubble_left_margin + X);
-            by = flmax(by, this->bubble_top_margin  + Y);
+            bx = flmax(bx, this->bubble_margin.left + X);
+            by = flmax(by, this->bubble_margin.top  + Y);
 
-            ix = bx + this->bubble_left_margin;
-            iy = by + this->bubble_top_margin;
+            ix = bx + this->bubble_margin.left;
+            iy = by + this->bubble_margin.top;
         
             clip.x = fl2fxi(flfloor(ix));
             clip.y = fl2fxi(flfloor(iy));
@@ -1983,13 +1980,6 @@ void GYDM::Plane::set_bubble_duration(double second) {
     }
 }
 
-void GYDM::Plane::set_bubble_margin(float top, float right, float bottom, float left) {
-    this->bubble_top_margin = top;
-    this->bubble_right_margin = right;
-    this->bubble_bottom_margin = bottom;
-    this->bubble_left_margin = left;
-}
-
 void GYDM::Plane::set_bubble_color(const RGBA& border, const RGBA& background) {
     this->bubble_border = border;
     this->bubble_color = background;
@@ -2006,9 +1996,8 @@ bool GYDM::Plane::is_colliding_with_mouse(IMatter* m) {
     bool okay = false;
     
     if (mdot.okay()) {
-        Dot mouse;
-    
-        feed_current_mouse_location(&mouse.x, &mouse.y);
+        Dot mouse = get_current_mouse_location();
+
         okay = m->is_colliding(mouse - (mdot + this->translate));
     }
     
@@ -2031,7 +2020,7 @@ void GYDM::Plane::glide_to_random_location(double sec, IMatter* m) {
         rpos.x = float(random_uniform(int(hinset), int(width - hinset)));
         rpos.y = float(random_uniform(int(vinset), int(height - vinset)));
 
-        this->glide_to(sec, m, rpos, MatterAnchor::CC, 0.0F, 0.0F);
+        this->glide_to(sec, m, rpos, MatterAnchor::CC, Vector::O);
     }
 }
 
@@ -2286,9 +2275,8 @@ int GYDM::IPlane::grid_cell_index(IMatter* m, int* r, int* c, const Anchor& a) {
     return this->grid_cell_index(dot.x, dot.y, r, c);    
 }
 
-void GYDM::IPlane::feed_grid_cell_extent(float* width, float* height) {
-    SET_BOX(width, this->cell_width);
-    SET_BOX(height, this->cell_height);
+GYDM::Box GYDM::IPlane::get_grid_cell_bounding_box() {
+    return { this->cell_width, this->cell_height };
 }
 
 Dot GYDM::IPlane::get_grid_cell_location(int idx, const Anchor& a) {
@@ -2328,28 +2316,28 @@ Dot GYDM::IPlane::get_grid_cell_location(int row, int col, const Anchor& a) {
     return dot;
 }
 
-void GYDM::IPlane::insert_at_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
-    this->insert_at(m, this->get_grid_cell_location(idx, a), a, dx, dy);
+void GYDM::IPlane::insert_at_grid(IMatter* m, int idx, const Anchor& a, const Vector& vec) {
+    this->insert_at(m, this->get_grid_cell_location(idx, a), a, vec);
 }
 
-void GYDM::IPlane::insert_at_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
-    this->insert_at(m, this->get_grid_cell_location(row, col, a), a, dx, dy);
+void GYDM::IPlane::insert_at_grid(IMatter* m, int row, int col, const Anchor& a, const Vector& vec) {
+    this->insert_at(m, this->get_grid_cell_location(row, col, a), a, vec);
 }
 
-void GYDM::IPlane::move_to_grid(IMatter* m, int idx, const Anchor& a, float dx, float dy) {
-    this->move_to(m, this->get_grid_cell_location(idx, a), a, dx, dy);
+void GYDM::IPlane::move_to_grid(IMatter* m, int idx, const Anchor& a, const Vector& vec) {
+    this->move_to(m, this->get_grid_cell_location(idx, a), a, vec);
 }
 
-void GYDM::IPlane::move_to_grid(IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
-    this->move_to(m, this->get_grid_cell_location(row, col, a), a, dx, dy);
+void GYDM::IPlane::move_to_grid(IMatter* m, int row, int col, const Anchor& a, const Vector& vec) {
+    this->move_to(m, this->get_grid_cell_location(row, col, a), a, vec);
 }
 
-void GYDM::IPlane::glide_to_grid(double sec, IMatter* m, int idx, const Anchor& a, float dx, float dy) {
-    this->glide_to(sec, m, this->get_grid_cell_location(idx, a), a, dx, dy);
+void GYDM::IPlane::glide_to_grid(double sec, IMatter* m, int idx, const Anchor& a, const Vector& vec) {
+    this->glide_to(sec, m, this->get_grid_cell_location(idx, a), a, vec);
 }
 
-void GYDM::IPlane::glide_to_grid(double sec, IMatter* m, int row, int col, const Anchor& a, float dx, float dy) {
-    this->glide_to(sec, m, this->get_grid_cell_location(row, col, a), a, dx, dy);
+void GYDM::IPlane::glide_to_grid(double sec, IMatter* m, int row, int col, const Anchor& a, const Vector& vec) {
+    this->glide_to(sec, m, this->get_grid_cell_location(row, col, a), a, vec);
 }
 
 /*************************************************************************************************/

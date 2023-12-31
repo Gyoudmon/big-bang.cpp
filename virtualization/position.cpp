@@ -6,6 +6,9 @@
 using namespace GYDM;
 
 /*************************************************************************************************/
+const GYDM::Position Position::O = {};
+
+/*************************************************************************************************/
 GYDM::Position::Position(const GYDM::Position& pos) : Position(pos.xtarget, pos.dot, pos.ytarget, pos.dot) {
     this->offset = pos.offset;
 }

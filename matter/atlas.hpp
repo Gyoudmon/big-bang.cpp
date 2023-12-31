@@ -44,10 +44,10 @@ namespace GYDM {
         void set_logic_grid_color(const GYDM::RGBA& color) { this->logic_grid_color = color; }
 
     public:
-        void move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
-        void move_to_logic_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_logic_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
+        void move_to_logic_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
+        void glide_to_logic_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
+        void glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
         
     protected:
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }
@@ -110,10 +110,10 @@ namespace GYDM {
         GYDM::Margin get_map_overlay();
         
     public:
-        void move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
-        void move_to_map_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_map_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
-        void glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, float dx = 0.0F, float dy = 0.0F);
+        void move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
+        void move_to_map_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
+        void glide_to_map_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
+        void glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec = Vector::O);
 
     protected:
         virtual GYDM::Margin get_original_map_overlay() { return this->get_original_margin(); }

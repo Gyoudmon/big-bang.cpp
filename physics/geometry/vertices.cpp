@@ -16,7 +16,7 @@ GYDM::polygon_vertices GYDM::regular_polygon_vertices(size_t n, float radius, fl
         float px = radius * flcos(theta);
         float py = radius * flsin(theta);
         
-        pvs.push_back(std::pair<float, float>(px, py));
+        pvs.push_back(Dot(px, py));
     }
 
     return pvs;
