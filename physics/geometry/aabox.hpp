@@ -13,7 +13,7 @@ namespace GYDM {
     public:
         AABox() { this->invalidate(); }
         AABox(T w, T h) : ltdot({ T(), T() }), rbdot({ w, h }) {}
-        AABox(T ltx, T lty, T rbx, T rby) : ltdot({ ltx, lty }), rbdot({ rbx, rby }) {}
+        AABox(T x, T y, T w, T h) : ltdot({ x, y }), rbdot({ x + w, y + h }) {}
         
         template<typename U>
         AABox(const GYDM::Point<U>& ltdot, const GYDM::Point<U>& rbdot) : ltdot(ltdot), rbdot(rbdot) {}

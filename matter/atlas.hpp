@@ -5,6 +5,7 @@
 #include "../physics/geometry/anchor.hpp"
 #include "../physics/geometry/aabox.hpp"
 #include "../physics/geometry/margin.hpp"
+#include "../physics/geometry/point.hpp"
 
 #include "../virtualization/filesystem/imgdb.hpp"
 
@@ -36,11 +37,11 @@ namespace GYDM {
         void create_logic_grid(int row, int col, const GYDM::Margin& margin = 0.0F);
         int logic_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int logic_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
-        void feed_logic_tile_extent(float* width = nullptr, float* height = nullptr);
-        void feed_logic_tile_fraction(int idx, float* fx, float* fy, const Anchor& a = 0.5F);
-        void feed_logic_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a = 0.5F);
-        void feed_logic_tile_location(int idx, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
-        void feed_logic_tile_location(int row, int col, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
+        GYDM::Box get_logic_tile_region();
+        GYDM::Anchor get_logic_tile_fraction(int idx, const Anchor& a = 0.5F);
+        GYDM::Anchor get_logic_tile_fraction(int row, int col, const Anchor& a = 0.5F);
+        GYDM::Dot get_logic_tile_location(int idx, const Anchor& a = 0.5F, bool local = true);
+        GYDM::Dot get_logic_tile_location(int row, int col, const Anchor& a = 0.5F, bool local = true);
         void set_logic_grid_color(const GYDM::RGBA& color) { this->logic_grid_color = color; }
 
     public:
@@ -51,16 +52,16 @@ namespace GYDM {
         
     protected:
         virtual int get_atlas_tile_index(size_t map_idx, int& xoff, int& yoff) { return int(map_idx); }
-        virtual void feed_map_extent(float* width, float* height) = 0;
+        virtual GYDM::Box get_map_region() = 0;
         virtual void on_tilemap_load(GYDM::shared_texture_t atlas) = 0;
-        virtual void feed_atlas_tile_region(SDL_Rect* tile, size_t idx) = 0;
-        virtual void feed_map_tile_region(SDL_FRect* tile, size_t idx) = 0;
+        virtual GYDM::AABox<int> get_atlas_tile_region(size_t idx) = 0;
+        virtual GYDM::Box get_map_tile_region(size_t idx) = 0;
 
     protected:
         void on_resize(float width, float height, float old_width, float old_height) override;
         
     protected:
-        void invalidate_map_size() { this->map_width = -1.0F; }
+        void invalidate_map_size() { this->map_region.invalidate(); }
         void on_map_resize(float map_width, float map_height);
         SDL_RendererFlip current_flip_status();
         float get_horizontal_scale();
@@ -74,10 +75,7 @@ namespace GYDM {
         GYDM::shared_texture_t atlas;
 
     private:
-        float map_width = -1.0F;
-        float map_height = 0.0F;
-
-    private:
+        GYDM::Box map_region;
         GYDM::Margin logic_margin;
         GYDM::RGBA logic_grid_color;
         float logic_tile_width = 0.0F;
@@ -103,10 +101,10 @@ namespace GYDM {
     public:
         int map_tile_index(int x, int y, int* r = nullptr, int* c = nullptr, bool local = true);
         int map_tile_index(float x, float y, int* r = nullptr, int* c = nullptr, bool local = true);
-        void feed_map_tile_fraction(int idx, float* fx, float* fy, const Anchor& a = 0.5F);
-        void feed_map_tile_fraction(int row, int col, float* fx, float* fy, const Anchor& a = 0.5F);
-        void feed_map_tile_location(int idx, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
-        void feed_map_tile_location(int row, int col, float* x, float* y, const Anchor& a = 0.5F, bool local = true);
+        GYDM::Anchor get_map_tile_fraction(int idx, const Anchor& a = 0.5F);
+        GYDM::Anchor get_map_tile_fraction(int row, int col, const Anchor& a = 0.5F);
+        GYDM::Dot get_map_tile_location(int idx, const Anchor& a = 0.5F, bool local = true);
+        GYDM::Dot get_map_tile_location(int row, int col, const Anchor& a = 0.5F, bool local = true);
         GYDM::Margin get_map_overlay();
         
     public:
@@ -123,9 +121,9 @@ namespace GYDM {
         
     protected:
         void on_tilemap_load(GYDM::shared_texture_t atlas) override;
-        void feed_map_extent(float* width, float* height) override;
-        void feed_atlas_tile_region(SDL_Rect* tile, size_t idx) override;
-        void feed_map_tile_region(SDL_FRect* tile, size_t idx) override;
+        GYDM::Box get_map_region() override;
+        GYDM::AABox<int> get_atlas_tile_region(size_t idx) override;
+        GYDM::Box get_map_tile_region(size_t idx) override;
     
     protected:
         int atlas_row;

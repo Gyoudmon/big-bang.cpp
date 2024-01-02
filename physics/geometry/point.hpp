@@ -25,6 +25,5 @@ namespace GYDM {
 
     typedef GYDM::Point<float> Dot;
 
-    template<typename T>
-    const GYDM::Point<T> GYDM::Point<T>::O = {};
+    template<typename T> const GYDM::Point<T> GYDM::Point<T>::O = {};
 }

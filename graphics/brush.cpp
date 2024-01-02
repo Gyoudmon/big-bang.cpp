@@ -695,3 +695,18 @@ void GYDM::Brush::fill_regular_polygon(SDL_Renderer* renderer, int n, float cx, 
     SDL_SetRenderDrawColor(renderer, color.R(), color.G(), color.B(), color.A());
     pen_fill_regular_polygon(renderer, n, cx, cy, radius, rotation);
 }
+
+/**************************************************************************************************/
+void GYDM::Brush::feed_rect(SDL_Rect* rect, const AABox<int>& box) {
+    rect->x = box.x();
+    rect->y = box.y();
+    rect->w = box.width();
+    rect->h = box.height();
+}
+
+void GYDM::Brush::feed_rect(SDL_FRect* rect, const Box& box) {
+    rect->x = box.x();
+    rect->y = box.y();
+    rect->w = box.width();
+    rect->h = box.height();
+}

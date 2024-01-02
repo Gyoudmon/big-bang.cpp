@@ -7,9 +7,14 @@
 #include <string>
 
 #include "../physics/color/rgba.hpp"
+#include "../physics/geometry/aabox.hpp"
 
 namespace GYDM {
     class __lambda__ Brush {
+    public:
+        static void feed_rect(SDL_Rect* rect, const GYDM::AABox<int>& box);
+        static void feed_rect(SDL_FRect* rect, const GYDM::Box& box);
+
     public:
         static void clear(SDL_Renderer* renderer, const GYDM::RGBA& color);
 

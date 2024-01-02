@@ -29,6 +29,5 @@ namespace GYDM {
 
     typedef GYDM::EuclideanVector<float> Vector;
 
-    template<typename T>
-    const GYDM::EuclideanVector<T> GYDM::EuclideanVector<T>::O = {};
+    template<typename T> const GYDM::EuclideanVector<T> GYDM::EuclideanVector<T>::O = {};
 }

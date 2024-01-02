@@ -65,6 +65,7 @@
 #include "physics/motion/map2d.hpp"
 
 #include "datum/flonum.hpp"
+#include "datum/fixnum.hpp"
 #include "datum/string.hpp"
 #include "datum/path.hpp"
 #include "datum/vector.hpp"
