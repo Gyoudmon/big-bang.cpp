@@ -9,8 +9,9 @@ using namespace GYDM;
 const GYDM::Position Position::O = {};
 
 /*************************************************************************************************/
-GYDM::Position::Position(const GYDM::Position& pos) : Position(pos.xtarget, pos.dot, pos.ytarget, pos.dot) {
-    this->offset = pos.offset;
+GYDM::Position::Position(const GYDM::Position& pos) : dot(pos.dot), offset(pos.offset) {
+    this->xtarget = pos.xtarget;
+    this->ytarget = pos.ytarget;
 }
 
 Position& GYDM::Position::operator=(const GYDM::Position& pos) {
@@ -23,7 +24,7 @@ Position& GYDM::Position::operator=(const GYDM::Position& pos) {
 }
 
 /*************************************************************************************************/
-Point<float> GYDM::Position::calculate_dot() const {
+Point<float> GYDM::Position::calculate_point() const {
     Point<float> pos;
 
     if (this->xtarget == nullptr) {

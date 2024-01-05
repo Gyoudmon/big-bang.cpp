@@ -35,7 +35,7 @@ namespace GYDM {
         GYDM::Position& operator=(const GYDM::Position& c);
 
     public:
-        GYDM::Dot calculate_dot() const;
+        GYDM::Dot calculate_point() const;
         GYDM::Vector get_offset() const { return this->offset; }
         void set_offset(const GYDM::Vector& vec) { this->offset = vec; }
 

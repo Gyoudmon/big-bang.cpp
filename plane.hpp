@@ -55,7 +55,8 @@ namespace GYDM {
         virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
     
     public:
-        virtual GYDM::IMatter* find_matter(float x, float y, GYDM::IMatter* after) = 0;
+        virtual GYDM::IMatter* find_matter(const Position& pos, GYDM::IMatter* after) = 0;
+        virtual GYDM::IMatter* find_matter(GYDM::IMatter* collided_matter, GYDM::IMatter* after) = 0;
         virtual GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a) = 0;
         virtual GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) = 0;
         virtual GYDM::Box get_bounding_box() = 0;
@@ -266,10 +267,11 @@ namespace GYDM {
     public:
         bool is_colliding_with_mouse(IMatter* m);
         void glide_to_random_location(double sec, IMatter* m);
-        void glide_to_mouse(double sec, IMatter* m, const GYDM::Anchor& a = 0.5F, float dx = 0.0F, float dy = 0.0F);
+        void glide_to_mouse(double sec, IMatter* m, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
 
     public:
-        GYDM::IMatter* find_matter(float x, float y, GYDM::IMatter* after = nullptr) override;
+        GYDM::IMatter* find_matter(const Position& pos, GYDM::IMatter* after = nullptr) override;
+        GYDM::IMatter* find_matter(GYDM::IMatter* collided_matter, GYDM::IMatter* after = nullptr) override;
         GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a = 0.0F) override;
         GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) override;
         GYDM::Box get_bounding_box() override;
@@ -381,9 +383,9 @@ namespace GYDM {
         void draw_speech(SDL_Renderer* renderer, IMatter* self, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
-        bool is_matter_found(IMatter* m, MatterInfo* info, float x, float y);
-        GYDM::IMatter* find_matter_for_tooltip(float x, float y);
-        GYDM::IMatter* find_least_recent_matter(float x, float y);
+        bool is_matter_found(IMatter* m, MatterInfo* info, const Dot& dot);
+        GYDM::IMatter* find_matter_for_tooltip(const GYDM::Dot& pos);
+        GYDM::IMatter* find_least_recent_matter(const GYDM::Dot& pos);
         void place_tooltip(IMatter* target);
         void no_selected_except(IMatter* m);
         void delete_matter(IMatter* m);

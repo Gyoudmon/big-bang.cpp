@@ -34,10 +34,10 @@ namespace GYDM {
         T width() const { return this->rbdot.x - this->ltdot.x; }
         T height() const { return this->rbdot.y - this->ltdot.y; }
         
-        GYDM::Point<T> dot(const GYDM::Anchor& anchor) const { return this->dot(anchor.fx, anchor.fy); }
+        GYDM::Point<T> point_at(const GYDM::Anchor& anchor) const { return this->point_at(anchor.fx, anchor.fy); }
 
         template<typename Fl>
-        GYDM::Point<Fl> dot(Fl fx, Fl fy) const {
+        GYDM::Point<Fl> point_at(Fl fx, Fl fy) const {
             return { Fl(this->ltdot.x) + Fl(this->rbdot.x - this->ltdot.x) * fx,
                      Fl(this->ltdot.y) + Fl(this->rbdot.y - this->ltdot.y) * fy };
         }

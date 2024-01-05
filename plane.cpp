@@ -37,18 +37,18 @@ namespace GYDM {
 
     struct GlidingMotion {
         GlidingMotion(double length, double second, bool absolute, bool heading)
-            : length(length), second(second), sec_delta(0.0), absolute(absolute), heading(heading) {}
+            : second(second), sec_delta(0.0), absolute(absolute), heading(heading), length(length) {}
 
         GlidingMotion(const Position& pos, double second, double delta, bool absolute, bool heading)
-            : dot(pos), second(second), sec_delta(delta), absolute(absolute), heading(heading) {}
+            : second(second), sec_delta(delta), absolute(absolute), heading(heading), target(pos) {}
 
-        GlidingMotion(const GlidingMotion& m) { (*this) = m; }
+        GlidingMotion(const GlidingMotion& m) { this->operator=(m); }
 
         GlidingMotion& operator=(const GlidingMotion& m) {
             if (m.sec_delta == 0.0) {
                 this->length = m.length;
             } else {
-                this->dot = m.dot;
+                this->target = m.target;
             }
 
             this->second = m.second;
@@ -61,15 +61,15 @@ namespace GYDM {
 
         ~GlidingMotion() noexcept {}
 
-        union {
-            double length;
-            Position dot;
-        };
-        
         double second;
         double sec_delta; // 0.0 means the target is based on current heading
         bool absolute;
         bool heading;     // moving only
+
+        union {
+            Position target;
+            double length;
+        };
     };
 
     struct MotionAction {
@@ -103,12 +103,12 @@ namespace GYDM {
         MotionActionType type;
         
         union {
+            GlidingMotion motion;
             bool drawing;
             double direction;
             double theta;
             uint8_t pen_width;
             RGBA color;
-            GlidingMotion motion;
             bool unused;
         };
     };
@@ -278,7 +278,7 @@ static void unsafe_do_canvas_setting(Plane* self, IMatter* m, MatterInfo* info, 
 
 static void unsafe_canvas_do_drawing(IMatter* m, MatterInfo* info, float x1, float y1, float x2, float y2) {
     if (!info->draw_anchor.is_zero()) {
-        Dot dot = m->get_bounding_box().dot(info->draw_anchor);
+        Dot dot = m->get_bounding_box().point_at(info->draw_anchor);
 
         info->canvas->add_line(x1 + dot.x, y1 + dot.y, x2 + dot.x, y2 + dot.y);
     } else {
@@ -736,19 +736,20 @@ void GYDM::Plane::clear_motion_actions(IMatter* m) {
     }
 }
 
-IMatter* GYDM::Plane::find_matter(float x, float y, IMatter* after) {
+IMatter* GYDM::Plane::find_matter(const Position& pos, IMatter* after) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
         MatterInfo* head_info = MATTER_INFO(this->head_matter);
         MatterInfo* aftr_info = plane_matter_info(this, after);
         IMatter* child = (aftr_info == nullptr) ? head_info->prev : aftr_info->prev;
+        Dot dot = pos.calculate_point();
 
         do {
             MatterInfo* info = MATTER_INFO(child);
 
             if (child->visible() && !child->concealled()) {
-                if (this->is_matter_found(child, info, x, y)) {
+                if (this->is_matter_found(child, info, dot)) {
                     found = child;
                     break;
                 }
@@ -761,7 +762,35 @@ IMatter* GYDM::Plane::find_matter(float x, float y, IMatter* after) {
     return found;
 }
 
-IMatter* GYDM::Plane::find_least_recent_matter(float x, float y) {
+IMatter* GYDM::Plane::find_matter(IMatter* collided_matter, IMatter* after) {
+    IMatter* found = nullptr;
+    Box self = this->get_matter_bounding_box(collided_matter);
+
+    if ((!self.is_empty()) && (this->head_matter != nullptr)) {
+        MatterInfo* head_info = MATTER_INFO(this->head_matter);
+        MatterInfo* aftr_info = plane_matter_info(this, after);
+        IMatter* child = (aftr_info == nullptr) ? head_info->prev : aftr_info->prev;
+
+        do {
+            MatterInfo* info = MATTER_INFO(child);
+
+            if (child->visible() && !child->concealled()) {
+                Box box = unsafe_get_matter_bound(child, info);
+
+                if (self.overlay(box) && (collided_matter != child)) {
+                    found = child;
+                    break;
+                }
+            }
+
+            child = info->prev;
+        } while (child != head_info->prev);
+    }
+
+    return found;
+}
+
+IMatter* GYDM::Plane::find_least_recent_matter(const Dot& pos) {
     IMatter* found = nullptr;
     uint32_t found_hit = 0xFFFFFFFFU;
 
@@ -773,7 +802,7 @@ IMatter* GYDM::Plane::find_least_recent_matter(float x, float y) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (child->visible() && !child->concealled()) {
-                if (this->is_matter_found(child, info, x, y)) {
+                if (this->is_matter_found(child, info, pos)) {
                     if (info->selection_hit < found_hit) {
                         found = child;
                         found_hit = info->selection_hit;
@@ -799,7 +828,7 @@ IMatter* GYDM::Plane::find_least_recent_matter(float x, float y) {
 /**
  * TODO: if we need to check selected matters first? 
  */
-IMatter* GYDM::Plane::find_matter_for_tooltip(float x, float y) {
+IMatter* GYDM::Plane::find_matter_for_tooltip(const Dot& pos) {
     IMatter* found = nullptr;
 
     if (this->head_matter != nullptr) {
@@ -810,7 +839,7 @@ IMatter* GYDM::Plane::find_matter_for_tooltip(float x, float y) {
             MatterInfo* info = MATTER_INFO(child);
 
             if (child->visible()) {
-                if (this->is_matter_found(child, info, x, y)) {
+                if (this->is_matter_found(child, info, pos)) {
                     found = child;
                     break;
                 }
@@ -846,7 +875,7 @@ GYDM::Dot GYDM::Plane::get_matter_location(IMatter* m, const Anchor& a) {
     Dot dot(flnan, flnan);
     
     if (info != nullptr) {
-        dot = unsafe_get_matter_bound(m, info).dot(a);
+        dot = unsafe_get_matter_bound(m, info).point_at(a);
     }
 
     return dot;
@@ -1061,7 +1090,8 @@ bool GYDM::Plane::on_pointer_pressed(uint8_t button, float x, float y, uint8_t c
 
     switch (button) {
     case SDL_BUTTON_LEFT: {
-        IMatter* self_matter = this->find_matter(x, y, static_cast<IMatter*>(nullptr));
+        Dot pos = Dot(x, y) - this->translate;
+        IMatter* self_matter = this->find_matter(pos, static_cast<IMatter*>(nullptr));
 
         if (self_matter != nullptr) {
             if (self_matter->low_level_events_allowed()) {
@@ -1086,7 +1116,8 @@ bool GYDM::Plane::on_pointer_move(uint32_t state, float x, float y, float dx, fl
     bool handled = false;
 
     if (state == 0) {
-        IMatter* self_matter = this->find_matter_for_tooltip(x, y);
+        Dot pos = Dot(x, y) - this->translate;
+        IMatter* self_matter = this->find_matter_for_tooltip(pos);
 
         if ((self_matter == nullptr) || (self_matter != this->hovering_matter)) {
             if ((self_matter != nullptr) && !self_matter->concealled()) {
@@ -1140,7 +1171,8 @@ bool GYDM::Plane::on_pointer_released(uint8_t button, float x, float y, uint8_t 
 
     switch (button) {
     case SDL_BUTTON_LEFT: {
-        IMatter* self_matter = this->find_least_recent_matter(x, y);
+        Dot pos = Dot(x, y) - this->translate;
+        IMatter* self_matter = this->find_least_recent_matter(pos);
 
         if (self_matter != nullptr) {
             MatterInfo* info = MATTER_INFO(self_matter);
@@ -1494,7 +1526,7 @@ void GYDM::Plane::draw_speech(SDL_Renderer* renderer, IMatter* child, MatterInfo
 /*************************************************************************************************/
 bool GYDM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_track, bool heading) {
     bool moved = false;
-    Dot dot = pos.calculate_dot();
+    Dot dot = pos.calculate_point();
     float x = dot.x;
     float y = dot.y;
     
@@ -1524,7 +1556,7 @@ bool GYDM::Plane::do_moving_via_info(IMatter* m, MatterInfo* info, const Positio
 
 bool GYDM::Plane::do_gliding_via_info(IMatter* m, MatterInfo* info, const Position& pos, double sec, double sec_delta, bool absolute, bool ignore_track) {
     bool moved = false;
-    Dot dot = pos.calculate_dot();
+    Dot dot = pos.calculate_point();
     float x = dot.x;
     float y = dot.y;
     
@@ -1742,7 +1774,7 @@ void GYDM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidt
 
                 if (gm.second > 0.0) {
                     if (gm.sec_delta > 0.0) {
-                        if (this->do_gliding_via_info(m, info, gm.dot, gm.second, gm.sec_delta, gm.absolute, false)) {
+                        if (this->do_gliding_via_info(m, info, gm.target, gm.second, gm.sec_delta, gm.absolute, false)) {
                             this->notify_updated();
                             break;
                         }
@@ -1752,7 +1784,7 @@ void GYDM::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwidt
                             break;
                         }
                     }
-                } else if (this->do_moving_via_info(m, info, gm.dot, gm.absolute, false, gm.heading)) {
+                } else if (this->do_moving_via_info(m, info, gm.target, gm.absolute, false, gm.heading)) {
                     this->notify_updated();
                 }
             } else {
@@ -1782,11 +1814,14 @@ bool GYDM::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length,
     return this->glide_matter_via_info(m, info, sec, Position(x, y), false, true);
 }
 
-bool GYDM::Plane::is_matter_found(IMatter* m, MatterInfo* info, float x, float y) {
-    float lx = x - (info->x + this->translate.x);
-    float ly = y - (info->y + this->translate.y);
+bool GYDM::Plane::is_matter_found(IMatter* m, MatterInfo* info, const Dot& dot) {
+    Dot lp = Dot(dot.x - info->x, dot.y - info->y);
+
+    /** NOTE:
+     * the translation should only affect view poisition(say, mouse position for instance)
+     */
     
-    return m->is_colliding({ lx, ly });
+    return m->is_colliding(lp);
 }
 
 /*************************************************************************************************/
@@ -1808,8 +1843,7 @@ void GYDM::Plane::reset_pen(IMatter* m) {
     MatterInfo* info = plane_matter_info(this, m);
 
     if (info != nullptr) {
-        MotionAction action(MotionActionType::TrackReset);
-        unsafe_do_canvas_setting(this, m, info, action);
+        unsafe_do_canvas_setting(this, m, info, MotionAction(MotionActionType::TrackReset));
     }
 }
 
@@ -2005,22 +2039,36 @@ bool GYDM::Plane::is_colliding_with_mouse(IMatter* m) {
 }
 
 void GYDM::Plane::glide_to_random_location(double sec, IMatter* m) {
-    IScreen* screen = this->master();
-    float width, height;
-    Dot rpos;
+    MatterInfo* info = plane_matter_info(this, m);
     
-    if (screen != nullptr) {
-        Box box = m->get_bounding_box();
-        float hinset = box.width() * 0.5F;
-        float vinset = box.height() * 0.5F;
+    if (info != nullptr) {
+        IScreen* screen = this->master();
+        float width, height;
+        Dot rpos;
+    
+        if (screen != nullptr) {
+            Box box = m->get_bounding_box();
+            float hinset = box.width() * 0.5F;
+            float vinset = box.height() * 0.5F;
 
-        screen->feed_client_extent(&width, &height);
+            screen->feed_client_extent(&width, &height);
 
-        // TODO: deal with translation
-        rpos.x = float(random_uniform(int(hinset), int(width - hinset)));
-        rpos.y = float(random_uniform(int(vinset), int(height - vinset)));
+            // TODO: deal with translation
+            rpos.x = float(random_uniform(int(hinset), int(width - hinset)));
+            rpos.y = float(random_uniform(int(vinset), int(height - vinset)));
 
-        this->glide_to(sec, m, rpos, MatterAnchor::CC, Vector::O);
+            this->glide_to(sec, m, rpos, MatterAnchor::CC, Vector::O);
+        }
+    }
+}
+
+void GYDM::Plane::glide_to_mouse(double sec, IMatter* m, const Anchor& a, const Vector& vec) {
+    MatterInfo* info = plane_matter_info(this, m);
+    
+    if (info != nullptr) {
+        Dot mouse = get_current_mouse_location();
+
+        this->glide_to(sec, m, mouse - this->translate, a, vec);
     }
 }
 

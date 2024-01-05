@@ -5,6 +5,13 @@
 
 namespace GYDM {
     template<typename Fl>
+    struct Length { using type = float; };
+
+    template<>
+    struct Length<double> { using type = double; };
+
+    /*********************************************************************************************/
+    template<typename Fl>
     inline Fl clamp(Fl v, Fl min, Fl max) {
         if (v > max) {
             v = max;
@@ -82,7 +89,6 @@ namespace GYDM {
     inline Fl vector_clamp(Fl v, Fl ceil) {
         return clamp(v, -ceil, ceil);
     }
-
 
     /*********************************************************************************************/
     template<typename Fl>
