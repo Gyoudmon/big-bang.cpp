@@ -195,7 +195,7 @@ void GYDM::IMatter::show(bool yes_no) {
 }
 
 Dot GYDM::IMatter::get_location(const Anchor& a) {
-    Dot dot(flnan, flnan);
+    Dot dot(flnan_f, flnan_f);
 
     if (this->info != nullptr) {
         dot = this->info->master->get_matter_location(this, a);

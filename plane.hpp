@@ -207,7 +207,7 @@ namespace GYDM {
         }
         
         template<class M>
-        M* insert(M* m, const GYDM::Position& pos = Position::O, const GYDM::Anchor& a = 0.0F, const GYDM::Vector& vec = Vector::O) {
+        M* insert(M* m, const GYDM::Position& pos = {}, const GYDM::Anchor& a = 0.0F, const GYDM::Vector& vec = Vector::O) {
             this->insert_at(m, pos, a, vec);
 
             return m;

@@ -9,9 +9,6 @@
 namespace GYDM {
     class __lambda__ Position {
     public:
-        static const GYDM::Position O;
-
-    public:
         Position() : Position(0.0F, 0.0F) {}
         Position(float x, float y) : dot(x, y) {}
         Position(const GYDM::Dot& dot) : Position(dot.x, dot.y) {}

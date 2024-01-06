@@ -244,7 +244,7 @@ Box GYDM::Polygonlet::get_bounding_box() {
 
 void GYDM::Polygonlet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     if (this->n > 2) {
-        aapolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
+        aapolygonRGBA(renderer, this->txs, this->tys, int(this->n), r, g, b, a);
     } else {
         // line and dot have no borders
     }
@@ -252,8 +252,8 @@ void GYDM::Polygonlet::draw_shape(SDL_Renderer* renderer, int width, int height,
 
 void GYDM::Polygonlet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     if (this->n > 2) {
-        filledPolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
-        aapolygonRGBA(renderer, this->txs, this->tys, this->n, r, g, b, a);
+        filledPolygonRGBA(renderer, this->txs, this->tys, int(this->n), r, g, b, a);
+        aapolygonRGBA(renderer, this->txs, this->tys, int(this->n), r, g, b, a);
     } else if (this->n == 2) {
         aalineRGBA(renderer, this->txs[0], this->tys[0], this->txs[1], this->tys[1], r, g, b, a);
     } else if (this->n == 1) {

@@ -15,7 +15,7 @@ static const float hatch_long_ratio = 0.618F;
 static const float mark_space_ratio = 0.500F;
 
 inline static shared_font_t hatchmark_default_font() {
-	static shared_font_t default_mark_font = GameFont::monospace(12.0F);
+	static shared_font_t default_mark_font = GameFont::monospace(12);
 
 	return default_mark_font;
 }

@@ -872,7 +872,7 @@ IMatter* GYDM::Plane::find_next_selected_matter(IMatter* start) {
 
 GYDM::Dot GYDM::Plane::get_matter_location(IMatter* m, const Anchor& a) {
     MatterInfo* info = plane_matter_info(this, m);
-    Dot dot(flnan, flnan);
+    Dot dot(flnan_f, flnan_f);
     
     if (info != nullptr) {
         dot = unsafe_get_matter_bound(m, info).point_at(a);

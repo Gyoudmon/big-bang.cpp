@@ -22,7 +22,7 @@ namespace GYDM {
 	};
 
 	struct __lambda__ VHatchMarkMetrics {
-		uint32_t span;
+		size_t span;
 		float mark_width;
 		float gap_space;
 		float top_space;
