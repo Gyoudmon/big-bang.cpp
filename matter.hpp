@@ -83,8 +83,8 @@ namespace GYDM {
         void scale_to(float x_ratio, float y_ratio, const GYDM::Anchor& anchor = 0.5F);
         void resize(float size, const GYDM::Anchor& anchor = 0.5F) { this->resize(size, size, anchor); }
         void resize(float width, float height, const GYDM::Anchor& anchor = 0.5F);
-        void resize_by_width(float size, const GYDM::Anchor& anchor = 0.5F);
-        void resize_by_height(float size, const GYDM::Anchor& anchor = 0.5F);
+        void resize_by_width(float size, const GYDM::Anchor& anchor = 0.5F) { this->scale_by_size(size, true, anchor); }
+        void resize_by_height(float size, const GYDM::Anchor& anchor = 0.5F) { this->scale_by_size(size, false, anchor); }
 
     public:
         bool events_allowed() { return this->deal_with_events; }
