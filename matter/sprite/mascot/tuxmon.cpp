@@ -1,6 +1,6 @@
 #include "tuxmon.hpp"
 
-#include "../../../graphics/renderer.hpp"
+#include "../../../graphics/misc.hpp"
 
 using namespace GYDM;
 

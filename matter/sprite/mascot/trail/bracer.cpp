@@ -10,16 +10,16 @@ GYDM::Bracer::Bracer(const char* name, const char* nickname)
 
 void GYDM::Bracer::on_costumes_load() {
     Citizen::on_costumes_load();
-    this->do_mode_switching(BracerMode::Walk, MatterAnchor::CC);
+    this->do_mode_switching(BracerMode::Walk, MatterPort::CC);
 }
 
-void GYDM::Bracer::try_switch_mode(BracerMode mode, int repeat, MatterAnchor anchor) {
+void GYDM::Bracer::try_switch_mode(BracerMode mode, int repeat, MatterPort anchor) {
     if (this->mode != mode) {
         this->switch_mode(mode, repeat, anchor);
     }
 }
 
-void GYDM::Bracer::switch_mode(BracerMode mode, int repeat, MatterAnchor anchor) {
+void GYDM::Bracer::switch_mode(BracerMode mode, int repeat, MatterPort anchor) {
     if (this->mode != mode) {
         this->do_mode_switching(mode, anchor);
     }
@@ -40,7 +40,7 @@ void GYDM::Bracer::retrigger_heading_change_event() {
     this->dispatch_heading_event(vr, vx, vy, vr);
 }
 
-void GYDM::Bracer::do_mode_switching(BracerMode mode, MatterAnchor anchor) {
+void GYDM::Bracer::do_mode_switching(BracerMode mode, MatterPort anchor) {
     float cwidth, cheight;
 
     this->mode = mode;

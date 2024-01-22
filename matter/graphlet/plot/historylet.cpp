@@ -4,7 +4,6 @@
 #include "../../../datum/flonum.hpp"
 
 #include "../../../graphics/image.hpp"
-#include "../../../graphics/brush.hpp"
 
 using namespace GYDM;
 
@@ -31,7 +30,7 @@ void GYDM::Historylet::on_resize(float w, float h, float width, float height) {
     this->height = flabs(h);
 }
 
-void GYDM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
+void GYDM::Historylet::draw_on_canvas(GYDM::dc_t* dc, float flwidth, float flheight) {
     size_t n = this->raw_dots.size();
     float xrange = flmax(this->xmax - this->xmin, flwidth);
     float yrange = flmax(this->ymax - this->ymin, flheight);
@@ -49,7 +48,7 @@ void GYDM::Historylet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, flo
         }
 
         if (this->pen_okay()) {
-            Brush::draw_lines(renderer, dots.data(), int(n), this->get_pen_color());
+            dc->draw_lines(dots.data(), int(n), this->get_pen_color());
         }
     }
 }

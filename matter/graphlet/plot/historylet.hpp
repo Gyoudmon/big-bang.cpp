@@ -20,7 +20,7 @@ namespace GYDM {
         void clear();
 
     protected:
-        void draw_on_canvas(SDL_Renderer* renderer, float Width, float Height) override;
+        void draw_on_canvas(GYDM::dc_t* dc, float Width, float Height) override;
         
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;

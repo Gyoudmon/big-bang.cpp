@@ -3,9 +3,6 @@
 #include "../../datum/box.hpp"
 #include "../../datum/flonum.hpp"
 
-#include "../../graphics/image.hpp"
-#include "../../graphics/brush.hpp"
-
 // https://www.ferzkopp.net/Software/SDL2_gfx/Docs/html/index.html
 #include <SDL2/SDL2_gfxPrimitives.h>
 
@@ -31,10 +28,10 @@ Box GYDM::Tracklet::get_bounding_box() {
 void GYDM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
     if (this->is_drawing()) {
         if (this->canvas->okay()) {
-            auto master = this->master_renderer();
+            auto master = this->drawing_context();
 
             if (master != nullptr) {
-                SDL_Texture* origin = SDL_GetRenderTarget(master);
+                SDL_Texture* origin = master->get_target();
                 short fx1 = fl2fx<short>(x1);
                 short fy1 = fl2fx<short>(y1);
                 short fx2 = fl2fx<short>(x2);
@@ -42,19 +39,19 @@ void GYDM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
                 uint8_t r, g, b, a;
 
                 if (this->pen_okay(&r, &g, &b, &a)) {
-                    SDL_SetRenderTarget(master, this->canvas->self());
+                    master->set_target(this->canvas->self());
                 
                     if (this->line_width <= 1) {
-                        aalineRGBA(master, fx1, fy1, fx2, fy2, r, g, b, a);
+                        aalineRGBA(master->self(), fx1, fy1, fx2, fy2, r, g, b, a);
                     } else {
                         int radius = this->line_width / 2;
 
-                        filledCircleRGBA(master, fx1, fy1, radius, r, g, b, a);
-                        filledCircleRGBA(master, fx2, fy2, radius, r, g, b, a);
-                        thickLineRGBA(master, fx1, fy1, fx2, fy2, this->line_width, r, g, b, a);
+                        filledCircleRGBA(master->self(), fx1, fy1, radius, r, g, b, a);
+                        filledCircleRGBA(master->self(), fx2, fy2, radius, r, g, b, a);
+                        thickLineRGBA(master->self(), fx1, fy1, fx2, fy2, this->line_width, r, g, b, a);
                     }
 
-                    SDL_SetRenderTarget(master, origin);
+                    SDL_SetRenderTarget(master->self(), origin);
 
                     this->resolve_boundary(x1, y1);
                     this->resolve_boundary(x2, y2);
@@ -68,17 +65,17 @@ void GYDM::Tracklet::add_line(float x1, float y1, float x2, float y2) {
 
 void GYDM::Tracklet::stamp(GYDM::IMatter* matter, float x, float y) {
     if (this->canvas->okay()) {
-        auto master = this->master_renderer();
+        auto master = this->drawing_context();
 
         if (master != nullptr) {
-            SDL_Texture* origin = SDL_GetRenderTarget(master);
+            SDL_Texture* origin = master->get_target();
             Box mbox = matter->get_bounding_box();
             float mwidth = mbox.width();
             float mheight = mbox.height();
                 
-            SDL_SetRenderTarget(master, this->canvas->self());
+            master->set_target(this->canvas->self());
             matter->draw(master, x, y, mwidth, mheight);
-            SDL_SetRenderTarget(master, origin);
+            master->set_target(origin);
 
             this->resolve_boundary(x, y);
             this->resolve_boundary(x + mwidth, y + mheight);

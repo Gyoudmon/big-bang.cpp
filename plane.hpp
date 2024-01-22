@@ -1,11 +1,12 @@
 #pragma once
 
+#include "graphics/dc.hpp"
 #include "graphics/font.hpp"
 #include "physics/color/rgba.hpp"
 #include "physics/color/names.hpp"
 #include "physics/geometry/point.hpp"
 #include "physics/geometry/vector.hpp"
-#include "physics/geometry/anchor.hpp"
+#include "physics/geometry/port.hpp"
 #include "physics/geometry/aabox.hpp"
 #include "physics/geometry/margin.hpp"
 
@@ -40,9 +41,9 @@ namespace GYDM {
         IPlane(const char* name);
 
     public:
-        const char* name();
-        GYDM::IScreen* master();
-        SDL_Renderer* master_renderer();
+        const char* name() const;
+        GYDM::IScreen* master() const;
+        GYDM::dc_t* drawing_context() const;
 
     public:
         virtual bool has_mission_completed() { return false; }
@@ -52,15 +53,15 @@ namespace GYDM {
         virtual void load(float Width, float Height) {}
         virtual void reflow(float width, float height) {}
         virtual void update(uint64_t count, uint32_t interval, uint64_t uptime) {}
-        virtual void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) {}
+        virtual void draw(GYDM::dc_t* dc, float X, float Y, float Width, float Height) {}
     
     public:
         virtual GYDM::IMatter* find_matter(const Position& pos, GYDM::IMatter* after) = 0;
         virtual GYDM::IMatter* find_matter(GYDM::IMatter* collided_matter, GYDM::IMatter* after) = 0;
-        virtual GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a) = 0;
+        virtual GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Port& a) = 0;
         virtual GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) = 0;
         virtual GYDM::Box get_bounding_box() = 0;
-        virtual void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) = 0;
+        virtual void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Port& p, const GYDM::Vector& vec) = 0;
         virtual void insert_as_speech_bubble(IMatter* m) = 0;
         virtual void bring_to_front(IMatter* m, IMatter* target) = 0;
         virtual void bring_forward(IMatter* m, int n) = 0;
@@ -68,10 +69,10 @@ namespace GYDM {
         virtual void send_backward(IMatter* m, int n) = 0;
         virtual void move(IMatter* m, double length, bool ignore_gliding) = 0;
         virtual void move(IMatter* m, const GYDM::Vector& vec, bool ignore_gliding) = 0;
-        virtual void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) = 0;
+        virtual void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Port& p, const GYDM::Vector& vec) = 0;
         virtual void glide(double sec, IMatter* m, double length) = 0;
         virtual void glide(double sec, IMatter* m, const GYDM::Vector& vec) = 0;
-        virtual void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) = 0;
+        virtual void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Port& p, const GYDM::Vector& vec) = 0;
         virtual void remove(IMatter* m, bool needs_delete) = 0;
         virtual void erase() = 0;
 
@@ -118,7 +119,7 @@ namespace GYDM {
 
     public:
         bool is_colliding(IMatter* m, IMatter* target);
-        bool is_colliding(IMatter* m, IMatter* target, const GYDM::Anchor& a);
+        bool is_colliding(IMatter* m, IMatter* target, const GYDM::Port& a);
         
     public:
         void create_grid(int col, float x = 0.0F, float y = 0.0F, float width = 0.0F);
@@ -127,16 +128,16 @@ namespace GYDM {
         void create_grid(float cell_width, float x = 0.0F, float y = 0.0F, int col = 0);
         void create_grid(float cell_width, float cell_height, float x = 0.0F, float y = 0.0F, int row = 0, int col = 0);
         int grid_cell_index(float x, float y, int* r = nullptr, int* c = nullptr);
-        int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, const GYDM::Anchor& a = 0.5F);
+        int grid_cell_index(IMatter* m, int* r = nullptr, int* c = nullptr, const GYDM::Port& p = 0.5F);
         GYDM::Box get_grid_cell_bounding_box();
-        GYDM::Dot get_grid_cell_location(int idx, const GYDM::Anchor& a = 0.5F);
-        GYDM::Dot get_grid_cell_location(int row, int col, const GYDM::Anchor& a = 0.5F);
-        void insert_at_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
-        void insert_at_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
-        void move_to_grid(IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
-        void move_to_grid(IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
-        void glide_to_grid(double sec, IMatter* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
-        void glide_to_grid(double sec, IMatter* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
+        GYDM::Dot get_grid_cell_location(int idx, const GYDM::Port& p = 0.5F);
+        GYDM::Dot get_grid_cell_location(int row, int col, const GYDM::Port& p = 0.5F);
+        void insert_at_grid(IMatter* m, int idx, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void insert_at_grid(IMatter* m, int row, int col, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void move_to_grid(IMatter* m, int idx, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void move_to_grid(IMatter* m, int row, int col, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void glide_to_grid(double sec, IMatter* m, int idx, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void glide_to_grid(double sec, IMatter* m, int row, int col, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O);
         void set_grid_color(const GYDM::RGBA& color) { this->grid_color = color; }
 
     public:
@@ -191,7 +192,7 @@ namespace GYDM {
         virtual void on_save(const std::string& usrdata_path, std::ofstream& dev_datout) {}
 
     protected:
-        virtual void draw_visible_selection(SDL_Renderer* renderer, float X, float Y, float width, float height) = 0;
+        virtual void draw_visible_selection(GYDM::dc_t* renderer, float X, float Y, float width, float height) = 0;
 
     protected:
         virtual IMatter* make_bubble_text(const std::string& message, const GYDM::RGBA& color) = 0;
@@ -207,22 +208,22 @@ namespace GYDM {
         }
         
         template<class M>
-        M* insert(M* m, const GYDM::Position& pos = {}, const GYDM::Anchor& a = 0.0F, const GYDM::Vector& vec = Vector::O) {
-            this->insert_at(m, pos, a, vec);
+        M* insert(M* m, const GYDM::Position& pos = {}, const GYDM::Port& p = 0.0F, const GYDM::Vector& vec = Vector::O) {
+            this->insert_at(m, pos, p, vec);
 
             return m;
         }
         
         template<class M>
-        M* insert(M* m, int idx, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O) {
-            this->insert_at_grid(m, idx, a, vec);
+        M* insert(M* m, int idx, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O) {
+            this->insert_at_grid(m, idx, p, vec);
 
             return m;
         }
 
         template<class M>
-        M* insert(M* m, int row, int col, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O) {
-            this->insert_at_grid(m, row, col, a, vec);
+        M* insert(M* m, int row, int col, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O) {
+            this->insert_at_grid(m, row, col, p, vec);
 
             return m;
         }
@@ -262,20 +263,20 @@ namespace GYDM {
         void set_bubble_margin(const GYDM::Margin& margin) { this->bubble_margin = margin; }
         
     public:
-        void draw(SDL_Renderer* renderer, float X, float Y, float Width, float Height) override;
+        void draw(GYDM::dc_t* renderer, float X, float Y, float Width, float Height) override;
         
     public:
         bool is_colliding_with_mouse(IMatter* m);
         void glide_to_random_location(double sec, IMatter* m);
-        void glide_to_mouse(double sec, IMatter* m, const GYDM::Anchor& a = 0.5F, const GYDM::Vector& vec = Vector::O);
+        void glide_to_mouse(double sec, IMatter* m, const GYDM::Port& p = 0.5F, const GYDM::Vector& vec = Vector::O);
 
     public:
         GYDM::IMatter* find_matter(const Position& pos, GYDM::IMatter* after = nullptr) override;
         GYDM::IMatter* find_matter(GYDM::IMatter* collided_matter, GYDM::IMatter* after = nullptr) override;
-        GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Anchor& a = 0.0F) override;
+        GYDM::Dot get_matter_location(GYDM::IMatter* m, const GYDM::Port& p = 0.0F) override;
         GYDM::Box get_matter_bounding_box(GYDM::IMatter* m) override;
         GYDM::Box get_bounding_box() override;
-        void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a, const GYDM::Vector& vec) override;
+        void insert_at(IMatter* m, const GYDM::Position& pos, const GYDM::Port& p, const GYDM::Vector& vec) override;
         void insert_as_speech_bubble(IMatter* m) override;
         void bring_to_front(IMatter* m, IMatter* target = nullptr) override;
         void bring_forward(IMatter* m, int n = 1) override;
@@ -283,17 +284,17 @@ namespace GYDM {
         void send_backward(IMatter* m, int n = 1) override;
         void move(IMatter* m, double length, bool ignore_gliding = false) override;
         void move(IMatter* m, const GYDM::Vector& vec, bool ignore_gliding = false) override;
-        void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, const GYDM::Vector& vec = Vector::O) override;
+        void move_to(IMatter* m, const GYDM::Position& pos, const GYDM::Port& p = 0.0F, const GYDM::Vector& vec = Vector::O) override;
         void glide(double sec, IMatter* m, double length) override;
         void glide(double sec, IMatter* m, const GYDM::Vector& vec) override;
-        void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Anchor& a = 0.0, const GYDM::Vector& vec = Vector::O) override;
+        void glide_to(double sec, IMatter* m, const GYDM::Position& pos, const GYDM::Port& p = 0.0F, const GYDM::Vector& vec = Vector::O) override;
         void remove(IMatter* m, bool needs_delete = true) override;
         void erase() override;
         void size_cache_invalid();
         void clear_motion_actions(IMatter* m);
 
     public:
-        void bind_canvas(IMatter* m, GYDM::Tracklet* canvas, const GYDM::Anchor& anchor = 0.5F, bool shared = false);
+        void bind_canvas(IMatter* m, GYDM::Tracklet* canvas, const GYDM::Port& anchor = 0.5F, bool shared = false);
         void reset_pen(IMatter* m);
         void stamp(IMatter* m);
         void pen_down(IMatter* m) { this->set_drawing(m, true); }
@@ -332,7 +333,7 @@ namespace GYDM {
         void set_local_fps(int fps, bool restart = false);
 
     protected:
-        void draw_visible_selection(SDL_Renderer* renderer, float x, float y, float width, float height) override;
+        void draw_visible_selection(GYDM::dc_t* renderer, float x, float y, float width, float height) override;
         virtual bool update_tooltip(IMatter* m, float local_x, float local_y, float global_x, float global_y) { return false; }
         virtual void on_double_tap_sentry_sprite(GYDM::ISprite* sentry) { this->mission_complete(); }
 
@@ -341,7 +342,7 @@ namespace GYDM {
         bool merge_bubble_text(IMatter* bubble, const std::string& message, const GYDM::RGBA& color) override;
         bool is_bubble_showing(IMatter* m, SpeechBubble* type) override;
         virtual void place_speech_bubble(IMatter* m, float bubble_width, float bubble_height, float Width, float Height,
-                                            GYDM::Anchor* ma, GYDM::Anchor* ba, float* dx, float* dy);
+                                            GYDM::Port* mp, GYDM::Port* bp, float* dx, float* dy);
         
     protected:
         bool on_pointer_pressed(uint8_t button, float x, float y, uint8_t clicks) override;
@@ -367,10 +368,10 @@ namespace GYDM {
         void handle_queued_motion(IMatter* m, MatterInfo* info, float dwidth, float dheight);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, double length, bool ignore_gliding, bool heading);
         bool move_matter_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_gliding, bool heading);
-        bool move_matter_to_location_via_info(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy);
+        bool move_matter_to_location_via_info(IMatter* m, MatterInfo* info, const Position& pos, const Port& p, float dx, float dy);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, double length);
         bool glide_matter_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, bool absolute, bool heading);
-        bool glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, const Anchor& a, float dx, float dy, bool heading);
+        bool glide_matter_to_location_via_info(IMatter* m, MatterInfo* info, double sec, const Position& pos, const Port& p, float dx, float dy, bool heading);
         bool do_moving_via_info(IMatter* m, MatterInfo* info, const Position& pos, bool absolute, bool ignore_track, bool heading);
         bool do_gliding_via_info(IMatter* m, MatterInfo* info, const Position& pos, double sec, double sec_delta, bool absolute, bool ignore_track);
         bool do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading);
@@ -378,9 +379,9 @@ namespace GYDM {
         
     private:
         void handle_new_matter(IMatter* m, SpeechInfo* info);
-        void handle_new_matter(IMatter* m, MatterInfo* info, const Position& pos, const Anchor& a, float dx, float dy);
-        void draw_matter(SDL_Renderer* renderer, IMatter* self, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
-        void draw_speech(SDL_Renderer* renderer, IMatter* self, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
+        void handle_new_matter(IMatter* m, MatterInfo* info, const Position& pos, const Port& p, float dx, float dy);
+        void draw_matter(GYDM::dc_t* renderer, IMatter* self, MatterInfo* info, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
+        void draw_speech(GYDM::dc_t* renderer, IMatter* self, MatterInfo* info, float Width, float Height, float X, float Y, float dsX, float dsY, float dsWidth, float dsHeight);
         void recalculate_matters_extent_when_invalid();
         bool say_goodbye_to_hover_matter(uint32_t state, float x, float y, float dx, float dy);
         bool is_matter_found(IMatter* m, MatterInfo* info, const Dot& dot);

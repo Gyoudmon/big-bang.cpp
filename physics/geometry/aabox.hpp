@@ -2,7 +2,7 @@
 
 #include "point.hpp"
 #include "vector.hpp"
-#include "anchor.hpp"
+#include "port.hpp"
 
 #include "../../datum/flonum.hpp"
 #include "../mathematics.hpp"
@@ -34,7 +34,7 @@ namespace GYDM {
         T width() const { return this->rbdot.x - this->ltdot.x; }
         T height() const { return this->rbdot.y - this->ltdot.y; }
         
-        GYDM::Point<T> point_at(const GYDM::Anchor& anchor) const { return this->point_at(anchor.fx, anchor.fy); }
+        GYDM::Point<T> point_at(const GYDM::Port& port) const { return this->point_at(port.fx, port.fy); }
 
         template<typename Fl>
         GYDM::Point<Fl> point_at(Fl fx, Fl fy) const {

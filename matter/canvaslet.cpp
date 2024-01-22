@@ -4,7 +4,6 @@
 #include "../datum/flonum.hpp"
 
 #include "../graphics/image.hpp"
-#include "../graphics/brush.hpp"
 
 using namespace GYDM;
 
@@ -13,12 +12,12 @@ void GYDM::ICanvaslet::on_resize(float w, float h, float width, float height) {
     this->invalidate_canvas();
 }
 
-void GYDM::ICanvaslet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
+void GYDM::ICanvaslet::draw(GYDM::dc_t* dc, float flx, float fly, float flwidth, float flheight) {
     if (this->canvas.use_count() == 0) {
         int width = fl2fxi(flwidth) + 1;
         int height = fl2fxi(flheight) + 1;
     
-        this->canvas = std::make_shared<Texture>(game_blank_image(renderer, width, height));
+        this->canvas = std::make_shared<Texture>(dc->create_blank_image(width, height));
 
         if (!this->canvas->okay()) {
             fprintf(stderr, "failed to refresh the canvas of %s: %s\n", this->name(), SDL_GetError());
@@ -28,25 +27,25 @@ void GYDM::ICanvaslet::draw(SDL_Renderer* renderer, float flx, float fly, float 
 
     if (this->canvas->okay()) {
         if (this->needs_refresh_canvas) {
-            SDL_Texture* origin = SDL_GetRenderTarget(renderer);
+            SDL_Texture* origin = dc->get_target();
             
-            SDL_SetRenderTarget(renderer, this->canvas->self());
+            dc->set_target(this->canvas->self());
 
             if (!this->canvas_background_color.is_transparent()) {
-                Brush::clear(renderer, this->canvas_background_color);
+                dc->clear(this->canvas_background_color);
             }
 
-            this->draw_on_canvas(renderer, flwidth, flheight);
+            this->draw_on_canvas(dc, flwidth, flheight);
 
-            SDL_SetRenderTarget(renderer, origin);
+            dc->set_target(origin);
             SDL_SetTextureBlendMode(this->canvas->self(), color_mixture_to_blend_mode(this->mixture));
 
             this->needs_refresh_canvas = false;
         }
 
-        this->draw_before_canvas(renderer, flx, fly, flwidth, flheight);
-        Brush::stamp(renderer, this->canvas->self(), flx, fly, flwidth, flheight);
-        this->draw_after_canvas(renderer, flx, fly , flwidth, flheight);
+        this->draw_before_canvas(dc, flx, fly, flwidth, flheight);
+        dc->stamp(this->canvas->self(), flx, fly, flwidth, flheight);
+        this->draw_after_canvas(dc, flx, fly , flwidth, flheight);
     }
 }
 

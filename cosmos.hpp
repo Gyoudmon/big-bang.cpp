@@ -13,7 +13,7 @@ namespace GYDM {
     public:
         void reflow(float window, float height) override;
         void update(uint64_t count, uint32_t interval, uint64_t uptime) override {};
-        void draw(SDL_Renderer* renderer, int x, int y, int width, int height) override;
+        void draw(GYDM::dc_t* dc, int x, int y, int width, int height) override;
         bool has_current_mission_completed();
         bool can_exit() override;
 

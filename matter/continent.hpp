@@ -17,10 +17,10 @@ namespace GYDM {
 		const char* name() override;
 
 	public:
-		void construct(SDL_Renderer* renderer) override;
+		void construct(GYDM::dc_t* dc) override;
 		GYDM::Box get_bounding_box() override;
 		int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
-		void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+		void draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
 
 	public:
 		void set_background_color(const GYDM::RGBA& color);

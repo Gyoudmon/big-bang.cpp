@@ -1,8 +1,6 @@
 #include "universe.hpp"
 #include "misc.hpp"
 
-#include "graphics/brush.hpp"
-#include "graphics/text.hpp"
 #include "graphics/image.hpp"
 #include "physics/color/rgba.hpp"
 #include "physics/color/names.hpp"
@@ -162,32 +160,15 @@ static void game_create_world(int width, int height, SDL_Window** window, SDL_Re
         "SDL 窗体和渲染器创建失败: ", SDL_GetError);
 }
 
-static inline void game_world_reset(SDL_Renderer* renderer, const RGBA& fgc, const RGBA& bgc) {
-    // the `alpha` might not affect the window
-
-    SDL_SetRenderDrawColor(renderer, bgc.R(), bgc.G(), bgc.B(), bgc.A());
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, fgc.R(), fgc.G(), fgc.B(), fgc.A());
-}
-
-static inline void game_world_reset(SDL_Renderer* renderer, SDL_Texture* texture, const RGBA& fgc, const RGBA& bgc) {
-    SDL_SetRenderTarget(renderer, texture);
-    game_world_reset(renderer, fgc, bgc);
-}
-
-static inline void game_world_refresh(SDL_Renderer* renderer, SDL_Texture* texture) {
-    SDL_SetRenderTarget(renderer, nullptr);
-    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
-    SDL_RenderPresent(renderer);
-    SDL_SetRenderTarget(renderer, texture);
-}
-
 /*************************************************************************************************/
 GYDM::IUniverse::IUniverse(uint32_t fps, const RGBA& fgc, const RGBA& bgc) : _fgc(fgc), _bgc(bgc), _fps(fps), _mfgc(fgc) {
+    SDL_Renderer* renderer;
+
     // 初始化游戏系统
     game_initialize(SDL_INIT_VIDEO | SDL_INIT_TIMER);
-    game_create_world(1, 0, &this->window, &this->renderer);
+    game_create_world(1, 0, &this->window, &renderer);
     
+    this->device = new DrawingContext(renderer);
     this->echo.x = 0;
     this->echo.h = 0;
 }
@@ -201,7 +182,7 @@ GYDM::IUniverse::~IUniverse() {
         SDL_DestroyTexture(this->texture);
     }
 
-    SDL_DestroyRenderer(this->renderer);
+    delete this->device;
     SDL_DestroyWindow(this->window);
 }
 
@@ -363,10 +344,10 @@ void GYDM::IUniverse::on_resize(int width, int height) {
         SDL_DestroyTexture(this->texture);
     }
 
-    this->texture = game_create_texture(this->window, this->renderer);
+    this->texture = game_create_texture(this->window, this->device->self());
     
     this->begin_update_sequence();
-    game_world_reset(this->renderer, this->texture, this->_fgc, this->_bgc);
+    this->device->reset(this->texture, this->_fgc, this->_bgc);
     this->reflow(float(width), float(height - this->get_cmdwin_height()));
     this->notify_updated();
     this->end_update_sequence();
@@ -377,7 +358,7 @@ void GYDM::IUniverse::on_user_input(const char* text) {
         this->usrin.append(text);
         this->current_usrin = nullptr;
         
-        if (this->display_usr_input_and_caret(this->renderer, true)) {
+        if (this->display_usr_input_and_caret(this->device, true)) {
             this->notify_updated();
         }
     }
@@ -390,40 +371,41 @@ void GYDM::IUniverse::on_editing(const char* text, int pos, int span) {
     this->on_editing_text(text, pos, span);
 }
 
-void GYDM::IUniverse::do_redraw(SDL_Renderer* renderer, int x, int y, int width, int height) {
+void GYDM::IUniverse::do_redraw(dc_t* device, int x, int y, int width, int height) {
     /**
      * Even if the subclass has its own background,
      *   resetting the renderer is also meaningful,
      *   as the `alpha` does't affect the renderer here,
      *      but does have effect for the subclass.
      */
-    game_world_reset(renderer, this->_fgc, this->_bgc);
-    this->draw(renderer, x, y, width, height - this->get_cmdwin_height());
+    device->reset(this->_fgc, this->_bgc);
+    this->draw(device, x, y, width, height - this->get_cmdwin_height());
 
     if (this->in_editing) {
-        this->display_usr_input_and_caret(renderer, true);
+        this->display_usr_input_and_caret(device, true);
     } else {
-        this->display_usr_message(renderer);
+        this->display_usr_message(device);
     }
     
     if (this->echo.h > 0) {
-        this->draw_cmdwin(renderer, this->echo.x, this->echo.y, this->echo.w, this->echo.h);
+        this->draw_cmdwin(device, this->echo.x, this->echo.y, this->echo.w, this->echo.h);
     }
 }
 
-void GYDM::IUniverse::draw_cmdwin(SDL_Renderer* renderer, int x, int y, int width, int height) {
-    Brush::draw_line(renderer, x, y, width, y, 0x888888U);
+void GYDM::IUniverse::draw_cmdwin(dc_t* device, int x, int y, int width, int height) {
+    device->draw_line(x, y, width, y, 0x888888U);
 }
 
-bool GYDM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
+bool GYDM::IUniverse::display_usr_message(dc_t* device) {
     bool updated = (this->echo.h > 0);
 
     if (updated) {
-        Brush::fill_rect(renderer, &this->echo, this->_ibgc);
+        device->fill_rect(&this->echo, this->_ibgc);
 
         if (!this->message.empty()) {
-            Pen::draw_blended_text(this->echo_font, renderer, this->_mfgc,
-                    this->echo.x, this->cmdline_message_yposition(), this->message, this->echo.w);
+            device->draw_blended_text(this->message, this->echo_font,
+                    this->echo.x, this->cmdline_message_yposition(),
+                    this->_mfgc, this->echo.w);
         }
     } else {
         if (!this->message.empty()) {
@@ -437,19 +419,21 @@ bool GYDM::IUniverse::display_usr_message(SDL_Renderer* renderer) {
     return updated;
 }
 
-bool GYDM::IUniverse::display_usr_input_and_caret(SDL_Renderer* renderer, bool yes) {
+bool GYDM::IUniverse::display_usr_input_and_caret(dc_t* device, bool yes) {
     bool updated = false;
 
     if (this->echo.h > 0) {
-        Brush::fill_rect(renderer, &this->echo, this->_ibgc);
+        device->fill_rect(&this->echo, this->_ibgc);
 
         if (yes) {
             if (this->prompt.empty()) {
-                Pen::draw_blended_text(this->echo_font, renderer, this->_ifgc,
-                        this->echo.x, this->cmdline_message_yposition(), this->usrin + "_", this->echo.w);
+                device->draw_blended_text(this->usrin + "_", this->echo_font,
+                        this->echo.x, this->cmdline_message_yposition(),
+                        this->_ifgc, this->echo.w);
             } else {
-                Pen::draw_blended_text(this->echo_font, renderer, this->_ifgc,
-                        this->echo.x, this->cmdline_message_yposition(), this->prompt + this->usrin + "_", this->echo.w);
+                device->draw_blended_text(this->prompt + this->usrin + "_", this->echo_font,
+                        this->echo.x, this->cmdline_message_yposition(),
+                        this->_ifgc, this->echo.w);
             }
         }
 
@@ -483,16 +467,8 @@ void GYDM::IUniverse::set_window_title(const char* fmt, ...) {
     this->set_window_title(title);
 }
 
-SDL_Renderer* GYDM::IUniverse::master_renderer() {
-    return this->renderer;
-}
-
-const char* GYDM::IUniverse::get_renderer_name() {
-    SDL_RendererInfo rinfo;
-
-    SDL_GetRendererInfo(this->renderer, &rinfo);
-    
-    return rinfo.name; 
+dc_t* GYDM::IUniverse::drawing_context() {
+    return this->device;
 }
 
 void GYDM::IUniverse::set_window_size(int width, int height, bool centerize) {
@@ -526,7 +502,7 @@ void GYDM::IUniverse::set_window_size(int width, int height, bool centerize) {
 
 void GYDM::IUniverse::feed_window_size(int* width, int* height, bool logical) {
     if (logical) {
-        SDL_GetRendererOutputSize(this->renderer, width, height);
+        this->device->feed_output_size(width, height);
     } else {
         SDL_GetWindowSize(this->window, width, height);
     }
@@ -541,8 +517,8 @@ void GYDM::IUniverse::set_window_fullscreen(bool yes) {
 }
 
 void GYDM::IUniverse::refresh() {
-    this->do_redraw(this->renderer, 0, 0, this->window_width, this->window_height);
-    game_world_refresh(this->renderer, this->texture);
+    this->do_redraw(this->device, 0, 0, this->window_width, this->window_height);
+    this->device->refresh(this->texture);
 }
 
 void GYDM::IUniverse::feed_extent(float* width, float* height) {
@@ -589,7 +565,7 @@ void GYDM::IUniverse::log_message(Log level, const std::string& msg) {
     default: this->_mfgc = transparent; break;
     }
 
-    if (this->display_usr_message(this->renderer)){
+    if (this->display_usr_message(this->device)){
         this->notify_updated();
     }
 }
@@ -608,7 +584,7 @@ void GYDM::IUniverse::start_input_text(const std::string& p) {
     this->in_editing = true;
     this->message.erase();
     
-    if (this->display_usr_input_and_caret(this->renderer, true)) {
+    if (this->display_usr_input_and_caret(this->device, true)) {
         this->notify_updated();
     }
 }
@@ -620,7 +596,7 @@ void GYDM::IUniverse::stop_input_text() {
     this->usrin.erase();
     this->prompt.erase();
 
-    if (this->display_usr_input_and_caret(this->renderer, false)) {
+    if (this->display_usr_input_and_caret(this->device, false)) {
         this->notify_updated();
     }
 }
@@ -636,7 +612,7 @@ void GYDM::IUniverse::enter_input_text() {
 
 void GYDM::IUniverse::popback_input_text() {
     if (string_popback_utf8_char(this->usrin)) {
-        if (this->display_usr_input_and_caret(this->renderer, true)) {
+        if (this->display_usr_input_and_caret(this->device, true)) {
             this->notify_updated();
         }
     }
@@ -644,13 +620,10 @@ void GYDM::IUniverse::popback_input_text() {
 
 /*************************************************************************************************/
 SDL_Surface* GYDM::IUniverse::snapshot() {
-    uint32_t format = SDL_PIXELFORMAT_RGBA8888;
-    SDL_Surface* photograph = game_formatted_surface(this->window_width, this->window_height, format);
+    SDL_Surface* photograph = this->device->snapshot(this->window_width, this->window_height);
 
-    if (photograph != nullptr) {
-        if (SDL_RenderReadPixels(this->renderer, NULL, format, photograph->pixels, photograph->pitch) < 0) {
-            this->log_message(Log::Error, make_nstring("failed to take snapshot: %s", SDL_GetError()));
-        }
+    if (photograph == nullptr) {
+        this->log_message(Log::Error, make_nstring("failed to take snapshot: %s", SDL_GetError()));
     }
 
     return photograph;

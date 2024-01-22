@@ -1,6 +1,5 @@
 #include "shapelet.hpp"
 
-#include "../../graphics/brush.hpp"
 #include "../../graphics/image.hpp"
 #include "../../physics/mathematics.hpp"
 
@@ -20,17 +19,17 @@ GYDM::IShapelet::IShapelet(const RGBA& color, const RGBA& bcolor) {
     this->set_pen_color(bcolor);
 }
 
-void GYDM::IShapelet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
+void GYDM::IShapelet::draw_on_canvas(GYDM::dc_t* dc, float flwidth, float flheight) {
     int width = fl2fxi(flwidth);
     int height = fl2fxi(flheight);
     uint8_t r, g, b, a;
 
     if (this->brush_okay(&r, &g, &b, &a)) {
-        this->fill_shape(renderer, width, height, r, g, b, a);
+        this->fill_shape(dc, width, height, r, g, b, a);
     }
 
     if (this->pen_okay(&r, &g, &b, &a)) {
-        this->draw_shape(renderer, width, height, r, g, b, a);
+        this->draw_shape(dc, width, height, r, g, b, a);
     }
 }
 
@@ -48,7 +47,7 @@ Box GYDM::Linelet::get_bounding_box() {
     return { flmax(flabs(this->epx), 1.0F), flmax(flabs(this->epy), 1.0F) };
 }
 
-void GYDM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void GYDM::Linelet::fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     int x = 0;
     int y = 0;
     int xn = fl2fxi(this->epx);
@@ -62,7 +61,7 @@ void GYDM::Linelet::fill_shape(SDL_Renderer* renderer, int width, int height, ui
         y = y - yn;
     }
 
-    aalineRGBA(renderer, x, y, x + xn, y + yn, r, g, b, a);
+    aalineRGBA(dc->self(), x, y, x + xn, y + yn, r, g, b, a);
 }
 
 /*************************************************************************************************/
@@ -83,12 +82,12 @@ Box GYDM::Rectanglet::get_bounding_box() {
     return { this->width, this->height };
 }
 
-void GYDM::Rectanglet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    rectangleRGBA(renderer, width, 0, 0, height, r, g, b, a);
+void GYDM::Rectanglet::draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    rectangleRGBA(dc->self(), width, 0, 0, height, r, g, b, a);
 }
 
-void GYDM::Rectanglet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    boxRGBA(renderer, width, 0, 0, height, r, g, b, a);
+void GYDM::Rectanglet::fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    boxRGBA(dc->self(), width, 0, 0, height, r, g, b, a);
 }
 
 /*************************************************************************************************/
@@ -109,24 +108,24 @@ Box GYDM::RoundedRectanglet::get_bounding_box() {
     return { this->width, this->height };
 }
 
-void GYDM::RoundedRectanglet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void GYDM::RoundedRectanglet::draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     float rad = this->radius;
 
     if (rad < 0.0F) {
         rad = -flmin(this->width, this->height) * rad;
     }
 
-    roundedRectangleRGBA(renderer, 0, 0, width, height, fl2fxi(rad), r, g, b, a);
+    roundedRectangleRGBA(dc->self(), 0, 0, width, height, fl2fxi(rad), r, g, b, a);
 }
 
-void GYDM::RoundedRectanglet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void GYDM::RoundedRectanglet::fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     float rad = this->radius;
 
     if (rad < 0.0F) {
         rad = -flmin(this->width, this->height) * rad;
     }
     
-    roundedBoxRGBA(renderer, 0, 0, width, height, fl2fxi(rad), r, g, b, a);
+    roundedBoxRGBA(dc->self(), 0, 0, width, height, fl2fxi(rad), r, g, b, a);
 }
 
 /*************************************************************************************************/
@@ -147,31 +146,31 @@ Box GYDM::Ellipselet::get_bounding_box() {
     return { this->aradius * 2.0F, this->bradius * 2.0F };
 }
 
-void GYDM::Ellipselet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void GYDM::Ellipselet::draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     short rx = fl2fx<short>(this->aradius) - 1;
     short ry = fl2fx<short>(this->bradius) - 1;
     short cx = short(rx) + 1;
     short cy = short(ry) + 1;
 
     if (rx == ry) {
-        aacircleRGBA(renderer, cx, cy, rx, r, g, b, a);
+        aacircleRGBA(dc->self(), cx, cy, rx, r, g, b, a);
     } else {
-        aaellipseRGBA(renderer, cx, cy, rx, ry, r, g, b, a);
+        aaellipseRGBA(dc->self(), cx, cy, rx, ry, r, g, b, a);
     }
 }
 
-void GYDM::Ellipselet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void GYDM::Ellipselet::fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     short rx = fl2fx<short>(this->aradius) - 1;
     short ry = fl2fx<short>(this->bradius) - 1;
     short cx = short(rx) + 1;
     short cy = short(ry) + 1;
 
     if (rx == ry) {
-        filledCircleRGBA(renderer, cx, cy, rx, r, g, b, a);
-        aacircleRGBA(renderer, cx, cy, rx, r, g, b, a);
+        filledCircleRGBA(dc->self(), cx, cy, rx, r, g, b, a);
+        aacircleRGBA(dc->self(), cx, cy, rx, r, g, b, a);
     } else {
-        filledEllipseRGBA(renderer, cx, cy, rx, ry, r, g, b, a);
-        aaellipseRGBA(renderer, cx, cy, rx, ry, r, g, b, a);
+        filledEllipseRGBA(dc->self(), cx, cy, rx, ry, r, g, b, a);
+        aaellipseRGBA(dc->self(), cx, cy, rx, ry, r, g, b, a);
     }
 }
 
@@ -242,22 +241,22 @@ Box GYDM::Polygonlet::get_bounding_box() {
              this->by - this->ty + 1.0F };
 }
 
-void GYDM::Polygonlet::draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void GYDM::Polygonlet::draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     if (this->n > 2) {
-        aapolygonRGBA(renderer, this->txs, this->tys, int(this->n), r, g, b, a);
+        aapolygonRGBA(dc->self(), this->txs, this->tys, int(this->n), r, g, b, a);
     } else {
         // line and dot have no borders
     }
 }
 
-void GYDM::Polygonlet::fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+void GYDM::Polygonlet::fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
     if (this->n > 2) {
-        filledPolygonRGBA(renderer, this->txs, this->tys, int(this->n), r, g, b, a);
-        aapolygonRGBA(renderer, this->txs, this->tys, int(this->n), r, g, b, a);
+        filledPolygonRGBA(dc->self(), this->txs, this->tys, int(this->n), r, g, b, a);
+        aapolygonRGBA(dc->self(), this->txs, this->tys, int(this->n), r, g, b, a);
     } else if (this->n == 2) {
-        aalineRGBA(renderer, this->txs[0], this->tys[0], this->txs[1], this->tys[1], r, g, b, a);
+        aalineRGBA(dc->self(), this->txs[0], this->tys[0], this->txs[1], this->tys[1], r, g, b, a);
     } else if (this->n == 1) {
-        pixelRGBA(renderer, this->txs[0], this->tys[0], r, g, b, a);
+        pixelRGBA(dc->self(), this->txs[0], this->tys[0], r, g, b, a);
     }
 }
 

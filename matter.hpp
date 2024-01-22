@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL2/SDL.h>
+#include "graphics/dc.hpp"
 
 #include <cstdint>
 #include <string>
@@ -8,7 +8,7 @@
 #include "forward.hpp"
 #include "physics/motion.hpp"
 #include "physics/color/names.hpp"
-#include "physics/geometry/anchor.hpp"
+#include "physics/geometry/port.hpp"
 #include "physics/geometry/point.hpp"
 #include "physics/geometry/aabox.hpp"
 #include "physics/geometry/margin.hpp"
@@ -32,7 +32,7 @@ namespace GYDM {
 
     public:
         GYDM::IPlane* master() const;
-        SDL_Renderer* master_renderer() const;
+        GYDM::dc_t* drawing_context() const;
 
     public:
         void attach_metadata(IMatterMetadata* metadata);
@@ -42,14 +42,14 @@ namespace GYDM {
         MD* unsafe_metadata() const { return static_cast<MD*>(this->metadata()); }
 
     public:
-        virtual void construct(SDL_Renderer* renderer) {}
+        virtual void construct(GYDM::dc_t* renderer) {}
         virtual GYDM::Box get_bounding_box() { return GYDM::Box(); }
         virtual GYDM::Box get_original_bounding_box() { return this->get_bounding_box(); }
         virtual GYDM::Margin get_margin() { return this->get_original_margin(); }
         virtual GYDM::Margin get_original_margin() { return GYDM::Margin(); }
         virtual int update(uint64_t count, uint32_t interval, uint64_t uptime) { return 0; }
-        virtual void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) = 0;
-        virtual void draw_in_progress(SDL_Renderer* renderer, float x, float y, float Width, float Height) {}
+        virtual void draw(GYDM::dc_t* renderer, float x, float y, float Width, float Height) = 0;
+        virtual void draw_in_progress(GYDM::dc_t* renderer, float x, float y, float Width, float Height) {}
         virtual bool ready() { return true; }
 
     public:
@@ -77,14 +77,14 @@ namespace GYDM {
 
     public:
         bool resizable() { return this->can_resize; }
-        void scale(float ratio, const GYDM::Anchor& anchor = 0.5F) { this->scale(ratio, ratio, anchor); }
-        void scale(float x_ratio, float y_ratio, const GYDM::Anchor& anchor = 0.5F);
-        void scale_to(float ratio, const GYDM::Anchor& anchor = 0.5F) { this->scale_to(ratio, ratio, anchor); }
-        void scale_to(float x_ratio, float y_ratio, const GYDM::Anchor& anchor = 0.5F);
-        void resize(float size, const GYDM::Anchor& anchor = 0.5F) { this->resize(size, size, anchor); }
-        void resize(float width, float height, const GYDM::Anchor& anchor = 0.5F);
-        void resize_by_width(float size, const GYDM::Anchor& anchor = 0.5F) { this->scale_by_size(size, true, anchor); }
-        void resize_by_height(float size, const GYDM::Anchor& anchor = 0.5F) { this->scale_by_size(size, false, anchor); }
+        void scale(float ratio, const GYDM::Port& port = 0.5F) { this->scale(ratio, ratio, port); }
+        void scale(float x_ratio, float y_ratio, const GYDM::Port& port = 0.5F);
+        void scale_to(float ratio, const GYDM::Port& port = 0.5F) { this->scale_to(ratio, ratio, port); }
+        void scale_to(float x_ratio, float y_ratio, const GYDM::Port& port = 0.5F);
+        void resize(float size, const GYDM::Port& port = 0.5F) { this->resize(size, size, port); }
+        void resize(float width, float height, const GYDM::Port& port = 0.5F);
+        void resize_by_width(float size, const GYDM::Port& port = 0.5F) { this->scale_by_size(size, true, port); }
+        void resize_by_height(float size, const GYDM::Port& port = 0.5F) { this->scale_by_size(size, false, port); }
 
     public:
         bool events_allowed() { return this->deal_with_events; }
@@ -92,7 +92,7 @@ namespace GYDM {
     
     public:
         bool has_caret();
-        void moor(const GYDM::Anchor& anchor);
+        void moor(const GYDM::Port& port);
         void clear_moor(); /* the notify_updated() will clear the moor,
                               but the notification is not always guaranteed to be done,
                               use this method to do it manually. */
@@ -106,7 +106,7 @@ namespace GYDM {
     public:
         void notify_updated();
         void notify_timeline_restart(uint32_t count0 = 0, int duration = 0);
-        GYDM::Dot get_location(const GYDM::Anchor& a = 0.0F);
+        GYDM::Dot get_location(const GYDM::Port& p = 0.0F);
         void log_message(GYDM::Log level, const std::string& msg);
         
     public:
@@ -118,7 +118,7 @@ namespace GYDM {
         virtual void on_resize(float width, float height, float old_width, float old_height) {}
 
     private:
-        void scale_by_size(float size, bool given_width, const GYDM::Anchor& anchor);
+        void scale_by_size(float size, bool given_width, const GYDM::Port& port);
 
     private:
         bool findable = true;
@@ -129,8 +129,8 @@ namespace GYDM {
         // bool wheel_translation = true;
     
     private:
-        GYDM::Anchor anchor;
-        GYDM::Dot anchor_dot;
+        GYDM::Port port;
+        GYDM::Dot port_dot;
 
     private:
         GYDM::IMatterMetadata* _metatdata = nullptr;

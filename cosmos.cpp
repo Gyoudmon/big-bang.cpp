@@ -47,8 +47,8 @@ static inline void construct_plane(IPlane* plane, float flwidth, float flheight,
     plane->end_update_sequence();
 }
 
-static inline void draw_plane(SDL_Renderer* renderer, IPlane* plane, float x, float y, float width, float height) {
-    plane->draw(renderer, x, y, width, height);
+static inline void draw_plane(dc_t* dc, IPlane* plane, float x, float y, float width, float height) {
+    plane->draw(dc, x, y, width, height);
 }
 
 /*************************************************************************************************/
@@ -171,7 +171,7 @@ void GYDM::Cosmos::on_elapse(uint64_t count, uint32_t interval, uint64_t uptime)
     this->end_update_sequence();
 }
 
-void GYDM::Cosmos::draw(SDL_Renderer* renderer, int x, int y, int width, int height) {
+void GYDM::Cosmos::draw(dc_t* dc, int x, int y, int width, int height) {
     float flx = float(x);
     float fly = float(y);
     float flwidth = float(width);
@@ -180,7 +180,7 @@ void GYDM::Cosmos::draw(SDL_Renderer* renderer, int x, int y, int width, int hei
     // NOTE: only the current plane needs to be drawn
 
     if (this->recent_plane != nullptr) {
-        draw_plane(renderer, this->recent_plane, flx, fly, flwidth, flheight);
+        draw_plane(dc, this->recent_plane, flx, fly, flwidth, flheight);
     }
 }
 

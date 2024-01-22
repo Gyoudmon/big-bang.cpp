@@ -3,7 +3,7 @@
 #include "../forward.hpp"
 
 #include "../physics/geometry/point.hpp"
-#include "../physics/geometry/anchor.hpp"
+#include "../physics/geometry/port.hpp"
 #include "../physics/geometry/vector.hpp"
 
 namespace GYDM {
@@ -17,12 +17,12 @@ namespace GYDM {
         template<typename T>
         Position(T x, T y) : Position(float(x), float(y)) {}
 
-        Position(const GYDM::IMatter* target, const GYDM::Anchor& anchor)
-            : dot(anchor), xtarget(target) {}
+        Position(const GYDM::IMatter* target, const GYDM::Port& port)
+            : dot(port), xtarget(target) {}
 
-        Position(const GYDM::IMatter* xtarget, const GYDM::Anchor& xanchor,
-                    const GYDM::IMatter* ytarget, const GYDM::Anchor& yanchor)
-            : dot(xanchor.fx, yanchor.fy), xtarget(xtarget), ytarget(ytarget) {}
+        Position(const GYDM::IMatter* xtarget, const GYDM::Port& xport,
+                    const GYDM::IMatter* ytarget, const GYDM::Port& yport)
+            : dot(xport.fx, yport.fy), xtarget(xtarget), ytarget(ytarget) {}
 
         Position(const GYDM::Position& pos);
 
@@ -40,7 +40,7 @@ namespace GYDM {
         std::string desc() const;
 
     private:
-        GYDM::Anchor dot; // also serves as an absolute location
+        GYDM::Port dot; // also serves as an absolute location
         const GYDM::IMatter* xtarget = nullptr;
         const GYDM::IMatter* ytarget = nullptr;
         GYDM::Vector offset;

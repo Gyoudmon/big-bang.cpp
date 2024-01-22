@@ -2,7 +2,7 @@
 
 #include "../plane.hpp"
 #include "../datum/box.hpp"
-#include "../graphics/brush.hpp"
+#include "../graphics/misc.hpp"
 
 #include "../virtualization/screen/pasteboard.hpp"
 
@@ -68,7 +68,7 @@ const char* GYDM::Continent::name() {
 }
 
 /*************************************************************************************************/
-void GYDM::Continent::construct(SDL_Renderer* renderer) {
+void GYDM::Continent::construct(GYDM::dc_t* dc) {
 	bind_subplane_owership(this->screen, this->plane);
 	construct_subplane(this->plane, this->width, this->height);
 }
@@ -97,16 +97,16 @@ int GYDM::Continent::update(uint64_t count, uint32_t interval, uint64_t uptime) 
 	return 0;
 }
 
-void GYDM::Continent::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::Continent::draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) {
 	if (this->background.is_opacity()) {
-        Brush::fill_rect(renderer, x, y, Width, Height, this->background);
+        dc->fill_rect(x, y, Width, Height, this->background);
     }
 
 	if (this->border.is_opacity()) {
-        Brush::draw_rect(renderer, x, y, Width, Height, this->border);
+        dc->draw_rect(x, y, Width, Height, this->border);
     }
 
-	this->plane->draw(renderer, x, y, Width, Height);
+	this->plane->draw(dc, x, y, Width, Height);
 }
 
 /**************************************************************************************************/

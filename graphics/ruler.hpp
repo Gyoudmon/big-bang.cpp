@@ -1,7 +1,6 @@
 #pragma once
 
-#include <SDL2/SDL.h>
-
+#include "dc.hpp"
 #include "font.hpp"
 
 #include <vector>
@@ -53,46 +52,46 @@ namespace GYDM {
 					double vmin, double vmax, uint8_t precision = 0U);
 
 	public:
-		static void draw_ht_hatchmark(SDL_Renderer* renderer, float x, float y,
+		static void draw_ht_hatchmark(GYDM::dc_t* dc, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
 		static void draw_ht_hatchmark(GYDM::shared_font_t font,
-					SDL_Renderer* renderer, float x, float y,
+					GYDM::dc_t* dc, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
-		static void draw_hb_hatchmark(SDL_Renderer* renderer, float x, float y,
+		static void draw_hb_hatchmark(GYDM::dc_t* dc, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 		
 		static void draw_hb_hatchmark(GYDM::shared_font_t font,
-					SDL_Renderer* renderer, float x, float y,
+					GYDM::dc_t* dc, float x, float y,
 					float width, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::HHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
-		static void draw_vl_hatchmark(SDL_Renderer* renderer, float x, float y,
+		static void draw_vl_hatchmark(GYDM::dc_t* dc, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
 		static void draw_vl_hatchmark(GYDM::shared_font_t font,
-					SDL_Renderer* renderer, float x, float y,
+					GYDM::dc_t* dc, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
-		static void draw_vr_hatchmark(SDL_Renderer* renderer, float x, float y,
+		static void draw_vr_hatchmark(GYDM::dc_t* dc, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);
 
 		static void draw_vr_hatchmark(GYDM::shared_font_t font,
-					SDL_Renderer* renderer, float x, float y,
+					GYDM::dc_t* dc, float x, float y,
 					float height, double vmin, double vmax, uint32_t step, uint32_t color,
 					GYDM::VHatchMarkMetrics* metrics = nullptr,
 					uint8_t precision = 0U, bool no_short = false);

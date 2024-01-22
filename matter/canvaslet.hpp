@@ -3,7 +3,7 @@
 #include "graphlet.hpp"
 
 #include "../graphics/texture.hpp"
-#include "../graphics/renderer.hpp"
+#include "../graphics/misc.hpp"
 #include "../physics/color/rgba.hpp"
 
 namespace GYDM {
@@ -13,7 +13,7 @@ namespace GYDM {
 		virtual ~ICanvaslet() { this->invalidate_canvas(); }
 
 	public:
-		void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
+		void draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
 
 	public:
 		void dirty_canvas(const RGBA& c);
@@ -41,9 +41,9 @@ namespace GYDM {
 		void on_resize(float w, float h, float width, float height) override;
 
 	protected:
-		virtual void draw_on_canvas(SDL_Renderer* ds, float Width, float Height) {}
-		virtual void draw_before_canvas(SDL_Renderer* ds, float x, float y, float Width, float Height) {}
-		virtual void draw_after_canvas(SDL_Renderer* ds, float x, float y, float Width, float Height) {}
+		virtual void draw_on_canvas(GYDM::dc_t* dc, float Width, float Height) {}
+		virtual void draw_before_canvas(GYDM::dc_t* dc, float x, float y, float Width, float Height) {}
+		virtual void draw_after_canvas(GYDM::dc_t* dc, float x, float y, float Width, float Height) {}
 		virtual void invalidate_canvas();
 		virtual void on_canvas_invalidated() {}
 

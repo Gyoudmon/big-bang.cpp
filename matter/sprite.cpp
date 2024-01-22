@@ -7,7 +7,7 @@
 #include "../datum/flonum.hpp"
 #include "../datum/string.hpp"
 
-#include "../graphics/renderer.hpp"
+#include "../graphics/misc.hpp"
 
 #include "../physics/random.hpp"
 #include "../physics/mathematics.hpp"
@@ -15,7 +15,7 @@
 using namespace GYDM;
 
 /*************************************************************************************************/
-void GYDM::ISprite::construct(SDL_Renderer* renderer) {
+void GYDM::ISprite::construct(GYDM::dc_t* renderer) {
     int idx = this->get_initial_costume_index();
 
     if (idx >= 0) {
@@ -72,7 +72,7 @@ void GYDM::ISprite::on_resize(float width, float height, float old_width, float 
     }
 }
 
-void GYDM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::ISprite::draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) {
     if (this->current_costume_idx < this->costume_count()) {
         SpriteRenderArguments argv;
         
@@ -80,7 +80,7 @@ void GYDM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, 
         argv.flip = this->current_flip_status();
 
         if ((this->canvas_width <= 0.0F) && (this->canvas_height <= 0.0F)) {
-            this->draw_costume(renderer, this->current_costume_idx, nullptr, &argv);
+            this->draw_costume(dc, this->current_costume_idx, nullptr, &argv);
         } else {
             float width, height, xoff, yoff;
             float sx = flabs(this->xscale);
@@ -112,7 +112,7 @@ void GYDM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, 
             }
 
             if ((xoff >= 0.0F) && (yoff >= 0.0F)) {
-                this->draw_costume(renderer, this->current_costume_idx, nullptr, &argv);
+                this->draw_costume(dc, this->current_costume_idx, nullptr, &argv);
             } else {
                 SDL_Rect src = { 0, 0, fl2fxi(width), fl2fxi(height) };
             
@@ -126,7 +126,7 @@ void GYDM::ISprite::draw(SDL_Renderer* renderer, float x, float y, float Width, 
                     src.h -= src.y * 2;
                 }
 
-                this->draw_costume(renderer, this->current_costume_idx, &src, &argv);
+                this->draw_costume(dc, this->current_costume_idx, &src, &argv);
             }
         }
     }

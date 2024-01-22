@@ -11,8 +11,8 @@ namespace GYDM {
         virtual ~Bracer() {}
 
     public:
-        void try_switch_mode(BracerMode mode, int repeat = -1, MatterAnchor anchor = MatterAnchor::CC);
-        void switch_mode(BracerMode mode, int repeat = -1, MatterAnchor anchor = MatterAnchor::CC);
+        void try_switch_mode(BracerMode mode, int repeat = -1, MatterPort port = MatterPort::CC);
+        void switch_mode(BracerMode mode, int repeat = -1, MatterPort port = MatterPort::CC);
         BracerMode current_mode() { return this->mode; }
 
     protected:
@@ -37,7 +37,7 @@ namespace GYDM {
         void retrigger_heading_change_event();
 
     private:
-        void do_mode_switching(BracerMode mode, MatterAnchor anchor);
+        void do_mode_switching(BracerMode mode, MatterPort port);
 
     private:
         BracerMode mode;

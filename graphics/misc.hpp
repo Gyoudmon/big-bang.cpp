@@ -2,6 +2,8 @@
 
 #include <SDL2/SDL.h>
 
+#include "../physics/geometry/aabox.hpp"
+
 namespace GYDM {
     enum class ColorMixture {
         None = SDL_BLENDMODE_NONE,
@@ -23,4 +25,8 @@ namespace GYDM {
     __lambda__ SDL_RendererFlip game_scales_to_flip(float x_scale, float y_scale);
     __lambda__ void game_flip_to_signs(SDL_RendererFlip flip, float* hsgn = nullptr, float* vsgn = nullptr);
     __lambda__ void game_flip_to_signs(SDL_RendererFlip flip, double* hsgn = nullptr, double* vsgn = nullptr);
+
+    /*********************************************************************************************/
+    __lambda__ void feed_rect(SDL_Rect* rect, const GYDM::AABox<int>& box);
+    __lambda__ void feed_rect(SDL_FRect* rect, const GYDM::Box& box);
 }

@@ -12,7 +12,7 @@ void GYDM::TheBigBang::load(float width, float height) {
 
     this->title->camouflage(true);
     this->set_sentry_sprite(this->agent);
-    this->move_to(this->title, Position(this->agent, MatterAnchor::RB), MatterAnchor::LB);
+    this->move_to(this->title, Position(this->agent, MatterPort::RB), MatterPort::LB);
 
     this->tooltip = this->insert(make_label_for_tooltip(GameFont::Tooltip()));
     this->set_tooltip_matter(this->tooltip);

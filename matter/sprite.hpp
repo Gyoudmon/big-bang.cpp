@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../matter.hpp"
-#include "../graphics/image.hpp"
 #include "../physics/color/rgba.hpp"
 #include "../physics/geometry/aabox.hpp"
 #include "../physics/geometry/margin.hpp"
@@ -21,14 +20,14 @@ namespace GYDM {
         ISprite() {}
         virtual ~ISprite() {}
 
-        void construct(SDL_Renderer* renderer) override;
+        void construct(GYDM::dc_t* renderer) override;
 
     public:
         GYDM::Box get_bounding_box() override;
         GYDM::Box get_original_bounding_box() override;
         GYDM::Margin get_margin() override;
         int update(uint64_t count, uint32_t interval, uint64_t uptime) override;
-        void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+        void draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
 
     public:
         virtual size_t costume_count() = 0;
@@ -83,7 +82,7 @@ namespace GYDM {
         virtual void feed_costume_extent(size_t idx, float* width, float* height) = 0;
         virtual const char* costume_index_to_name(size_t idx) = 0;
         virtual int costume_name_to_index(const char* name);
-        virtual void draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) = 0;
+        virtual void draw_costume(GYDM::dc_t* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) = 0;
 
     protected:
         virtual int get_initial_costume_index() { return 0; }

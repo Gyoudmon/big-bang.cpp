@@ -3,9 +3,6 @@
 #include "../../../datum/box.hpp"
 #include "../../../datum/flonum.hpp"
 
-#include "../../../graphics/image.hpp"
-#include "../../../graphics/brush.hpp"
-
 using namespace GYDM;
 
 /*************************************************************************************************/
@@ -20,7 +17,7 @@ GYDM::Histogramlet::Histogramlet(float width, float height, uint32_t box_hex, ui
     this->enable_resize(true);
 }
 
-Box GYDM::Histogramlet::get_bouding_box() {
+Box GYDM::Histogramlet::get_bounding_box() {
     return { this->width, this->height };
 }
 
@@ -30,14 +27,14 @@ void GYDM::Histogramlet::on_resize(float w, float h, float width, float height) 
     this->invalidate_geometry();
 }
 
-void GYDM::Histogramlet::draw(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
+void GYDM::Histogramlet::draw(GYDM::dc_t* dc, float flx, float fly, float flwidth, float flheight) {
     if (this->diagram.use_count() == 0) {
-        this->diagram = std::make_shared<Texture>(game_blank_image(renderer, fl2fxi(this->width) + 1, fl2fxi(this->height) + 1));
+        this->diagram = std::make_shared<Texture>(dc->create_blank_image(fl2fxi(this->width) + 1, fl2fxi(this->height) + 1));
     }
 
     if (this->diagram->okay()) {
         if (this->needs_refresh_diagram) {
-            SDL_Texture* origin = SDL_GetRenderTarget(renderer);
+            SDL_Texture* origin = dc->get_target();
             size_t n = this->raw_dots.size();
             float xrange = flmax(this->xmax - this->xmin, flwidth);
             float yrange = flmax(this->ymax - this->ymin, flheight);
@@ -54,18 +51,17 @@ void GYDM::Histogramlet::draw(SDL_Renderer* renderer, float flx, float fly, floa
                     dots[idx] = { (X - this->xmin) * xratio, flheight - (Y - this->ymin) * yratio };
                 }
 
-                SDL_SetRenderTarget(renderer, this->diagram->self());
+                dc->set_target(this->diagram->self());
 
-                Brush::clear(renderer, transparent);
-                Brush::draw_lines(renderer, dots.data(), int(n), RGBA(this->color, this->alpha));
-
-                SDL_SetRenderTarget(renderer, origin);
+                dc->clear(transparent);
+                dc->draw_lines(dots.data(), int(n), RGBA(this->color, this->alpha));
+                dc->set_target(origin);
             }
 
             this->needs_refresh_diagram = false;
         }
 
-        Brush::stamp(renderer, this->diagram->self(), flx, fly, flwidth, flheight);
+        dc->stamp(this->diagram->self(), flx, fly, flwidth, flheight);
     } else {
         fprintf(stderr, "无法绘制历史曲线：%s\n", SDL_GetError());
     }

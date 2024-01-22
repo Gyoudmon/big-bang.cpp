@@ -5,8 +5,6 @@
 #include "../../datum/string.hpp"
 #include "../../datum/flonum.hpp"
 
-#include "../../graphics/brush.hpp"
-
 #include <filesystem>
 
 using namespace GYDM;
@@ -32,30 +30,30 @@ const char* GYDM::Sprite::name() {
     return _name.c_str();
 }
 
-void GYDM::Sprite::construct(SDL_Renderer* renderer) {
+void GYDM::Sprite::construct(GYDM::dc_t* dc) {
     path target = imgdb_absolute_path(this->_pathname);
     
     if (exists(target)) {
         if (is_directory(target)) {
             for (auto entry : directory_iterator(target)) {
                 if (entry.is_regular_file()) {
-                    this->load_costume(renderer, entry.path().string());
+                    this->load_costume(dc, entry.path().string());
                 } else if (entry.is_directory()) {
                     std::string decorate_name = file_basename_from_path(entry.path().string());
 
                     for (auto subentry : directory_iterator(entry)) {
                         if (subentry.is_regular_file()) {
-                            this->load_decorate(renderer, decorate_name, subentry.path().string());
+                            this->load_decorate(dc, decorate_name, subentry.path().string());
                         }
                     }
                 }
             }
         } else {
-            this->load_costume(renderer, this->_pathname);
+            this->load_costume(dc, this->_pathname);
         }
 
         this->on_costumes_load();
-        ISprite::construct(renderer);
+        ISprite::construct(dc);
     }
 }
 
@@ -63,15 +61,15 @@ void GYDM::Sprite::feed_costume_extent(size_t idx, float* width, float* height) 
     this->costumes[idx].second->feed_extent(width, height);
 }
 
-void GYDM::Sprite::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
-    Brush::stamp(renderer, this->costumes[idx].second->self(), src, &argv->dst, argv->flip);
+void GYDM::Sprite::draw_costume(GYDM::dc_t* dc, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
+    dc->stamp(this->costumes[idx].second->self(), src, &argv->dst, argv->flip);
 
     if (this->current_decorate.size() > 0) {
         std::string c_name = this->costumes[idx].first;
         auto decorate = this->decorates[this->current_decorate];
 
         if (decorate.find(c_name) != decorate.end()) {
-            Brush::stamp(renderer, decorate[c_name]->self(), src, &argv->dst, argv->flip);
+            dc->stamp(decorate[c_name]->self(), src, &argv->dst, argv->flip);
         }
     }
 }
@@ -98,11 +96,11 @@ void GYDM::Sprite::take_off() {
     }
 }
 
-void GYDM::Sprite::load_costume(SDL_Renderer* renderer, const std::string& png) {
+void GYDM::Sprite::load_costume(GYDM::dc_t* dc, const std::string& png) {
     std::string name = file_basename_from_path(png);
     
     if (!name.empty()) { // ignore dot files
-        shared_texture_t costume = imgdb_ref(png, renderer);
+        shared_texture_t costume = imgdb_ref(png, dc->self());
 
         if (costume->okay()) {
             auto datum = std::pair<std::string, shared_texture_t>(name, costume);
@@ -122,11 +120,11 @@ void GYDM::Sprite::load_costume(SDL_Renderer* renderer, const std::string& png) 
     }
 }
 
-void GYDM::Sprite::load_decorate(SDL_Renderer* renderer, const std::string& d_name, const std::string& png) {
+void GYDM::Sprite::load_decorate(GYDM::dc_t* dc, const std::string& d_name, const std::string& png) {
     std::string c_name = file_basename_from_path(png);
 
     if (!c_name.empty()) {
-        shared_texture_t deco_costume = imgdb_ref(png, renderer);
+        shared_texture_t deco_costume = imgdb_ref(png, dc->self());
 
         if (deco_costume->okay()) {
         

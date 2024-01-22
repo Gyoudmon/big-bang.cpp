@@ -1,8 +1,6 @@
 #include "dimensionlet.hpp"
 
 #include "../../graphics/font.hpp"
-#include "../../graphics/text.hpp"
-#include "../../graphics/brush.hpp"
 
 #include "../../datum/string.hpp"
 #include "../../datum/box.hpp"
@@ -138,7 +136,7 @@ Box GYDM::Dimensionlet::get_bounding_box() {
     return { w, h };
 }
 
-void GYDM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height, const std::optional<RGBA>& bgcolor, const std::optional<RGBA>& bcolor) {
+void GYDM::Dimensionlet::draw_box(GYDM::dc_t* dc, int idx, float xfraction, float x, float y, float Height, const std::optional<RGBA>& bgcolor, const std::optional<RGBA>& bcolor) {
     SDL_FRect* self = &this->boxes[idx];
     
     if ((self->w > 0.0F) && (self->h > 0.0F)) {
@@ -150,30 +148,30 @@ void GYDM::Dimensionlet::draw_box(SDL_Renderer* ds, int idx, float xfraction, fl
         self->y = bottom - self->h;
         
         if (bgcolor.has_value()) {
-            Brush::fill_rect(ds, self, bgcolor.value());
+            dc->fill_rect(self, bgcolor.value());
         }
 
         if (bcolor.has_value()) {
-            Brush::draw_rect(ds, self, bcolor.value());
+            dc->draw_rect(self, bcolor.value());
         }
 
         if (texture.use_count() > 0) {
             int width, height;
 
             texture->feed_extent(&width, &height);
-            Brush::stamp(ds, texture->self(), self->x + (self->w - width) * xfraction, bottom - height);
+            dc->stamp(texture->self(), self->x + (self->w - width) * xfraction, bottom - height);
         }
 
         self->x -= x;
     }
 }
 
-void GYDM::Dimensionlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::Dimensionlet::draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) {
     DimensionStyle style = this->get_style();
 
-    this->draw_box(renderer, label_idx, style.label_xfraction, x, y, Height, style.label_background_color, style.label_border_color);
-    this->draw_box(renderer, datum_idx, style.number_xfraction, x, y, Height, style.number_background_color, style.number_border_color);
-    this->draw_box(renderer,  unit_idx, 0.0F, x, y, Height, style.unit_background_color, style.unit_border_color);
+    this->draw_box(dc, label_idx, style.label_xfraction, x, y, Height, style.label_background_color, style.label_border_color);
+    this->draw_box(dc, datum_idx, style.number_xfraction, x, y, Height, style.number_background_color, style.number_border_color);
+    this->draw_box(dc, unit_idx, 0.0F, x, y, Height, style.unit_background_color, style.unit_border_color);
 }
 
 void GYDM::Dimensionlet::prepare_style(DimensionState status, DimensionStyle& style) {
@@ -201,19 +199,17 @@ void GYDM::Dimensionlet::prepare_style(DimensionState status, DimensionStyle& st
 	// NOTE: the others can be `nullptr`
 }
 
-void GYDM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* renderer) {
+void GYDM::Dimensionlet::apply_style(DimensionStyle& style, GYDM::dc_t* dc) {
     if (!this->label.empty()) {
         this->textures[label_idx].reset(
-            new Texture(game_blended_text_texture(renderer, this->label, style.label_font,
-                            style.label_color.value(), 0)));
+            new Texture(dc->create_blended_text(this->label, style.label_font, style.label_color.value(), 0)));
     }
 
-    this->update_number_texture(renderer, this->get_value(), style);
+    this->update_number_texture(dc, this->get_value(), style);
 
     if (!this->unit.empty()) {
         this->textures[unit_idx].reset(
-            new Texture(game_blended_text_texture(renderer, this->unit, style.unit_font,
-                            style.unit_color.value(), 0)));
+            new Texture(dc->create_blended_text(this->unit, style.unit_font, style.unit_color.value(), 0)));
     }
 	
     this->update_drawing_box(label_idx, style.minimize_label_width, style.label_font, 0.0F);
@@ -221,15 +217,13 @@ void GYDM::Dimensionlet::apply_style(DimensionStyle& style, SDL_Renderer* render
     this->update_drawing_box( unit_idx, -1.0F, style.unit_font, style.unit_leading_space);
 }
 
-void GYDM::Dimensionlet::on_value_changed(SDL_Renderer* ds, double value) {
-	this->update_number_texture(ds, value, this->get_style());
+void GYDM::Dimensionlet::on_value_changed(dc_t* dc, double value) {
+	this->update_number_texture(dc, value, this->get_style());
 }
 
-void GYDM::Dimensionlet::update_number_texture(SDL_Renderer* renderer, double value, DimensionStyle& style) {
+void GYDM::Dimensionlet::update_number_texture(GYDM::dc_t* dc, double value, DimensionStyle& style) {
     this->textures[datum_idx].reset(
-        new Texture(game_blended_text_texture(renderer,
-                        flstring(value, style.precision), style.number_font,
-                        style.number_color.value(), 0)));
+        new Texture(dc->create_blended_text(flstring(value, style.precision), style.number_font, style.number_color.value(), 0)));
 }
 
 void GYDM::Dimensionlet::update_drawing_box(size_t idx, float min_width, shared_font_t font, float leading_space) {

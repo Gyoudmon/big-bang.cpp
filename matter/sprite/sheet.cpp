@@ -5,8 +5,6 @@
 #include "../../datum/fixnum.hpp"
 #include "../../datum/flonum.hpp"
 
-#include "../../graphics/brush.hpp"
-
 using namespace GYDM;
 
 /*************************************************************************************************/
@@ -24,12 +22,12 @@ const char* GYDM::ISpriteSheet::name() {
     return _name.c_str();
 }
 
-void GYDM::ISpriteSheet::construct(SDL_Renderer* renderer) {
-    this->sprite_sheet = imgdb_ref(this->_pathname, renderer);
+void GYDM::ISpriteSheet::construct(GYDM::dc_t* dc) {
+    this->sprite_sheet = imgdb_ref(this->_pathname, dc->self());
 
     if (this->sprite_sheet->okay()) {
         this->on_sheet_load(this->sprite_sheet);
-        ISprite::construct(renderer);
+        ISprite::construct(dc);
     }
 }
 
@@ -40,7 +38,7 @@ void GYDM::ISpriteSheet::feed_costume_extent(size_t idx, float* width, float* he
     SET_BOX(height, float(this->costume_region.h));
 }
 
-void GYDM::ISpriteSheet::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
+void GYDM::ISpriteSheet::draw_costume(GYDM::dc_t* dc, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) {
     this->feed_costume_region(&this->costume_region, idx);
     
     if (src == nullptr) {
@@ -50,7 +48,7 @@ void GYDM::ISpriteSheet::draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Re
         src->y += this->costume_region.y;
     }
 
-    Brush::stamp(renderer, this->sprite_sheet->self(), src, &argv->dst, argv->flip);
+    dc->stamp(this->sprite_sheet->self(), src, &argv->dst, argv->flip);
 }
 
 /*************************************************************************************************/

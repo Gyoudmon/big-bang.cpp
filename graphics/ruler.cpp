@@ -5,9 +5,6 @@
 #include "../datum/flonum.hpp"
 #include "../datum/fixnum.hpp"
 
-#include "text.hpp"
-#include "brush.hpp"
-
 using namespace GYDM;
 
 /*************************************************************************************************/
@@ -100,7 +97,7 @@ static float resolve_interval(uint32_t* step, double vmin, double vmax, float le
 	return interval;
 }
 
-static void draw_hthatch(SDL_Renderer* renderer, float x0, float y0
+static void draw_hthatch(GYDM::dc_t* dc, float x0, float y0
 		, HHatchMarkMetrics* metrics, float interval, uint32_t step, uint32_t color, bool no_short) {
 	float x = x0 + metrics->hatch_x;
 	float y = y0 + metrics->height - 1.0F /* thickness */;
@@ -108,16 +105,15 @@ static void draw_hthatch(SDL_Renderer* renderer, float x0, float y0
 	float short_length = height * (((step % 2 == 1) || no_short) ? 0.0F : 0.382F);
 	
 	metrics->hatch_width = interval * step;
-	Brush::draw_hline(renderer, x, y, metrics->hatch_width, color);
+	dc->draw_hline(x, y, metrics->hatch_width, color);
 	
 	for (unsigned int i = 0; i <= step; i++) {
-		float xthis = interval * float(i) + x;
-
-		Brush::draw_vline(renderer, xthis, y, - ((i % 2 == 0) ? height : short_length), color);
+		dc->draw_vline(interval * float(i) + x, y,
+			- ((i % 2 == 0) ? height : short_length), color);
 	}
 }
 
-static void draw_hbhatch(SDL_Renderer* renderer, float x0, float y0
+static void draw_hbhatch(GYDM::dc_t* dc, float x0, float y0
 		, HHatchMarkMetrics* metrics, float interval, uint32_t step, uint32_t color, bool no_short) {
 	float x = x0 + metrics->hatch_x;
 	float y = y0 + metrics->hatch_y;
@@ -125,16 +121,15 @@ static void draw_hbhatch(SDL_Renderer* renderer, float x0, float y0
 	float short_length = height * (((step % 2 == 1) || no_short) ? 0.0F : 0.382F);
 	
 	metrics->hatch_width = interval * step;
-	Brush::draw_hline(renderer, x, y, metrics->hatch_width, color);
+	dc->draw_hline(x, y, metrics->hatch_width, color);
 	
 	for (unsigned int i = 0; i <= step; i++) {
-		float xthis = interval * float(i) + x;
-
-		Brush::draw_vline(renderer, xthis, y, ((i % 2 == 0) ? height : short_length), color);
+		dc->draw_vline(interval * float(i) + x, y,
+			((i % 2 == 0) ? height : short_length), color);
 	}
 }
 
-static void draw_vlhatch(SDL_Renderer* renderer, float x0, float y0
+static void draw_vlhatch(GYDM::dc_t* dc, float x0, float y0
 		, VHatchMarkMetrics* metrics, float interval, uint32_t step, uint32_t color, bool no_short) {
 	float x = x0 + metrics->hatch_x;
 	float y = y0 + metrics->hatch_y;
@@ -143,16 +138,15 @@ static void draw_vlhatch(SDL_Renderer* renderer, float x0, float y0
 	
 	metrics->hatch_height = interval * step;
 	x += width - 1.0F /* thickness */;
-	Brush::draw_vline(renderer, x, y, metrics->hatch_height, color);
+	dc->draw_vline(x, y, metrics->hatch_height, color);
 
 	for (uint32_t i = 0; i <= step; i++) {
-		float ythis = y + interval * float(i);
-
-		Brush::draw_hline(renderer, x, ythis, -((i % 2 == 0) ? width : short_length), color);
+		dc->draw_hline(x, y + interval * float(i),
+			-((i % 2 == 0) ? width : short_length), color);
 	}
 }
 
-static void draw_vrhatch(SDL_Renderer* renderer, float x0, float y0
+static void draw_vrhatch(GYDM::dc_t* dc, float x0, float y0
 		, VHatchMarkMetrics* metrics, float interval, uint32_t step, uint32_t color, bool no_short) {
 	float x = x0 + metrics->hatch_x;
 	float y = y0 + metrics->hatch_y;
@@ -160,12 +154,11 @@ static void draw_vrhatch(SDL_Renderer* renderer, float x0, float y0
 	float short_length = width * (((step % 2 == 1) || no_short) ? 0.0F : 0.382F);
 	
 	metrics->hatch_height = interval * step;
-	Brush::draw_vline(renderer, x, y, metrics->hatch_height, color);
+	dc->draw_vline(x, y, metrics->hatch_height, color);
 
 	for (uint32_t i = 0; i <= step; i++) {
-		float ythis = y + interval * float(i);
-
-		Brush::draw_hline(renderer, x, ythis, (i % 2 == 0) ? width : short_length, color);
+		dc->draw_hline(x, y + interval * float(i),
+			(i % 2 == 0) ? width : short_length, color);
 	}
 }
 
@@ -174,14 +167,14 @@ HHatchMarkMetrics GYDM::Ruler::hhatchmark_metrics(double vmin, double vmax, uint
 	return hhatchmark_metrics(hatchmark_default_font(), vmin, vmax, precision);
 }
 
-void GYDM::Ruler::draw_ht_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_ht_hatchmark(GYDM::dc_t* dc, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, HHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
-	Ruler::draw_ht_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
+	Ruler::draw_ht_hatchmark(hatchmark_default_font(), dc, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
-void GYDM::Ruler::draw_hb_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_hb_hatchmark(GYDM::dc_t* dc, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, HHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
-	Ruler::draw_hb_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
+	Ruler::draw_hb_hatchmark(hatchmark_default_font(), dc, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
 HHatchMarkMetrics GYDM::Ruler::hhatchmark_metrics(shared_font_t font, double vmin, double vmax, uint8_t precision) {
@@ -209,7 +202,7 @@ HHatchMarkMetrics GYDM::Ruler::hhatchmark_metrics(shared_font_t font, double vmi
 }
 
 void GYDM::Ruler::draw_ht_hatchmark(shared_font_t font
-		, SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax, uint32_t step0
+		, GYDM::dc_t* dc, float x, float y, float width, double vmin, double vmax, uint32_t step0
 		, uint32_t color, HHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	uint32_t skip;
 	double diff;
@@ -219,21 +212,20 @@ void GYDM::Ruler::draw_ht_hatchmark(shared_font_t font
 	float mark_ty = y - metrics.top_space + 1.0F /* thickness */;
 	
 	metrics.hatch_y = metrics.height - metrics.hatch_height - metrics.top_space;
-	draw_hthatch(renderer, x, y, &metrics, interval, step, color, no_short);
+	draw_hthatch(dc, x, y, &metrics, interval, step, color, no_short);
 	
 	for (uint32_t i = 0; i <= step; i += (no_short ? 1 : skip)) {
 		std::string mark = make_mark_string(vmin + diff * double(i), precision);
-		auto pmark = game_blended_text_texture(renderer, mark, font, color);
 		float tx = x + metrics.hatch_x + interval * float(i) - float(font->width(mark)) * 0.5F;
 
-		Brush::stamp(renderer, pmark, tx, mark_ty);
+		dc->draw_blended_text(mark, font, tx, mark_ty, color);
 	}
 
 	SET_BOX(maybe_metrics, metrics);
 }
 
 void GYDM::Ruler::draw_hb_hatchmark(shared_font_t font
-		, SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax, uint32_t step0
+		, GYDM::dc_t* dc, float x, float y, float width, double vmin, double vmax, uint32_t step0
 		, uint32_t color, HHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	uint32_t skip;
 	double diff;
@@ -243,14 +235,13 @@ void GYDM::Ruler::draw_hb_hatchmark(shared_font_t font
 	float mark_ty = y + metrics.height - metrics.em;
 	
 	metrics.hatch_y = 0.0F;
-	draw_hbhatch(renderer, x, y, &metrics, interval, step, color, no_short);
+	draw_hbhatch(dc, x, y, &metrics, interval, step, color, no_short);
 
 	for (uint32_t i = 0; i <= step; i += (no_short ? 1 : skip)) {
 		std::string mark = make_mark_string(vmin + diff * double(i), precision);
-		auto pmark = game_blended_text_texture(renderer, mark, font, color);
 		float tx = x + metrics.hatch_x + interval * float(i) - float(font->width(mark)) * 0.5F;
 		
-		Brush::stamp(renderer, pmark, tx, mark_ty);
+		dc->draw_blended_text(mark, font, tx, mark_ty, color);
 	}
 
 	SET_BOX(maybe_metrics, metrics);
@@ -261,14 +252,14 @@ VHatchMarkMetrics GYDM::Ruler::vhatchmark_metrics(double vmin, double vmax, uint
 	return vhatchmark_metrics(hatchmark_default_font(), vmin, vmax, precision);
 }
 
-void GYDM::Ruler::draw_vl_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_vl_hatchmark(GYDM::dc_t* dc, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, VHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
-	Ruler::draw_vl_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
+	Ruler::draw_vl_hatchmark(hatchmark_default_font(), dc, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
-void GYDM::Ruler::draw_vr_hatchmark(SDL_Renderer* renderer, float x, float y, float width, double vmin, double vmax
+void GYDM::Ruler::draw_vr_hatchmark(GYDM::dc_t* dc, float x, float y, float width, double vmin, double vmax
 		, uint32_t step, uint32_t color, VHatchMarkMetrics* metrics, uint8_t precision, bool no_short) {
-	Ruler::draw_vr_hatchmark(hatchmark_default_font(), renderer, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
+	Ruler::draw_vr_hatchmark(hatchmark_default_font(), dc, x, y, width, vmin, vmax, step, color, metrics, precision, no_short);
 }
 
 VHatchMarkMetrics GYDM::Ruler::vhatchmark_metrics(shared_font_t font, double vmin, double vmax, uint8_t precision) {
@@ -297,7 +288,7 @@ VHatchMarkMetrics GYDM::Ruler::vhatchmark_metrics(shared_font_t font, double vmi
 }
 
 void GYDM::Ruler::draw_vl_hatchmark(shared_font_t font
-		, SDL_Renderer* renderer, float x, float y, float height, double vmin, double vmax, uint32_t step0
+		, GYDM::dc_t* dc, float x, float y, float height, double vmin, double vmax, uint32_t step0
 		, uint32_t color, VHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	uint32_t skip;
 	float mark_span_off;
@@ -307,22 +298,21 @@ void GYDM::Ruler::draw_vl_hatchmark(shared_font_t font
 	float interval = resolve_interval(&step, vmin, vmax, height, metrics.em, &skip, &diff);
 	
 	metrics.hatch_x = metrics.width - metrics.hatch_width;
-	draw_vlhatch(renderer, x, y, &metrics, interval, step, color, no_short);
+	draw_vlhatch(dc, x, y, &metrics, interval, step, color, no_short);
 	
 	for (uint32_t i = 0; i <= step; i += (no_short ? 1 : skip)) {
 		std::string mark = make_lmark_string(vmax - diff * double(i), precision, metrics.span, &mark_span_off);
-		auto pmark = game_blended_text_texture(renderer, mark, font, color);
 		float tx = x + mark_span_off * metrics.ch;
 		float ty = y + interval * float(i);
 
-		Brush::stamp(renderer, pmark, tx, ty);
+		dc->draw_blended_text(mark, font, tx, ty, color);
 	}
 
 	SET_BOX(maybe_metrics, metrics);
 }
 
 void GYDM::Ruler::draw_vr_hatchmark(shared_font_t font
-		, SDL_Renderer* renderer, float x, float y, float height, double vmin, double vmax, uint32_t step0
+		, GYDM::dc_t* dc, float x, float y, float height, double vmin, double vmax, uint32_t step0
 		, uint32_t color, VHatchMarkMetrics* maybe_metrics, uint8_t precision, bool no_short) {
 	unsigned int skip;
 	double diff;
@@ -332,14 +322,13 @@ void GYDM::Ruler::draw_vr_hatchmark(shared_font_t font
 	float mark_tx = x + metrics.hatch_width + metrics.gap_space;
 	
 	metrics.hatch_x = 0.0F;
-	draw_vrhatch(renderer, x, y, &metrics, interval, step, color, no_short);
+	draw_vrhatch(dc, x, y, &metrics, interval, step, color, no_short);
 	
 	for (uint32_t i = 0; i <= step; i += (no_short ? 1 : skip)) {
 		std::string mark = make_mark_string(vmax - diff * double(i), precision);
-		auto pmark = game_blended_text_texture(renderer, mark, font, color);
 		float ty = y + interval * float(i);
 
-		Brush::stamp(renderer, pmark, mark_tx, ty);
+		dc->draw_blended_text(mark, font, mark_tx, ty, color);
 	}
 
 	SET_BOX(maybe_metrics, metrics);

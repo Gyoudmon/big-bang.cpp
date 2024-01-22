@@ -18,17 +18,17 @@ namespace GYDM {
         ITextlet();
         virtual ~ITextlet() noexcept {}
 
-        void construct(SDL_Renderer* render) override;
+        void construct(GYDM::dc_t* dc) override;
         const char* name() override { return this->c_str(); }
 
     public:
         void set_text(const char* fmt, ...);
         void set_text(const GYDM::RGBA& color, const char* fmt, ...);
-        void set_text(GYDM::MatterAnchor anchor, const char* fmt, ...);
-        void set_text(const std::string& content, GYDM::MatterAnchor anchor = MatterAnchor::LT);
+        void set_text(GYDM::MatterPort port, const char* fmt, ...);
+        void set_text(const std::string& content, GYDM::MatterPort port = MatterPort::LT);
         
     public:
-        void set_font(shared_font_t font, GYDM::MatterAnchor anchor = MatterAnchor::LT);
+        void set_font(shared_font_t font, GYDM::MatterPort port = MatterPort::LT);
         void set_text_color(const GYDM::RGBA& color = SILVER);
         void set_foreground_color(const GYDM::RGBA& color = SILVER) { this->set_text_color(color); }
         void set_text_alpha(double alpha);
@@ -42,7 +42,7 @@ namespace GYDM {
 
     public:
         GYDM::Box get_bounding_box() override;
-        void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
+        void draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
 
     public:
         size_t content_size() { return this->raw.size(); }

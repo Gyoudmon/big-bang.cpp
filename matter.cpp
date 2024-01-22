@@ -32,15 +32,15 @@ IPlane* GYDM::IMatter::master() const {
     return plane;
 }
 
-SDL_Renderer* GYDM::IMatter::master_renderer() const {
+dc_t* GYDM::IMatter::drawing_context() const {
     IPlane* master = this->master();
-    SDL_Renderer* renderer = nullptr;
+    dc_t* device = nullptr;
 
     if (master != nullptr) {
-        renderer = master->master_renderer();
+        device = master->drawing_context();
     }
 
-    return renderer;
+    return device;
 }
 
 void GYDM::IMatter::attach_metadata(IMatterMetadata* metadata) {
@@ -65,19 +65,19 @@ bool GYDM::IMatter::is_colliding(const Dot& local_pt) {
     return okay;
 }
 
-void GYDM::IMatter::scale(float x_ratio, float y_ratio, const Anchor& anchor) {
+void GYDM::IMatter::scale(float x_ratio, float y_ratio, const Port& port) {
     if (this->can_resize) {
         if ((x_ratio != 1.0F) || (y_ratio != 1.0F)) {
             Box box = this->get_bounding_box();
 
-	        this->moor(anchor);
+	        this->moor(port);
             this->on_resize(box.width() * x_ratio, box.height() * y_ratio, box.width(), box.height());
 	        this->notify_updated();
         }
     }
 }
 
-void GYDM::IMatter::scale_to(float x_ratio, float y_ratio, const Anchor& anchor) {
+void GYDM::IMatter::scale_to(float x_ratio, float y_ratio, const Port& port) {
     if (this->can_resize) {
         float nwidth, nheight;
         Box cbox = this->get_bounding_box();
@@ -87,14 +87,14 @@ void GYDM::IMatter::scale_to(float x_ratio, float y_ratio, const Anchor& anchor)
         nheight = obox.height() * y_ratio;
 
         if ((nwidth != cbox.width()) || (nheight != cbox.height())) {
-	        this->moor(anchor);
+	        this->moor(port);
             this->on_resize(nwidth, nheight, cbox.width(), cbox.height());
 	        this->notify_updated();
         }
     }
 }
 
-void GYDM::IMatter::scale_by_size(float size, bool given_width, const Anchor& anchor) {
+void GYDM::IMatter::scale_by_size(float size, bool given_width, const Port& port) {
     if (this->can_resize) {
         float nwidth, nheight;
         Box box = this->get_bounding_box();
@@ -108,14 +108,14 @@ void GYDM::IMatter::scale_by_size(float size, bool given_width, const Anchor& an
         }
         
         if ((nwidth != box.width()) || (nheight != box.height())) {
-            this->moor(anchor);
+            this->moor(port);
             this->on_resize(nwidth, nheight, box.width(), box.height());
 	        this->notify_updated();
         }
     }
 }
 
-void GYDM::IMatter::resize(float nwidth, float nheight, const Anchor& anchor) {
+void GYDM::IMatter::resize(float nwidth, float nheight, const Port& port) {
     if (this->can_resize) {
         Box box = this->get_bounding_box();
 
@@ -128,7 +128,7 @@ void GYDM::IMatter::resize(float nwidth, float nheight, const Anchor& anchor) {
         }
 
 	    if ((box.width() != nwidth) || (box.height() != nheight)) {
-            this->moor(anchor);
+            this->moor(port);
             this->on_resize(nwidth, nheight, box.width(), box.height());
 	        this->notify_updated();
 	    }
@@ -137,8 +137,8 @@ void GYDM::IMatter::resize(float nwidth, float nheight, const Anchor& anchor) {
 
 void GYDM::IMatter::notify_updated() {
     if (this->info != nullptr) {
-        if (!this->anchor.is_zero()) {
-            Dot dot = this->info->master->get_matter_location(this, this->anchor);
+        if (!this->port.is_zero()) {
+            Dot dot = this->info->master->get_matter_location(this, this->port);
 
             /** NOTE
              * Gliding dramatically increasing the complexity of moving as glidings might be queued,
@@ -146,8 +146,8 @@ void GYDM::IMatter::notify_updated() {
              *   and do the moving immediately.
              **/
 
-            if (dot != this->anchor_dot) {
-                this->info->master->move(this, Vector(this->anchor_dot.x - dot.x, this->anchor_dot.y - dot.y), true);
+            if (dot != this->port_dot) {
+                this->info->master->move(this, Vector(this->port_dot.x - dot.x, this->port_dot.y - dot.y), true);
             }
 
             this->clear_moor();
@@ -163,18 +163,17 @@ void GYDM::IMatter::notify_timeline_restart(uint32_t count0, int duration) {
     }
 }
 
-void GYDM::IMatter::moor(const Anchor& anchor) {
-    if (this->anchor != anchor) {
+void GYDM::IMatter::moor(const Port& port) {
+    if (this->port != port) {
         if (this->info != nullptr) {
-            this->anchor = anchor;
-            this->anchor_dot = this->info->master->get_matter_location(this, anchor);
+            this->port = port;
+            this->port_dot = this->info->master->get_matter_location(this, port);
         }
     }
 }
 
 void GYDM::IMatter::clear_moor() {
-    this->anchor.reset();
-    // this->anchor_dot *= 0.0F;
+    this->port.reset();
 }
 
 bool GYDM::IMatter::has_caret() {
@@ -194,11 +193,11 @@ void GYDM::IMatter::show(bool yes_no) {
     }
 }
 
-Dot GYDM::IMatter::get_location(const Anchor& a) {
+Dot GYDM::IMatter::get_location(const Port& p) {
     Dot dot(flnan_f, flnan_f);
 
     if (this->info != nullptr) {
-        dot = this->info->master->get_matter_location(this, a);
+        dot = this->info->master->get_matter_location(this, p);
     }
 
     return dot;

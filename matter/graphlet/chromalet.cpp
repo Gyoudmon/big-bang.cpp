@@ -4,7 +4,6 @@
 #include "../../datum/flonum.hpp"
 
 #include "../../graphics/image.hpp"
-#include "../../graphics/brush.hpp"
 #include "../../physics/color/rgba.hpp"
 #include "../../physics/color/names.hpp"
 
@@ -253,23 +252,23 @@ void GYDM::Chromalet::on_resize(float w, float h, float width, float height) {
     this->height = h;
 }
 
-void GYDM::Chromalet::draw_before_canvas(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) { 
-    Brush::draw_grid(renderer, 10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, DIMGRAY, flx, fly);
-    SDL_RenderDrawLineF(renderer, flx, fly, flx + flwidth, fly + flheight);
+void GYDM::Chromalet::draw_before_canvas(GYDM::dc_t* dc, float flx, float fly, float flwidth, float flheight) { 
+    dc->draw_grid(10, 10, (flwidth - 2.0F) / 10.0F, (flheight - 2.0F)/ 10.0F, DIMGRAY, flx, fly);
+    SDL_RenderDrawLineF(dc->self(), flx, fly, flx + flwidth, fly + flheight);
 }
 
-void GYDM::Chromalet::draw_on_canvas(SDL_Renderer* renderer, float flwidth, float flheight) {
+void GYDM::Chromalet::draw_on_canvas(GYDM::dc_t* dc, float flwidth, float flheight) {
     double imaginary_width = abs(this->width);
     double imaginary_height = abs(this->height);
  
-    // this->draw_color_map(renderer, imaginary_width, imaginary_height);
-    this->draw_spectral_locus(renderer, imaginary_width, imaginary_height);
-    this->draw_chromaticity(renderer, imaginary_width, imaginary_height);
+    // this->draw_color_map(dc, imaginary_width, imaginary_height);
+    this->draw_spectral_locus(dc, imaginary_width, imaginary_height);
+    this->draw_chromaticity(dc, imaginary_width, imaginary_height);
 }
 
-void GYDM::Chromalet::draw_after_canvas(SDL_Renderer* renderer, float flx, float fly, float flwidth, float flheight) {
+void GYDM::Chromalet::draw_after_canvas(GYDM::dc_t* dc, float flx, float fly, float flwidth, float flheight) {
     if (this->pseudo_primary_triangle_color.is_opacity()) {
-        this->draw_color_triangle(renderer, flx, fly);
+        this->draw_color_triangle(dc, flx, fly);
     }
 }
 
@@ -400,7 +399,7 @@ void GYDM::Chromalet::recalculate_primary_colors(int idx) {
 }
 
 /*************************************************************************************************/
-void GYDM::Chromalet::draw_color_triangle(SDL_Renderer* renderer, double dx, double dy) {
+void GYDM::Chromalet::draw_color_triangle(GYDM::dc_t* dc, double dx, double dy) {
     static const size_t vcount = PseudoPrimaryColorCount + 1U;
     SDL_FPoint pts[vcount];
     double x, y;
@@ -413,23 +412,20 @@ void GYDM::Chromalet::draw_color_triangle(SDL_Renderer* renderer, double dx, dou
     }
 
     pts[vcount - 1] = pts[0];
-    SDL_SetRenderDrawColor(renderer,
-            this->pseudo_primary_triangle_color.R(), this->pseudo_primary_triangle_color.G(), this->pseudo_primary_triangle_color.B(),
-            this->pseudo_primary_triangle_color.A());
-    SDL_RenderDrawLinesF(renderer, pts, vcount);
+    dc->draw_lines(pts, vcount, this->pseudo_primary_triangle_color);
 
     for (int idx = 0; idx < PseudoPrimaryColorCount; idx ++) {
         if ((pts[idx].x != pts[idx + 1].x) || (pts[idx].y != pts[idx + 1].y)) {
             float mx, my;
 
             line_point(pts[idx].x, pts[idx].y, pts[idx + 1].x, pts[idx + 1].y, 0.5, &mx, &my);
-            this->render_special_dot(renderer, this->pseudo_primaries[idx], pts[idx].x, pts[idx].y);
-            this->render_special_dot(renderer, this->get_color_at(double(mx) - dx, double(my) - dy), mx, my);
+            this->render_special_dot(dc, this->pseudo_primaries[idx], pts[idx].x, pts[idx].y);
+            this->render_special_dot(dc, this->get_color_at(double(mx) - dx, double(my) - dy), mx, my);
         }
     }
 }
 
-void GYDM::Chromalet::draw_color_map(SDL_Renderer* renderer, double flwidth, double flheight, double dx, double dy) {
+void GYDM::Chromalet::draw_color_map(GYDM::dc_t* dc, double flwidth, double flheight, double dx, double dy) {
     double X, Y, Z, R, G, B, x, y;
 
     for (int px = 0; px < fl2fxi(flwidth); px ++) {
@@ -442,14 +438,14 @@ void GYDM::Chromalet::draw_color_map(SDL_Renderer* renderer, double flwidth, dou
                 CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
 
                 if ((R >= 0.0) && (G >= 0.0) && (B >= 0.0)) {
-                    this->render_dot(renderer, x, y, flwidth, flheight, R, G, B, dx, dy);
+                    this->render_dot(dc, x, y, flwidth, flheight, R, G, B, dx, dy);
                 }
             }
         }
     }
 }
 
-void GYDM::Chromalet::draw_spectral_locus(SDL_Renderer* renderer, double flwidth, double flheight, double dx, double dy) {
+void GYDM::Chromalet::draw_spectral_locus(GYDM::dc_t* dc, double flwidth, double flheight, double dx, double dy) {
     double R, G, B, xbar, ybar, zbar, x, y;
     
     for (int idx = 0; idx < sizeof(wavelength_xbars) / sizeof(double); idx ++) {
@@ -459,11 +455,11 @@ void GYDM::Chromalet::draw_spectral_locus(SDL_Renderer* renderer, double flwidth
 
         CIE_XYZ_to_xyY(xbar, ybar, zbar, &x, &y);
         CIE_XYZ_to_RGB(this->standard, xbar, ybar, zbar, &R, &G, &B, false);
-        this->render_dot(renderer, x, y, flwidth, flheight, R, G, B, dx, dy);
+        this->render_dot(dc, x, y, flwidth, flheight, R, G, B, dx, dy);
     }
 }
 
-void GYDM::Chromalet::draw_chromaticity(SDL_Renderer* renderer, double flwidth, double flheight, double dx, double dy) {
+void GYDM::Chromalet::draw_chromaticity(GYDM::dc_t* dc, double flwidth, double flheight, double dx, double dy) {
     int slt_idx = this->scanline_idx0;
     int slb_idx = this->scanline_idx0;
     double X, Y, Z, R, G, B;
@@ -482,7 +478,7 @@ void GYDM::Chromalet::draw_chromaticity(SDL_Renderer* renderer, double flwidth, 
             fy = 1.0 - y / flheight;        
             CIE_xyY_to_XYZ(fx, fy, &X, &Y, &Z, this->luminance);
             CIE_XYZ_to_RGB(this->standard, X, Y, Z, &R, &G, &B, true);
-            this->render_dot(renderer, fx, fy, flwidth, flheight, R, G, B, dx, dy);
+            this->render_dot(dc, fx, fy, flwidth, flheight, R, G, B, dx, dy);
         }
     };
 }
@@ -493,15 +489,15 @@ void GYDM::Chromalet::fix_render_location(double* x, double* y) {
     if (this->height > 0.0F) { (*y) = 1.0 - (*y); }
 }
 
-void GYDM::Chromalet::render_special_dot(SDL_Renderer* renderer, const RGBA& c, float x, float y) {
-    Brush::fill_circle(renderer, x, y, triangle_vertice_radius, c);
-    Brush::draw_circle(renderer, x, y, triangle_vertice_radius, GHOSTWHITE);
-    Brush::draw_circle(renderer, x, y, triangle_vertice_radius + 1.0F, GHOSTWHITE);
+void GYDM::Chromalet::render_special_dot(GYDM::dc_t* dc, const RGBA& c, float x, float y) {
+    dc->fill_circle(x, y, triangle_vertice_radius, c);
+    dc->draw_circle(x, y, triangle_vertice_radius, GHOSTWHITE);
+    dc->draw_circle(x, y, triangle_vertice_radius + 1.0F, GHOSTWHITE);
 }
 
-void GYDM::Chromalet::render_dot(SDL_Renderer* renderer, double x, double y, double width, double height, double R, double G, double B, double dx, double dy, double A) {
+void GYDM::Chromalet::render_dot(GYDM::dc_t* dc, double x, double y, double width, double height, double R, double G, double B, double dx, double dy, double A) {
     this->fix_render_location(&x, &y);
-    Brush::draw_point(renderer, float(x * width + dx), float(y * height + dy), RGBA(R, G, B, A));
+    dc->draw_point(float(x * width + dx), float(y * height + dy), RGBA(R, G, B, A));
 }
 
 void GYDM::Chromalet::make_locus_polygon(double flwidth, double flheight) {

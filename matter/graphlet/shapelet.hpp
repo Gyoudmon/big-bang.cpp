@@ -12,11 +12,11 @@ namespace GYDM {
         virtual ~IShapelet() noexcept {}
 
     public:
-        void draw_on_canvas(SDL_Renderer* renderer, float Width, float Height) override;
+        void draw_on_canvas(GYDM::dc_t* dc, float Width, float Height) override;
 
     protected:
-        virtual void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
-        virtual void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
+        virtual void draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
+        virtual void fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) = 0;
     };
 
     /*********************************************************************************************/
@@ -29,8 +29,8 @@ namespace GYDM {
         
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override {}
-        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override {}
+        void fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
     private:
         float epx;
@@ -58,8 +58,8 @@ namespace GYDM {
 
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	private:
 	    float width;
@@ -82,8 +82,8 @@ namespace GYDM {
         
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	private:
 	    float width;
@@ -107,8 +107,8 @@ namespace GYDM {
         
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
 	private:
 	    float aradius;
@@ -137,8 +137,8 @@ namespace GYDM {
 	    
     protected:
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
-        void draw_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
-        void fill_shape(SDL_Renderer* renderer, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void draw_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
+        void fill_shape(GYDM::dc_t* dc, int width, int height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) override;
 
     private:
         void initialize_vertices(float xscale, float yscale);

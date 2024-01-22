@@ -79,20 +79,20 @@ namespace GYDM {
 
     public:
         GYDM::Box get_bounding_box() override;
-        void draw(SDL_Renderer* ds, float x, float y, float Width, float Height) override;
+        void draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
 
     protected:
         void prepare_style(GYDM::DimensionState status, GYDM::DimensionStyle& style) override;
-		void apply_style(GYDM::DimensionStyle& style, SDL_Renderer* renderer) override;
+		void apply_style(GYDM::DimensionStyle& style, GYDM::dc_t* dc) override;
 
     protected:
-        void on_value_changed(SDL_Renderer* ds, double value) override;
+        void on_value_changed(GYDM::dc_t* dc, double value) override;
 
     private:
         void feed_subextent(size_t n, float* w = nullptr, float* h = nullptr);
         void update_drawing_box(size_t idx, float minimize_width, shared_font_t font, float leading_space);
-        void update_number_texture(SDL_Renderer* ds, double value, GYDM::DimensionStyle& style);
-        void draw_box(SDL_Renderer* ds, int idx, float xfraction, float x, float y, float Height,
+        void update_number_texture(GYDM::dc_t* dc, double value, GYDM::DimensionStyle& style);
+        void draw_box(GYDM::dc_t* dc, int idx, float xfraction, float x, float y, float Height,
                 const std::optional<GYDM::RGBA>& bgcolor,
                 const std::optional<GYDM::RGBA>& bcolor);
 

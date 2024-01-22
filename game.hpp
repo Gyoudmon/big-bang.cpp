@@ -20,12 +20,11 @@
 #include "matter.hpp"
 #include "misc.hpp"
 
-#include "graphics/renderer.hpp"
+#include "graphics/dc.hpp"
 #include "graphics/font.hpp"
-#include "graphics/text.hpp"
 #include "graphics/texture.hpp"
-#include "graphics/brush.hpp"
 #include "graphics/ruler.hpp"
+#include "graphics/misc.hpp"
 
 #include "matter/atlas.hpp"
 #include "matter/continent.hpp"
@@ -57,7 +56,7 @@
 #include "physics/color/CIE.hpp"
 #include "physics/color/names.hpp"
 #include "physics/geometry/point.hpp"
-#include "physics/geometry/anchor.hpp"
+#include "physics/geometry/port.hpp"
 #include "physics/geometry/vertices.hpp"
 #include "physics/geometry/aabox.hpp"
 #include "physics/geometry/margin.hpp"

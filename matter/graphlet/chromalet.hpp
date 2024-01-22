@@ -36,23 +36,23 @@ namespace GYDM {
         void on_resize(float new_width, float new_height, float old_width, float old_height) override;
         
     protected:
-        void draw_before_canvas(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
-        void draw_on_canvas(SDL_Renderer* renderer, float Width, float Height) override;
-        void draw_after_canvas(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+        void draw_before_canvas(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
+        void draw_on_canvas(GYDM::dc_t* dc, float Width, float Height) override;
+        void draw_after_canvas(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
         void on_canvas_invalidated() override;
     
     private:
-        void draw_color_triangle(SDL_Renderer* renderer, double dx = 0.0, double dy = 0.0);
-        void draw_color_map(SDL_Renderer* renderer, double width, double height, double dx = 0.0, double dy = 0.0);
-        void draw_spectral_locus(SDL_Renderer* renderer, double width, double height, double dx = 0.0, double dy = 0.0);
-        void draw_chromaticity(SDL_Renderer* renderer, double width, double height, double dx = 0.0, double dy = 0.0);
+        void draw_color_triangle(GYDM::dc_t* dc, double dx = 0.0, double dy = 0.0);
+        void draw_color_map(GYDM::dc_t* dc, double width, double height, double dx = 0.0, double dy = 0.0);
+        void draw_spectral_locus(GYDM::dc_t* dc, double width, double height, double dx = 0.0, double dy = 0.0);
+        void draw_chromaticity(GYDM::dc_t* dc, double width, double height, double dx = 0.0, double dy = 0.0);
 
     private:
         void fix_render_location(double* x, double* y);
         void make_locus_polygon(double width, double height);
         void spectrum_intersection_vpoints(double x, double flheight, int& slt_idx, int& slb_idx, double* ty, double* by);
-        void render_special_dot(SDL_Renderer* renderer, const GYDM::RGBA& c, float x, float y);
-        void render_dot(SDL_Renderer* renderer, double x, double y, double width, double height,
+        void render_special_dot(GYDM::dc_t* dc, const GYDM::RGBA& c, float x, float y);
+        void render_dot(GYDM::dc_t* dc, double x, double y, double width, double height,
                             double R, double G, double B, double dx, double dy, double A = 1.0);
 
     private:

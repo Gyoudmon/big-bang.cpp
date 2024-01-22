@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <string>
 
+#include "../graphics/dc.hpp"
 #include "../forward.hpp"
 
 /**************************************************************************************************/
@@ -22,7 +23,7 @@ namespace GYDM {
         virtual void log_message(GYDM::Log level, const std::string& message) = 0;
         virtual void start_input_text(const std::string& prompt) = 0;
         virtual SDL_Surface* snapshot() = 0;
-        virtual SDL_Renderer* master_renderer() = 0;
+        virtual GYDM::dc_t* drawing_context() = 0;
 
     public:
         void begin_update_sequence() { this->update_sequence_depth += 1; }

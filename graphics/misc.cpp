@@ -1,4 +1,4 @@
-#include "renderer.hpp"
+#include "misc.hpp"
 
 #include "../datum/box.hpp"
 
@@ -34,4 +34,19 @@ void GYDM::game_flip_to_signs(SDL_RendererFlip flip, float* hsgn, float* vsgn) {
     game_flip_to_signs(flip, &flhsgn, &flvsgn);
     SET_BOX(hsgn, float(flhsgn));
     SET_BOX(vsgn, float(flvsgn));
+}
+
+/*************************************************************************************************/
+void GYDM::feed_rect(SDL_Rect* rect, const AABox<int>& box) {
+    rect->x = box.x();
+    rect->y = box.y();
+    rect->w = box.width();
+    rect->h = box.height();
+}
+
+void GYDM::feed_rect(SDL_FRect* rect, const Box& box) {
+    rect->x = box.x();
+    rect->y = box.y();
+    rect->w = box.width();
+    rect->h = box.height();
 }

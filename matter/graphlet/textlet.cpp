@@ -1,8 +1,6 @@
 #include "textlet.hpp"
 
 #include "../../graphics/font.hpp"
-#include "../../graphics/text.hpp"
-#include "../../graphics/brush.hpp"
 
 #include "../../datum/string.hpp"
 #include "../../datum/box.hpp"
@@ -35,7 +33,7 @@ GYDM::ITextlet::ITextlet() {
     this->set_text_color();
 }
 
-void GYDM::ITextlet::construct(SDL_Renderer* renderer) {
+void GYDM::ITextlet::construct(GYDM::dc_t* dcer) {
     this->update_texture();
 }
 
@@ -76,23 +74,23 @@ void GYDM::ITextlet::set_corner_radius(float radius) {
     }
 }
 
-void GYDM::ITextlet::set_font(shared_font_t font, MatterAnchor anchor) {
-    this->moor(anchor);
+void GYDM::ITextlet::set_font(shared_font_t font, MatterPort port) {
+    this->moor(port);
 
     this->text_font = (((font.use_count() > 0) && (font->okay())) ? font : GameFont::Default());
-    this->set_text(this->raw, anchor);
+    this->set_text(this->raw, port);
     this->on_font_changed();
 
     this->notify_updated();
 }
 
-void GYDM::ITextlet::set_text(const std::string& content, MatterAnchor anchor) {
+void GYDM::ITextlet::set_text(const std::string& content, MatterPort port) {
     this->raw = content;
 
-    this->moor(anchor);
+    this->moor(port);
 
     if ((this->text_font.use_count() == 0) || (!this->text_font->okay())) {
-        this->set_font(nullptr, anchor);
+        this->set_font(nullptr, port);
     } else {
         this->update_texture();
     }
@@ -111,9 +109,9 @@ void GYDM::ITextlet::set_text(const RGBA& color, const char* fmt, ...) {
     this->set_text_color(color);
 }
 
-void GYDM::ITextlet::set_text(MatterAnchor anchor, const char* fmt, ...) {
+void GYDM::ITextlet::set_text(MatterPort port, const char* fmt, ...) {
     VSNPRINT(content, fmt);
-    this->set_text(content, anchor);
+    this->set_text(content, port);
 }
 
 Box GYDM::ITextlet::get_bounding_box() {
@@ -131,54 +129,53 @@ Box GYDM::ITextlet::get_bounding_box() {
     return box;
 }
 
-void GYDM::ITextlet::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::ITextlet::draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) {
     if ((this->texture.use_count() > 0) && this->texture->okay()) {
         if (this->corner_radius == 0.0F) {
             float pos_off = 0.0F;
             float sizeoff = 0.5F;
 
             if (this->background_color.is_opacity()) {
-                Brush::fill_rect(renderer, x + pos_off, y + pos_off,
-                                        Width - sizeoff, Height - sizeoff,
-                                        this->background_color);
+                dc->fill_rect(x + pos_off, y + pos_off,
+                                Width - sizeoff, Height - sizeoff,
+                                this->background_color);
             }
 
             if (this->border_color.is_opacity()) {
-                Brush::draw_rect(renderer, x + pos_off, y + pos_off,
-                                        Width - sizeoff, Height - sizeoff,
-                                        this->border_color);
+                dc->draw_rect(x + pos_off, y + pos_off,
+                                Width - sizeoff, Height - sizeoff,
+                                this->border_color);
             }
         } else {
             float pos_off = 0.5F;
             float sizeoff = 2.0F;
 
             if (this->background_color.is_opacity()) {
-                Brush::fill_rounded_rect(renderer, x + pos_off, y + pos_off,
+                dc->fill_rounded_rect(x + pos_off, y + pos_off,
                                         Width - sizeoff, Height - sizeoff,
                                         this->corner_radius, this->background_color);
             }
 
             if (this->border_color.is_opacity()) {
-                Brush::draw_rounded_rect(renderer, x + pos_off, y + pos_off,
+                dc->draw_rounded_rect(x + pos_off, y + pos_off,
                                         Width - sizeoff, Height - sizeoff,
                                         this->corner_radius, this->border_color);
             }
         }
 
         if (this->foreground_color.is_opacity()) {
-            Brush::stamp(renderer, this->texture->self(), x, y);
+            dc->stamp(this->texture->self(), x, y);
         }
     }
 }
 
 void GYDM::ITextlet::update_texture() {
-    SDL_Renderer* renderer = this->master_renderer();
+    GYDM::dc_t* dc = this->drawing_context();
 
-    if ((this->raw.empty()) || (renderer == nullptr)) {
+    if ((this->raw.empty()) || (dc == nullptr)) {
         this->texture.reset();
     } else {
-        this->texture.reset(new Texture(game_text_texture(renderer, this->raw, this->text_font,
-            TextRenderMode::Blender, this->foreground_color, this->foreground_color, 0)));
+        this->texture.reset(new Texture(dc->create_blended_text(this->raw, this->text_font, this->foreground_color, 0)));
     }
 }
 

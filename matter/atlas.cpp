@@ -7,9 +7,7 @@
 #include "../datum/fixnum.hpp"
 
 #include "../plane.hpp"
-#include "../graphics/brush.hpp"
-#include "../graphics/renderer.hpp"
-
+#include "../graphics/misc.hpp"
 #include "../physics/mathematics.hpp"
 
 using namespace GYDM;
@@ -28,8 +26,8 @@ const char* GYDM::IAtlas::name() {
     return _name.c_str();
 }
 
-void GYDM::IAtlas::construct(SDL_Renderer* renderer) {
-    this->atlas = imgdb_ref(this->_pathname, renderer);
+void GYDM::IAtlas::construct(GYDM::dc_t* dc) {
+    this->atlas = imgdb_ref(this->_pathname, dc->self());
 
     if (this->atlas->okay()) {
         this->on_tilemap_load(this->atlas);
@@ -90,7 +88,7 @@ void GYDM::IAtlas::on_resize(float width, float height, float old_width, float o
     }
 }
 
-void GYDM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) {
+void GYDM::IAtlas::draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) {
     SDL_Texture* tilemap = this->atlas->self();
     SDL_RendererFlip flip = this->current_flip_status();
     float sx = flabs(this->xscale);
@@ -110,8 +108,8 @@ void GYDM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float Width, f
              *   and it's okay, the larger part is simply ignored. 
              **/
             
-            Brush::feed_rect(&src, this->get_atlas_tile_region(primitive_tile_idx % idxmax));
-            Brush::feed_rect(&dest, this->get_map_tile_region(idx));
+            feed_rect(&src, this->get_atlas_tile_region(primitive_tile_idx % idxmax));
+            feed_rect(&dest, this->get_map_tile_region(idx));
 
             if (xoff != 0) {
                 src.x += xoff;
@@ -136,12 +134,12 @@ void GYDM::IAtlas::draw(SDL_Renderer* renderer, float x, float y, float Width, f
                 dest.y = y + Height - dest.y * sy - dest.h;
             }
 
-            Brush::stamp(renderer, tilemap, &src, &dest, flip);
+            dc->stamp(tilemap, &src, &dest, flip);
         }
     }
 
     if (this->logic_grid_color.is_opacity() && (this->logic_col > 0) && (this->logic_row > 0)) {
-        Brush::draw_grid(renderer, this->logic_row, this->logic_col,
+        dc->draw_grid(this->logic_row, this->logic_col,
             this->logic_tile_width * sx, this->logic_tile_height * sy,
             this->logic_grid_color,
             x + this->logic_margin.left * sx, y + this->logic_margin.top * sy);
@@ -169,7 +167,7 @@ int GYDM::IAtlas::logic_tile_index(float x, float y, int* r, int* c, bool local)
         auto master = this->master();
 
         if (master != nullptr) {
-            Dot dot = master->get_matter_location(this, MatterAnchor::LT);
+            Dot dot = master->get_matter_location(this, MatterPort::LT);
 
             x -= dot.x;
             y -= dot.y;
@@ -189,19 +187,19 @@ int GYDM::IAtlas::logic_tile_index(float x, float y, int* r, int* c, bool local)
     return idx;
 }
 
-Dot GYDM::IAtlas::get_logic_tile_location(int idx, const Anchor& a, bool local) {
+Dot GYDM::IAtlas::get_logic_tile_location(int idx, const Port& p, bool local) {
     int total = this->logic_col * this->logic_row;
     Dot dot;
     
     if (total > 0) {
         idx = safe_index(idx, total);
-        dot = this->get_logic_tile_location(idx / this->logic_col, idx / this->logic_row, a, local);
+        dot = this->get_logic_tile_location(idx / this->logic_col, idx / this->logic_row, p, local);
     }
 
     return dot;
 }
 
-Dot GYDM::IAtlas::get_logic_tile_location(int row, int col, const Anchor& a, bool local) {
+Dot GYDM::IAtlas::get_logic_tile_location(int row, int col, const Port& p, bool local) {
     Dot dot;
     
     if (this->logic_row > 0) {
@@ -216,65 +214,65 @@ Dot GYDM::IAtlas::get_logic_tile_location(int row, int col, const Anchor& a, boo
         auto master = this->master();
 
         if (master != nullptr) {
-            dot = master->get_matter_location(this, MatterAnchor::LT);
+            dot = master->get_matter_location(this, MatterPort::LT);
         }
     }
     
-    return dot + Dot((this->logic_tile_width * (float(col) + a.fx) + this->logic_margin.left) * flabs(this->xscale),
-                     (this->logic_tile_height * (float(row) + a.fy) + this->logic_margin.top) * flabs(this->yscale));
+    return dot + Dot((this->logic_tile_width * (float(col) + p.fx) + this->logic_margin.left) * flabs(this->xscale),
+                     (this->logic_tile_height * (float(row) + p.fy) + this->logic_margin.top) * flabs(this->yscale));
 }
 
-Anchor GYDM::IAtlas::get_logic_tile_fraction(int idx, const Anchor& a) {
+Port GYDM::IAtlas::get_logic_tile_fraction(int idx, const Port& a) {
     int total = this->logic_col * this->logic_row;
-    Anchor anchor;
+    Port port;
     
     if (total > 0) {
         idx = safe_index(idx, total);
-        anchor = this->get_logic_tile_fraction(idx / this->logic_col, idx / this->logic_row, a);
+        port = this->get_logic_tile_fraction(idx / this->logic_col, idx / this->logic_row, a);
     }
 
-    return anchor;
+    return port;
 }
 
-Anchor GYDM::IAtlas::get_logic_tile_fraction(int row, int col, const Anchor& a) {
+Port GYDM::IAtlas::get_logic_tile_fraction(int row, int col, const Port& p) {
     Box box = this->get_bounding_box();
-    Dot dot = this->get_logic_tile_location(row, col, a, true);
+    Dot dot = this->get_logic_tile_location(row, col, p, true);
     
     return { dot.x / box.width(),
              dot.y / box.height() };
 }
 
-void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int idx, const Port& tp, const Port& p, const Vector& vec) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
         idx = safe_index(idx, total);
-        this->move_to_logic_tile(m, idx / this->logic_col, idx / this->logic_row, ta, a, vec);
+        this->move_to_logic_tile(m, idx / this->logic_col, idx / this->logic_row, tp, p, vec);
     }
 }
 
-void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::IAtlas::move_to_logic_tile(IMatter* m, int row, int col, const Port& tp, const Port& p, const Vector& vec) {
     auto master = this->master();
     
     if (master != nullptr) {
-        master->move_to(m, this->get_logic_tile_location(row, col, ta, false), a, vec);
+        master->move_to(m, this->get_logic_tile_location(row, col, tp, false), p, vec);
     }
 }
 
-void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int idx, const Port& tp, const Port& p, const Vector& vec) {
     int total = this->logic_col * this->logic_row;
     
     if (total > 0) {
         idx = safe_index(idx, total);
-        this->glide_to_logic_tile(sec, m, idx / this->logic_col, idx / this->logic_row, ta, a, vec);
+        this->glide_to_logic_tile(sec, m, idx / this->logic_col, idx / this->logic_row, tp, p, vec);
     }
 }
 
-void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::IAtlas::glide_to_logic_tile(double sec, IMatter* m, int row, int col, const Port& tp, const Port& p, const Vector& vec) {
     auto master = this->master();
     
     if (master != nullptr) {
-        master->glide_to(sec, m, get_logic_tile_location(row, col, ta, false), a, vec);
+        master->glide_to(sec, m, get_logic_tile_location(row, col, tp, false), p, vec);
     }
 }
 
@@ -430,7 +428,7 @@ int GYDM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, bool local
         auto master = this->master();
 
         if (master != nullptr) {
-            Dot dot = master->get_matter_location(this, MatterAnchor::LT);
+            Dot dot = master->get_matter_location(this, MatterPort::LT);
 
             x -= dot.x;
             y -= dot.y;
@@ -448,21 +446,21 @@ int GYDM::GridAtlas::map_tile_index(float x, float y, int* r, int* c, bool local
     return rw * this->map_col + cl;
 }
 
-Anchor GYDM::GridAtlas::get_map_tile_fraction(int idx, const Anchor& a) {
+Port GYDM::GridAtlas::get_map_tile_fraction(int idx, const Port& p) {
     Box box = this->get_bounding_box();
-    Dot dot = this->get_map_tile_location(idx, a, true);
+    Dot dot = this->get_map_tile_location(idx, p, true);
 
     return { dot.x / box.width(), dot.y / box.height() };
 }
 
-Anchor GYDM::GridAtlas::get_map_tile_fraction(int row, int col, const Anchor& a) {
+Port GYDM::GridAtlas::get_map_tile_fraction(int row, int col, const Port& a) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
     
     return this->get_map_tile_fraction(row * this->map_col + col, a);
 }
 
-Dot GYDM::GridAtlas::get_map_tile_location(int idx, const Anchor& a, bool local) {
+Dot GYDM::GridAtlas::get_map_tile_location(int idx, const Port& p, bool local) {
     int total = this->map_col * this->map_row;
     Box region;
     Dot dot;
@@ -474,47 +472,47 @@ Dot GYDM::GridAtlas::get_map_tile_location(int idx, const Anchor& a, bool local)
         auto master = this->master();
 
         if (master != nullptr) {
-            dot = master->get_matter_location(this, MatterAnchor::LT);
+            dot = master->get_matter_location(this, MatterPort::LT);
         }
     }
     
-    return { (region.x() + region.width()  * a.fx + dot.x) * flabs(this->xscale),
-             (region.y() + region.height() * a.fy + dot.y) * flabs(this->yscale) };
+    return { (region.x() + region.width()  * p.fx + dot.x) * flabs(this->xscale),
+             (region.y() + region.height() * p.fy + dot.y) * flabs(this->yscale) };
 }
 
-Dot GYDM::GridAtlas::get_map_tile_location(int row, int col, const Anchor& a, bool local) {
+Dot GYDM::GridAtlas::get_map_tile_location(int row, int col, const Port& p, bool local) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
 
-    return this->get_map_tile_location(row * this->map_col + col, a, local);
+    return this->get_map_tile_location(row * this->map_col + col, p, local);
 }
 
-void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int idx, const Port& tp, const Port& p, const Vector& vec) {
     auto master = this->master();
 
     if (master != nullptr) {
-        master->move_to(m, this->get_map_tile_location(idx, ta, false), a, vec);
+        master->move_to(m, this->get_map_tile_location(idx, tp, false), p, vec);
     }
 }
 
-void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::GridAtlas::move_to_map_tile(IMatter* m, int row, int col, const Port& tp, const Port& p, const Vector& vec) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
-    this->move_to_map_tile(m, row * this->map_col + col, ta, a, vec);
+    this->move_to_map_tile(m, row * this->map_col + col, tp, p, vec);
 }
 
-void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int idx, const Port& tp, const Port& p, const Vector& vec) {
     auto master = this->master();
 
     if (master != nullptr) {
-        master->glide_to(sec, m, this->get_map_tile_location(idx, ta, false), a, vec);
+        master->glide_to(sec, m, this->get_map_tile_location(idx, tp, false), p, vec);
     }
 }
 
-void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col, const Anchor& ta, const Anchor& a, const Vector& vec) {
+void GYDM::GridAtlas::glide_to_map_tile(double sec, IMatter* m, int row, int col, const Port& tp, const Port& p, const Vector& vec) {
     row = safe_index(row, this->map_row);
     col = safe_index(col, this->map_col);
-    this->glide_to_map_tile(sec, m, row * this->map_col + col, ta, a, vec);
+    this->glide_to_map_tile(sec, m, row * this->map_col + col, tp, p, vec);
 }
 
 GYDM::Margin GYDM::GridAtlas::get_map_overlay() {

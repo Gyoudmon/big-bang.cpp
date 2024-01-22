@@ -15,7 +15,7 @@ namespace GYDM {
 
     public:
         GYDM::Box get_bounding_box() override;
-        void draw(SDL_Renderer* renderer, float x, float y, float Width, float Height) override;
+        void draw(GYDM::dc_t* dc, float x, float y, float Width, float Height) override;
 
     public:
         void push_back_datum(float x, float y);

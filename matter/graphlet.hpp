@@ -37,12 +37,12 @@ namespace GYDM {
 			}
 		}
 
-		void set_value_anchor(GYDM::MatterAnchor anchor) {
-			this->anchor = anchor;
+		void set_value_port(GYDM::MatterPort port) {
+			this->port = port;
 		}
 
-		GYDM::MatterAnchor get_value_anchor() {
-			return this->anchor;
+		GYDM::MatterPort get_value_port() {
+			return this->port;
 		}
 
 	public:
@@ -52,7 +52,7 @@ namespace GYDM {
 		}
 		
 	protected:
-		virtual void on_value_changed(SDL_Renderer* renderer, T value) {}
+		virtual void on_value_changed(GYDM::dc_t* renderer, T value) {}
 		virtual T guarded_value() { return *(this->value); }
 
 	private:
@@ -60,15 +60,17 @@ namespace GYDM {
 			T cur_value = this->guarded_value();
 
 			if (last_value != cur_value) {
+				GYDM::dc_t* dc = this->drawing_context();
+
 				last_value = cur_value;
-				this->moor(this->anchor);
-				this->on_value_changed(this->master_renderer(), cur_value);
+				this->moor(this->port);
+				if (dc != nullptr) this->on_value_changed(dc, cur_value);
 				this->notify_updated();
 			}
 		}
 
 	private:
-		MatterAnchor anchor = GYDM::MatterAnchor::LT;
+		MatterPort port = GYDM::MatterPort::LT;
 		T shadow = T();
 
 	private:
@@ -109,14 +111,16 @@ namespace GYDM {
 				}
 
 				if (changed) {
-					this->moor(this->get_value_anchor());
-					this->on_range_changed(this->master_renderer(), this->vmin, this->vmax);
+					GYDM::dc_t* dc = this->drawing_context();
+
+					this->moor(this->get_value_port());
+					if (dc != nullptr) this->on_range_changed(dc, this->vmin, this->vmax);
 					this->notify_updated();
 				}
 			}
 		}
 
-		virtual void on_range_changed(SDL_Renderer* ds, T vmin, T vmax) {}
+		virtual void on_range_changed(GYDM::dc_t* ds, T vmin, T vmax) {}
 
 	public:
 		double get_percentage(T value) {
@@ -170,8 +174,8 @@ namespace GYDM {
 		}
 
 	public:
-		void construct(SDL_Renderer* renderer) override {
-			this->update_state(renderer);
+		void construct(GYDM::dc_t* dc) override {
+			this->update_state(dc);
 		}
 
 	public:		
@@ -179,8 +183,10 @@ namespace GYDM {
 			unsigned int new_state = ((state == State::_) ? this->default_state : _I(state));
 
 			if (this->current_state != new_state) {
+				GYDM::dc_t* dc = this->drawing_context();
+
 				this->current_state = new_state;
-				this->update_state(this->master_renderer());
+				if (dc != nullptr) this->update_state(dc);
 				this->notify_updated();
 			}
 		}
@@ -210,7 +216,9 @@ namespace GYDM {
 			this->style_ready[idx] = false;
 
 			if (idx == this->current_state) {
-				this->update_state(this->master_renderer());
+				GYDM::dc_t* dc = this->drawing_context();
+
+				if (dc != nullptr) this->update_state(dc);
 				this->notify_updated();
 			}
 		}
@@ -233,15 +241,15 @@ namespace GYDM {
 		}
 
 	protected:
-		void update_state(SDL_Renderer* renderer) {
-			this->apply_style(this->get_style(), renderer);
+		void update_state(GYDM::dc_t* dc) {
+			this->apply_style(this->get_style(), dc);
 			this->on_state_changed(_E(State, this->current_state));
 		}
 
 	protected:
 		virtual void prepare_style(State status, Style& style) = 0;
 		virtual void on_state_changed(State status) {}
-		virtual void apply_style(Style& style, SDL_Renderer* renderer) {}
+		virtual void apply_style(Style& style, GYDM::dc_t* dc) {}
 
 	private:
 		unsigned int default_state;

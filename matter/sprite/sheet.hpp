@@ -10,7 +10,7 @@ namespace GYDM {
         ISpriteSheet(const char* pathname);
         virtual ~ISpriteSheet() {}
 
-        void construct(SDL_Renderer* renderer) override;
+        void construct(GYDM::dc_t* renderer) override;
         const char* name() override;
 
     protected:
@@ -19,7 +19,7 @@ namespace GYDM {
 
     protected:
         void feed_costume_extent(size_t idx, float* width, float* height) override;
-        void draw_costume(SDL_Renderer* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) override;
+        void draw_costume(GYDM::dc_t* renderer, size_t idx, SDL_Rect* src, SpriteRenderArguments* argv) override;
         
     private:
         GYDM::shared_texture_t sprite_sheet;
