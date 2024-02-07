@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "point.hpp"
+#include "../algebra/point.hpp"
 
 namespace GYDM {
     typedef std::vector<GYDM::Dot> polygon_vertices;

@@ -3,7 +3,7 @@
 
 #include "datum/box.hpp"
 #include "graphics/image.hpp"
-#include "physics/geometry/vector.hpp"
+#include "physics/algebra/vector.hpp"
 
 #include <typeinfo>
 

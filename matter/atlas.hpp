@@ -2,10 +2,10 @@
 
 #include "../matter.hpp"
 #include "../physics/color/rgba.hpp"
+#include "../physics/algebra/point.hpp"
 #include "../physics/geometry/port.hpp"
 #include "../physics/geometry/aabox.hpp"
 #include "../physics/geometry/margin.hpp"
-#include "../physics/geometry/point.hpp"
 
 #include "../virtualization/filesystem/imgdb.hpp"
 

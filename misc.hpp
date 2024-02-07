@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "physics/geometry/point.hpp"
+#include "physics/algebra/point.hpp"
 
 /*************************************************************************************************/
 namespace GYDM {

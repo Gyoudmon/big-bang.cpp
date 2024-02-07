@@ -2,7 +2,7 @@
 
 #include "../canvaslet.hpp"
 #include "../../physics/color/CIE.hpp"
-#include "../../physics/geometry/point.hpp"
+#include "../../physics/algebra/point.hpp"
 #include "../../physics/geometry/aabox.hpp"
 
 namespace GYDM {

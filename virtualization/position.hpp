@@ -2,9 +2,9 @@
 
 #include "../forward.hpp"
 
-#include "../physics/geometry/point.hpp"
+#include "../physics/algebra/point.hpp"
+#include "../physics/algebra/vector.hpp"
 #include "../physics/geometry/port.hpp"
-#include "../physics/geometry/vector.hpp"
 
 namespace GYDM {
     class __lambda__ Position {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../canvaslet.hpp"
-#include "../../physics/geometry/point.hpp"
+#include "../../physics/algebra/point.hpp"
 #include "../../physics/geometry/aabox.hpp"
 #include "../../physics/geometry/vertices.hpp"
 

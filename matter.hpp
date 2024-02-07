@@ -8,8 +8,8 @@
 #include "forward.hpp"
 #include "physics/motion.hpp"
 #include "physics/color/names.hpp"
+#include "physics/algebra/point.hpp"
 #include "physics/geometry/port.hpp"
-#include "physics/geometry/point.hpp"
 #include "physics/geometry/aabox.hpp"
 #include "physics/geometry/margin.hpp"
 

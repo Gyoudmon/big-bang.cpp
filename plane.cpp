@@ -9,7 +9,7 @@
 #include "matter/graphlet/tracklet.hpp"
 
 #include "physics/color/rgba.hpp"
-#include "physics/geometry/point.hpp"
+#include "physics/algebra/point.hpp"
 #include "physics/mathematics.hpp"
 #include "physics/random.hpp"
 

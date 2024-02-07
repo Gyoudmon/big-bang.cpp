@@ -1,7 +1,7 @@
 #pragma once
 
-#include "point.hpp"
-#include "vector.hpp"
+#include "../algebra/point.hpp"
+#include "../algebra/vector.hpp"
 #include "port.hpp"
 
 #include "../../datum/flonum.hpp"
