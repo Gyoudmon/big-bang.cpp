@@ -57,6 +57,7 @@
 #include "physics/color/names.hpp"
 #include "physics/algebra/point.hpp"
 #include "physics/algebra/vector.hpp"
+#include "physics/algebra/matrix.hpp"
 #include "physics/geometry/port.hpp"
 #include "physics/geometry/vertices.hpp"
 #include "physics/geometry/aabox.hpp"

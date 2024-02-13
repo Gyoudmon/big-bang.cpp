@@ -10,14 +10,14 @@ namespace GYDM {
 
     public:
         Point() = default;
-        Point(T x, T y) : GYDM::Tuple<GYDM::Point, T>(x, y) {}
+        Point(T x, T y) noexcept : GYDM::Tuple<GYDM::Point, T>(x, y) {}
 
         template<typename U>
-        explicit Point(const GYDM::Point<U>& v)
+        explicit Point(const GYDM::Point<U>& v) noexcept
             : GYDM::Tuple<GYDM::Point, T>(T(v.x), T(v.y)) {}
 
         template<typename U>
-        explicit Point(const GYDM::Point<U>& v, T sx, T sy)
+        explicit Point(const GYDM::Point<U>& v, T sx, T sy) noexcept
             : GYDM::Tuple<GYDM::Point, T>(T(v.x * sx), T(v.y * sy)) {}
 
         ~Point() noexcept {}

@@ -54,7 +54,7 @@ namespace GYDM {
     }
 
     template<typename Fl>
-    void orthogonal_decompose(Fl magnitude, Fl direction, Fl* x, Fl* y, bool is_radian = true) {
+    inline void orthogonal_decompose(Fl magnitude, Fl direction, Fl* x, Fl* y, bool is_radian = true) {
         Fl rad = is_radian ? direction : degrees_to_radians(direction);
 
         SET_BOX(x, magnitude * flcos(rad));
@@ -74,7 +74,7 @@ namespace GYDM {
     }
 
     template<typename Fl>
-    void vector_rotate(Fl x, Fl y, Fl theta, Fl* rx, Fl* ry, Fl ox, Fl oy, bool is_radian = true) {
+    inline void vector_rotate(Fl x, Fl y, Fl theta, Fl* rx, Fl* ry, Fl ox, Fl oy, bool is_radian = true) {
         Fl radians = is_radian ? theta : degrees_to_radians(theta);
 	    Fl cosr = flcos(radians);
 	    Fl sinr = flsin(radians);
@@ -114,7 +114,7 @@ namespace GYDM {
 
     /*********************************************************************************************/
     template<typename Fl>
-    void circle_point(Fl radius, Fl angle, Fl* x, Fl* y, bool is_radian = false) {
+    inline void circle_point(Fl radius, Fl angle, Fl* x, Fl* y, bool is_radian = false) {
         Fl rad = is_radian ? angle : degrees_to_radians(angle);
 
 	    SET_BOX(x, radius * flcos(rad));
@@ -122,7 +122,7 @@ namespace GYDM {
     }
 
     template<typename Fl>
-    void ellipse_point(Fl radiusX, Fl radiusY, Fl angle, Fl* x, Fl* y, bool is_radian = false) {
+    inline void ellipse_point(Fl radiusX, Fl radiusY, Fl angle, Fl* x, Fl* y, bool is_radian = false) {
         Fl rad = is_radian ? angle : degrees_to_radians(angle);
 
 	    SET_BOX(x, radiusX * flcos(rad));
@@ -130,17 +130,17 @@ namespace GYDM {
     }
 
     template<typename Fl>
-    Fl point_distance(Fl x1, Fl y1, Fl x2, Fl y2) {
+    inline Fl point_distance(Fl x1, Fl y1, Fl x2, Fl y2) {
         return flsqrt(flsqr(x2 - x1) + flsqr(y2 - y1));
     }
 
     template<typename Fl>
-    Fl point_distance_squared(Fl x1, Fl y1, Fl x2, Fl y2) {
+    inline Fl point_distance_squared(Fl x1, Fl y1, Fl x2, Fl y2) {
         return flsqr(x2 - x1) + flsqr(y2 - y1);
     }
 
     template<typename Fl>
-    void line_point(Fl x0, Fl y0, Fl x1, Fl y1, double t, Fl* x, Fl* y) {
+    inline void line_point(Fl x0, Fl y0, Fl x1, Fl y1, double t, Fl* x, Fl* y) {
 	    Fl flt = Fl(t);
 
 	    SET_BOX(x, (x0 - x1) * flt + x1);
@@ -148,8 +148,81 @@ namespace GYDM {
     }
 
     template<typename Fl>
-    Fl line_slope(Fl x0, Fl y0, Fl x1, Fl y1) {
+    inline Fl line_slope(Fl x0, Fl y0, Fl x1, Fl y1) {
 	    return (x1 == x0) ? Fl(flnan) : (y1 - y0) / (x1 - x0);
+    }
+
+    /*********************************************************************************************/
+    /**
+     * for Error-Free Transformations
+     * 
+     *      FMA(x, y, z) = x * y + z
+     * where the FMA is short for `fused multiply add`
+     */
+
+    template<typename Fl>
+    inline Fl sum_of_products(Fl a, Fl b, Fl c, Fl d) {
+        Fl cd = c * d;
+        Fl result = flfma(a, b, cd);
+        Fl error = flfma(c, d, -cd);
+        
+        return result + error;    
+    }
+
+    template<typename Fl>
+    inline Fl difference_of_products(Fl a, Fl b, Fl c, Fl d) {
+        Fl cd = c * d;
+        Fl result = flfma(a, b, -cd);
+        Fl error = flfma(-c, d, cd);
+        
+        return result + error;
+    }
+
+    template<typename Fl, size_t N>
+    Fl matrix_determinant(const Fl (&entries)[N][N]) {
+        return Fl(0);
+    }
+
+    template<typename Fl>
+    Fl matrix_determinant(const Fl (&entries)[1][1]) {
+        return entries[0][0];
+    }
+
+    template<typename Fl>
+    Fl matrix_determinant(const Fl (&entries)[2][2]) {
+        return difference_of_products(entries[0][0], entries[1][1], entries[0][1], entries[1][0]);
+    }
+
+    template<typename Fl>
+    Fl matrix_determinant(const Fl (&entries)[3][3]) {
+        Fl minor12 = difference_of_products(entries[1][1], entries[2][2], entries[1][2], entries[2][1]);
+        Fl minor02 = difference_of_products(entries[1][0], entries[2][2], entries[1][2], entries[2][0]);
+        Fl minor01 = difference_of_products(entries[1][0], entries[2][1], entries[1][1], entries[2][0]);
+    
+        return flfma(entries[0][2], minor01, difference_of_products(entries[0][0], minor12, entries[0][1], minor02));
+    }
+
+    template<typename Fl>
+    Fl matrix_determinant(const Fl (&entries)[4][4]) {
+        Fl s0 = difference_of_products(entries[0][0], entries[1][1], entries[1][0], entries[0][1]);
+        Fl s1 = difference_of_products(entries[0][0], entries[1][2], entries[1][0], entries[0][2]);
+        Fl s2 = difference_of_products(entries[0][0], entries[1][3], entries[1][0], entries[0][3]);
+
+        Fl s3 = difference_of_products(entries[0][1], entries[1][2], entries[1][1], entries[0][2]);
+        Fl s4 = difference_of_products(entries[0][1], entries[1][3], entries[1][1], entries[0][3]);
+        Fl s5 = difference_of_products(entries[0][2], entries[1][3], entries[1][2], entries[0][3]);
+
+        Fl c0 = difference_of_products(entries[2][0], entries[3][1], entries[3][0], entries[2][1]);
+        Fl c1 = difference_of_products(entries[2][0], entries[3][2], entries[3][0], entries[2][2]);
+        Fl c2 = difference_of_products(entries[2][0], entries[3][3], entries[3][0], entries[2][3]);
+
+        Fl c3 = difference_of_products(entries[2][1], entries[3][2], entries[3][1], entries[2][2]);
+        Fl c4 = difference_of_products(entries[2][1], entries[3][3], entries[3][1], entries[2][3]);
+        Fl c5 = difference_of_products(entries[2][2], entries[3][3], entries[3][2], entries[2][3]);
+
+        return difference_of_products(s0, c5, s1, c4)
+            + difference_of_products(s2, c3, -s3, c2)
+            + difference_of_products(s5, c0, s4, c1);
     }
 
     /*********************************************************************************************/

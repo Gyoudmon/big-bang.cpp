@@ -11,17 +11,17 @@ namespace GYDM {
 
     public:
         EuclideanVector() = default;
-        EuclideanVector(T x, T y) : Tuple<GYDM::EuclideanVector, T>(x, y) {}
-        EuclideanVector(const GYDM::Point<T>& pt) : Tuple<GYDM::EuclideanVector, T>(pt.x, pt.y) {}
-        EuclideanVector(const GYDM::Point<T>& sp, const GYDM::Point<T>& ep)
+        EuclideanVector(T x, T y) noexcept : Tuple<GYDM::EuclideanVector, T>(x, y) {}
+        EuclideanVector(const GYDM::Point<T>& pt) noexcept : Tuple<GYDM::EuclideanVector, T>(pt.x, pt.y) {}
+        EuclideanVector(const GYDM::Point<T>& sp, const GYDM::Point<T>& ep) noexcept
             : Tuple<GYDM::EuclideanVector, T>(ep.x - sp.x, ep.y - sp.y) {}
 
         template <typename U>
-        explicit EuclideanVector(const GYDM::EuclideanVector<U>& v)
+        explicit EuclideanVector(const GYDM::EuclideanVector<U>& v) noexcept
             : GYDM::Tuple<GYDM::EuclideanVector, U>(T(v.x), T(v.y)) {}
 
         template<typename U>
-        explicit EuclideanVector(const GYDM::EuclideanVector<U>& v, T sx, T sy)
+        explicit EuclideanVector(const GYDM::EuclideanVector<U>& v, T sx, T sy) noexcept
             : GYDM::Tuple<GYDM::EuclideanVector, T>(T(v.x * sx), T(v.y * sy)) {}
 
         ~EuclideanVector() noexcept {}
