@@ -220,6 +220,10 @@ namespace GYDM {
             }
         }
 
+#ifndef OVERRIDE
+#define OVERRIDE
+#endif
+
     public:
         size_t row_size() const noexcept OVERRIDE { return M; }
         size_t column_size() const noexcept OVERRIDE { return N; }
