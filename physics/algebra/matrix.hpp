@@ -174,6 +174,17 @@ namespace GYDM {
         template<size_t R, size_t C, typename U>
         bool operator==(const GYDM::Matrix<R, C, U>& m) const noexcept { return false; }
 
+		GYDM::Matrix<M, N, T>& operator+=(const GYDM::Matrix<M, N, T>& rhs) { array2d_add(this->entries, rhs.entries, M, N); return (*this); }
+		GYDM::Matrix<M, N, T>& operator-=(const GYDM::Matrix<M, N, T>& rhs) { array2d_subtract(this->entries, rhs.entries, M, N); return (*this); }
+		GYDM::Matrix<M, N, T>& operator*=(T rhs) { array2d_dot_multiply(this->entries, rhs, M, N); return (*this); }
+        GYDM::Matrix<M, N, T>& operator/=(T rhs) { array2d_divide(this->entries, rhs, M, N); return (*this); }
+        
+		friend inline GYDM::Matrix<M, N, T> operator+(GYDM::Matrix<M, N, T> lhs, const GYDM::Matrix<M, N, T>& rhs) { return lhs += rhs; }
+		friend inline GYDM::Matrix<M, N, T> operator-(GYDM::Matrix<M, N, T> lhs, const GYDM::Matrix<M, N, T>& rhs) { return lhs -= rhs; }
+		friend inline GYDM::Matrix<M, N, T> operator*(GYDM::Matrix<M, N, T> lhs, T rhs) { return lhs *= rhs; }
+        friend inline GYDM::Matrix<M, N, T> operator*(T lhs, GYDM::Matrix<M, N, T> rhs) { return rhs *= lhs; }
+        friend inline GYDM::Matrix<M, N, T> operator/(GYDM::Matrix<M, N, T> lhs, T rhs) { return lhs /= rhs; }
+
     public:
         GYDM::Matrix<N, M, T> transpose() const noexcept { GYDM::Matrix<N, M, T> dest; this->transpose(&dest); return dest; }
         void transpose(GYDM::Matrix<N, M, T>* dest) const noexcept {
@@ -263,7 +274,7 @@ namespace GYDM {
         T entries[M][N] = {};
     };
 
-    template<size_t N, typename T = double, typename Super = SuperDatum<T>, typename = RealDatum<T>>
+    template<size_t N, typename T = float, typename Super = SuperDatum<T>, typename = RealDatum<T>>
     class SquareMatrix : public GYDM::Matrix<N, N, T> {
         template<size_t O, typename U, typename L, typename /* don't redefine the default parameter */>
         friend class GYDM::SquareMatrix;
@@ -275,6 +286,18 @@ namespace GYDM {
 
     public:
         bool is_singular_matrix() const noexcept { return (this->determinant() == T(0)); }
+
+    public:
+		SquareMatrix<N, T, Super>& operator+=(const SquareMatrix<N, T, Super>& rhs) { array2d_add(this->entries, rhs.entries, N); return (*this); }
+		SquareMatrix<N, T, Super>& operator-=(const SquareMatrix<N, T, Super>& rhs) { array2d_subtract(this->entries, rhs.entries, N); return (*this); }
+		SquareMatrix<N, T, Super>& operator*=(T rhs) { array2d_dot_multiply(this->entries, rhs, N); return (*this); }
+        SquareMatrix<N, T, Super>& operator/=(T rhs) { array2d_divide(this->entries, rhs, N); return (*this); }
+
+		friend inline SquareMatrix<N, T, Super> operator+(SquareMatrix<N, T, Super> lhs, const SquareMatrix<N, T, Super>& rhs) { return lhs += rhs; }
+		friend inline SquareMatrix<N, T, Super> operator-(SquareMatrix<N, T, Super> lhs, const SquareMatrix<N, T, Super>& rhs) { return lhs -= rhs; }
+		friend inline SquareMatrix<N, T, Super> operator*(SquareMatrix<N, T, Super> lhs, T rhs) { return lhs *= rhs; }
+        friend inline SquareMatrix<N, T, Super> operator*(T lhs, SquareMatrix<N, T, Super> rhs) { return rhs *= lhs; }
+        friend inline SquareMatrix<N, T, Super> operator/(SquareMatrix<N, T, Super> lhs, T rhs) { return lhs /= rhs; }
 
     public:
         T trace() const noexcept { return array2d_trace(this->entries, N, T(0)); }
