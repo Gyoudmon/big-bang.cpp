@@ -3,12 +3,27 @@
 #include "../datum/box.hpp"
 #include "../datum/flonum.hpp"
 
-namespace GYDM {
-    template<typename Fl>
-    struct Length { using type = float; };
+#include <type_traits>
 
-    template<>
-    struct Length<double> { using type = double; };
+namespace GYDM {
+    template<typename T> struct SuperType { using type = long long; };
+    template<> struct SuperType<double> { using type = double; };
+    template<> struct SuperType<float> { using type = double; };
+    
+    template<typename Fl> struct LengthType { using type = float; };
+    template<> struct LengthType<double> { using type = double; };
+
+    template<typename T>
+    using SuperDatum = typename SuperType<T>::type;
+
+    template<typename T>
+    using RealDatum = typename std::enable_if<std::is_arithmetic<T>::value>::type;
+
+    template<typename T>
+    using FixnumDatum = typename std::enable_if<std::is_integral<T>::value>::type;
+
+    template<typename T>
+    using FlonumDatum = typename std::enable_if<std::is_floating_point<T>::value>::type;
 
     /*********************************************************************************************/
     template<typename Fl>
@@ -158,7 +173,17 @@ namespace GYDM {
      * 
      *      FMA(x, y, z) = x * y + z
      * where the FMA is short for `fused multiply add`
+     * 
+     * The `error` might be quite considerable
      */
+
+    template<typename Fl>
+    inline Fl two_product(Fl a, Fl b) {
+        Fl result = a * b;
+        Fl error = flfma(a, b, -result);
+
+        return result + error;
+    }
 
     template<typename Fl>
     inline Fl sum_of_products(Fl a, Fl b, Fl c, Fl d) {
@@ -174,51 +199,62 @@ namespace GYDM {
         Fl cd = c * d;
         Fl result = flfma(a, b, -cd);
         Fl error = flfma(-c, d, cd);
-        
+
         return result + error;
     }
 
-    template<typename Fl, size_t N>
-    Fl matrix_determinant(const Fl (&entries)[N][N]) {
-        return Fl(0);
+    template<typename Super, typename Fl1, typename Fl2 = Fl1>
+    inline Super safe_two_product(Fl1 a, Fl2 b) {
+        return two_product(Super(a), Super(b));
     }
 
-    template<typename Fl>
-    Fl matrix_determinant(const Fl (&entries)[1][1]) {
-        return entries[0][0];
+    template<typename Super, typename Fl1, typename Fl2 = Fl1, typename Fl3 = Fl1, typename Fl4 = Fl1>
+    inline Super safe_sum_of_products(Fl1 a, Fl2 b, Fl3 c, Fl4 d) {
+        return sum_of_products(Super(a), Super(b), Super(c), Super(d));
     }
 
-    template<typename Fl>
-    Fl matrix_determinant(const Fl (&entries)[2][2]) {
-        return difference_of_products(entries[0][0], entries[1][1], entries[0][1], entries[1][0]);
+    template<typename Super, typename Fl1, typename Fl2 = Fl1, typename Fl3 = Fl1, typename Fl4 = Fl1>
+    inline Super safe_difference_of_products(Fl1 a, Fl2 b, Fl3 c, Fl4 d) {
+        return difference_of_products(Super(a), Super(b), Super(c), Super(d));
     }
-
-    template<typename Fl>
-    Fl matrix_determinant(const Fl (&entries)[3][3]) {
-        Fl minor12 = difference_of_products(entries[1][1], entries[2][2], entries[1][2], entries[2][1]);
-        Fl minor02 = difference_of_products(entries[1][0], entries[2][2], entries[1][2], entries[2][0]);
-        Fl minor01 = difference_of_products(entries[1][0], entries[2][1], entries[1][1], entries[2][0]);
     
-        return flfma(entries[0][2], minor01, difference_of_products(entries[0][0], minor12, entries[0][1], minor02));
+    template<typename Fl, typename Super>
+    Fl matrix_determinant(const Fl (&self)[1][1]) {
+        return self[0][0];
     }
 
-    template<typename Fl>
-    Fl matrix_determinant(const Fl (&entries)[4][4]) {
-        Fl s0 = difference_of_products(entries[0][0], entries[1][1], entries[1][0], entries[0][1]);
-        Fl s1 = difference_of_products(entries[0][0], entries[1][2], entries[1][0], entries[0][2]);
-        Fl s2 = difference_of_products(entries[0][0], entries[1][3], entries[1][0], entries[0][3]);
+    template<typename Fl, typename Super>
+    inline Super matrix_determinant(const Fl (&self)[2][2]) {
+        return safe_difference_of_products<Super, Fl>(self[0][0], self[1][1], self[0][1], self[1][0]);
+    }
 
-        Fl s3 = difference_of_products(entries[0][1], entries[1][2], entries[1][1], entries[0][2]);
-        Fl s4 = difference_of_products(entries[0][1], entries[1][3], entries[1][1], entries[0][3]);
-        Fl s5 = difference_of_products(entries[0][2], entries[1][3], entries[1][2], entries[0][3]);
+    template<typename Fl, typename Super>
+    Super matrix_determinant(const Fl (&self)[3][3]) {
+        Super minor12 = safe_difference_of_products<Super, Fl>(self[1][1], self[2][2], self[1][2], self[2][1]);
+        Super minor02 = safe_difference_of_products<Super, Fl>(self[1][0], self[2][2], self[1][2], self[2][0]);
+        Super minor01 = safe_difference_of_products<Super, Fl>(self[1][0], self[2][1], self[1][1], self[2][0]);
+    
+        return flfma(Super(self[0][2]), minor01,
+                difference_of_products(Super(self[0][0]), minor12, Super(self[0][1]), minor02));
+    }
 
-        Fl c0 = difference_of_products(entries[2][0], entries[3][1], entries[3][0], entries[2][1]);
-        Fl c1 = difference_of_products(entries[2][0], entries[3][2], entries[3][0], entries[2][2]);
-        Fl c2 = difference_of_products(entries[2][0], entries[3][3], entries[3][0], entries[2][3]);
+    template<typename Fl, typename Super>
+    Super matrix_determinant(const Fl (&self)[4][4]) {
+        Super s0 = safe_difference_of_products<Super, Fl>(self[0][0], self[1][1], self[1][0], self[0][1]);
+        Super s1 = safe_difference_of_products<Super, Fl>(self[0][0], self[1][2], self[1][0], self[0][2]);
+        Super s2 = safe_difference_of_products<Super, Fl>(self[0][0], self[1][3], self[1][0], self[0][3]);
 
-        Fl c3 = difference_of_products(entries[2][1], entries[3][2], entries[3][1], entries[2][2]);
-        Fl c4 = difference_of_products(entries[2][1], entries[3][3], entries[3][1], entries[2][3]);
-        Fl c5 = difference_of_products(entries[2][2], entries[3][3], entries[3][2], entries[2][3]);
+        Super s3 = safe_difference_of_products<Super, Fl>(self[0][1], self[1][2], self[1][1], self[0][2]);
+        Super s4 = safe_difference_of_products<Super, Fl>(self[0][1], self[1][3], self[1][1], self[0][3]);
+        Super s5 = safe_difference_of_products<Super, Fl>(self[0][2], self[1][3], self[1][2], self[0][3]);
+
+        Super c0 = safe_difference_of_products<Super, Fl>(self[2][0], self[3][1], self[3][0], self[2][1]);
+        Super c1 = safe_difference_of_products<Super, Fl>(self[2][0], self[3][2], self[3][0], self[2][2]);
+        Super c2 = safe_difference_of_products<Super, Fl>(self[2][0], self[3][3], self[3][0], self[2][3]);
+
+        Super c3 = safe_difference_of_products<Super, Fl>(self[2][1], self[3][2], self[3][1], self[2][2]);
+        Super c4 = safe_difference_of_products<Super, Fl>(self[2][1], self[3][3], self[3][1], self[2][3]);
+        Super c5 = safe_difference_of_products<Super, Fl>(self[2][2], self[3][3], self[3][2], self[2][3]);
 
         return difference_of_products(s0, c5, s1, c4)
             + difference_of_products(s2, c3, -s3, c2)

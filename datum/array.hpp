@@ -538,6 +538,31 @@ namespace GYDM {
         }
     }
 
+    template<typename S, typename T>
+    T array2d_trace(const S& self, size_t order, T datum0) noexcept {
+        T sum = datum0;
+
+        for (size_t d = 0; d < order; ++ d) {
+            sum += self[d][d];
+        }
+
+        return sum;
+    }
+
+    template<typename S, typename T>
+    void array2d_reduce(const S& self, size_t order, T& dest, size_t ex_row, size_t ex_col) noexcept {
+        size_t D_1 = order - 1;
+
+        for (size_t r = 0; r < D_1; ++ r) {
+            for (size_t c = 0; c < D_1; ++ c) {
+                size_t sR = (r < ex_row) ? r : r + 1;
+                size_t sC = (c < ex_col) ? c : c + 1;
+
+                dest[r][c] = self[sR][sC];
+            }
+        }
+    }
+
     /*********************************************************************************************/
     template<typename T>
     std::string array2d_to_string(const T& self, size_t R, size_t C, bool one_line = false) noexcept {

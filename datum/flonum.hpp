@@ -4,6 +4,9 @@
 #include <limits>
 #include <cstdlib>
 
+// TODO
+// check: http://www.plunk.org/~hatch/rightway.html
+
 namespace GYDM {
 #define flin(open, v, close) ((open <= v) && (v <= close))
 #define flout(open, v, close) ((v < open) || (v > close))

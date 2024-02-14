@@ -15,9 +15,6 @@
 #include <type_traits>
 
 namespace GYDM {
-    template<typename T>
-    using MatrixDatum = typename std::enable_if<std::is_arithmetic<T>::value>::type;
-
 #ifdef OVERRIDE
     class __lambda__ MatrixTop {
     public:
@@ -48,7 +45,7 @@ namespace GYDM {
     };
 #endif
 
-    template<size_t M, size_t N = M, typename T = float, typename = MatrixDatum<T>>
+    template<size_t M, size_t N = M, typename T = double, typename = RealDatum<T>>
     class __lambda__ Matrix
 #ifdef OVERRIDE
         : public GYDM::MatrixTop
@@ -67,10 +64,10 @@ namespace GYDM {
         Matrix(const U (&src)[O]) noexcept { this->fill(src); }
 
         template<typename Array1D>
-        Matrix(const Array1D& src, size_t mn) noexcept { this->fill(src, mn); }
+        Matrix(const Array1D& src1D, size_t mn) noexcept { this->fill(src1D, mn); }
 
         template<typename Array2D>
-        Matrix(const Array2D& src, size_t rN, size_t cN) noexcept { this->fill(src, rN, cN); }
+        Matrix(const Array2D& src2D, size_t rN, size_t cN) noexcept { this->fill(src2D, rN, cN); }
 
         template<size_t R, size_t C, typename U>
         Matrix(const GYDM::Matrix<R, C, U>& src) noexcept { this->fill(src); }
@@ -86,10 +83,10 @@ namespace GYDM {
         void set(size_t r, size_t c, T datum) { this->check_bounds(r, c); this->entries[r][c] = datum; }
 
         template<typename Array1D>
-        size_t extract(Array1D& dest, size_t size) const noexcept { return array2d_copy_to_array1d(this->entries, M, N, dest, size); }
+        size_t extract(Array1D& dest1D, size_t size) const noexcept { return array2d_copy_to_array1d(this->entries, M, N, dest1D, size); }
 
         template<typename Array2D>
-        size_t extract(Array2D& dest, size_t nR, size_t nC) const noexcept { return array2d_copy_to_array2d(this->entries, M, N, dest, nR, nC); }
+        size_t extract(Array2D& dest2D, size_t nR, size_t nC) const noexcept { return array2d_copy_to_array2d(this->entries, M, N, dest2D, nR, nC); }
 
         template<typename Array1D>
         size_t extract_diagonal(Array1D& dest, size_t size) const noexcept { return array2d_copy_diagonal_to_array1d(this->entries, M, N, dest, size); }
@@ -103,15 +100,15 @@ namespace GYDM {
         void fill(T datum) noexcept { array2d_fill_with_datum(this->entries, M, N, datum); }
 
         template<typename Array1D>
-        void fill(const Array1D& src, size_t mn) noexcept { array2d_fill_from_array1d(this->entries, M, N, src, mn); }
+        void fill(const Array1D& src1D, size_t mn) noexcept { array2d_fill_from_array1d(this->entries, M, N, src1D, mn); }
 
         template<typename Array2D>
-        void fill(const Array2D& src, size_t rN, size_t cN) noexcept { array2d_copy_to_array2d(src, rN, cN, this->entries, M, N); }
+        void fill(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_copy_to_array2d(src2D, rN, cN, this->entries, M, N); }
 
-        template<size_t R, size_t C, typename U, typename = MatrixDatum<U>>
+        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
         void fill(const U (&src)[R][C]) noexcept { array2d_copy_to_array2d(src, R, C, this->entries, M, N); }
         
-        template<size_t O, typename U, typename = MatrixDatum<U>>
+        template<size_t O, typename U, typename = RealDatum<U>>
         void fill(const U (&src)[O]) noexcept { array2d_fill_from_array1d(this->entries, M, N, src, O); }
 
         template<size_t R, size_t C, typename U>
@@ -123,15 +120,15 @@ namespace GYDM {
         void fill_diagonal(T datum) noexcept { array2d_fill_diagonal_with_datum(this->entries, M, N, datum); }
 
         template<typename Array1D>
-        void fill_diagonal(const Array1D& src, size_t n) noexcept { array2d_fill_diagonal_from_array1d(this->entries, M, N, src, n); }
+        void fill_diagonal(const Array1D& src1D, size_t n) noexcept { array2d_fill_diagonal_from_array1d(this->entries, M, N, src1D, n); }
 
         template<typename Array2D>
-        void fill_diagonal(const Array2D& src, size_t rN, size_t cN) noexcept { array2d_fill_diagonal_from_array2d(this->entries, M, N, src, rN, cN); }
+        void fill_diagonal(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_fill_diagonal_from_array2d(this->entries, M, N, src2D, rN, cN); }
 
-        template<size_t R, size_t C, typename U, typename = MatrixDatum<U>>
+        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
         void fill_diagonal(const U (&src)[R][C]) noexcept { array2d_copy_diagonal_to_array2d(src, R, C, this->entries, M, N); }
         
-        template<size_t O, typename U, typename = MatrixDatum<U>>
+        template<size_t O, typename U, typename = RealDatum<U>>
         void fill_diagonal(const U (&src)[O]) noexcept { array2d_fill_diagonal_from_array1d(this->entries, M, N, src, O); }
 
         template<size_t R, size_t C, typename U>
@@ -143,9 +140,9 @@ namespace GYDM {
         void fill_lower_triangle(T datum) noexcept { array2d_fill_lower_triangle_with_datum(this->entries, M, N, datum); }
 
         template<typename Array2D>
-        void fill_lower_triangle(const Array2D& src, size_t rN, size_t cN) noexcept { array2d_copy_lower_triangle_to_array2d(src, rN, cN, this->entries, M, N); }
+        void fill_lower_triangle(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_copy_lower_triangle_to_array2d(src2D, rN, cN, this->entries, M, N); }
 
-        template<size_t R, size_t C, typename U, typename = MatrixDatum<U>>
+        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
         void fill_lower_triangle(const U (&src)[R][C]) noexcept { array2d_copy_lower_triangle_to_array2d(src, R, C, this->entries, M, N); }
         
         template<size_t R, size_t C, typename U>
@@ -157,9 +154,9 @@ namespace GYDM {
         void fill_upper_triangle(T datum) noexcept { array2d_fill_upper_triangle_with_datum(this->entries, M, N, datum); }
 
         template<typename Array2D>
-        void fill_upper_triangle(const Array2D& src, size_t rN, size_t cN) noexcept { array2d_copy_upper_triangle_to_array2d(src, rN, cN, this->entries, M, N); }
+        void fill_upper_triangle(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_copy_upper_triangle_to_array2d(src2D, rN, cN, this->entries, M, N); }
         
-        template<size_t R, size_t C, typename U, typename = MatrixDatum<U>>
+        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
         void fill_upper_triangle(const U (&src)[R][C]) noexcept { array2d_copy_upper_triangle_to_array2d(src, R, C, this->entries, M, N); }
         
         template<size_t R, size_t C, typename U>
@@ -262,8 +259,10 @@ namespace GYDM {
         T entries[M][N] = {};
     };
 
-    template<size_t N, typename T = float>
+    template<size_t N, typename T = double, typename Super = SuperDatum<T>, typename = RealDatum<T>>
     class SquareMatrix : public GYDM::Matrix<N, N, T> {
+        template<size_t O, typename U, typename L, typename /* don't redefine the default parameter */>
+        friend class GYDM::SquareMatrix;
     public:
         using GYDM::Matrix<N, N, T>::Matrix;
 
@@ -274,24 +273,34 @@ namespace GYDM {
         bool is_singular_matrix() const noexcept { return (this->determinant() == T(0)); }
 
     public:
-         T trace() const noexcept { 
-            T sum = T(0);
-            
-            for (size_t d = 0; d < N; ++ d) {
-                sum += this->entries[d][d];
-            }
+        T trace() const noexcept { return array2d_trace(this->entries, N, T(0)); }
 
-            return sum;
-        }
-
-        T determinant() const noexcept {
-            if constexpr(N == 0) {
+        /** WARNING
+         * It's quite easy to get incorrect determinant for a large matrix due to overflow,
+         * hence the `Super` type declared as a template parameter.
+         **/
+        Super determinant() const noexcept {
+            if constexpr(N > 0) {
+                if constexpr(N < 5) {
+                    return matrix_determinant<T, Super>(this->entries);
+                } else {  // Inefficient, but we don't currently use N > 4 anyway...
+                    GYDM::SquareMatrix<N - 1, T, Super> submtx;
+                    Super sign = 1;
+                    Super det = 0;
+                    
+                    for (size_t i = 0; i < N; ++ i) {
+                        // Submatrix without row 0 and column `i`
+                        array2d_reduce(this->entries, N, submtx.entries, 0, i);
+                        det += two_product(sign * this->entries[0][i], submtx.determinant());
+                        sign = -sign;
+                    }
+        
+                    return det;
+                }
+            } else { 
                 // the empty product as in `x^0 = 1` and `0! = 1`,
                 // the 1 is the multiplicative identity.
-        
-                return T(1);
-            } else {
-                return matrix_determinant(this->entries);
+                return 1;
             }
         }
     };
