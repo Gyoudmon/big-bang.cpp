@@ -8,6 +8,26 @@
 // check: http://www.plunk.org/~hatch/rightway.html
 
 namespace GYDM {
+    // for non-flonums
+    template<typename T> bool inline flisnan(T fl) { return false; }
+    template<typename T> bool inline flisinfinity(T fl) { return false; }
+    template<typename T> bool inline flisfinite(T fl) { return true; }
+    template<typename T> T inline flfma(T x, T y, T z) { return x * y + z; }
+
+    template<typename T> T inline flsafe(T v, T fallback) { return v; }
+    template<typename T> T inline flsafe(T v, T min, T max) {
+        if (v < min) {
+            v = min;
+        } else if (v > max) {
+            v = max;
+        } else if (flisnan(v)) {
+            v = max;
+        }
+
+        return v;
+    }
+    
+/*************************************************************************************************/    
 #define flin(open, v, close) ((open <= v) && (v <= close))
 #define flout(open, v, close) ((v < open) || (v > close))
 
@@ -150,22 +170,68 @@ namespace GYDM {
     int inline fl2fxi(double fl) { return GYDM::fl2fx<int>(fl); }
     int inline fl2fxi(long double fl) { return GYDM::fl2fx<int>(fl); }
 
-    // for non-flonums
-    template<typename T> bool inline flisnan(T fl) { return false; }
-    template<typename T> bool inline flisinfinity(T fl) { return false; }
-    template<typename T> bool inline flisfinite(T fl) { return true; }
-    template<typename T> T inline flfma(T x, T y, T z) { return x * y + z; }
+/*************************************************************************************************/
+    /**
+     * for Error-Free Transformations
+     * 
+     *      FMA(x, y, z) = x * y + z
+     * where the FMA is short for `fused multiply add`
+     * 
+     * The `error` might be quite considerable
+     */
 
-    template<typename T> T inline flsafe(T v, T fallback) { return v; }
-    template<typename T> T inline flsafe(T v, T min, T max) {
-        if (v < min) {
-            v = min;
-        } else if (v > max) {
-            v = max;
-        } else if (flisnan(v)) {
-            v = max;
-        }
+    template<typename Fl>
+    inline Fl fl_add(Fl a, Fl b) {
+        Fl sum = a + b;
+        Fl delta = sum - a;
+        Fl error = (a - (sum - delta)) + (b - delta);
+    
+        return sum + error;
+    }
 
-        return v;
+    template<typename Fl>
+    inline Fl fl_multiply(Fl a, Fl b) {
+        Fl product = a * b;
+        Fl error = flfma(a, b, -product);
+
+        return product + error;
+    }
+
+    template<typename Fl>
+    inline Fl fl_add_products(Fl a, Fl b, Fl c, Fl d) {
+        Fl cd = c * d;
+        Fl sum = flfma(a, b, cd);
+        Fl error = flfma(c, d, -cd);
+        
+        return sum + error;    
+    }
+
+    template<typename Fl>
+    inline Fl fl_subtract_products(Fl a, Fl b, Fl c, Fl d) {
+        Fl cd = c * d;
+        Fl diff = flfma(a, b, -cd);
+        Fl error = flfma(-c, d, cd);
+
+        return diff + error;
+    }
+
+    template<typename Super, typename Fl1, typename Fl2 = Fl1>
+    inline Super fl_safe_add(Fl1 a, Fl2 b) {
+        return fl_add(Super(a), Super(b));
+    }
+
+    template<typename Super, typename Fl1, typename Fl2 = Fl1>
+    inline Super fl_safe_multiply(Fl1 a, Fl2 b) {
+        return fl_multiply(Super(a), Super(b));
+    }
+
+    template<typename Super, typename Fl1, typename Fl2 = Fl1, typename Fl3 = Fl1, typename Fl4 = Fl1>
+    inline Super fl_safe_add_products(Fl1 a, Fl2 b, Fl3 c, Fl4 d) {
+        return fl_add_products(Super(a), Super(b), Super(c), Super(d));
+    }
+
+    template<typename Super, typename Fl1, typename Fl2 = Fl1, typename Fl3 = Fl1, typename Fl4 = Fl1>
+    inline Super fl_safe_subtract_products(Fl1 a, Fl2 b, Fl3 c, Fl4 d) {
+        return fl_subtract_products(Super(a), Super(b), Super(c), Super(d));
     }
 }

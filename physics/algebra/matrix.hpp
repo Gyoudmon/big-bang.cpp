@@ -12,10 +12,58 @@
 
 #include "../mathematics.hpp"
 
+#include <stdexcept>
 #include <type_traits>
 
 namespace GYDM {
-#ifdef OVERRIDE
+    /*********************************************************************************************/
+    template<typename Fl, typename Super>
+    Fl matrix_determinant(const Fl (&self)[1][1]) {
+        return self[0][0];
+    }
+
+    template<typename Fl, typename Super>
+    inline Super matrix_determinant(const Fl (&self)[2][2]) {
+        return fl_safe_subtract_products<Super, Fl>(self[0][0], self[1][1], self[0][1], self[1][0]);
+    }
+
+    template<typename Fl, typename Super>
+    Super matrix_determinant(const Fl (&self)[3][3]) {
+        Super minor12 = fl_safe_subtract_products<Super, Fl>(self[1][1], self[2][2], self[1][2], self[2][1]);
+        Super minor02 = fl_safe_subtract_products<Super, Fl>(self[1][0], self[2][2], self[1][2], self[2][0]);
+        Super minor01 = fl_safe_subtract_products<Super, Fl>(self[1][0], self[2][1], self[1][1], self[2][0]);
+    
+        return flfma(Super(self[0][2]), minor01,
+                fl_subtract_products(Super(self[0][0]), minor12, Super(self[0][1]), minor02));
+    }
+
+    template<typename Fl, typename Super>
+    Super matrix_determinant(const Fl (&self)[4][4]) {
+        Super s0 = fl_safe_subtract_products<Super, Fl>(self[0][0], self[1][1], self[1][0], self[0][1]);
+        Super s1 = fl_safe_subtract_products<Super, Fl>(self[0][0], self[1][2], self[1][0], self[0][2]);
+        Super s2 = fl_safe_subtract_products<Super, Fl>(self[0][0], self[1][3], self[1][0], self[0][3]);
+
+        Super s3 = fl_safe_subtract_products<Super, Fl>(self[0][1], self[1][2], self[1][1], self[0][2]);
+        Super s4 = fl_safe_subtract_products<Super, Fl>(self[0][1], self[1][3], self[1][1], self[0][3]);
+        Super s5 = fl_safe_subtract_products<Super, Fl>(self[0][2], self[1][3], self[1][2], self[0][3]);
+
+        Super c0 = fl_safe_subtract_products<Super, Fl>(self[2][0], self[3][1], self[3][0], self[2][1]);
+        Super c1 = fl_safe_subtract_products<Super, Fl>(self[2][0], self[3][2], self[3][0], self[2][2]);
+        Super c2 = fl_safe_subtract_products<Super, Fl>(self[2][0], self[3][3], self[3][0], self[2][3]);
+
+        Super c3 = fl_safe_subtract_products<Super, Fl>(self[2][1], self[3][2], self[3][1], self[2][2]);
+        Super c4 = fl_safe_subtract_products<Super, Fl>(self[2][1], self[3][3], self[3][1], self[2][3]);
+        Super c5 = fl_safe_subtract_products<Super, Fl>(self[2][2], self[3][3], self[3][2], self[2][3]);
+
+        return fl_subtract_products(s0, c5, s1, c4)
+            + fl_subtract_products(s2, c3, -s3, c2)
+            + fl_subtract_products(s5, c0, s4, c1);
+    }
+
+    /*********************************************************************************************/
+#ifdef __racket__
+#define OVERRIDE override
+
     class __lambda__ MatrixTop {
     public:
         virtual ~MatrixTop() = default;
@@ -43,19 +91,31 @@ namespace GYDM {
     public:
         virtual std::string desc(bool one_line) const noexcept = 0;
     };
+#else
+#define OVERRIDE
 #endif
 
-    template<size_t M, size_t N = M, typename T = double, typename = RealDatum<T>>
+    /*********************************************************************************************/
+    template<size_t M, size_t N = M, typename T = float>
     class __lambda__ Matrix
-#ifdef OVERRIDE
+#ifdef __racket__
         : public GYDM::MatrixTop
 #endif
     {
-        template<size_t R, size_t C, typename U, typename /* don't redefine the default parameter */>
-        friend class GYDM::Matrix;
+        template<size_t R, size_t C, typename U> friend class GYDM::Matrix;
+
+        using Super = std::enable_if_t<std::is_arithmetic_v<T>, SuperDatum<T>>;
 
     public:
         Matrix() = default;
+
+        Matrix(T scalar, bool diagonal_only = true) noexcept {
+            if (diagonal_only) {
+                this->fill_diagonal(scalar);
+            } else {
+                this->fill(scalar);
+            }
+        }
 
         template<size_t R, size_t C, typename U>
         Matrix(const U (&src)[R][C]) noexcept { this->fill(src); }
@@ -105,7 +165,7 @@ namespace GYDM {
         template<typename Array2D>
         void fill(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_copy_to_array2d(src2D, rN, cN, this->entries, M, N); }
 
-        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
+        template<size_t R, size_t C, typename U>
         void fill(const U (&src)[R][C]) noexcept { array2d_copy_to_array2d(src, R, C, this->entries, M, N); }
         
         template<size_t O, typename U, typename = RealDatum<U>>
@@ -125,10 +185,10 @@ namespace GYDM {
         template<typename Array2D>
         void fill_diagonal(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_fill_diagonal_from_array2d(this->entries, M, N, src2D, rN, cN); }
 
-        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
+        template<size_t R, size_t C, typename U>
         void fill_diagonal(const U (&src)[R][C]) noexcept { array2d_copy_diagonal_to_array2d(src, R, C, this->entries, M, N); }
         
-        template<size_t O, typename U, typename = RealDatum<U>>
+        template<size_t O, typename U>
         void fill_diagonal(const U (&src)[O]) noexcept { array2d_fill_diagonal_from_array1d(this->entries, M, N, src, O); }
 
         template<size_t R, size_t C, typename U>
@@ -142,7 +202,7 @@ namespace GYDM {
         template<typename Array2D>
         void fill_lower_triangle(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_copy_lower_triangle_to_array2d(src2D, rN, cN, this->entries, M, N); }
 
-        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
+        template<size_t R, size_t C, typename U>
         void fill_lower_triangle(const U (&src)[R][C]) noexcept { array2d_copy_lower_triangle_to_array2d(src, R, C, this->entries, M, N); }
         
         template<size_t R, size_t C, typename U>
@@ -156,7 +216,7 @@ namespace GYDM {
         template<typename Array2D>
         void fill_upper_triangle(const Array2D& src2D, size_t rN, size_t cN) noexcept { array2d_copy_upper_triangle_to_array2d(src2D, rN, cN, this->entries, M, N); }
         
-        template<size_t R, size_t C, typename U, typename = RealDatum<U>>
+        template<size_t R, size_t C, typename U>
         void fill_upper_triangle(const U (&src)[R][C]) noexcept { array2d_copy_upper_triangle_to_array2d(src, R, C, this->entries, M, N); }
         
         template<size_t R, size_t C, typename U>
@@ -171,36 +231,65 @@ namespace GYDM {
 
         template<size_t R, size_t C, typename U>
         bool operator!=(const GYDM::Matrix<R, C, U>& m) const noexcept { return true; }
+        
         template<size_t R, size_t C, typename U>
         bool operator==(const GYDM::Matrix<R, C, U>& m) const noexcept { return false; }
 
-		GYDM::Matrix<M, N, T>& operator+=(const GYDM::Matrix<M, N, T>& rhs) { array2d_add(this->entries, rhs.entries, M, N); return (*this); }
-		GYDM::Matrix<M, N, T>& operator-=(const GYDM::Matrix<M, N, T>& rhs) { array2d_subtract(this->entries, rhs.entries, M, N); return (*this); }
-		GYDM::Matrix<M, N, T>& operator*=(T rhs) { array2d_dot_multiply(this->entries, rhs, M, N); return (*this); }
+        template<typename R>
+		GYDM::Matrix<M, N, T>& operator+=(const GYDM::Matrix<M, N, R>& rhs)
+        { array2d_add(this->entries, rhs.entries, M, N); return (*this); }
+        
+        template<typename R>
+		GYDM::Matrix<M, N, T>& operator-=(const GYDM::Matrix<M, N, R>& rhs)
+        { array2d_subtract(this->entries, rhs.entries, M, N); return (*this); }
+		
+        GYDM::Matrix<M, N, T>& operator*=(T rhs) { array2d_scalar_multiply(this->entries, rhs, M, N); return (*this); }
         GYDM::Matrix<M, N, T>& operator/=(T rhs) { array2d_divide(this->entries, rhs, M, N); return (*this); }
         
-		friend inline GYDM::Matrix<M, N, T> operator+(GYDM::Matrix<M, N, T> lhs, const GYDM::Matrix<M, N, T>& rhs) { return lhs += rhs; }
-		friend inline GYDM::Matrix<M, N, T> operator-(GYDM::Matrix<M, N, T> lhs, const GYDM::Matrix<M, N, T>& rhs) { return lhs -= rhs; }
-		friend inline GYDM::Matrix<M, N, T> operator*(GYDM::Matrix<M, N, T> lhs, T rhs) { return lhs *= rhs; }
-        friend inline GYDM::Matrix<M, N, T> operator*(T lhs, GYDM::Matrix<M, N, T> rhs) { return rhs *= lhs; }
-        friend inline GYDM::Matrix<M, N, T> operator/(GYDM::Matrix<M, N, T> lhs, T rhs) { return lhs /= rhs; }
+        template<typename L, typename R>
+		friend inline GYDM::Matrix<M, N, decltype(L{} + R{})> operator+(const GYDM::Matrix<M, N, L>& lhs, const GYDM::Matrix<M, N, R>& rhs)
+        { return GYDM::Matrix<M, N, decltype(L{} + R{})>(lhs, rhs, true); }
+
+        template<typename L, typename R>
+		friend inline GYDM::Matrix<M, N, decltype(L{} - R{})> operator-(const GYDM::Matrix<M, N, L>& lhs, const GYDM::Matrix<M, N, R>& rhs)
+        { return GYDM::Matrix<M, N, decltype(L{} - R{})>(lhs, rhs, false); }
+		
+        template<typename L, typename R>
+        friend inline GYDM::Matrix<M, N, decltype(L{} * R{})> operator*(const GYDM::Matrix<M, N, T>& lhs, R rhs)
+        { return GYDM::Matrix<M, N, decltype(L{} * R{})>(lhs, rhs, true); }
+        
+        template<typename L, typename R>
+        friend inline GYDM::Matrix<M, N, decltype(L{} * R{})> operator*(L lhs, const GYDM::Matrix<M, N, R>& rhs)
+        { return GYDM::Matrix<M, N, decltype(L{} * R{})>(rhs, lhs, true); }
+
+        template<typename L, typename R>
+        friend inline GYDM::Matrix<M, N, decltype(L{} / R{})> operator/(GYDM::Matrix<M, N, L> lhs, R rhs)
+        { return GYDM::Matrix<M, N, decltype(L{} / R{})>(lhs, rhs, false); }
+
+        // GYDM::Matrix<M, N, T>& operator*=(const GYDM::Matrix<N, N, T>& rhs) { array2d_scalar_multiply(this->entries, rhs, M, N); return (*this); }
+        
+        // friend inline GYDM::Matrix<M, N, T> operator*(GYDM::Matrix<M, N, T> lhs, T rhs) { return lhs *= rhs; }
 
     public:
         GYDM::Matrix<N, M, T> transpose() const noexcept { GYDM::Matrix<N, M, T> dest; this->transpose(&dest); return dest; }
+        GYDM::Matrix<M, N, T> diagonal() const noexcept { GYDM::Matrix<M, N, T> dest; this->diagonal(&dest); return dest; }
+        GYDM::Matrix<1, N, T> row(size_t r) const { GYDM::Matrix<1, N, T> dest; this->row(r, &dest); return dest; }
+        GYDM::Matrix<M, 1, T> column(size_t c) const { GYDM::Matrix<M, 1, T> dest; this->column(c, &dest); return dest; }
+        GYDM::Matrix<M, N, T> lower_triangle() const noexcept { GYDM::Matrix<M, N, T> dest; this->lower_triangle(&dest); return dest; }
+        GYDM::Matrix<M, N, T> upper_triangle() const noexcept { GYDM::Matrix<M, N, T> dest; this->upper_triangle(&dest); return dest; }
+        
         void transpose(GYDM::Matrix<N, M, T>* dest) const noexcept {
             if (this != dest) {
                 array2d_transpose(this->entries, dest->entries, M, N);
             }
         }
 
-        GYDM::Matrix<M, N, T> diagonal() const noexcept { GYDM::Matrix<M, N, T> dest; this->diagonal(&dest); return dest; }
         void diagonal(GYDM::Matrix<M, N, T>* dest) const noexcept {
             if (this != dest) {
                 array2d_copy_diagonal_to_array2d(this->entries, M, N, dest->entries, M, N);
             }
         }
 
-        GYDM::Matrix<1, N, T> row(size_t r) const { GYDM::Matrix<1, N, T> dest; this->row(r, &dest); return dest; }
         void row(size_t r, GYDM::Matrix<1, N, T>* dest) const {
             if (this != dest) {
                 this->check_bounds(r, 0);
@@ -208,8 +297,6 @@ namespace GYDM {
             }
         }
 
-
-        GYDM::Matrix<M, 1, T> column(size_t c) const { GYDM::Matrix<M, 1, T> dest; this->column(c, &dest); return dest; }
         void column(size_t c, GYDM::Matrix<M, 1, T>* dest) const {
             if (this != dest) {
                 this->check_bounds(0, c);
@@ -217,23 +304,17 @@ namespace GYDM {
             }
         }
 
-        GYDM::Matrix<M, N, T> lower_triangle() const noexcept { GYDM::Matrix<M, N, T> dest; this->lower_triangle(&dest); return dest; }
         void lower_triangle(GYDM::Matrix<M, N, T>* dest) const noexcept {
             if (this != dest) {
                 dest->fill_lower_triangle(this->entries, M, N);
             }
         }
 
-        GYDM::Matrix<M, N, T> upper_triangle() const noexcept { GYDM::Matrix<M, N, T> dest; this->upper_triangle(&dest); return dest; }
         void upper_triangle(GYDM::Matrix<M, N, T>* dest) const noexcept {
             if (this != dest) {
                 dest->fill_upper_triangle(this->entries, M, N);
             }
         }
-
-#ifndef OVERRIDE
-#define OVERRIDE
-#endif
 
     public:
         size_t row_size() const noexcept OVERRIDE { return M; }
@@ -254,7 +335,8 @@ namespace GYDM {
         bool is_triangular_matrix() const noexcept { return this->is_lower_triangular_matrix() || this->is_upper_triangular_matrix(); }
         bool is_diagonal_matrix() const noexcept OVERRIDE { return (M == N) && array2d_off_diagonal_equal(this->entries, M, T()); }
         bool is_identity_matrix() const noexcept OVERRIDE { return this->is_diagonal_matrix() && array2d_diagonal_equal(this->entries, M, T(1)); }
-        
+        bool is_singular_matrix() const noexcept { return (this->determinant() == Super(0)); }
+
         bool is_scalar_matrix() const noexcept OVERRIDE {
             return (M > 0)
                 && this->is_diagonal_matrix()
@@ -262,63 +344,27 @@ namespace GYDM {
         }
 
     public:
-        std::string desc(bool one_line = false) const noexcept OVERRIDE { return array2d_to_string(this->entries, M, N, one_line); }
+        T trace() const noexcept(M == N) {
+            if constexpr(M != N) throw std::domain_error("the trace is only defined for square matrix");
 
-    private:
-        inline void check_bounds(size_t r, size_t c) const {
-            if (r >= M) throw std::out_of_range(make_nstring("row index too large, %zd >= %zd", r, M));
-            if (c >= N) throw std::out_of_range(make_nstring("column index too large, %zd >= %zd", c, N));
+            return array2d_trace(this->entries, N, T(0));
         }
 
-    protected:
-        T entries[M][N] = {};
-    };
+        Super determinant() const noexcept(M == N) {
+            if constexpr(M != N) throw std::domain_error("the dterminant is only defined for square matrix");
 
-    template<size_t N, typename T = float, typename Super = SuperDatum<T>, typename = RealDatum<T>>
-    class SquareMatrix : public GYDM::Matrix<N, N, T> {
-        template<size_t O, typename U, typename L, typename /* don't redefine the default parameter */>
-        friend class GYDM::SquareMatrix;
-    public:
-        using GYDM::Matrix<N, N, T>::Matrix;
-
-        SquareMatrix() noexcept : GYDM::Matrix<N, N, T>() {}
-        SquareMatrix(T diagonal_scalar) noexcept { array2d_fill_diagonal_with_datum(this->entries, N, N, diagonal_scalar); }
-
-    public:
-        bool is_singular_matrix() const noexcept { return (this->determinant() == T(0)); }
-
-    public:
-		SquareMatrix<N, T, Super>& operator+=(const SquareMatrix<N, T, Super>& rhs) { array2d_add(this->entries, rhs.entries, N); return (*this); }
-		SquareMatrix<N, T, Super>& operator-=(const SquareMatrix<N, T, Super>& rhs) { array2d_subtract(this->entries, rhs.entries, N); return (*this); }
-		SquareMatrix<N, T, Super>& operator*=(T rhs) { array2d_dot_multiply(this->entries, rhs, N); return (*this); }
-        SquareMatrix<N, T, Super>& operator/=(T rhs) { array2d_divide(this->entries, rhs, N); return (*this); }
-
-		friend inline SquareMatrix<N, T, Super> operator+(SquareMatrix<N, T, Super> lhs, const SquareMatrix<N, T, Super>& rhs) { return lhs += rhs; }
-		friend inline SquareMatrix<N, T, Super> operator-(SquareMatrix<N, T, Super> lhs, const SquareMatrix<N, T, Super>& rhs) { return lhs -= rhs; }
-		friend inline SquareMatrix<N, T, Super> operator*(SquareMatrix<N, T, Super> lhs, T rhs) { return lhs *= rhs; }
-        friend inline SquareMatrix<N, T, Super> operator*(T lhs, SquareMatrix<N, T, Super> rhs) { return rhs *= lhs; }
-        friend inline SquareMatrix<N, T, Super> operator/(SquareMatrix<N, T, Super> lhs, T rhs) { return lhs /= rhs; }
-
-    public:
-        T trace() const noexcept { return array2d_trace(this->entries, N, T(0)); }
-
-        /** WARNING
-         * It's quite easy to get incorrect determinant for a large matrix due to overflow,
-         * hence the `Super` type declared as a template parameter.
-         **/
-        Super determinant() const noexcept {
             if constexpr(N > 0) {
                 if constexpr(N < 5) {
                     return matrix_determinant<T, Super>(this->entries);
                 } else {  // Inefficient, but we don't currently use N > 4 anyway...
-                    GYDM::SquareMatrix<N - 1, T, Super> submtx;
+                    Matrix<N - 1, N - 1, T> submtx;
                     Super sign = 1;
                     Super det = 0;
                     
                     for (size_t i = 0; i < N; ++ i) {
                         // Submatrix without row 0 and column `i`
                         array2d_reduce(this->entries, N, submtx.entries, 0, i);
-                        det += two_product(sign * this->entries[0][i], submtx.determinant());
+                        det += fl_multiply(sign * this->entries[0][i], submtx.determinant());
                         sign = -sign;
                     }
         
@@ -330,9 +376,42 @@ namespace GYDM {
                 return 1;
             }
         }
+
+    public:
+        std::string desc(bool one_line = false) const noexcept OVERRIDE { return array2d_to_string(this->entries, M, N, one_line); }
+
+    private:
+        template<typename Lhs, typename Rhs>
+        Matrix(const GYDM::Matrix<M, N, Lhs>& lhs, const GYDM::Matrix<M, N, Rhs>& rhs, bool forward) noexcept {
+            if (forward) {
+                array2d_add(this->entries, lhs.entries, rhs.entries, M, N);
+            } else {
+                array2d_subtract(this->entries, lhs.entries, rhs.entries, M, N);
+            }
+        }
+
+        template<typename Lhs, typename Rhs>
+        Matrix(const GYDM::Matrix<M, N, Lhs>& lhs, Rhs rhs, bool forward) noexcept {
+            if (forward) {
+                array2d_scalar_multiply(this->entries, lhs.entries, rhs, M, N);
+            } else {
+                array2d_divide(this->entries, lhs.entries, rhs, M, N);
+            }
+        }
+
+    private:
+        inline void check_bounds(size_t r, size_t c) const {
+            if (r >= M) throw std::out_of_range(make_nstring("row index too large, %zd >= %zd", r, M));
+            if (c >= N) throw std::out_of_range(make_nstring("column index too large, %zd >= %zd", c, N));
+        }
+
+    private:
+        T entries[M][N] = {};
     };
 
     /*********************************************************************************************/
+    template<size_t N, typename T> using SquareMatrix = GYDM::Matrix<N, N, T>;
+
     template<size_t M, size_t N> using FlMatrix = GYDM::Matrix<M, N, float>;
     template<size_t M, size_t N> using FxMatrix = GYDM::Matrix<M, N, int>;
 

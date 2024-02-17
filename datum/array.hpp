@@ -529,8 +529,17 @@ namespace GYDM {
     }
 
     /*********************************************************************************************/
-    template<typename S>
-    void array2d_add(S& self, const S& rhs, size_t R, size_t C) noexcept {
+    template<typename S, typename Lhs, typename Rhs>
+    void array2d_add(S& self, const Lhs& lhs, const Rhs& rhs, size_t R, size_t C) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                self[r][c] = lhs[r][c] + rhs[r][c];
+            }
+        }
+    }
+    
+    template<typename Lhs, typename Rhs>
+    void array2d_add(Lhs& self, const Rhs& rhs, size_t R, size_t C) noexcept {
         for (size_t r = 0; r < R; ++ r) {
             for (size_t c = 0; c < C; ++ c) {
                 self[r][c] += rhs[r][c];
@@ -538,8 +547,17 @@ namespace GYDM {
         }
     }
 
-    template<typename S>
-    void array2d_subtract(S& self, const S& rhs, size_t R, size_t C) noexcept {
+    template<typename S, typename Lhs, typename Rhs>
+    void array2d_subtract(S& self, const Lhs& lhs, const Rhs& rhs, size_t R, size_t C) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                self[r][c] = lhs[r][c] - rhs[r][c];
+            }
+        }
+    }
+
+    template<typename Lhs, typename Rhs>
+    void array2d_subtract(Lhs& self, const Rhs& rhs, size_t R, size_t C) noexcept {
         for (size_t r = 0; r < R; ++ r) {
             for (size_t c = 0; c < C; ++ c) {
                 self[r][c] -= rhs[r][c];
@@ -547,8 +565,17 @@ namespace GYDM {
         }
     }
 
-    template<typename S, typename T>
-    void array2d_dot_multiply(S& self, T rhs, size_t R, size_t C) noexcept {
+    template<typename S, typename Lhs, typename Rhs>
+    void array2d_scalar_multiply(S& self, const Lhs& lhs, Rhs rhs, size_t R, size_t C) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                self[r][c] = lhs[r][c] * rhs;
+            }
+        }
+    }
+
+    template<typename S, typename Rhs>
+    void array2d_scalar_multiply(S& self, Rhs rhs, size_t R, size_t C) noexcept {
         for (size_t r = 0; r < R; ++ r) {
             for (size_t c = 0; c < C; ++ c) {
                 self[r][c] *= rhs;
@@ -556,8 +583,17 @@ namespace GYDM {
         }
     }
 
-    template<typename S, typename T>
-    void array2d_divide(S& self, T rhs, size_t R, size_t C) noexcept {
+    template<typename S, typename Lhs, typename Rhs>
+    void array2d_divide(S& self, const Lhs& lhs, Rhs rhs, size_t R, size_t C) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                self[r][c] = lhs[r][c] / rhs;
+            }
+        }
+    }
+
+    template<typename S, typename Rhs>
+    void array2d_divide(S& self, Rhs rhs, size_t R, size_t C) noexcept {
         for (size_t r = 0; r < R; ++ r) {
             for (size_t c = 0; c < C; ++ c) {
                 self[r][c] /= rhs;
@@ -565,17 +601,29 @@ namespace GYDM {
         }
     }
 
-    template<typename S>
-    inline void array2d_add(S& self, const S& rhs, size_t N) noexcept { array2d_add(self, rhs, N, N); }
+    template<typename Lhs, typename Rhs>
+    inline void array2d_add(Lhs& self, const Rhs& rhs, size_t N) noexcept { array2d_add(self, rhs, N, N); }
 
-    template<typename S>
-    inline void array2d_subtract(S& self, const S& rhs, size_t N) noexcept { array2d_subtract(self, rhs, N, N); }
+    template<typename S, typename Lhs, typename Rhs>
+    inline void array2d_add(S& self, const Lhs& lhs, const Rhs& rhs, size_t N) noexcept { array2d_add(self, lhs, rhs, N, N); }
 
-    template<typename S, typename T>
-    inline void array2d_dot_multiply(S& self, T rhs, size_t N) noexcept { array2d_dot_multiply(self, rhs, N, N); }
+    template<typename Lhs, typename Rhs>
+    inline void array2d_subtract(Lhs& self, const Rhs& rhs, size_t N) noexcept { array2d_subtract(self, rhs, N, N); }
 
-    template<typename S, typename T>
-    inline void array2d_divide(S& self, T rhs, size_t N) noexcept { array2d_divide(self, rhs, N, N); }
+    template<typename S, typename Lhs, typename Rhs>
+    inline void array2d_subtract(S& self, const Lhs& lhs, const Rhs& rhs, size_t N) noexcept { array2d_subtract(self, lhs, rhs, N, N); }
+
+    template<typename S, typename Rhs>
+    inline void array2d_scalar_multiply(S& self, Rhs rhs, size_t N) noexcept { array2d_dot_multiply(self, rhs, N, N); }
+
+    template<typename S, typename Lhs, typename Rhs>
+    inline void array2d_scalar_multiply(S& self, const Lhs& lhs, Rhs rhs, size_t N) noexcept { array2d_dot_multiply(self, lhs, rhs, N, N); }
+
+    template<typename S, typename Rhs>
+    inline void array2d_divide(S& self, Rhs rhs, size_t N) noexcept { array2d_divide(self, rhs, N, N); }
+
+    template<typename S, typename Lhs, typename Rhs>
+    inline void array2d_divide(S& self, const Lhs& lhs, Rhs rhs, size_t N) noexcept { array2d_divide(self, lhs, rhs, N, N); }
 
     /*********************************************************************************************/
     template<typename S, typename T>
