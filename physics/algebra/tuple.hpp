@@ -53,6 +53,7 @@ namespace GYDM {
     public:
         Child<T> operator+(const Child<T>& c) const noexcept { return { this->x + c.x, this->y + c.y }; }
         Child<T> operator-(const Child<T>& c) const noexcept { return { this->x - c.x, this->y - c.y }; }
+        Child<T> operator-() const noexcept { return { - this->x, - this->y }; }
         Child<T> operator*(T s) const noexcept { return { this->x * s, this->y * s }; }
         Child<T> operator/(T d) const noexcept { return { this->x / d, this->y / d }; }
 

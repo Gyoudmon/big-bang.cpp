@@ -1,7 +1,11 @@
 #pragma once
 
 #include <cstdlib>
+#include <cstdint>
+#include <cstring>
 #include <string>
+
+#include "flonum.hpp"
 
 /** WARNING
  * Designed for Matrix
@@ -14,6 +18,36 @@
 
 /*************************************************************************************************/
 namespace GYDM {
+    template<typename T>
+    std::string array2d_to_string(const T& self, size_t R, size_t C, bool one_line = false) noexcept {
+        std::string s = "[[";
+    
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                if (flisinteger(self[r][c])) {
+                    if (self[r][c] < 0) {
+                        s += std::to_string(int64_t(self[r][c]));
+                    } else {
+                        s += std::to_string(uint64_t(self[r][c]));
+                    }
+                } else {
+                    s += std::to_string(self[r][c]);
+                }
+
+                s += ((c < C - 1) ? ", " : "]");
+            }
+
+            if (one_line) {
+                s += (r < R - 1) ? ", [" : "]";
+            } else {
+                s += (r < R - 1) ? "\n [" : "]";
+            }
+        }
+            
+        return s;
+    }
+
+    /*********************************************************************************************/
     template<typename S, typename T>
     size_t array1d_fill_with_datum(S& self, size_t R, size_t C, T datum) noexcept {
         size_t N = R * C;
@@ -324,15 +358,16 @@ namespace GYDM {
     }
 
     template<typename S, typename T>
-    size_t array2d_copy_upper_triangle_to_array2d(const S& src, size_t sR, size_t sC, T& dest, size_t dR, size_t dC) noexcept {
+    size_t array2d_copy_upper_triangle_to_array2d(const S& src, size_t sR, size_t sC, T& dest, size_t dR, size_t dC, bool diagonal) noexcept {
         size_t R = (sR < dR) ? sR : dR;
         size_t C = (sC < dC) ? sC : dC;
         size_t N = 0;
+        size_t offset = (diagonal ? 0 : 1);
 
         for (size_t r = 0; r < R; ++ r) {
             N += (C - r - 1);
 
-            for (size_t c = r + 1; c < C; ++ c) {
+            for (size_t c = r + offset; c < C; ++ c) {
                 dest[r][c] = src[r][c];
             }
         }
@@ -498,8 +533,21 @@ namespace GYDM {
     }
 
     /*********************************************************************************************/
-    template<typename T>
-    bool array2d_is_symmetric(const T& self, size_t R, size_t C) noexcept {
+    template<typename S>
+    bool array2d_is_integer(const S& self, size_t R, size_t C) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                if (!flisinteger(self[r][c])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    template<typename S>
+    bool array2d_is_symmetric(const S& self, size_t R, size_t C) noexcept {
         if (R != C) return false;
 
         for (size_t r = 1; r < R; ++ r) {
@@ -513,8 +561,8 @@ namespace GYDM {
         return true;
     }
 
-    template<typename T>
-    bool array2d_is_skew_symmetric(const T& self, size_t R, size_t C) noexcept {
+    template<typename S>
+    bool array2d_is_skew_symmetric(const S& self, size_t R, size_t C) noexcept {
         if (R != C) return false;
 
         for (size_t r = 0; r < R; ++ r) {
@@ -528,7 +576,64 @@ namespace GYDM {
         return true;
     }
 
+    template<typename S, typename T>
+    bool array2d_is_row_echelon_form(const S& self, size_t R, size_t C, T zdatum) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = r; c < C; ++ c) {
+                if (self[r][c] != zdatum) {
+                    for (size_t b = r + 1; b < R; ++ b) {
+                        if (self[b][c] != zdatum) {
+                            return false;
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    template<typename S, typename T>
+    bool array2d_is_row_canonical_form(const S& self, size_t R, size_t C, T zdatum, T odatum) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = r; c < C; ++ c) {
+                if (self[r][c] != zdatum) {
+                    if (self[r][c] == odatum) {
+                        for (size_t a = 0; a < r; ++ a) {
+                            if (self[a][c] != zdatum) {
+                                return false;
+                            }
+                        }
+                        
+                        for (size_t b = r + 1; b < R; ++ b) {
+                            if (self[b][c] != zdatum) {
+                                return false;
+                            }
+                        }
+                    
+                        break;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     /*********************************************************************************************/
+    template<typename S>
+    void array2d_opposite(S& self, const S& s, size_t R, size_t C) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                self[r][c] = -s[r][c];
+            }
+        }
+    }
+
     template<typename S, typename Lhs, typename Rhs>
     void array2d_add(S& self, const Lhs& lhs, const Rhs& rhs, size_t R, size_t C) noexcept {
         for (size_t r = 0; r < R; ++ r) {
@@ -601,31 +706,50 @@ namespace GYDM {
         }
     }
 
-    template<typename Lhs, typename Rhs>
-    inline void array2d_add(Lhs& self, const Rhs& rhs, size_t N) noexcept { array2d_add(self, rhs, N, N); }
+    template<typename S, typename Rhs>
+    void array2d_dot_multiply(S& self, Rhs rhs, size_t N) noexcept {
+        for (size_t r = 0; r < N; ++ r) {
+            for (size_t c = 0; c < N; ++ c) {
+                self[r][c] *= rhs;
+            }
+        }
+    }
 
     template<typename S, typename Lhs, typename Rhs>
-    inline void array2d_add(S& self, const Lhs& lhs, const Rhs& rhs, size_t N) noexcept { array2d_add(self, lhs, rhs, N, N); }
+    void array2d_multiply(S& self, const Lhs& lhs, const Rhs& rhs, size_t M, size_t N, size_t P) noexcept {
+        for (size_t r = 0; r < M; ++ r) {
+            for (size_t c = 0; c < P; ++ c) {
+                self[r][c] = 0;
 
-    template<typename Lhs, typename Rhs>
-    inline void array2d_subtract(Lhs& self, const Rhs& rhs, size_t N) noexcept { array2d_subtract(self, rhs, N, N); }
-
-    template<typename S, typename Lhs, typename Rhs>
-    inline void array2d_subtract(S& self, const Lhs& lhs, const Rhs& rhs, size_t N) noexcept { array2d_subtract(self, lhs, rhs, N, N); }
+                for (size_t n = 0; n < N; ++ n) {
+                    self[r][c] += lhs[r][n] * rhs[n][c];
+                }
+            }
+        }
+    }
 
     template<typename S, typename Rhs>
-    inline void array2d_scalar_multiply(S& self, Rhs rhs, size_t N) noexcept { array2d_dot_multiply(self, rhs, N, N); }
-
-    template<typename S, typename Lhs, typename Rhs>
-    inline void array2d_scalar_multiply(S& self, const Lhs& lhs, Rhs rhs, size_t N) noexcept { array2d_dot_multiply(self, lhs, rhs, N, N); }
-
-    template<typename S, typename Rhs>
-    inline void array2d_divide(S& self, Rhs rhs, size_t N) noexcept { array2d_divide(self, rhs, N, N); }
-
-    template<typename S, typename Lhs, typename Rhs>
-    inline void array2d_divide(S& self, const Lhs& lhs, Rhs rhs, size_t N) noexcept { array2d_divide(self, lhs, rhs, N, N); }
+    void array2d_multiply(S& self, Rhs rhs, size_t N) noexcept {
+        for (size_t r = 0; r < N; ++ r) {
+            for (size_t c = 0; c < N; ++ c) {
+                self[r][c] *= rhs;
+            }
+        }
+    }
 
     /*********************************************************************************************/
+    template<typename S>
+    void array2d_swap_row(S& self, size_t C, size_t r1, size_t r2) noexcept {
+        std::swap(self[r1], self[r2]);
+    }
+
+    template<typename S>
+    void array2d_swap_column(S& self, size_t R, size_t c1, size_t c2) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            std::swap(self[r][c1], self[r][c2]);
+        }
+    }
+    
     template<typename S, typename T>
     void array2d_transpose(const S& self, const T& dest, size_t R, size_t C) noexcept {
         for (size_t r = 0; r < R; ++ r) {
@@ -660,24 +784,41 @@ namespace GYDM {
         }
     }
 
-    /*********************************************************************************************/
-    template<typename T>
-    std::string array2d_to_string(const T& self, size_t R, size_t C, bool one_line = false) noexcept {
-        std::string s = "[[";
-    
-        for (size_t r = 0; r < R; ++ r) {
-            for (size_t c = 0; c < C; ++ c) {
-                s += std::to_string(self[r][c]);
-                s += ((c < C - 1) ? ", " : "]");
+    template<size_t N, typename S, typename T>
+    bool array2d_lu_decomposite(const S (&self)[N][N], T (&L)[N][N], T (&U)[N][N]) noexcept {
+        /**
+         * O(n^3)  
+         * M
+         * =
+         * | a11    wT |
+         * | v      A' |
+         * =
+         * |    1   0 | | a11           wT  |
+         * | v/a11  I | | 0     A' - vwT/a11|
+         **/
+        
+        array2d_copy_to_array2d(self, N, N, U, N, N);
+        
+        for (size_t k = 0; k < N; ++ k) {
+            // TODO: A symmetric positive-definite matrix doesn't have such a problem
+            if (U[k][k] == 0) return false;
+
+            // compute the Lower triangle, diagonal and v_i
+            L[k][k] = 1;
+            for (size_t i = k + 1; i < N; ++ i) {
+                L[i][k] = U[i][k] / U[k][k];
             }
 
-            if (one_line) {
-                s += (r < R - 1) ? ", [" : "]";
-            } else {
-                s += (r < R - 1) ? "\n [" : "]";
+            // compute the elements of the Schur complement
+            for (size_t r = k + 1; r < N; ++ r) {
+                for (size_t c = k + 1; c < N; ++ c) {
+                    U[r][c] -= L[r][k] * U[k][c];
+                }
             }
         }
-            
-        return s;
+
+        array2d_fill_lower_triangle_with_datum(U, N, N, T(0));
+
+        return true;
     }
 }

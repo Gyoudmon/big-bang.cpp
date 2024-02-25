@@ -6,12 +6,15 @@
 
 // TODO
 // check: http://www.plunk.org/~hatch/rightway.html
+// check: https://www-pequan.lip6.fr/~graillat/papers/posterRNC7.pdf
 
 namespace GYDM {
     // for non-flonums
     template<typename T> bool inline flisnan(T fl) { return false; }
     template<typename T> bool inline flisinfinity(T fl) { return false; }
     template<typename T> bool inline flisfinite(T fl) { return true; }
+    template<typename T> bool inline flisinteger(T fl) { return true; }
+    template<typename T> T inline flfloor(T fx) { return fx; }
     template<typename T> T inline flfma(T x, T y, T z) { return x * y + z; }
 
     template<typename T> T inline flsafe(T v, T fallback) { return v; }
@@ -70,6 +73,10 @@ namespace GYDM {
     bool inline flisinfinity(float f) { return std::isinf(f); }
     bool inline flisinfinity(double fl) { return std::isinf(fl); }
     bool inline flisinfinity(long double fl) { return std::isinf(fl); }
+
+    bool inline flisinteger(float f) { return (std::floorf(f) == f) && flisfinite(f); }
+    bool inline flisinteger(double fl) { return (std::floor(fl) == fl) && flisfinite(fl); }
+    bool inline flisinteger(long double fl) { return (std::floorl(fl) == fl) && flisfinite(fl); }
 
     float inline flsafe(float v, float fallback = 0.0F) { return (flisnan(v) ? fallback : v); }
     double inline flsafe(double v, double fallback = 0.0) { return (flisnan(v) ? fallback : v); }
