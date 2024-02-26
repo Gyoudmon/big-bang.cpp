@@ -7,6 +7,7 @@
 // TODO
 // check: http://www.plunk.org/~hatch/rightway.html
 // check: https://www-pequan.lip6.fr/~graillat/papers/posterRNC7.pdf
+// check: https://www-pequan.lip6.fr/~graillat/papers/nolta07.pdf
 
 namespace GYDM {
     // for non-flonums

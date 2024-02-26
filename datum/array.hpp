@@ -788,28 +788,26 @@ namespace GYDM {
     bool array2d_lu_decomposite(const S (&self)[N][N], T (&L)[N][N], T (&U)[N][N]) noexcept {
         /**
          * O(n^3)  
-         * M
-         * =
-         * | a11    wT |
-         * | v      A' |
-         * =
-         * |    1   0 | | a11           wT  |
-         * | v/a11  I | | 0     A' - vwT/a11|
+         * M = | a11  wT | = |     1  0 | | a11            wT |
+         *     |   v  A' |   | v/a11  I | |   0  A' - vwT/a11 |
          **/
         
+        // the upper triangular matrix also holds the `A' - vwT/a11` recursively,
+        // thus, its lower portion must be initialized as well.
         array2d_copy_to_array2d(self, N, N, U, N, N);
         
         for (size_t k = 0; k < N; ++ k) {
-            // TODO: A symmetric positive-definite matrix doesn't have such a problem
+            // Symmetric positive-definite matrix doesn't have such a problem
             if (U[k][k] == 0) return false;
 
-            // compute the Lower triangle, diagonal and v_i
+            // compute the Lower triangle, diagonal and v
             L[k][k] = 1;
             for (size_t i = k + 1; i < N; ++ i) {
                 L[i][k] = U[i][k] / U[k][k];
             }
 
-            // compute the elements of the Schur complement
+            // compute the elements of the Schur complement `A' - vwT/a11`,
+            // as well as scale follow-up `wT`s in place
             for (size_t r = k + 1; r < N; ++ r) {
                 for (size_t c = k + 1; c < N; ++ c) {
                     U[r][c] -= L[r][k] * U[k][c];
@@ -817,6 +815,7 @@ namespace GYDM {
             }
         }
 
+        // zero out the lower portion for the upper portion
         array2d_fill_lower_triangle_with_datum(U, N, N, T(0));
 
         return true;
