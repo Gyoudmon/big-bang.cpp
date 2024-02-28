@@ -47,8 +47,6 @@ namespace GYDM {
             default: throw std::out_of_range("index too large for a 2D Tuple");
             }
         }
-        
-        Child<T> operator-() const noexcept { return { -this->x, -this->y }; }
 
     public:
         Child<T> operator+(const Child<T>& c) const noexcept { return { this->x + c.x, this->y + c.y }; }

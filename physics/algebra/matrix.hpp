@@ -244,7 +244,7 @@ namespace GYDM {
 
     public:
 	    GYDM::Matrix<M, N, T> operator-() const noexcept { GYDM::Matrix<M, N, T> self; array2d_opposite(self.entries, this->entries, M, N); return self; }
-        bool operator!=(const GYDM::Matrix<M, N, T>& m) const noexcept { return !(this->operator==(m)); }
+	    bool operator!=(const GYDM::Matrix<M, N, T>& m) const noexcept { return !(this->operator==(m)); }
         bool operator==(const GYDM::Matrix<M, N, T>& m) const noexcept { return array2d_equal(this->entries, M, N, m.entries, M, N); }
 
         template<size_t R, size_t C, typename U>

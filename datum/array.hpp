@@ -45,7 +45,8 @@ namespace GYDM {
     }
 
     /*********************************************************************************************/
-    void array1d_permutation_initialize(size_t self[], size_t N) {
+    template<typename S>
+    inline void array1d_permutation_initialize(S& self, size_t N) {
         for (size_t d = 0; d < N; ++ d) {
             self[d] = d;
         }
