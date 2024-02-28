@@ -1,10 +1,6 @@
 #pragma once
 
-#include <cstdlib>
-#include <cstdint>
-#include <cstring>
-#include <string>
-
+#include <sstream>
 #include "flonum.hpp"
 
 /** WARNING
@@ -19,35 +15,42 @@
 /*************************************************************************************************/
 namespace GYDM {
     template<typename T>
-    std::string array2d_to_string(const T& self, size_t R, size_t C, bool one_line = false) noexcept {
-        std::string s = "[[";
+    std::string array2d_to_string(const T& self, size_t R, size_t C, size_t w, bool one_line = false) noexcept {
+        std::ostringstream s;
+        std::string sep = (one_line ? ", [" : "\n [");
+        long actual_width = w;
+
+        s << "[[";
     
         for (size_t r = 0; r < R; ++ r) {
             for (size_t c = 0; c < C; ++ c) {
-                if (flisinteger(self[r][c])) {
-                    if (self[r][c] < 0) {
-                        s += std::to_string(int64_t(self[r][c]));
-                    } else {
-                        s += std::to_string(uint64_t(self[r][c]));
-                    }
-                } else {
-                    s += std::to_string(self[r][c]);
-                }
+                long self_width = s.tellp();
 
-                s += ((c < C - 1) ? ", " : "]");
-            }
-
-            if (one_line) {
-                s += (r < R - 1) ? ", [" : "]";
-            } else {
-                s += (r < R - 1) ? "\n [" : "]";
-            }
-        }
+                s.width(w);
+                s << self[r][c];
+                actual_width = std::max(long(s.tellp()) - self_width, actual_width);
+                s.width(0);
             
-        return s;
+                s << ((c < C - 1) ? ", " : "]");
+            }
+
+            s << ((r < R - 1) ? sep : "]");
+        }
+
+        if (one_line || (actual_width <= w)) {
+            return s.str();
+        } else {
+            return array2d_to_string(self, R, C, actual_width, one_line);
+        }
     }
 
     /*********************************************************************************************/
+    void array1d_permutation_initialize(size_t self[], size_t N) {
+        for (size_t d = 0; d < N; ++ d) {
+            self[d] = d;
+        }
+    }
+
     template<typename S, typename T>
     size_t array1d_fill_with_datum(S& self, size_t R, size_t C, T datum) noexcept {
         size_t N = R * C;
@@ -91,6 +94,17 @@ namespace GYDM {
         for (size_t r = 0; r < R; ++ r) {
             for (size_t c = 0; c < C; ++ c) {
                 self[r][c] = datum;
+            }
+        }
+
+        return R * C;
+    }
+
+    template<typename S>
+    size_t array2d_fill_based_on_row_permutation(S& self, const size_t pi[], size_t R, size_t C) noexcept {
+        for (size_t r = 0; r < R; ++ r) {
+            for (size_t c = 0; c < C; ++ c) {
+                self[r][c] = (c == pi[r]) ? 1 : 0;
             }
         }
 
@@ -395,6 +409,20 @@ namespace GYDM {
         for (size_t r = 0; r < sR; ++ r) {
             for (size_t c = 0; c < sC; ++ c) {
                 if (self[r][c] != target[r][c]) return false;
+            }
+        }
+
+        return true;
+    }
+
+    template<typename T, typename E>
+    bool array2d_equal(const T& self, size_t sR, size_t sC, const T& target, size_t tR, size_t tC, E epsilon) noexcept {
+        if (sR != tR) return false;
+        if (sC != tC) return false;
+
+        for (size_t r = 0; r < sR; ++ r) {
+            for (size_t c = 0; c < sC; ++ c) {
+                if (!flequal(self[r][c], target[r][c], epsilon)) return false;
             }
         }
 
@@ -706,15 +734,6 @@ namespace GYDM {
         }
     }
 
-    template<typename S, typename Rhs>
-    void array2d_dot_multiply(S& self, Rhs rhs, size_t N) noexcept {
-        for (size_t r = 0; r < N; ++ r) {
-            for (size_t c = 0; c < N; ++ c) {
-                self[r][c] *= rhs;
-            }
-        }
-    }
-
     template<typename S, typename Lhs, typename Rhs>
     void array2d_multiply(S& self, const Lhs& lhs, const Rhs& rhs, size_t M, size_t N, size_t P) noexcept {
         for (size_t r = 0; r < M; ++ r) {
@@ -739,12 +758,12 @@ namespace GYDM {
 
     /*********************************************************************************************/
     template<typename S>
-    void array2d_swap_row(S& self, size_t C, size_t r1, size_t r2) noexcept {
+    inline void array2d_swap_row(S& self, size_t C, size_t r1, size_t r2) noexcept {
         std::swap(self[r1], self[r2]);
     }
 
     template<typename S>
-    void array2d_swap_column(S& self, size_t R, size_t c1, size_t c2) noexcept {
+    inline void array2d_swap_column(S& self, size_t R, size_t c1, size_t c2) noexcept {
         for (size_t r = 0; r < R; ++ r) {
             std::swap(self[r][c1], self[r][c2]);
         }
@@ -788,8 +807,8 @@ namespace GYDM {
     bool array2d_lu_decomposite(const S (&self)[N][N], T (&L)[N][N], T (&U)[N][N]) noexcept {
         /**
          * O(n^3)  
-         * M = | a11  wT | = |     1  0 | | a11            wT |
-         *     |   v  A' |   | v/a11  I | |   0  A' - vwT/a11 |
+         * M = | a01  wT | = |     1  0 | | a01            wT |
+         *     |   v  A' |   | v/a01  I | |   0  A' - vwT/a01 |
          **/
         
         // the upper triangular matrix also holds the `A' - vwT/a11` recursively,
@@ -800,23 +819,83 @@ namespace GYDM {
             // Symmetric positive-definite matrix doesn't have such a problem
             if (U[k][k] == 0) return false;
 
-            // compute the Lower triangle, diagonal and v
-            L[k][k] = 1;
-            for (size_t i = k + 1; i < N; ++ i) {
-                L[i][k] = U[i][k] / U[k][k];
-            }
-
-            // compute the elements of the Schur complement `A' - vwT/a11`,
-            // as well as scale follow-up `wT`s in place
+            L[k][k] = 1; // lower triangle has all 1s diagonal
             for (size_t r = k + 1; r < N; ++ r) {
+                // fill the Lower triangle, v
+                L[r][k] = U[r][k] / U[k][k];
+
+                // compute the elements of the Schur complement `A' - vwT/a11`,
+                // as well as scale follow-up `wT`s in place
                 for (size_t c = k + 1; c < N; ++ c) {
                     U[r][c] -= L[r][k] * U[k][c];
                 }
             }
         }
 
-        // zero out the lower portion for the upper portion
+        // clear the lower portion from the upper triangular matrix
         array2d_fill_lower_triangle_with_datum(U, N, N, T(0));
+
+        return true;
+    }
+
+    template<size_t N, typename S, typename T>
+    bool array2d_lup_decomposite(const S (&self)[N][N], T (&L)[N][N], T (&U)[N][N], T (&P)[N][N]) noexcept {
+        size_t pi[N];
+        
+        /**
+         * O(n^3)  
+         * PM = | ak1  wT | = |     1  0 | | ak1            wT |
+         *      |   v  A' |   | v/ak1  I | |   0  A' - vwT/ak1 |
+         **/
+        
+        // the upper triangular matrix also holds the `A' - vwT/a11` recursively,
+        // thus, its lower portion must be initialized as well.
+        array2d_copy_to_array2d(self, N, N, U, N, N);
+        array1d_permutation_initialize(pi, N);
+        
+        for (size_t k = 0; k < N; ++ k) {
+            T pivot = 0;
+            size_t tk;
+
+            // search based on the largest absolute value can somehow
+            //   avoid dividing by floating numbers very closing to 0 
+            for (size_t r = k; r < N; ++ r) {
+                if (U[r][k] > pivot) {
+                    pivot = U[r][k];
+                    tk = r;
+                } else if (U[r][k] < -pivot) {
+                    pivot = -U[r][k];
+                    tk = r;
+                }
+            }
+
+            // singular(non-invertible) matrix
+            if (pivot == 0) return false;
+
+            if (k != tk) {
+                std::swap(pi[k], pi[tk]);
+                array2d_swap_row(U, N, k, tk);
+            }
+
+            L[k][k] = 1; // lower triangle has all 1s diagonal
+            for (size_t r = k + 1; r < N; ++ r) {
+                // fill the Lower triangle, v
+                U[r][k] = U[r][k] / U[k][k];
+
+                // compute the elements of the Schur complement `A' - vwT/ak1`,
+                // as well as scale follow-up `wT`s in place
+                for (size_t c = k + 1; c < N; ++ c) {
+                    U[r][c] -= U[r][k] * U[k][c];
+                }
+            }
+        }
+
+        // clear the lower portion from the upper triangular matrix
+        array2d_copy_lower_triangle_to_array2d(U, N, N, L, N, N);
+        array2d_fill_lower_triangle_with_datum(U, N, N, T(0));
+
+        // fill the permutation
+        array2d_fill_based_on_row_permutation(P, pi, N, N);
 
         return true;
     }

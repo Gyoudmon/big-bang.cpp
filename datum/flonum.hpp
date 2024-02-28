@@ -11,11 +11,13 @@
 
 namespace GYDM {
     // for non-flonums
-    template<typename T> bool inline flisnan(T fl) { return false; }
-    template<typename T> bool inline flisinfinity(T fl) { return false; }
-    template<typename T> bool inline flisfinite(T fl) { return true; }
-    template<typename T> bool inline flisinteger(T fl) { return true; }
+    template<typename T> bool inline flisnan(T fx) { return false; }
+    template<typename T> bool inline flisinfinity(T fx) { return false; }
+    template<typename T> bool inline flisfinite(T fx) { return true; }
+    template<typename T> bool inline flisinteger(T fx) { return true; }
+    template<typename T> T inline flabs(T fx) { return (fx >= 0) ? fx : -fx; }
     template<typename T> T inline flfloor(T fx) { return fx; }
+    template<typename T> T inline fltruncate(T fx) { return fx; }
     template<typename T> T inline flfma(T x, T y, T z) { return x * y + z; }
 
     template<typename T> T inline flsafe(T v, T fallback) { return v; }
@@ -29,6 +31,12 @@ namespace GYDM {
         }
 
         return v;
+    }
+
+    template<typename V1, typename V2, typename E> bool inline flequal(V1 v1, V2 v2, E epsilon) {
+        E diff = v2 - v1;
+
+        return (-epsilon <= diff) && (diff <= epsilon);
     }
     
 /*************************************************************************************************/    
@@ -75,9 +83,9 @@ namespace GYDM {
     bool inline flisinfinity(double fl) { return std::isinf(fl); }
     bool inline flisinfinity(long double fl) { return std::isinf(fl); }
 
-    bool inline flisinteger(float f) { return (std::floorf(f) == f) && flisfinite(f); }
-    bool inline flisinteger(double fl) { return (std::floor(fl) == fl) && flisfinite(fl); }
-    bool inline flisinteger(long double fl) { return (std::floorl(fl) == fl) && flisfinite(fl); }
+    bool inline flisinteger(float f) { return (std::truncf(f) == f) && flisfinite(f); }
+    bool inline flisinteger(double fl) { return (std::trunc(fl) == fl) && flisfinite(fl); }
+    bool inline flisinteger(long double fl) { return (std::truncl(fl) == fl) && flisfinite(fl); }
 
     float inline flsafe(float v, float fallback = 0.0F) { return (flisnan(v) ? fallback : v); }
     double inline flsafe(double v, double fallback = 0.0) { return (flisnan(v) ? fallback : v); }
@@ -141,6 +149,10 @@ namespace GYDM {
     float inline flceiling(float f) { return std::ceilf(f); }
     double inline flceiling(double fl) { return std::ceil(fl); }
     long double inline flceiling(long double fl) { return std::ceill(fl); }
+
+    float inline fltruncate(float f) { return std::truncf(f); }
+    double inline fltruncate(double fl) { return std::trunc(fl); }
+    long double inline fltruncate(long double fl) { return std::truncl(fl); }
 
     float inline flsin(float f) { return std::sinf(f); }
     double inline flsin(double fl) { return std::sin(fl); }

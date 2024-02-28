@@ -253,6 +253,16 @@ namespace GYDM {
         template<size_t R, size_t C, typename U>
         bool operator==(const GYDM::Matrix<R, C, U>& m) const noexcept { return false; }
 
+        template<size_t R, size_t C, typename U, typename B = bool>
+        typename std::enable_if_t<std::is_floating_point_v<T>, B> flequal(const GYDM::Matrix<R, C, U>& m, double epsilon) const noexcept {
+            return array2d_equal(this->entries, M, N, m.entries, R, C, epsilon);
+        }
+
+        template<size_t R, size_t C, typename U, typename B = bool>
+        typename std::enable_if_t<std::is_floating_point_v<T>, B> flequal(const GYDM::Matrix<R, C, U>* m, double epsilon) const noexcept {
+            return array2d_equal(this->entries, M, N, m->entries, R, C, epsilon);
+        }
+
         template<typename R>
 		GYDM::Matrix<M, N, T>& operator+=(const GYDM::Matrix<M, N, R>& rhs)
         { array2d_add(this->entries, rhs.entries, M, N); return (*this); }
@@ -370,6 +380,11 @@ namespace GYDM {
             return array2d_lu_decomposite(this->entries, L->entries, U->entries);
         }
 
+        template<typename TT, typename B = bool>
+        typename std::enable_if_t<M == N, B> LUP_decomposite(GYDM::Matrix<M, N, TT>* L, GYDM::Matrix<M, N, TT>* U, GYDM::Matrix<M, N, TT>* P) const noexcept {
+            return array2d_lup_decomposite(this->entries, L->entries, U->entries, P->entries);
+        }
+
     public:
         template<typename E = T>
         typename std::enable_if_t<M == N, E> trace() const noexcept { return array2d_trace(this->entries, N, E(0)); }
@@ -401,7 +416,8 @@ namespace GYDM {
         }
 
     public:
-        std::string desc(bool one_line = false) const noexcept OVERRIDE { return array2d_to_string(this->entries, M, N, one_line); }
+        std::string desc(bool one_line = false) const noexcept OVERRIDE
+        { return array2d_to_string(this->entries, M, N, 0, one_line); }
 
     private:
         template<typename Lhs, typename Rhs>
@@ -456,12 +472,6 @@ namespace GYDM {
 
     /*********************************************************************************************/
     template<size_t N, typename T> using SquareMatrix = GYDM::Matrix<N, N, T>;
-
-    /**
-     * NOTE
-     * Changing `double` to `float` may cause the testcase failing
-     * since Racket on Chez Scheme does not support single-precision floating number. 
-     **/
 
     template<size_t M, size_t N> using FlMatrix = GYDM::Matrix<M, N, double>;
     template<size_t M, size_t N> using FxMatrix = GYDM::Matrix<M, N, int>;
