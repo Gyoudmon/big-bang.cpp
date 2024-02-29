@@ -102,8 +102,10 @@ namespace GYDM {
     }
 
     template<typename S>
-    size_t array2d_fill_based_on_row_permutation(S& self, const size_t pi[], size_t R, size_t C) noexcept {
+    size_t array2d_fill_based_on_row_permutation(S& self, size_t R, size_t C, const size_t pi[], size_t N) noexcept {
         for (size_t r = 0; r < R; ++ r) {
+            if (r >= N) return r * C;
+
             for (size_t c = 0; c < C; ++ c) {
                 self[r][c] = (c == pi[r]) ? 1 : 0;
             }
@@ -760,13 +762,15 @@ namespace GYDM {
     /*********************************************************************************************/
     template<typename S>
     inline void array2d_swap_row(S& self, size_t C, size_t r1, size_t r2) noexcept {
-        std::swap(self[r1], self[r2]);
+        using std::swap;
+        swap(self[r1], self[r2]);
     }
 
     template<typename S>
     inline void array2d_swap_column(S& self, size_t R, size_t c1, size_t c2) noexcept {
+        using std::swap;
         for (size_t r = 0; r < R; ++ r) {
-            std::swap(self[r][c1], self[r][c2]);
+            swap(self[r][c1], self[r][c2]);
         }
     }
     
@@ -840,9 +844,9 @@ namespace GYDM {
     }
 
     template<size_t N, typename S, typename T>
-    bool array2d_lup_decomposite(const S (&self)[N][N], T (&L)[N][N], T (&U)[N][N], T (&P)[N][N]) noexcept {
-        size_t pi[N];
-        
+    bool array2d_lup_decomposite(const S (&self)[N][N], T (&L)[N][N], T (&U)[N][N], size_t (&P)[1][N]) noexcept {
+        using std::swap;
+
         /**
          * O(n^3)  
          * PM = | ak1  wT | = |     1  0 | | ak1            wT |
@@ -852,7 +856,7 @@ namespace GYDM {
         // the upper triangular matrix also holds the `A' - vwT/a11` recursively,
         // thus, its lower portion must be initialized as well.
         array2d_copy_to_array2d(self, N, N, U, N, N);
-        array1d_permutation_initialize(pi, N);
+        array1d_permutation_initialize(P[0], N);
         
         for (size_t k = 0; k < N; ++ k) {
             T pivot = 0;
@@ -874,7 +878,7 @@ namespace GYDM {
             if (pivot == 0) return false;
 
             if (k != tk) {
-                std::swap(pi[k], pi[tk]);
+                swap(P[0][k], P[0][tk]);
                 array2d_swap_row(U, N, k, tk);
             }
 
@@ -894,9 +898,6 @@ namespace GYDM {
         // clear the lower portion from the upper triangular matrix
         array2d_copy_lower_triangle_to_array2d(U, N, N, L, N, N);
         array2d_fill_lower_triangle_with_datum(U, N, N, T(0));
-
-        // fill the permutation
-        array2d_fill_based_on_row_permutation(P, pi, N, N);
 
         return true;
     }
