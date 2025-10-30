@@ -5,6 +5,7 @@
 #include "graphics/ruler.hpp"
 
 #include "matter/sprite.hpp"
+#include "matter/planet.hpp"
 #include "matter/graphlet/textlet.hpp"
 #include "matter/graphlet/tracklet.hpp"
 
@@ -2481,4 +2482,8 @@ void Plteen::IPlane::think(ISprite* m, double sec, const std::string& sentence, 
     } else {
         this->say(m, sec, sentence, color, SpeechBubble::Thought);
     }
+}
+
+void IPlane::insert_planelet(Plteen::IPlane* child) {
+    this->insert(new Planelet(child));
 }

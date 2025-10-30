@@ -117,6 +117,13 @@ void Plteen::Planelet::set_background_color(const RGBA& color) {
 	}
 }
 
+void Plteen::Planelet::set_grid_color(const RGBA& color) {
+	if (this->background != color) {
+		this->background = color;
+		this->notify_updated();
+	}
+}
+
 void Plteen::Planelet::set_border_color(const RGBA& color) {
 	if (this->border != color) {
 		this->border = color;

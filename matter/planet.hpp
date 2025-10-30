@@ -24,6 +24,7 @@ namespace Plteen {
 
 	public:
 		void set_background_color(const Plteen::RGBA& color);
+		void set_grid_color(const Plteen::RGBA& color);
 		void set_border_color(const Plteen::RGBA& color);
 
     public: // low-level events

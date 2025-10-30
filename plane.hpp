@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "graphics/dc.hpp"
 #include "graphics/font.hpp"
 #include "physics/color/rgba.hpp"
@@ -205,8 +207,10 @@ namespace Plteen {
         virtual void on_bubble_expired(IMatter* m, SpeechBubble type) {}
 
     public:
-        template<class M>
-        M* insert_for_speech(M* m) {
+        template<class M, typename... Args>
+        M* create_for_speech(Args&&... args) {
+            M* m = new M(std::forward<Args>(args)...);
+
             this->insert_as_speech_bubble(m);
 
             return m;
@@ -215,7 +219,7 @@ namespace Plteen {
         template<class M>
         M* insert(M* m, const Plteen::Position& pos = {}, const Plteen::Port& p = 0.0F, const Plteen::Vector& vec = Plteen::Vector::O) {
             this->insert_at(m, pos, p, vec);
-
+            
             return m;
         }
         
@@ -233,6 +237,23 @@ namespace Plteen {
             return m;
         }
 
+        template<class M, typename... Args>
+        M* spawn(Args && ... args) {
+            M* self = nullptr;
+
+            static_assert(std::is_base_of_v<Plteen::IMatter, M> || std::is_base_of_v<Plteen::IPlane, M>);
+
+            if constexpr(std::is_base_of_v<Plteen::IMatter, M>) {
+                self = new M(std::forward<Args>(args)...);
+                this->insert(self);
+            } else {
+                self = new M(std::forward<Args>(args)...);
+                this->insert_planelet(self);
+            }
+
+            return self;
+        }
+
     public:
         IPlaneInfo* info = nullptr;
 
@@ -247,6 +268,9 @@ namespace Plteen {
         float cell_width = 0.0F;
         float cell_height = 0.0F;
         Plteen::RGBA grid_color;
+
+    private:
+        void insert_planelet(Plteen::IPlane* child);
         
     private:
         std::string caption;

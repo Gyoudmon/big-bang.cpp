@@ -51,6 +51,18 @@ namespace Plteen {
     protected:
         Plteen::IPlane* push_plane(Plteen::IPlane* plane);
 
+        template<class M, typename... Args>
+        M* spawn(Args && ... args) {
+            M* self = nullptr;
+
+            static_assert(std::is_base_of_v<Plteen::IPlane, M>);
+
+            self = new M(std::forward<Args>(args)...);
+            this->push_plane(self);
+
+            return self;
+        }
+
     private:
         void collapse();
         void notify_transfer(Plteen::IPlane* from, Plteen::IPlane* to);
