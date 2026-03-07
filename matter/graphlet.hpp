@@ -209,7 +209,7 @@ namespace Plteen {
 			return _E(State, this->current_state);
 		}
 
-		void set_style(State state, Style& style) {
+		void set_style(State state, const Style& style) {
 			unsigned int idx = (state == State::_) ? this->current_state : _I(state);
 
 			this->styles[idx] = style;
@@ -223,7 +223,7 @@ namespace Plteen {
 			}
 		}
 
-		void set_style(Style& style) {
+		void set_style(const Style& style) {
 			for (unsigned int idx = 0; idx < _N(State); idx ++) {
 				this->set_style(_E(State, idx), style);
 			}

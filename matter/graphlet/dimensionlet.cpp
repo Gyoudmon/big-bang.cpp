@@ -99,13 +99,13 @@ Plteen::Dimensionlet::Dimensionlet(DimensionState& state, const char* unit, cons
     this->label = label;
 }
 
-Plteen::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const std::string& label) {
+Plteen::Dimensionlet::Dimensionlet(const DimensionStyle& style, const char* unit, const std::string& label) {
     this->unit = std::string(unit);
     this->label = label;
     this->set_style(style);
 }
 
-Plteen::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, const char* label_fmt, ...) {
+Plteen::Dimensionlet::Dimensionlet(const DimensionStyle& style, const char* unit, const char* label_fmt, ...) {
     VSNPRINT(label, label_fmt);
     
     this->unit = std::string(unit);
@@ -113,13 +113,13 @@ Plteen::Dimensionlet::Dimensionlet(DimensionStyle& style, const char* unit, cons
     this->set_style(style);
 }
 
-Plteen::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle& style, const char* unit, const std::string& label) : IStatelet(state) {
+Plteen::Dimensionlet::Dimensionlet(DimensionState& state, const DimensionStyle& style, const char* unit, const std::string& label) : IStatelet(state) {
     this->unit = std::string(unit);
     this->label = label;
     this->set_style(style);
 }
 
-Plteen::Dimensionlet::Dimensionlet(DimensionState& state, DimensionStyle& style, const char* unit, const char* label_fmt, ...) : IStatelet(state) {
+Plteen::Dimensionlet::Dimensionlet(DimensionState& state, const DimensionStyle& style, const char* unit, const char* label_fmt, ...) : IStatelet(state) {
     VSNPRINT(label, label_fmt);
     
     this->unit = std::string(unit);

@@ -71,10 +71,10 @@ namespace Plteen {
         Dimensionlet(const char* unit, const char* label_fmt, ...);
         Dimensionlet(Plteen::DimensionState& state, const char* unit, const std::string& label = "");
         Dimensionlet(Plteen::DimensionState& state, const char* unit, const char* label_fmt, ...);
-        Dimensionlet(Plteen::DimensionStyle& style, const char* unit, const std::string& label = "");
-        Dimensionlet(Plteen::DimensionStyle& style, const char* unit, const char* label_fmt, ...);
-        Dimensionlet(Plteen::DimensionState& state, Plteen::DimensionStyle& style, const char* unit, const std::string& label = "");
-        Dimensionlet(Plteen::DimensionState& state, Plteen::DimensionStyle& style, const char* unit, const char* label_fmt, ...);
+        Dimensionlet(const Plteen::DimensionStyle& style, const char* unit, const std::string& label = "");
+        Dimensionlet(const Plteen::DimensionStyle& style, const char* unit, const char* label_fmt, ...);
+        Dimensionlet(Plteen::DimensionState& state, const Plteen::DimensionStyle& style, const char* unit, const std::string& label = "");
+        Dimensionlet(Plteen::DimensionState& state, const Plteen::DimensionStyle& style, const char* unit, const char* label_fmt, ...);
         virtual ~Dimensionlet() noexcept {}
 
     public:

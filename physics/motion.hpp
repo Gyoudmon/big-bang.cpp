@@ -12,12 +12,12 @@ namespace Plteen {
         virtual void on_border(float hoffset, float voffset);
 
     public:
-        void set_acceleration(double acc) { this->set_acceleration(acc, this->get_acceleration_direction(), true); }
-        void add_acceleration(double acc) { this->add_acceleration(acc, this->get_acceleration_direction(), true); }
+        void set_acceleration(double acc) { this->set_acceleration(acc, this->get_acceleration_direction(true), true); }
+        void add_acceleration(double acc) { this->add_acceleration(acc, this->get_acceleration_direction(true), true); }
         void set_acceleration(double acc, double direction, bool is_radian = false);
         void add_acceleration(double acc, double direction, bool is_radian = false);
         double get_acceleration(double* direction = nullptr, double* vx = nullptr, double* vy = nullptr);
-        double get_acceleration_direction(bool need_radian = true);
+        double get_acceleration_direction(bool need_radian = false);
 
         void set_delta_speed(double xacc, double yacc);
         void add_delta_speed(double xacc, double yacc);
@@ -25,12 +25,12 @@ namespace Plteen {
         double y_delta_speed() { return this->ay; }
 
     public:
-        void set_velocity(double spd) { this->set_velocity(spd, this->get_velocity_direction(), true); }
-        void add_velocity(double spd) { this->add_velocity(spd, this->get_velocity_direction(), true); }
+        void set_velocity(double spd) { this->set_velocity(spd, this->get_velocity_direction(true), true); }
+        void add_velocity(double spd) { this->add_velocity(spd, this->get_velocity_direction(true), true); }
         void set_velocity(double spd, double direction, bool is_radian = false);
         void add_velocity(double spd, double direction, bool is_radian = false);
         double get_velocity(double* direction = nullptr, double* vx = nullptr, double* vy = nullptr);
-        double get_velocity_direction(bool need_radian = true);
+        double get_velocity_direction(bool need_radian = false);
         
         void set_speed(double xspd, double yspd);
         void add_speed(double xspd, double yspd);
@@ -40,7 +40,7 @@ namespace Plteen {
     public:
         void set_terminal_velocity(double max_spd, double direction, bool is_radian = false);
         void set_terminal_speed(double mxspd, double myspd);
-        double get_heading(bool need_radian = true) { return this->get_velocity_direction(need_radian); }
+        double get_heading(bool need_radian = false) { return this->get_velocity_direction(need_radian); }
         void set_heading(double dx, double dy);
         void set_heading(double direction, bool is_radian = false);
         void add_heading(double theta, bool is_radian = false);

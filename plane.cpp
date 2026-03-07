@@ -1644,7 +1644,7 @@ bool Plteen::Plane::move_matter_via_info(IMatter* m, MatterInfo* info, double le
     } else {
         double x, y;
 
-        orthogonal_decompose(length, m->get_heading(), &x, &y);
+        orthogonal_decompose(length, m->get_heading(true), &x, &y);
     
         return this->move_matter_via_info(m, info, Position(x, y), false, ignore_gliding, heading);
     }
@@ -1841,7 +1841,7 @@ void Plteen::Plane::handle_queued_motion(IMatter* m, MatterInfo* info, float dwi
 bool Plteen::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length, bool heading) {
     double x, y;
 
-    orthogonal_decompose(length, m->get_heading(), &x, &y);
+    orthogonal_decompose(length, m->get_heading(true), &x, &y);
     
     return this->move_matter_via_info(m, info, Position(x, y), false, true, heading);
 }
@@ -1849,7 +1849,7 @@ bool Plteen::Plane::do_vector_moving(IMatter* m, MatterInfo* info, double length
 bool Plteen::Plane::do_vector_gliding(IMatter* m, MatterInfo* info, double length, double sec) {
     double x, y;
 
-    orthogonal_decompose(length, m->get_heading(), &x, &y);
+    orthogonal_decompose(length, m->get_heading(true), &x, &y);
     
     return this->glide_matter_via_info(m, info, sec, Position(x, y), false, true);
 }
